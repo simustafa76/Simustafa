@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Pendidik - SI-MUSTAFA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .profile-card {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 16px;
+        }
+        .profile-card .avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin: 0 auto 12px;
+        }
+        .profile-card .name {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .profile-card .nik {
+            text-align: center;
+            color: #888;
+            font-size: 0.85rem;
+        }
+        .profile-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 20px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f2f5;
+        }
+        .profile-detail .label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+        .profile-detail .value {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #333;
+        }
+        .btn-mutasi {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-mutasi:hover {
+            background: var(--primary-light);
+        }
+        @media (max-width: 640px) {
+            .profile-detail {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">
+                <img src="assets/logo-kemenag.png" alt="Logo" 
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+                <div>
+                    <h1>SI-<span>MUSTAFA</span></h1>
+                    <small>Kemenag Kab. Tegal</small>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="header-date" id="currentDate"></span>
+            <div class="header-user" onclick="handleLogout()">
+                <div class="avatar" id="userAvatar">A</div>
+                <span class="user-name" id="userName">Pendidik</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+        <div class="page-header">
+            <h1>Profil Pendidik</h1>
+            <p>Informasi data diri dan riwayat bantuan/mutasi</p>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="profile-card" id="profileCard">
+            <div class="avatar-large"><i class="fas fa-user-graduate"></i></div>
+            <div class="name" id="pNama">Memuat...</div>
+            <div class="nik" id="pNik">NIK: -</div>
+            <div class="profile-detail">
+                <div><span class="label">Lembaga</span><div class="value" id="pLembaga">-</div></div>
+                <div><span class="label">Kecamatan</span><div class="value" id="pKecamatan">-</div></div>
+                <div><span class="label">TMT Mengajar</span><div class="value" id="pTmt">-</div></div>
+                <div><span class="label">Status</span><div class="value" id="pStatus">-</div></div>
+            </div>
+            <button class="btn-mutasi" onclick="ajukanMutasi()"><i class="fas fa-exchange-alt"></i> Ajukan Mutasi</button>
+        </div>
+
+        <!-- Riwayat Bantuan -->
+        <div class="profile-card">
+            <h3 style="margin-bottom:12px;font-size:1rem;color:var(--primary);">
+                <i class="fas fa-hand-holding-heart"></i> Riwayat Bantuan
+            </h3>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>Jenis</th><th>Nominal</th><th>Tahun</th><th>Status</th></tr></thead>
+                    <tbody id="riwayatBantuan">
+                        <tr><td colspan="4" style="text-align:center;color:#999;">Belum ada data</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Riwayat Mutasi -->
+        <div class="profile-card">
+            <h3 style="margin-bottom:12px;font-size:1rem;color:var(--primary);">
+                <i class="fas fa-exchange-alt"></i> Riwayat Mutasi
+            </h3>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>Jenis</th><th>Status</th><th>Tanggal</th></tr></thead>
+                    <tbody id="riwayatMutasi">
+                        <tr><td colspan="3" style="text-align:center;color:#999;">Belum ada data</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <nav class="bottom-nav">
+        <a class="nav-item active" href="profile-pendidik.html">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </a>
+        <a class="nav-item" href="#" onclick="showToast('Riwayat bantuan', 'info')">
+            <i class="fas fa-hand-holding-heart"></i>
+            <span>Bantuan</span>
+        </a>
+        <a class="nav-item" href="#" onclick="showToast('Riwayat mutasi', 'info')">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Mutasi</span>
+        </a>
+        <a class="nav-item" href="#" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
+    </nav>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        // ============================================================
+        // ===== PROFILE PENDIDIK SPECIFIC =====
+        // ============================================================
+
+        async function loadProfile() {
+            try {
+                // Ambil data pendidik berdasarkan pendidik_id dari userProfile
+                const pendidikId = window.userProfile?.pendidik_id;
+                if (!pendidikId) {
+                    showToast('Data pendidik tidak ditemukan', 'error');
+                    return;
+                }
+
+                const { data, error } = await supabaseClient
+                    .from('pendidik')
+                    .select('*, lembaga(nama)')
+                    .eq('id', pendidikId)
+                    .single();
+
+                if (error) throw error;
+
+                // Isi profil
+                document.getElementById('pNama').textContent = data.nama_lengkap || '-';
+                document.getElementById('pNik').textContent = 'NIK: ' + (data.nik || '-');
+                document.getElementById('pLembaga').textContent = data.lembaga?.nama || data.nslp_lembaga || '-';
+                document.getElementById('pKecamatan').textContent = data.kecamatan_lembaga || '-';
+                document.getElementById('pTmt').textContent = data.tmt_mengajar || '-';
+                document.getElementById('pStatus').textContent = data.status_aktif ? 'Aktif' : 'Tidak Aktif';
+
+                // Load riwayat bantuan
+                const { data: bantuan } = await supabaseClient
+                    .from('bantuan')
+                    .select('*')
+                    .eq('pendidik_id', pendidikId)
+                    .order('created_at', { ascending: false });
+
+                const tbodyBantuan = document.getElementById('riwayatBantuan');
+                if (bantuan && bantuan.length > 0) {
+                    tbodyBantuan.innerHTML = bantuan.map(item => `
+                        <tr>
+                            <td><span class="badge active">${capitalize(item.jenis)}</span></td>
+                            <td>Rp ${formatRupiah(item.nominal)}</td>
+                            <td>${item.tahun_anggaran}</td>
+                            <td><span class="badge ${item.status === 'cair' ? 'active' : item.status === 'proses' ? 'pending' : 'inactive'}">${capitalize(item.status)}</span></td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Load riwayat mutasi
+                const { data: mutasi } = await supabaseClient
+                    .from('mutasi')
+                    .select('*')
+                    .eq('pendidik_id', pendidikId)
+                    .order('created_at', { ascending: false });
+
+                const tbodyMutasi = document.getElementById('riwayatMutasi');
+                if (mutasi && mutasi.length > 0) {
+                    tbodyMutasi.innerHTML = mutasi.map(item => `
+                        <tr>
+                            <td>${capitalize(item.jenis_mutasi)}</td>
+                            <td><span class="badge ${item.status === 'disetujui' ? 'active' : item.status === 'pending' ? 'pending' : 'inactive'}">${capitalize(item.status)}</span></td>
+                            <td>${formatDate(item.created_at)}</td>
+                        </tr>
+                    `).join('');
+                }
+
+            } catch (e) {
+                console.error('Error loading profile:', e);
+                showToast('Gagal memuat profil', 'error');
+            }
+        }
+
+        function ajukanMutasi() {
+            // Bisa diarahkan ke halaman form mutasi atau modal
+            showToast('Fitur ajukan mutasi akan segera tersedia', 'info');
+        }
+
+        // Utility functions
+        function capitalize(str) {
+            if (!str) return '-';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function formatRupiah(value) {
+            if (!value) return '0';
+            return value.toLocaleString('id-ID');
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            updateDate();
+
+            // Pastikan user adalah pendidik
+            if (!window.userProfile?.isPendidik) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            loadProfile();
+            setInterval(updateDate, 60000);
+        });
+
+        window.ajukanMutasi = ajukanMutasi;
+    </script>
+</body>
+</html>

@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Bantuan & Insentif - SI-MUSTAFA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* ===== FILTER ===== */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 16px;
+        }
+        .filter-section .filter-item {
+            flex: 1;
+            min-width: 140px;
+        }
+        .filter-section .filter-item label {
+            display: block;
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 2px;
+        }
+        .filter-section select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: white;
+        }
+        .filter-section select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .filter-actions {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        .filter-actions .btn {
+            padding: 8px 16px;
+        }
+
+        /* ===== STAT MINI ===== */
+        .stat-mini {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .stat-mini .stat-card {
+            background: white;
+            padding: 14px 16px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+        .stat-mini .stat-card .label {
+            font-size: 0.65rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+        .stat-mini .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-mini .stat-card .value.green { color: var(--success); }
+        .stat-mini .stat-card .value.orange { color: var(--warning); }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            padding: 28px 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeInModal 0.25s ease;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        .modal-header h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #888;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .modal-header .close-btn:hover {
+            color: #333;
+        }
+        .modal-body .form-group {
+            margin-bottom: 14px;
+        }
+        .modal-body .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 2px;
+        }
+        .modal-body .form-group input,
+        .modal-body .form-group select,
+        .modal-body .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: #fafafa;
+            transition: 0.2s;
+        }
+        .modal-body .form-group input:focus,
+        .modal-body .form-group select:focus,
+        .modal-body .form-group textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: white;
+        }
+        .modal-body .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f2f5;
+        }
+
+        @media (max-width: 640px) {
+            .modal-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            .filter-section .filter-item {
+                min-width: 100%;
+            }
+            .filter-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+            .filter-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">
+                <img src="assets/logo-kemenag.png" alt="Logo" 
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+                <div>
+                    <h1>SI-<span>MUSTAFA</span></h1>
+                    <small>Kemenag Kab. Tegal</small>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="header-date" id="currentDate"></span>
+            <div class="header-user" onclick="showToast('Profile', 'info')">
+                <div class="avatar" id="userAvatar">A</div>
+                <span class="user-name" id="userName">Admin</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+        <div class="page-header">
+            <h1>Bantuan & Insentif</h1>
+            <p>Kelola penyaluran bantuan dan insentif untuk pendidik keagamaan</p>
+        </div>
+
+        <!-- ===== STATISTIK RINGKAS ===== -->
+        <div class="stat-mini">
+            <div class="stat-card">
+                <div class="label">Total Bantuan</div>
+                <div class="value" id="totalBantuan">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Sudah Cair</div>
+                <div class="value green" id="totalCair">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Proses</div>
+                <div class="value orange" id="totalProses">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Nominal</div>
+                <div class="value" id="totalNominal">Rp 0</div>
+            </div>
+        </div>
+
+        <!-- ===== FILTER & ACTION ===== -->
+        <div class="filter-section">
+            <div class="filter-item">
+                <label>Jenis Bantuan</label>
+                <select id="filterJenis" onchange="applyFilter()">
+                    <option value="all">Semua</option>
+                    <option value="kabupaten">Kabupaten</option>
+                    <option value="provinsi">Provinsi</option>
+                    <option value="kemenag">Kemenag</option>
+                    <option value="lainnya">Lainnya</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>Status</label>
+                <select id="filterStatus" onchange="applyFilter()">
+                    <option value="all">Semua</option>
+                    <option value="proses">Proses</option>
+                    <option value="cair">Cair</option>
+                    <option value="batal">Batal</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>Tahun</label>
+                <select id="filterTahun" onchange="applyFilter()">
+                    <option value="all">Semua</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-outline" onclick="resetFilter()"><i class="fas fa-undo"></i> Reset</button>
+                <button class="btn btn-success" onclick="openTambahModal()"><i class="fas fa-plus"></i> Tambah</button>
+                <button class="btn btn-primary" onclick="openImportModal()"><i class="fas fa-file-import"></i> Import</button>
+                <button class="btn btn-primary" onclick="generateCalon()"><i class="fas fa-users"></i> Generate Calon</button>
+            </div>
+        </div>
+
+        <!-- ===== TABEL ===== -->
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                <div class="card-title" style="margin-bottom:0;">Daftar Bantuan <small id="totalData" style="font-weight:400;color:#888;">0 data</small></div>
+                <button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Pendidik</th>
+                            <th>Jenis</th>
+                            <th>Nominal</th>
+                            <th>Tahun</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bantuanTableBody">
+                        <tr><td colspan="7" style="text-align:center;padding:30px;color:#999;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination -->
+            <div style="display:flex;justify-content:center;align-items:center;gap:16px;padding-top:12px;border-top:1px solid #f0f2f5;margin-top:12px;">
+                <button class="btn btn-outline" onclick="changePage(-1)" id="prevPage" style="padding:4px 12px;font-size:0.8rem;"><i class="fas fa-chevron-left"></i></button>
+                <span id="pageInfo" style="font-size:0.8rem;color:#666;">Halaman 1</span>
+                <button class="btn btn-outline" onclick="changePage(1)" id="nextPage" style="padding:4px 12px;font-size:0.8rem;"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <nav class="bottom-nav">
+        <a class="nav-item" href="dashboard.html">
+            <i class="fas fa-chart-pie"></i>
+            <span>Dashboard</span>
+        </a>
+        <a class="nav-item" href="lembaga.html">
+            <i class="fas fa-building"></i>
+            <span>Lembaga</span>
+        </a>
+        <a class="nav-item" href="pendidik.html">
+            <i class="fas fa-user-graduate"></i>
+            <span>Pendidik</span>
+            <span class="nav-badge" id="navPendidikCount">0</span>
+        </a>
+        <a class="nav-item active" href="bantuan.html">
+            <i class="fas fa-hand-holding-heart"></i>
+            <span>Bantuan</span>
+        </a>
+        <a class="nav-item" href="pengaturan.html">
+            <i class="fas fa-cog"></i>
+            <span>Pengaturan</span>
+        </a>
+    </nav>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ===== MODAL TAMBAH / EDIT BANTUAN ===== -->
+    <div class="modal-overlay" id="bantuanModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modalTitle">Tambah Bantuan</h2>
+                <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Pendidik <span style="color:red;">*</span></label>
+                    <select id="editPendidikId">
+                        <option value="">-- Pilih Pendidik --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Jenis Bantuan <span style="color:red;">*</span></label>
+                    <select id="editJenis">
+                        <option value="kabupaten">Kabupaten</option>
+                        <option value="provinsi">Provinsi</option>
+                        <option value="kemenag">Kemenag</option>
+                        <option value="lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nominal (Rp) <span style="color:red;">*</span></label>
+                    <input type="number" id="editNominal" placeholder="0" min="0" step="1000">
+                </div>
+                <div class="form-group">
+                    <label>Tahun Anggaran <span style="color:red;">*</span></label>
+                    <input type="number" id="editTahun" placeholder="2026" min="2000" max="2099">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="editStatus">
+                        <option value="proses">Proses</option>
+                        <option value="cair">Cair</option>
+                        <option value="batal">Batal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Keterangan</label>
+                    <textarea id="editKeterangan" placeholder="Catatan tambahan..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Batal</button>
+                <button class="btn btn-success" id="btnSave" onclick="saveBantuan()"><i class="fas fa-save"></i> Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL GENERATE CALON ===== -->
+    <div class="modal-overlay" id="calonModal">
+        <div class="modal-container" style="max-width:600px;">
+            <div class="modal-header">
+                <h2>Calon Penerima Bantuan</h2>
+                <button class="close-btn" onclick="closeCalonModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.85rem;color:#666;margin-bottom:12px;">Pendidik aktif dengan masa mengajar ≥ 2 tahun.</p>
+                <div style="max-height:300px;overflow-y:auto;">
+                    <table style="width:100%;font-size:0.8rem;border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#f8fafc;">
+                                <th style="padding:6px 8px;text-align:left;">Nama</th>
+                                <th style="padding:6px 8px;text-align:left;">NIK</th>
+                                <th style="padding:6px 8px;text-align:left;">Lembaga</th>
+                                <th style="padding:6px 8px;text-align:left;">TMT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calonTableBody">
+                            <tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Memuat...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeCalonModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL IMPORT ===== -->
+    <div id="importModal" class="modal-overlay">
+        <div class="modal-container" style="max-width:450px;">
+            <div class="modal-header">
+                <h2>Import Data Bantuan</h2>
+                <button class="close-btn" onclick="closeImportModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.9rem;color:#666;margin-bottom:12px;">Upload file Excel (.xlsx, .xls) dengan format: Pendidik (NIK/Nama), Jenis, Nominal, Tahun, Status, Keterangan.</p>
+                <input type="file" id="fileInputBantuan" accept=".xlsx,.xls" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:8px;">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeImportModal()">Batal</button>
+                <button class="btn btn-success" onclick="importBantuan()"><i class="fas fa-upload"></i> Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
+    </script>
+
+    <script>
+        // ============================================================
+        // ===== BANTUAN SPECIFIC =====
+        // ============================================================
+        let currentPage = 1;
+        const pageSize = 10;
+        let totalData = 0;
+        let currentFilter = { jenis: 'all', status: 'all', tahun: 'all' };
+        let pendidikOptions = [];
+
+        // ============================================================
+        // ===== FUNGSI LOAD PENDIDIK UNTUK DROPDOWN =====
+        // ============================================================
+        async function loadPendidikOptions() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('pendidik')
+                    .select('id, nik, nama_lengkap')
+                    .order('nama_lengkap');
+                if (error) throw error;
+                pendidikOptions = data || [];
+                const select = document.getElementById('editPendidikId');
+                select.innerHTML = '<option value="">-- Pilih Pendidik --</option>';
+                pendidikOptions.forEach(item => {
+                    const label = `${item.nama_lengkap} (${item.nik})`;
+                    select.innerHTML += `<option value="${item.id}">${label}</option>`;
+                });
+            } catch (e) {
+                console.error('Error loading pendidik options:', e);
+            }
+        }
+
+        // ============================================================
+        // ===== LOAD BANTUAN =====
+        // ============================================================
+        async function loadBantuan() {
+            try {
+                let query = supabaseClient
+                    .from('bantuan')
+                    .select('*, pendidik(nama_lengkap, nik)', { count: 'exact' });
+
+                if (currentFilter.jenis !== 'all') {
+                    query = query.eq('jenis', currentFilter.jenis);
+                }
+                if (currentFilter.status !== 'all') {
+                    query = query.eq('status', currentFilter.status);
+                }
+                if (currentFilter.tahun !== 'all') {
+                    query = query.eq('tahun_anggaran', parseInt(currentFilter.tahun));
+                }
+
+                const from = (currentPage - 1) * pageSize;
+                const to = from + pageSize - 1;
+
+                const { data, count, error } = await query
+                    .order('created_at', { ascending: false })
+                    .range(from, to);
+
+                if (error) throw error;
+
+                totalData = count || 0;
+                renderTable(data);
+                updatePagination();
+                loadStats();
+
+            } catch (e) {
+                console.error('Error loading bantuan:', e);
+                document.getElementById('bantuanTableBody').innerHTML =
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">Gagal memuat data: ${e.message}</td></tr>`;
+            }
+        }
+
+        // ============================================================
+        // ===== RENDER TABEL =====
+        // ============================================================
+        function renderTable(data) {
+            const tbody = document.getElementById('bantuanTableBody');
+            const totalEl = document.getElementById('totalData');
+            totalEl.textContent = `${totalData} data`;
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">
+                    <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>Belum ada data bantuan</td></tr>`;
+                return;
+            }
+
+            const start = (currentPage - 1) * pageSize;
+            tbody.innerHTML = data.map((item, i) => `
+                <tr onclick="viewBantuan('${item.id}')" style="cursor:pointer;">
+                    <td>${start + i + 1}</td>
+                    <td>
+                        <strong>${item.pendidik?.nama_lengkap || '-'}</strong>
+                        <br><small style="color:#888;font-size:0.65rem;">${item.pendidik?.nik || ''}</small>
+                    </td>
+                    <td><span class="badge active">${capitalize(item.jenis)}</span></td>
+                    <td><strong>Rp ${formatRupiah(item.nominal)}</strong></td>
+                    <td>${item.tahun_anggaran || '-'}</td>
+                    <td><span class="badge ${item.status === 'cair' ? 'active' : item.status === 'proses' ? 'pending' : 'inactive'}">${capitalize(item.status)}</span></td>
+                    <td>
+                        <button class="btn btn-outline" style="padding:2px 8px;font-size:0.65rem;" onclick="event.stopPropagation(); editBantuan('${item.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-outline" style="padding:2px 8px;font-size:0.65rem;border-color:#f44336;color:#f44336;" onclick="event.stopPropagation(); deleteBantuan('${item.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ============================================================
+        // ===== STATISTIK =====
+        // ============================================================
+        async function loadStats() {
+            try {
+                const { count: total } = await supabaseClient
+                    .from('bantuan')
+                    .select('*', { count: 'exact', head: true });
+
+                const { count: cair } = await supabaseClient
+                    .from('bantuan')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'cair');
+
+                const { count: proses } = await supabaseClient
+                    .from('bantuan')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'proses');
+
+                const { data: nominalData } = await supabaseClient
+                    .from('bantuan')
+                    .select('nominal')
+                    .eq('status', 'cair');
+
+                const totalNominal = (nominalData || []).reduce((sum, d) => sum + (d.nominal || 0), 0);
+
+                document.getElementById('totalBantuan').textContent = total || 0;
+                document.getElementById('totalCair').textContent = cair || 0;
+                document.getElementById('totalProses').textContent = proses || 0;
+                document.getElementById('totalNominal').textContent = `Rp ${formatRupiah(totalNominal)}`;
+
+            } catch (e) { console.error(e); }
+        }
+
+        // ============================================================
+        // ===== TAHUN FILTER =====
+        // ============================================================
+        async function loadTahunFilter() {
+            try {
+                const { data } = await supabaseClient
+                    .from('bantuan')
+                    .select('tahun_anggaran')
+                    .order('tahun_anggaran', { ascending: false });
+
+                const tahunSet = new Set();
+                (data || []).forEach(d => {
+                    if (d.tahun_anggaran) tahunSet.add(d.tahun_anggaran);
+                });
+
+                const select = document.getElementById('filterTahun');
+                select.innerHTML = '<option value="all">Semua Tahun</option>';
+                tahunSet.forEach(year => {
+                    select.innerHTML += `<option value="${year}">${year}</option>`;
+                });
+
+            } catch (e) { console.error(e); }
+        }
+
+        // ============================================================
+        // ===== FILTER =====
+        // ============================================================
+        function applyFilter() {
+            currentFilter.jenis = document.getElementById('filterJenis').value;
+            currentFilter.status = document.getElementById('filterStatus').value;
+            currentFilter.tahun = document.getElementById('filterTahun').value;
+            currentPage = 1;
+            loadBantuan();
+        }
+
+        function resetFilter() {
+            document.getElementById('filterJenis').value = 'all';
+            document.getElementById('filterStatus').value = 'all';
+            document.getElementById('filterTahun').value = 'all';
+            currentFilter = { jenis: 'all', status: 'all', tahun: 'all' };
+            currentPage = 1;
+            loadBantuan();
+        }
+
+        // ============================================================
+        // ===== PAGINATION =====
+        // ============================================================
+        function updatePagination() {
+            const totalPages = Math.ceil(totalData / pageSize);
+            document.getElementById('pageInfo').textContent = `Halaman ${currentPage} dari ${totalPages || 1}`;
+            document.getElementById('prevPage').disabled = currentPage <= 1;
+            document.getElementById('nextPage').disabled = currentPage >= totalPages;
+        }
+
+        function changePage(delta) {
+            const totalPages = Math.ceil(totalData / pageSize);
+            const newPage = currentPage + delta;
+            if (newPage < 1 || newPage > totalPages) return;
+            currentPage = newPage;
+            loadBantuan();
+        }
+
+        // ============================================================
+        // ===== MODAL TAMBAH / EDIT =====
+        // ============================================================
+        function openTambahModal() {
+            document.getElementById('modalTitle').textContent = 'Tambah Bantuan';
+            document.getElementById('editId').value = '';
+            document.getElementById('editPendidikId').value = '';
+            document.getElementById('editJenis').value = 'kabupaten';
+            document.getElementById('editNominal').value = '';
+            document.getElementById('editTahun').value = new Date().getFullYear();
+            document.getElementById('editStatus').value = 'proses';
+            document.getElementById('editKeterangan').value = '';
+            document.getElementById('btnSave').textContent = 'Simpan';
+            document.getElementById('bantuanModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('bantuanModal').classList.remove('active');
+        }
+
+        async function viewBantuan(id) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('bantuan')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                if (error) throw error;
+                if (!data) {
+                    showToast('Data tidak ditemukan', 'error');
+                    return;
+                }
+                // Tampilkan modal untuk view (tidak bisa diedit)
+                document.getElementById('modalTitle').textContent = 'Detail Bantuan';
+                document.getElementById('editId').value = data.id;
+                document.getElementById('editPendidikId').value = data.pendidik_id || '';
+                document.getElementById('editJenis').value = data.jenis || 'kabupaten';
+                document.getElementById('editNominal').value = data.nominal || '';
+                document.getElementById('editTahun').value = data.tahun_anggaran || '';
+                document.getElementById('editStatus').value = data.status || 'proses';
+                document.getElementById('editKeterangan').value = data.keterangan || '';
+                document.getElementById('btnSave').textContent = 'Simpan';
+                // Disable semua input (view only)
+                const inputs = document.querySelectorAll('#bantuanModal .modal-body input, #bantuanModal .modal-body select, #bantuanModal .modal-body textarea');
+                inputs.forEach(el => el.disabled = true);
+                document.getElementById('btnSave').style.display = 'none';
+                document.getElementById('bantuanModal').classList.add('active');
+            } catch (e) {
+                console.error(e);
+                showToast('Gagal memuat detail: ' + e.message, 'error');
+            }
+        }
+
+        async function editBantuan(id) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('bantuan')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                if (error) throw error;
+                if (!data) {
+                    showToast('Data tidak ditemukan', 'error');
+                    return;
+                }
+                document.getElementById('modalTitle').textContent = 'Edit Bantuan';
+                document.getElementById('editId').value = data.id;
+                document.getElementById('editPendidikId').value = data.pendidik_id || '';
+                document.getElementById('editJenis').value = data.jenis || 'kabupaten';
+                document.getElementById('editNominal').value = data.nominal || '';
+                document.getElementById('editTahun').value = data.tahun_anggaran || '';
+                document.getElementById('editStatus').value = data.status || 'proses';
+                document.getElementById('editKeterangan').value = data.keterangan || '';
+                document.getElementById('btnSave').textContent = 'Simpan';
+                // Enable semua input
+                const inputs = document.querySelectorAll('#bantuanModal .modal-body input, #bantuanModal .modal-body select, #bantuanModal .modal-body textarea');
+                inputs.forEach(el => el.disabled = false);
+                document.getElementById('btnSave').style.display = 'inline-flex';
+                document.getElementById('bantuanModal').classList.add('active');
+            } catch (e) {
+                console.error(e);
+                showToast('Gagal memuat data: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== SAVE BANTUAN =====
+        // ============================================================
+        async function saveBantuan() {
+            const id = document.getElementById('editId').value;
+            const pendidikId = document.getElementById('editPendidikId').value;
+            const jenis = document.getElementById('editJenis').value;
+            const nominal = parseFloat(document.getElementById('editNominal').value);
+            const tahun = parseInt(document.getElementById('editTahun').value);
+            const status = document.getElementById('editStatus').value;
+            const keterangan = document.getElementById('editKeterangan').value.trim();
+
+            if (!pendidikId) {
+                showToast('Pilih pendidik terlebih dahulu!', 'error');
+                return;
+            }
+            if (!nominal || nominal <= 0) {
+                showToast('Nominal harus diisi dan lebih dari 0!', 'error');
+                return;
+            }
+            if (!tahun || tahun < 2000 || tahun > 2099) {
+                showToast('Tahun anggaran tidak valid!', 'error');
+                return;
+            }
+
+            const data = {
+                pendidik_id: pendidikId,
+                jenis: jenis,
+                nominal: nominal,
+                tahun_anggaran: tahun,
+                status: status,
+                keterangan: keterangan,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                let error;
+                if (id) {
+                    // Update
+                    const result = await supabaseClient
+                        .from('bantuan')
+                        .update(data)
+                        .eq('id', id);
+                    error = result.error;
+                } else {
+                    // Insert
+                    data.created_at = new Date().toISOString();
+                    const result = await supabaseClient
+                        .from('bantuan')
+                        .insert([data]);
+                    error = result.error;
+                }
+                if (error) throw error;
+
+                showToast(id ? 'Bantuan berhasil diperbarui!' : 'Bantuan berhasil ditambahkan!', 'success');
+                closeModal();
+                loadBantuan();
+            } catch (e) {
+                console.error(e);
+                showToast('Gagal menyimpan: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== DELETE BANTUAN =====
+        // ============================================================
+        async function deleteBantuan(id) {
+            if (!confirm('Yakin ingin menghapus data bantuan ini?')) return;
+            try {
+                const { error } = await supabaseClient
+                    .from('bantuan')
+                    .delete()
+                    .eq('id', id);
+                if (error) throw error;
+                showToast('Bantuan berhasil dihapus', 'success');
+                loadBantuan();
+            } catch (e) {
+                showToast('Gagal hapus: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== GENERATE CALON =====
+        // ============================================================
+        async function generateCalon() {
+            showToast('Mencari calon penerima bantuan...', 'info');
+            try {
+                const twoYearsAgo = new Date();
+                twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+                const dateStr = twoYearsAgo.toISOString().split('T')[0];
+
+                const { data, error } = await supabaseClient
+                    .from('pendidik')
+                    .select('id, nama_lengkap, nik, nslp_lembaga, tmt_mengajar')
+                    .eq('status_aktif', true)
+                    .lte('tmt_mengajar', dateStr);
+
+                if (error) throw error;
+
+                const tbody = document.getElementById('calonTableBody');
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Tidak ada calon penerima yang memenuhi kriteria.</td></tr>`;
+                } else {
+                    tbody.innerHTML = data.map(item => `
+                        <tr>
+                            <td style="padding:6px 8px;">${item.nama_lengkap || '-'}</td>
+                            <td style="padding:6px 8px;">${item.nik || '-'}</td>
+                            <td style="padding:6px 8px;">${item.nslp_lembaga || '-'}</td>
+                            <td style="padding:6px 8px;">${item.tmt_mengajar || '-'}</td>
+                        </tr>
+                    `).join('');
+                }
+                document.getElementById('calonModal').classList.add('active');
+            } catch (e) {
+                console.error(e);
+                showToast('Gagal generate calon: ' + e.message, 'error');
+            }
+        }
+
+        function closeCalonModal() {
+            document.getElementById('calonModal').classList.remove('active');
+        }
+
+        // ============================================================
+        // ===== IMPORT BANTUAN =====
+        // ============================================================
+        function openImportModal() {
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+            document.getElementById('fileInputBantuan').value = '';
+        }
+
+        async function importBantuan() {
+            const fileInput = document.getElementById('fileInputBantuan');
+            const file = fileInput.files[0];
+            if (!file) {
+                showToast('Pilih file Excel terlebih dahulu!', 'error');
+                return;
+            }
+
+            showToast('Memproses import...', 'info');
+            closeImportModal();
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+                    // Ambil semua NIK yang ada di file untuk dicocokkan dengan pendidik
+                    const nikList = json.map(row => row['NIK']?.toString().trim() || '');
+                    const { data: pendidikData } = await supabaseClient
+                        .from('pendidik')
+                        .select('id, nik')
+                        .in('nik', nikList);
+
+                    const nikToId = {};
+                    (pendidikData || []).forEach(p => { nikToId[p.nik] = p.id; });
+
+                    let success = 0, failed = 0;
+                    for (const row of json) {
+                        try {
+                            const nik = row['NIK']?.toString().trim() || '';
+                            const pendidikId = nikToId[nik];
+                            if (!pendidikId) {
+                                failed++;
+                                continue;
+                            }
+
+                            const jenis = row['Jenis Bantuan'] || row['Jenis'] || 'kabupaten';
+                            const nominal = parseFloat(row['Nominal']) || 0;
+                            const tahun = parseInt(row['Tahun']) || new Date().getFullYear();
+                            const status = row['Status']?.toLowerCase() || 'proses';
+                            const keterangan = row['Keterangan'] || '';
+
+                            if (nominal <= 0) {
+                                failed++;
+                                continue;
+                            }
+
+                            const dataBantuan = {
+                                pendidik_id: pendidikId,
+                                jenis: jenis,
+                                nominal: nominal,
+                                tahun_anggaran: tahun,
+                                status: status,
+                                keterangan: keterangan,
+                                created_at: new Date().toISOString(),
+                                updated_at: new Date().toISOString()
+                            };
+
+                            const { error } = await supabaseClient
+                                .from('bantuan')
+                                .insert([dataBantuan]);
+                            if (error) throw error;
+                            success++;
+                        } catch (err) {
+                            failed++;
+                            console.error(err);
+                        }
+                    }
+
+                    showToast(`Import selesai: ${success} berhasil, ${failed} gagal`, success > 0 ? 'success' : 'error');
+                    loadBantuan();
+
+                } catch (error) {
+                    showToast('Gagal membaca file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // ============================================================
+        // ===== UTILITY =====
+        // ============================================================
+        function capitalize(str) {
+            if (!str) return '-';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function formatRupiah(value) {
+            if (!value) return '0';
+            return value.toLocaleString('id-ID');
+        }
+
+        // ============================================================
+        // ===== REFRESH =====
+        // ============================================================
+        function refreshData() {
+            showToast('Memperbarui data...', 'info');
+            loadBantuan();
+            supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true)
+                .then(({ count }) => { document.getElementById('navPendidikCount').textContent = count || 0; });
+        }
+
+        // ============================================================
+        // ===== INIT =====
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            updateDate();
+            await loadPendidikOptions();
+            await loadTahunFilter();
+            loadBantuan();
+
+            const { count } = await supabaseClient
+                .from('pendidik')
+                .select('*', { count: 'exact', head: true })
+                .eq('status_aktif', true);
+            document.getElementById('navPendidikCount').textContent = count || 0;
+
+            setInterval(updateDate, 60000);
+            setInterval(() => { loadBantuan(); }, 300000);
+        });
+
+        // ============================================================
+        // ===== EXPOSE FUNCTIONS =====
+        // ============================================================
+        window.applyFilter = applyFilter;
+        window.resetFilter = resetFilter;
+        window.changePage = changePage;
+        window.refreshData = refreshData;
+        window.openTambahModal = openTambahModal;
+        window.closeModal = closeModal;
+        window.saveBantuan = saveBantuan;
+        window.deleteBantuan = deleteBantuan;
+        window.viewBantuan = viewBantuan;
+        window.editBantuan = editBantuan;
+        window.generateCalon = generateCalon;
+        window.closeCalonModal = closeCalonModal;
+        window.openImportModal = openImportModal;
+        window.closeImportModal = closeImportModal;
+        window.importBantuan = importBantuan;
+        window.showToast = showToast;
+    </script>
+</body>
+</html>
