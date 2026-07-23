@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SI-MUSTAFA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* ===== RESET & VARIABLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary: #0b5c30;
+            --primary-dark: #073d20;
+            --primary-mid: #0f7a3e;
+            --primary-light: #e8f5e9;
+            --gold: #d4a72c;
+            --gold-light: #f0d78c;
+            --gold-dark: #a97f1d;
+            --text-dark: #1a2a3a;
+            --text-gray: #555;
+            --shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            background: #f5f7f5;
+        }
+
+        /* ===== KIRI: BRANDING & NILAI ===== */
+        .left-panel {
+            flex: 1.2;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(155deg, #073d20 0%, #0b5c30 45%, #0f7a3e 100%);
+            color: white;
+            padding: 44px 40px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        /* dot-grid pattern, top right, echoes the poster's corner texture */
+        .left-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 220px;
+            height: 220px;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1.4px, transparent 1.4px);
+            background-size: 14px 14px;
+            -webkit-mask-image: linear-gradient(225deg, #000 20%, transparent 75%);
+            mask-image: linear-gradient(225deg, #000 20%, transparent 75%);
+            pointer-events: none;
+        }
+
+        /* gold arc ribbon, top left, echoes the poster's corner sweep */
+        .left-panel::after {
+            content: "";
+            position: absolute;
+            top: -90px;
+            left: -110px;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            border: 14px solid transparent;
+            border-top-color: var(--gold);
+            border-right-color: var(--gold-light);
+            opacity: 0.55;
+            transform: rotate(-18deg);
+            pointer-events: none;
+        }
+
+        .left-panel .top {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        /* Logo + Judul */
+        .left-panel .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        /* STYLE UNTUK LOGO GAMBAR */
+        .left-panel .logo-area .logo-img {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(2px);
+            flex-shrink: 0;
+        }
+
+        .left-panel .logo-area h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        .left-panel .logo-area h1 span {
+            color: var(--gold-light);
+        }
+
+        .left-panel .logo-area .sub {
+            font-size: 0.65rem;
+            opacity: 0.75;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Tagline */
+        .left-panel .tagline {
+            font-size: 0.95rem;
+            font-weight: 300;
+            opacity: 0.94;
+            margin-bottom: 22px;
+            line-height: 1.55;
+            border-left: 3px solid var(--gold);
+            padding-left: 16px;
+        }
+
+        .left-panel .tagline strong {
+            color: var(--gold-light);
+            font-weight: 600;
+        }
+
+        /* ===== Nilai-nilai: letter-tile rows, mirrors the SI-MUSTAFA poster ===== */
+        .left-panel .values-heading {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            opacity: 0.85;
+            margin-bottom: 8px;
+        }
+
+        .left-panel .values {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+
+        .left-panel .values .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .left-panel .values .row .tile {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: white;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+        }
+
+        .left-panel .values .row .icon-circle {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-light);
+            font-size: 0.65rem;
+        }
+
+        .left-panel .values .row .text {
+            line-height: 1.25;
+            min-width: 0;
+        }
+
+        .left-panel .values .row .text strong {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .left-panel .values .row .text span {
+            display: block;
+            font-size: 0.66rem;
+            opacity: 0.72;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Motto quote, echoes the poster's ribbon quote */
+        .left-panel .motto {
+            position: relative;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            font-size: 0.78rem;
+            font-style: italic;
+            font-weight: 600;
+            text-align: center;
+            color: var(--gold-light);
+            margin-bottom: 18px;
+        }
+
+        /* Mosque silhouette, bottom right, echoes the poster's skyline motif */
+        .left-panel .skyline {
+            position: absolute;
+            right: -10px;
+            bottom: 46px;
+            width: 220px;
+            opacity: 0.16;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Footer strip: Akurat / Aman / Melayani / Berkualitas, mirrors poster's bottom bar */
+        .left-panel .footer-strip {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.22);
+            margin: 0 -40px 0;
+            padding: 12px 40px;
+        }
+
+        .left-panel .footer-strip .fitem {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .left-panel .footer-strip .fitem i {
+            color: var(--gold-light);
+        }
+
+        /* Footer kiri */
+        .left-panel .footer-left {
+            position: relative;
+            z-index: 1;
+            font-size: 0.68rem;
+            opacity: 0.6;
+            text-align: center;
+            padding: 10px 0 16px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ===== KANAN: LOGIN ===== */
+        .right-panel {
+            flex: 1;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .login-box .login-header {
+            margin-bottom: 28px;
+        }
+
+        .login-box .login-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .login-box .login-header h2 span {
+            color: var(--gold);
+        }
+
+        .login-box .login-header p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .login-box .login-hint {
+            background: var(--primary-light);
+            border-radius: var(--radius);
+            padding: 10px 14px;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+        }
+
+        .login-box .login-hint i {
+            margin-right: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e8ecf1;
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            transition: 0.3s;
+            background: #fafbfc;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(11, 92, 48, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #f44336;
+        }
+
+        .input-hint {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .form-options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .form-options label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+
+        .form-options a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .form-options a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(11, 92, 48, 0.3);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message,
+        .success-message {
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            border-left: 4px solid;
+            display: none;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #f44336;
+            border-color: #f44336;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .loader {
+            width: 22px;
+            height: 22px;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .left-panel {
+                padding: 32px 28px 0;
+                flex: 1;
+            }
+            .left-panel .footer-strip {
+                margin: 0 -28px 0;
+                padding: 12px 28px;
+            }
+            .left-panel .logo-area h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .left-panel {
+                min-height: auto;
+                padding: 20px 20px 0;
+                order: 1;
+            }
+            .left-panel::before,
+            .left-panel .skyline {
+                display: none;
+            }
+            .left-panel .logo-area {
+                margin-bottom: 12px;
+            }
+            .left-panel .logo-area .logo-img {
+                width: 40px;
+                height: 40px;
+                padding: 4px;
+            }
+            .left-panel .logo-area h1 {
+                font-size: 1.3rem;
+            }
+            .left-panel .tagline {
+                font-size: 0.82rem;
+                margin-bottom: 12px;
+                padding-left: 12px;
+            }
+            .left-panel .values {
+                gap: 3px;
+                margin-bottom: 12px;
+            }
+            .left-panel .values .row .text span {
+                display: none;
+            }
+            .left-panel .motto {
+                font-size: 0.72rem;
+                padding: 10px 12px;
+                margin-bottom: 12px;
+            }
+            .left-panel .footer-strip {
+                margin: 0 -20px 0;
+                padding: 10px 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .left-panel .footer-strip .fitem {
+                font-size: 0.62rem;
+            }
+            .left-panel .footer-left {
+                font-size: 0.62rem;
+                padding: 8px 0 12px;
+            }
+            .right-panel {
+                min-height: auto;
+                padding: 24px;
+                order: 2;
+            }
+            .login-box {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .left-panel {
+                padding: 14px 16px 0;
+            }
+            .left-panel .footer-strip {
+                margin: 0 -16px 0;
+                padding: 8px 16px;
+            }
+            .left-panel .logo-area h1 {
+                font-size: 1.1rem;
+            }
+            .left-panel .tagline {
+                font-size: 0.75rem;
+                padding-left: 10px;
+            }
+            .left-panel .values .row {
+                padding: 4px 6px;
+            }
+            .right-panel {
+                padding: 16px;
+            }
+            .login-box .login-header h2 {
+                font-size: 1.3rem;
+            }
+            .form-group input {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            .btn-login {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== KIRI: BRANDING & NILAI ===== -->
+    <div class="left-panel">
+        <div class="top">
+            <div class="logo-area">
+                <!-- LOGO MENGGUNAKAN GAMBAR logo-kemenag.png -->
+                <img src="assets/logo-kemenag.png" alt="Logo Kemenag" class="logo-img"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+                <div>
+                    <h1>SI-<span>MUSTAFA</span></h1>
+                    <div class="sub">Sistem Informasi Manajemen Ustadz–Ustadzah</div>
+                </div>
+            </div>
+
+            <div class="tagline">
+                <strong>“Satu Data Pendidik Keagamaan”</strong><br>
+                untuk Pelayanan yang Profesional, Transparan dan Akuntabel
+            </div>
+
+            <div class="values-heading">Nilai-Nilai SI-MUSTAFA</div>
+
+            <!-- Nilai-nilai -->
+            <div class="values">
+                <div class="row">
+                    <div class="tile" style="background:#0f4d2a">S</div>
+                    <div class="icon-circle"><i class="fas fa-handshake"></i></div>
+                    <div class="text"><strong>Sinergi</strong><span>Integrasikan seluruh data pendidik</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#136536">I</div>
+                    <div class="icon-circle"><i class="fas fa-shield-alt"></i></div>
+                    <div class="text"><strong>Integritas</strong><span>Jamin keakuratan &amp; keamanan data</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#177e42">M</div>
+                    <div class="icon-circle"><i class="fas fa-desktop"></i></div>
+                    <div class="text"><strong>Modern</strong><span>Manfaatkan teknologi digital</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#1c974e">U</div>
+                    <div class="icon-circle"><i class="fas fa-chart-line"></i></div>
+                    <div class="text"><strong>Unggul</strong><span>Dorong kualitas tata kelola</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#22b05a">S</div>
+                    <div class="icon-circle"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="text"><strong>Smart</strong><span>Sajikan data cepat &amp; tepat</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#a97f1d">T</div>
+                    <div class="icon-circle"><i class="fas fa-search"></i></div>
+                    <div class="text"><strong>Transparan</strong><span>Perubahan data dapat ditelusuri</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#bd8e22">A</div>
+                    <div class="icon-circle"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="text"><strong>Akuntabel</strong><span>Proses dapat dipertanggungjawabkan</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#d4a72c">F</div>
+                    <div class="icon-circle"><i class="fas fa-rocket"></i></div>
+                    <div class="text"><strong>Futuristik</strong><span>Siap dikembangkan lebih luas</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#e0b845">A</div>
+                    <div class="icon-circle"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div class="text"><strong>Amanah</strong><span>Data jadi dasar kebijakan terpercaya</span></div>
+                </div>
+            </div>
+
+            <div class="motto">
+                &ldquo;Satu Data Pendidik Keagamaan untuk Pelayanan yang Profesional, Transparan dan Akuntabel&rdquo;
+            </div>
+        </div>
+
+        <svg class="skyline" viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" fill="white">
+            <rect x="0" y="110" width="300" height="30"/>
+            <rect x="8" y="70" width="14" height="70"/>
+            <polygon points="15,50 22,70 8,70"/>
+            <rect x="270" y="70" width="14" height="70"/>
+            <polygon points="277,50 284,70 270,70"/>
+            <path d="M100 110 V78 a50 50 0 0 1 100 0 V110 Z"/>
+            <circle cx="150" cy="60" r="6"/>
+            <rect x="146" y="42" width="8" height="18"/>
+            <rect x="60" y="90" width="16" height="20"/>
+            <rect x="224" y="90" width="16" height="20"/>
+        </svg>
+
+        <div class="footer-strip">
+            <div class="fitem"><i class="fas fa-shield-alt"></i> Akurat</div>
+            <div class="fitem"><i class="fas fa-lock"></i> Aman</div>
+            <div class="fitem"><i class="fas fa-users"></i> Melayani</div>
+            <div class="fitem"><i class="fas fa-chart-line"></i> Berkualitas</div>
+        </div>
+
+        <div class="footer-left">
+            <i class="fas fa-building"></i> Kantor Kementerian Agama Kabupaten Tegal
+        </div>
+    </div>
+
+    <!-- ===== KANAN: LOGIN ===== -->
+    <div class="right-panel">
+        <div class="login-box">
+
+            <div class="login-header">
+                <h2>Selamat Datang</h2>
+                <p>Masuk ke SI-MUSTAFA untuk melanjutkan</p>
+            </div>
+
+            <div class="login-hint">
+                <i class="fas fa-info-circle"></i> Masuk dengan <strong>NIK</strong> (16 digit) atau <strong>Email</strong>.
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="identifier">NIK / Email</label>
+                    <input type="text" id="identifier" placeholder="3328012010810001 atau admin@simustafa.com" required>
+                    <div class="input-hint" id="inputHint">💡 Contoh: 3328012010810001 (NIK) atau admin@simustafa.com</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Kata Sandi</label>
+                    <input type="password" id="password" placeholder="Masukkan kata sandi" required>
+                </div>
+
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox" id="rememberMe"> Ingat saya
+                    </label>
+                    <a href="#" onclick="alert('Hubungi admin untuk reset password')">Lupa password?</a>
+                </div>
+
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span id="btnText">Masuk</span>
+                    <span id="btnLoader" class="loader" style="display:none;"></span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                © 2026 SI-MUSTAFA – Kemenag Kab. Tegal
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SUPABASE SCRIPT ===== -->
+    <script src="js/supabase-client.js"></script>
+    <script>
+        // ============================================================
+        // ===== KONFIGURASI =====
+        // ============================================================
+        const DOMAIN_EMAIL = '@simustafa.local';
+        const DEFAULT_PASSWORD = 'nik123456';
+
+        const form = document.getElementById('loginForm');
+        const identifier = document.getElementById('identifier');
+        const password = document.getElementById('password');
+        const btn = document.getElementById('loginBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+        const errorMsg = document.getElementById('errorMessage');
+        const successMsg = document.getElementById('successMessage');
+        const rememberMe = document.getElementById('rememberMe');
+        const inputHint = document.getElementById('inputHint');
+
+        // ============================================================
+        // ===== FUNGSI KONVERSI =====
+        // ============================================================
+        function isNIK(value) {
+            return /^\d{16}$/.test(value.replace(/\s/g, ''));
+        }
+
+        function nikToEmail(nik) {
+            return `nik_${nik.replace(/\s/g, '')}${DOMAIN_EMAIL}`;
+        }
+
+        function detectIdentifier(value) {
+            const clean = value.trim();
+            if (!clean) return { type: 'empty' };
+            if (clean.includes('@')) return { type: 'email', value: clean };
+            if (isNIK(clean)) return { type: 'nik', value: clean, email: nikToEmail(clean) };
+            return { type: 'unknown' };
+        }
+
+        // ============================================================
+        // ===== LIVE HINT =====
+        // ============================================================
+        identifier.addEventListener('input', function() {
+            const raw = this.value.trim();
+            if (!raw) {
+                inputHint.innerHTML = '💡 Contoh: 3328012010810001 (NIK) atau admin@simustafa.com';
+                return;
+            }
+            const d = detectIdentifier(raw);
+            if (d.type === 'nik') {
+                inputHint.innerHTML = `🔑 Login sebagai NIK: <strong>${d.value}</strong> → ${d.email}`;
+            } else if (d.type === 'email') {
+                inputHint.innerHTML = `📧 Login sebagai Email: <strong>${d.value}</strong>`;
+            } else {
+                inputHint.innerHTML = '⚠️ Masukkan NIK 16 digit atau Email yang valid.';
+            }
+        });
+
+        // ============================================================
+        // ===== LOGIN =====
+        // ============================================================
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            identifier.classList.remove('error');
+            password.classList.remove('error');
+
+            const rawInput = identifier.value.trim();
+            const pass = password.value.trim();
+
+            if (!rawInput || !pass) {
+                showError('NIK/Email dan kata sandi harus diisi!');
+                return;
+            }
+
+            const d = detectIdentifier(rawInput);
+            if (d.type === 'empty' || d.type === 'unknown') {
+                showError('Masukkan NIK 16 digit atau Email yang valid.');
+                identifier.classList.add('error');
+                return;
+            }
+
+            const loginEmail = d.type === 'nik' ? d.email : d.value;
+            setLoading(true);
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: loginEmail,
+                    password: pass
+                });
+
+                if (error) {
+                    if (d.type === 'nik' && error.message.includes('Invalid login credentials')) {
+                        const retry = await supabaseClient.auth.signInWithPassword({
+                            email: loginEmail,
+                            password: DEFAULT_PASSWORD
+                        });
+                        if (retry.error) {
+                            throw new Error('NIK atau password salah. Jika pertama kali, gunakan password default: ' + DEFAULT_PASSWORD);
+                        }
+                        showSuccess('Login berhasil! (password default). Segera ganti password Anda.');
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 1500);
+                        return;
+                    }
+                    throw error;
+                }
+
+                if (rememberMe.checked) {
+                    localStorage.setItem('rememberIdentifier', rawInput);
+                } else {
+                    localStorage.removeItem('rememberIdentifier');
+                }
+
+                const { data: userData } = await supabaseClient
+                    .from('users')
+                    .select('role')
+                    .eq('id', data.user.id)
+                    .single();
+
+                const role = userData?.role || 'viewer';
+                let redirect = 'dashboard.html';
+                if (role === 'pendidik') redirect = 'profile-pendidik.html';
+                else if (role === 'operator') redirect = 'lembaga.html';
+
+                showSuccess('Login berhasil! Mengalihkan...');
+                setTimeout(() => {
+                    window.location.href = redirect;
+                }, 1000);
+
+            } catch (err) {
+                console.error(err);
+                showError(err.message || 'Login gagal. Periksa NIK/Email dan password.');
+                identifier.classList.add('error');
+                password.classList.add('error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ============================================================
+        // ===== UTILITY =====
+        // ============================================================
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.style.display = 'block';
+            successMsg.style.display = 'none';
+        }
+
+        function showSuccess(msg) {
+            successMsg.textContent = msg;
+            successMsg.style.display = 'block';
+            errorMsg.style.display = 'none';
+        }
+
+        function setLoading(loading) {
+            btn.disabled = loading;
+            btnText.style.display = loading ? 'none' : 'inline';
+            btnLoader.style.display = loading ? 'inline-block' : 'none';
+        }
+
+        // ============================================================
+        // ===== CHECK SESSION =====
+        // ============================================================
+        async function checkSession() {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    const { data: userData } = await supabaseClient
+                        .from('users')
+                        .select('role')
+                        .eq('id', session.user.id)
+                        .single();
+                    const role = userData?.role || 'viewer';
+                    const redirect = role === 'pendidik' ? 'profile-pendidik.html' : 'dashboard.html';
+                    window.location.href = redirect;
+                    return;
+                }
+                const saved = localStorage.getItem('rememberIdentifier');
+                if (saved) {
+                    identifier.value = saved;
+                    rememberMe.checked = true;
+                    identifier.dispatchEvent(new Event('input'));
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // ============================================================
+        // ===== INIT =====
+        // ============================================================
+        form.addEventListener('submit', handleLogin);
+        document.addEventListener('DOMContentLoaded', checkSession);
+
+        password.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') form.dispatchEvent(new Event('submit'));
+        });
+    </script>
+</body>
+  </html>
