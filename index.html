@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — SI-MUSTAFA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* ========== RESET & FONT ========== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Warna utama */
+            --green-950: #052e14;
+            --green-900: #073d20;
+            --green-800: #0b5c30;
+            --green-700: #0f7a3e;
+            --green-600: #12994d;
+            --green-100: #e8f5e9;
+            --green-50: #f1f8f2;
+            /* Emas */
+            --gold-500: #d4a72c;
+            --gold-400: #e0b845;
+            --gold-300: #f0d78c;
+            --gold-200: #f8edc8;
+            --gold-100: #fdf6e3;
+            /* Netral */
+            --gray-900: #1a2a3a;
+            --gray-700: #3d4f60;
+            --gray-500: #6b7d8e;
+            --gray-300: #c5cdd5;
+            --gray-200: #e2e7ec;
+            --gray-100: #f3f5f7;
+            --gray-50: #fafbfc;
+            --white: #ffffff;
+            --red-500: #ef4444;
+            --red-100: #fef2f2;
+
+            /* Ukuran */
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.10), 0 4px 14px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.13), 0 8px 24px rgba(0, 0, 0, 0.06);
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            background: var(--gray-100);
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--gray-900);
+            line-height: 1.5;
+        }
+
+        /* ========== PANEL KIRI ========== */
+        .left-panel {
+            flex: 1.15;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(160deg, #052e14 0%, #073d20 30%, #0b5c30 65%, #0f7a3e 100%);
+            color: var(--white);
+            padding: clamp(24px, 4vw, 44px) clamp(20px, 4vw, 44px) 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+            isolation: isolate;
+        }
+
+        /* Ornamen geometris */
+        .left-panel::before {
+            content: "";
+            position: absolute;
+            top: -120px;
+            right: -80px;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            border: 18px solid transparent;
+            border-top-color: rgba(212, 167, 44, 0.35);
+            border-right-color: rgba(240, 215, 140, 0.25);
+            transform: rotate(-22deg);
+            pointer-events: none;
+            z-index: 0;
+            animation: orbitSlow 28s linear infinite;
+        }
+        @keyframes orbitSlow {
+            to {
+                transform: rotate(338deg);
+            }
+        }
+
+        .left-panel::after {
+            content: "";
+            position: absolute;
+            bottom: 18%;
+            left: -60px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 12px solid transparent;
+            border-bottom-color: rgba(212, 167, 44, 0.2);
+            border-left-color: rgba(240, 215, 140, 0.15);
+            transform: rotate(30deg);
+            pointer-events: none;
+            z-index: 0;
+            animation: orbitSlow 22s linear infinite reverse;
+        }
+
+        .left-panel .content-wrap {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 520px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Logo */
+        .left-panel .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: clamp(18px, 2.5vw, 26px);
+        }
+        .left-panel .logo-img {
+            width: clamp(42px, 5vw, 54px);
+            height: clamp(42px, 5vw, 54px);
+            border-radius: 50%;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 7px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            flex-shrink: 0;
+            transition: transform var(--transition-slow);
+        }
+        .left-panel .logo-img:hover {
+            transform: scale(1.06);
+        }
+        .left-panel .logo-area .title-group h1 {
+            font-size: clamp(1.3rem, 2.4vw, 1.85rem);
+            font-weight: 700;
+            letter-spacing: 1.8px;
+            line-height: 1.15;
+        }
+        .left-panel .logo-area .title-group h1 span {
+            color: var(--gold-300);
+        }
+        .left-panel .logo-area .title-group .sub {
+            font-size: 0.64rem;
+            opacity: 0.78;
+            letter-spacing: 0.6px;
+            margin-top: 3px;
+            font-weight: 400;
+        }
+
+        /* Tagline */
+        .left-panel .tagline {
+            font-size: clamp(0.82rem, 1.15vw, 0.95rem);
+            font-weight: 300;
+            opacity: 0.93;
+            margin-bottom: clamp(16px, 2vw, 24px);
+            line-height: 1.6;
+            border-left: 3px solid var(--gold-500);
+            padding-left: clamp(12px, 1.8vw, 18px);
+        }
+        .left-panel .tagline strong {
+            color: var(--gold-300);
+            font-weight: 600;
+        }
+
+        /* Nilai */
+        .left-panel .values-heading {
+            font-size: 0.66rem;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--gold-300);
+            opacity: 0.85;
+            margin-bottom: 10px;
+        }
+        .left-panel .values {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: clamp(16px, 2vw, 22px);
+        }
+        .left-panel .values .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.03);
+            transition: background var(--transition);
+        }
+        .left-panel .values .row:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .left-panel .values .tile {
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.88rem;
+            color: var(--white);
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+            letter-spacing: 0.5px;
+        }
+        .left-panel .values .icon-circle {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.10);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-300);
+            font-size: 0.62rem;
+            transition: background var(--transition);
+        }
+        .left-panel .values .row:hover .icon-circle {
+            background: rgba(255, 255, 255, 0.18);
+        }
+        .left-panel .values .text {
+            line-height: 1.3;
+            min-width: 0;
+        }
+        .left-panel .values .text strong {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .left-panel .values .text span {
+            display: block;
+            font-size: 0.64rem;
+            opacity: 0.7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Motto */
+        .left-panel .motto {
+            position: relative;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+            padding: 13px 18px;
+            font-size: 0.76rem;
+            font-style: italic;
+            font-weight: 600;
+            text-align: center;
+            color: var(--gold-300);
+            margin-bottom: clamp(14px, 1.8vw, 20px);
+            letter-spacing: 0.3px;
+        }
+
+        /* Footer strip */
+        .left-panel .footer-strip {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.25);
+            margin: 0 calc(-1 * clamp(20px, 4vw, 44px)) 0;
+            padding: 13px clamp(20px, 4vw, 44px);
+            flex-wrap: wrap;
+        }
+        .left-panel .footer-strip .fitem {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            opacity: 0.88;
+            white-space: nowrap;
+        }
+        .left-panel .footer-strip .fitem i {
+            color: var(--gold-300);
+            font-size: 0.7rem;
+        }
+        .left-panel .footer-left {
+            position: relative;
+            z-index: 1;
+            font-size: 0.66rem;
+            opacity: 0.55;
+            text-align: center;
+            padding: 10px 0 18px;
+            letter-spacing: 0.4px;
+        }
+
+        /* ========== PANEL KANAN ========== */
+        .right-panel {
+            flex: 0.85;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(24px, 4vw, 48px);
+            min-height: 100vh;
+        }
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-box .login-header {
+            margin-bottom: 28px;
+            text-align: center;
+        }
+        .login-box .login-header .icon-lock {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--green-100);
+            color: var(--green-800);
+            font-size: 1.2rem;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+        .login-box .login-header h2 {
+            font-size: clamp(1.35rem, 2vw, 1.6rem);
+            font-weight: 700;
+            color: var(--gray-900);
+            letter-spacing: -0.3px;
+        }
+        .login-box .login-header h2 span {
+            color: var(--gold-500);
+        }
+        .login-box .login-header p {
+            color: var(--gray-500);
+            font-size: 0.88rem;
+            margin-top: 5px;
+        }
+
+        /* Hint */
+        .login-box .login-hint {
+            background: var(--green-50);
+            border-radius: var(--radius);
+            padding: 11px 15px;
+            margin-bottom: 22px;
+            font-size: 0.8rem;
+            color: var(--green-800);
+            border-left: 3px solid var(--green-700);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .login-box .login-hint i {
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.84rem;
+            color: var(--gray-700);
+            margin-bottom: 5px;
+            letter-spacing: 0.1px;
+        }
+        .form-group .input-wrapper {
+            position: relative;
+        }
+        .form-group .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-300);
+            font-size: 0.9rem;
+            transition: color var(--transition);
+            pointer-events: none;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 0.93rem;
+            transition: var(--transition);
+            background: var(--gray-50);
+            color: var(--gray-900);
+            letter-spacing: 0.2px;
+        }
+        .form-group input:focus {
+            border-color: var(--green-700);
+            outline: none;
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(11, 92, 48, 0.07);
+        }
+        .form-group input:focus~i,
+        .form-group input:focus+.input-icon {
+            color: var(--green-700);
+        }
+        .form-group input.error {
+            border-color: var(--red-500);
+            background: var(--red-100);
+        }
+        .input-hint {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            margin-top: 5px;
+            transition: color var(--transition);
+            min-height: 18px;
+        }
+        .input-hint strong {
+            color: var(--green-800);
+        }
+
+        /* Opsi */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            font-size: 0.84rem;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .form-options label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--gray-700);
+            cursor: pointer;
+            font-weight: 500;
+            user-select: none;
+        }
+        .form-options label input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            accent-color: var(--green-700);
+            cursor: pointer;
+        }
+        .form-options a {
+            color: var(--green-700);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color var(--transition);
+        }
+        .form-options a:hover {
+            color: var(--green-900);
+            text-decoration: underline;
+        }
+
+        /* Tombol */
+        .btn-login {
+            width: 100%;
+            padding: 13px 20px;
+            background: var(--green-800);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.98rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-login::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.08) 50%,
+                    transparent 100%);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+        .btn-login:hover:not(:disabled) {
+            background: var(--green-900);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(7, 61, 32, 0.3);
+        }
+        .btn-login:hover:not(:disabled)::after {
+            opacity: 1;
+        }
+        .btn-login:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 4px 14px rgba(7, 61, 32, 0.25);
+            transition: 0.1s;
+        }
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(15%);
+        }
+
+        /* Alert */
+        .error-message,
+        .success-message {
+            padding: 11px 15px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            font-size: 0.83rem;
+            border-left: 4px solid;
+            display: none;
+            align-items: flex-start;
+            gap: 8px;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            border-color: #ef4444;
+        }
+        .success-message {
+            background: #f0fdf4;
+            color: #16a34a;
+            border-color: #22c55e;
+        }
+        .error-message i,
+        .success-message i {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* Loader */
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(255, 255, 255, 0.35);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 0.7s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Footer login */
+        .login-footer {
+            text-align: center;
+            margin-top: 26px;
+            font-size: 0.73rem;
+            color: var(--gray-300);
+            letter-spacing: 0.3px;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .left-panel {
+                flex: 1;
+                padding: 32px 28px 0;
+            }
+            .left-panel .footer-strip {
+                margin: 0 -28px 0;
+                padding: 12px 28px;
+            }
+            .right-panel {
+                flex: 0.9;
+                padding: 32px;
+            }
+            .left-panel::before,
+            .left-panel::after {
+                opacity: 0.5;
+                width: 240px;
+                height: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .left-panel {
+                min-height: auto;
+                padding: 22px 20px;
+                order: 1;
+                justify-content: center;
+            }
+            .left-panel .content-wrap {
+                flex: 0 0 auto;
+                max-width: 100%;
+            }
+            .left-panel::before,
+            .left-panel::after {
+                display: none;
+            }
+            .left-panel .logo-area {
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+            .left-panel .logo-img {
+                width: 38px;
+                height: 38px;
+                padding: 5px;
+            }
+            .left-panel .logo-area .title-group h1 {
+                font-size: 1.2rem;
+                letter-spacing: 1.2px;
+            }
+            .left-panel .logo-area .title-group .sub {
+                font-size: 0.6rem;
+            }
+            .left-panel .tagline {
+                font-size: 0.78rem;
+                margin-bottom: 10px;
+                padding-left: 10px;
+                border-left-width: 2px;
+            }
+            .left-panel .values-heading {
+                font-size: 0.6rem;
+                letter-spacing: 1.5px;
+                margin-bottom: 6px;
+            }
+            .left-panel .values {
+                gap: 3px;
+                margin-bottom: 10px;
+            }
+            .left-panel .values .row {
+                padding: 4px 7px;
+                gap: 7px;
+            }
+            .left-panel .values .tile {
+                width: 24px;
+                height: 24px;
+                font-size: 0.75rem;
+                border-radius: 5px;
+            }
+            .left-panel .values .icon-circle {
+                width: 22px;
+                height: 22px;
+                font-size: 0.55rem;
+            }
+            .left-panel .values .text strong {
+                font-size: 0.7rem;
+            }
+            .left-panel .values .text span {
+                display: none;
+            }
+            .left-panel .motto {
+                font-size: 0.7rem;
+                padding: 10px 12px;
+                margin-bottom: 10px;
+                border-radius: var(--radius-sm);
+            }
+            .left-panel .footer-strip {
+                margin: 0 -20px 0;
+                padding: 10px 20px;
+                justify-content: center;
+                gap: 12px;
+            }
+            .left-panel .footer-strip .fitem {
+                font-size: 0.6rem;
+                gap: 4px;
+            }
+            .left-panel .footer-left {
+                font-size: 0.6rem;
+                padding: 6px 0 0;
+            }
+            .right-panel {
+                min-height: auto;
+                padding: 20px 20px 32px;
+                order: 2;
+                flex: none;
+            }
+            .login-box {
+                max-width: 100%;
+            }
+            .login-box .login-header {
+                margin-bottom: 20px;
+            }
+            .login-box .login-header .icon-lock {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+            .login-box .login-header h2 {
+                font-size: 1.2rem;
+            }
+            .login-box .login-header p {
+                font-size: 0.8rem;
+            }
+            .login-box .login-hint {
+                font-size: 0.74rem;
+                padding: 9px 12px;
+                margin-bottom: 16px;
+            }
+            .form-group input {
+                padding: 10px 12px 10px 36px;
+                font-size: 0.88rem;
+            }
+            .form-group .input-wrapper i {
+                left: 12px;
+                font-size: 0.8rem;
+            }
+            .btn-login {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .left-panel {
+                padding: 16px 14px;
+            }
+            .left-panel .footer-strip {
+                margin: 0 -14px 0;
+                padding: 8px 14px;
+                gap: 8px;
+            }
+            .left-panel .values {
+                gap: 2px;
+            }
+            .left-panel .values .row {
+                padding: 3px 5px;
+            }
+            .left-panel .motto {
+                font-size: 0.66rem;
+                padding: 8px 10px;
+            }
+            .right-panel {
+                padding: 14px 14px 24px;
+            }
+            .login-box .login-header h2 {
+                font-size: 1.1rem;
+            }
+            .form-options {
+                font-size: 0.76rem;
+                gap: 6px;
+            }
+            .form-options label input[type="checkbox"] {
+                width: 15px;
+                height: 15px;
+            }
+            .btn-login {
+                font-size: 0.85rem;
+                padding: 11px;
+            }
+        }
+
+        @media (min-width: 1600px) {
+            .left-panel {
+                flex: 1.1;
+            }
+            .right-panel {
+                flex: 0.9;
+            }
+            .login-box {
+                max-width: 440px;
+            }
+            .left-panel .content-wrap {
+                max-width: 560px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== PANEL KIRI: BRANDING ========== -->
+    <div class="left-panel">
+        <div class="content-wrap">
+            <!-- Logo -->
+            <div class="logo-area">
+                <img src="assets/logo-kemenag.png"
+                alt="Logo Kemenag"
+                class="logo-img"
+                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+                <div class="title-group">
+                    <h1>SI-<span>MUSTAFA</span></h1>
+                    <div class="sub">Sistem Informasi Manajemen Ustadz–Ustadzah</div>
+                </div>
+            </div>
+
+            <!-- Tagline -->
+            <div class="tagline">
+                <strong>“Satu Data Pendidik Keagamaan”</strong><br>
+                untuk Pelayanan yang Profesional, Transparan dan Akuntabel
+            </div>
+
+            <!-- Nilai -->
+            <div class="values-heading">Nilai-Nilai SI-MUSTAFA</div>
+            <div class="values">
+                <div class="row">
+                    <div class="tile" style="background:#0f4d2a">S</div>
+                    <div class="icon-circle"><i class="fas fa-handshake"></i></div>
+                    <div class="text"><strong>Sinergi</strong><span>Integrasikan seluruh data pendidik</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#136536">I</div>
+                    <div class="icon-circle"><i class="fas fa-shield-alt"></i></div>
+                    <div class="text"><strong>Integritas</strong><span>Jamin keakuratan &amp; keamanan data</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#177e42">M</div>
+                    <div class="icon-circle"><i class="fas fa-desktop"></i></div>
+                    <div class="text"><strong>Modern</strong><span>Manfaatkan teknologi digital</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#1c974e">U</div>
+                    <div class="icon-circle"><i class="fas fa-chart-line"></i></div>
+                    <div class="text"><strong>Unggul</strong><span>Dorong kualitas tata kelola</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#22b05a">S</div>
+                    <div class="icon-circle"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="text"><strong>Smart</strong><span>Sajikan data cepat &amp; tepat</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#a97f1d">T</div>
+                    <div class="icon-circle"><i class="fas fa-search"></i></div>
+                    <div class="text"><strong>Transparan</strong><span>Perubahan data dapat ditelusuri</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#bd8e22">A</div>
+                    <div class="icon-circle"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="text"><strong>Akuntabel</strong><span>Proses dapat dipertanggungjawabkan</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#d4a72c">F</div>
+                    <div class="icon-circle"><i class="fas fa-rocket"></i></div>
+                    <div class="text"><strong>Futuristik</strong><span>Siap dikembangkan lebih luas</span></div>
+                </div>
+                <div class="row">
+                    <div class="tile" style="background:#e0b845">A</div>
+                    <div class="icon-circle"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div class="text"><strong>Amanah</strong><span>Data jadi dasar kebijakan terpercaya</span></div>
+                </div>
+            </div>
+
+            <!-- Motto -->
+            <div class="motto">
+                &ldquo;Satu Data Pendidik Keagamaan untuk Pelayanan yang Profesional, Transparan dan Akuntabel&rdquo;
+            </div>
+        </div>
+
+        <!-- Footer strip -->
+        <div class="footer-strip">
+            <div class="fitem"><i class="fas fa-shield-alt"></i> Akurat</div>
+            <div class="fitem"><i class="fas fa-lock"></i> Aman</div>
+            <div class="fitem"><i class="fas fa-users"></i> Melayani</div>
+            <div class="fitem"><i class="fas fa-chart-line"></i> Berkualitas</div>
+        </div>
+        <div class="footer-left">
+            <i class="fas fa-building"></i> Kantor Kementerian Agama Kabupaten Tegal
+        </div>
+    </div>
+
+    <!-- ========== PANEL KANAN: LOGIN FORM ========== -->
+    <div class="right-panel">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="icon-lock">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2>Selamat Datang</h2>
+                <p>Masuk ke <span>SI-MUSTAFA</span> untuk melanjutkan</p>
+            </div>
+
+            <div class="login-hint">
+                <i class="fas fa-info-circle"></i>
+                <span>Masuk dengan <strong>NIK</strong> (16 digit) atau <strong>Email</strong>.</span>
+            </div>
+
+            <form id="loginForm" novalidate>
+                <!-- Identifier -->
+                <div class="form-group">
+                    <label for="identifier">NIK / Email</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="identifier" placeholder="3328012010810001 atau admin@simustafa.com" required autocomplete="username">
+                    </div>
+                    <div class="input-hint" id="inputHint">💡 Contoh: 3328012010810001 (NIK) atau admin@simustafa.com</div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Kata Sandi</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key"></i>
+                        <input type="password" id="password" placeholder="Masukkan kata sandi" required autocomplete="current-password">
+                    </div>
+                </div>
+
+                <!-- Opsi -->
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox" id="rememberMe"> Ingat saya
+                    </label>
+                    <a href="#" onclick="alert('Hubungi admin untuk reset password')">Lupa password?</a>
+                </div>
+
+                <!-- Alert -->
+                <div id="errorMessage" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText"></span>
+                </div>
+                <div id="successMessage" class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="successText"></span>
+                </div>
+
+                <!-- Tombol -->
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span id="btnText"><i class="fas fa-sign-in-alt"></i> Masuk</span>
+                    <span id="btnLoader" class="loader" style="display:none;"></span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                © 2026 SI-MUSTAFA — Kemenag Kab. Tegal
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SCRIPT ========== -->
+    <script src="js/supabase-client.js"></script>
+    <script>
+        (function() {
+            // ============================================================
+            // KONFIGURASI
+            // ============================================================
+            const DOMAIN_EMAIL = '@simustafa.local';
+            const DEFAULT_PASSWORD = 'nik123456';
+
+            const form = document.getElementById('loginForm');
+            const identifier = document.getElementById('identifier');
+            const password = document.getElementById('password');
+            const btn = document.getElementById('loginBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            const errorMsg = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const successMsg = document.getElementById('successMessage');
+            const successText = document.getElementById('successText');
+            const rememberMe = document.getElementById('rememberMe');
+            const inputHint = document.getElementById('inputHint');
+
+            // ============================================================
+            // FUNGSI KONVERSI
+            // ============================================================
+            function isNIK(value) {
+                return /^\d{16}$/.test(value.replace(/\s/g, ''));
+            }
+
+            function nikToEmail(nik) {
+                return 'nik_' + nik.replace(/\s/g, '') + DOMAIN_EMAIL;
+            }
+
+            function detectIdentifier(value) {
+                const clean = value.trim();
+                if (!clean) return { type: 'empty' };
+                if (clean.includes('@')) return { type: 'email', value: clean };
+                if (isNIK(clean))
+                    return { type: 'nik', value: clean.replace(/\s/g, ''), email: nikToEmail(clean) };
+                return { type: 'unknown' };
+            }
+
+            // ============================================================
+            // LIVE HINT
+            // ============================================================
+            identifier.addEventListener('input', function() {
+                const raw = this.value.trim();
+                if (!raw) {
+                    inputHint.innerHTML =
+                        '💡 Contoh: <strong>3328012010810001</strong> (NIK) atau <strong>admin@simustafa.com</strong>';
+                    return;
+                }
+                const d = detectIdentifier(raw);
+                if (d.type === 'nik') {
+                    inputHint.innerHTML =
+                        '🔑 Login sebagai NIK: <strong>' + d.value + '</strong> → ' + d.email;
+                } else if (d.type === 'email') {
+                    inputHint.innerHTML = '📧 Login sebagai Email: <strong>' + d.value + '</strong>';
+                } else {
+                    inputHint.innerHTML = '⚠️ Masukkan NIK 16 digit atau Email yang valid.';
+                }
+            });
+
+            // ============================================================
+            // UTILITY
+            // ============================================================
+            function showError(msg) {
+                errorText.textContent = msg;
+                errorMsg.style.display = 'flex';
+                successMsg.style.display = 'none';
+            }
+
+            function showSuccess(msg) {
+                successText.textContent = msg;
+                successMsg.style.display = 'flex';
+                errorMsg.style.display = 'none';
+            }
+
+            function setLoading(loading) {
+                btn.disabled = loading;
+                btnText.style.display = loading ? 'none' : 'inline';
+                btnLoader.style.display = loading ? 'inline-block' : 'none';
+            }
+
+            function clearAlerts() {
+                errorMsg.style.display = 'none';
+                successMsg.style.display = 'none';
+                identifier.classList.remove('error');
+                password.classList.remove('error');
+            }
+
+            // ============================================================
+            // LOGIN
+            // ============================================================
+            async function handleLogin(e) {
+                e.preventDefault();
+                clearAlerts();
+
+                const rawInput = identifier.value.trim();
+                const pass = password.value.trim();
+
+                if (!rawInput || !pass) {
+                    showError('NIK/Email dan kata sandi harus diisi!');
+                    if (!rawInput) identifier.classList.add('error');
+                    if (!pass) password.classList.add('error');
+                    return;
+                }
+
+                const d = detectIdentifier(rawInput);
+                if (d.type === 'empty' || d.type === 'unknown') {
+                    showError('Masukkan NIK 16 digit atau Email yang valid.');
+                    identifier.classList.add('error');
+                    return;
+                }
+
+                const loginEmail = d.type === 'nik' ? d.email : d.value;
+                setLoading(true);
+
+                try {
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({
+                        email: loginEmail,
+                        password: pass
+                    });
+
+                    if (error) {
+                        // Fallback: coba password default untuk NIK
+                        if (d.type === 'nik' && error.message.includes('Invalid login credentials')) {
+                            const retry = await supabaseClient.auth.signInWithPassword({
+                                email: loginEmail,
+                                password: DEFAULT_PASSWORD
+                            });
+                            if (retry.error) {
+                                throw new Error(
+                                    'NIK atau password salah. Jika pertama kali, gunakan password default: <strong>' +
+                                    DEFAULT_PASSWORD + '</strong>');
+                            }
+                            showSuccess('Login berhasil! (password default). Segera ganti password Anda.');
+                            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+                            return;
+                        }
+                        throw error;
+                    }
+
+                    // Simpan / hapus remember
+                    if (rememberMe.checked) {
+                        localStorage.setItem('rememberIdentifier', rawInput);
+                    } else {
+                        localStorage.removeItem('rememberIdentifier');
+                    }
+
+                    // Ambil role
+                    const { data: userData } = await supabaseClient
+                        .from('users')
+                        .select('role')
+                        .eq('id', data.user.id)
+                        .single();
+
+                    const role = userData?.role || 'viewer';
+                    let redirect = 'dashboard.html';
+                    if (role === 'pendidik') redirect = 'profile-pendidik.html';
+                    else if (role === 'operator') redirect = 'lembaga.html';
+
+                    showSuccess('Login berhasil! Mengalihkan...');
+                    setTimeout(() => { window.location.href = redirect; }, 1000);
+
+                } catch (err) {
+                    console.error(err);
+                    showError(err.message || 'Login gagal. Periksa NIK/Email dan password.');
+                    identifier.classList.add('error');
+                    password.classList.add('error');
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            // ============================================================
+            // CEK SESI
+            // ============================================================
+            async function checkSession() {
+                try {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session) {
+                        const { data: userData } = await supabaseClient
+                            .from('users')
+                            .select('role')
+                            .eq('id', session.user.id)
+                            .single();
+                        const role = userData?.role || 'viewer';
+                        const redirect = role === 'pendidik' ? 'profile-pendidik.html' : 'dashboard.html';
+                        window.location.href = redirect;
+                        return;
+                    }
+                    const saved = localStorage.getItem('rememberIdentifier');
+                    if (saved) {
+                        identifier.value = saved;
+                        rememberMe.checked = true;
+                        identifier.dispatchEvent(new Event('input'));
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            // ============================================================
+            // INIT
+            // ============================================================
+            form.addEventListener('submit', handleLogin);
+            document.addEventListener('DOMContentLoaded', checkSession);
+
+            // Enter pada password → submit
+            password.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') form.dispatchEvent(new Event('submit'));
+            });
+            identifier.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    password.focus();
+                }
+            });
+        })();
+    </script>
+</body>
+  </html>
