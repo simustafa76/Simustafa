@@ -78,7 +78,9 @@
             color: #555;
             margin-bottom: 2px;
         }
-        .form-group input {
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 8px 12px;
             border: 2px solid #e0e0e0;
@@ -87,7 +89,9 @@
             background: #fafafa;
             transition: 0.2s;
         }
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
             border-color: var(--primary);
             outline: none;
             background: white;
@@ -96,6 +100,10 @@
             background: #f5f5f5;
             color: #666;
             cursor: not-allowed;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
         }
 
         .lembaga-info-box {
@@ -159,6 +167,13 @@
         .btn-danger:hover {
             background: #d32f2f;
         }
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #e65100;
+        }
 
         /* ===== MODAL ===== */
         .modal-overlay {
@@ -181,7 +196,7 @@
             background: white;
             border-radius: 16px;
             padding: 28px 30px;
-            max-width: 450px;
+            max-width: 550px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -215,6 +230,14 @@
         }
         .modal-header .close-btn:hover {
             color: #333;
+        }
+        .modal-body .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .modal-body .form-row .full-width {
+            grid-column: 1 / -1;
         }
         .modal-footer {
             display: flex;
@@ -250,6 +273,19 @@
         .toast-info { background: var(--primary); }
         .toast-warning { background: var(--warning); }
 
+        .spinner-sm {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f0f2f5;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 640px) {
             .setting-item {
                 flex-direction: column;
@@ -262,6 +298,9 @@
             .modal-container {
                 padding: 20px;
                 margin: 10px;
+            }
+            .modal-body .form-row {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -304,6 +343,9 @@
                     <div class="section-title"><i class="fas fa-building"></i>Profil Lembaga</div>
                     <div class="section-desc">Informasi lembaga tempat Anda bertugas</div>
                 </div>
+                <button class="btn btn-primary" onclick="openEditLembagaModal()">
+                    <i class="fas fa-edit"></i> Edit Profil Lembaga
+                </button>
             </div>
 
             <div class="lembaga-info-box">
@@ -321,6 +363,10 @@
                         <div class="value" id="lembagaNslp">-</div>
                     </div>
                     <div>
+                        <div class="label">Pimpinan</div>
+                        <div class="value" id="lembagaPimpinan">-</div>
+                    </div>
+                    <div>
                         <div class="label">Alamat</div>
                         <div class="value" id="lembagaAlamat">-</div>
                     </div>
@@ -331,6 +377,14 @@
                     <div>
                         <div class="label">Desa/Kelurahan</div>
                         <div class="value" id="lembagaDesa">-</div>
+                    </div>
+                    <div>
+                        <div class="label">No. HP</div>
+                        <div class="value" id="lembagaNoHp">-</div>
+                    </div>
+                    <div>
+                        <div class="label">Email</div>
+                        <div class="value" id="lembagaEmail">-</div>
                     </div>
                 </div>
             </div>
@@ -481,6 +535,84 @@
         </div>
     </div>
 
+    <!-- ===== MODAL EDIT LEMBAGA ===== -->
+    <div class="modal-overlay" id="editLembagaModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2><i class="fas fa-building" style="color:var(--primary);margin-right:8px;"></i>Edit Profil Lembaga</h2>
+                <button class="close-btn" onclick="closeEditLembagaModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nama Lembaga <span style="color:red;">*</span></label>
+                    <input type="text" id="editLembagaNama" placeholder="Nama lembaga">
+                </div>
+                <div class="form-group">
+                    <label>Jenis Lembaga <span style="color:red;">*</span></label>
+                    <select id="editLembagaJenis">
+                        <option value="LPQ">LPQ</option>
+                        <option value="MDT">MDT</option>
+                        <option value="PONPES">PONPES</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>NSLP/NSPP</label>
+                        <input type="text" id="editLembagaNslp" placeholder="Nomor statistik lembaga">
+                    </div>
+                    <div class="form-group">
+                        <label>Pimpinan</label>
+                        <input type="text" id="editLembagaPimpinan" placeholder="Nama pimpinan">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Alamat</label>
+                    <textarea id="editLembagaAlamat" placeholder="Alamat lengkap lembaga" rows="2"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kecamatan</label>
+                        <select id="editLembagaKecamatan">
+                            <option value="">-- Pilih Kecamatan --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Desa / Kelurahan</label>
+                        <select id="editLembagaDesa">
+                            <option value="">-- Pilih Desa --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>No. HP</label>
+                        <input type="text" id="editLembagaNoHp" placeholder="Nomor telepon">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="editLembagaEmail" placeholder="Alamat email">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kabupaten</label>
+                        <input type="text" id="editLembagaKabupaten" placeholder="Kabupaten" value="Tegal">
+                    </div>
+                    <div class="form-group">
+                        <label>Provinsi</label>
+                        <input type="text" id="editLembagaProvinsi" placeholder="Provinsi" value="Jawa Tengah">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeEditLembagaModal()">Batal</button>
+                <button class="btn btn-success" onclick="saveLembaga()" id="btnSaveLembaga">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
@@ -562,6 +694,56 @@
         }
 
         // ============================================================
+        // ===== LOAD MASTER DATA =====
+        // ============================================================
+        async function loadMasterData() {
+            try {
+                // Load kecamatan
+                const { data: kecamatanData } = await supabaseClient
+                    .from('master_kecamatan')
+                    .select('id, nama')
+                    .order('nama');
+
+                const kecSelect = document.getElementById('editLembagaKecamatan');
+                kecSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+                (kecamatanData || []).forEach(item => {
+                    kecSelect.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
+                });
+
+                // Load desa (default kosong)
+                const desaSelect = document.getElementById('editLembagaDesa');
+                desaSelect.innerHTML = '<option value="">-- Pilih Desa --</option>';
+
+                // Event listener untuk kecamatan
+                kecSelect.addEventListener('change', function() {
+                    loadDesaOptions(this.value);
+                });
+
+            } catch (e) {
+                console.error('Error loading master data:', e);
+            }
+        }
+
+        async function loadDesaOptions(kecamatanId) {
+            try {
+                const { data } = await supabaseClient
+                    .from('master_kelurahan')
+                    .select('id, nama')
+                    .eq('kecamatan_id', kecamatanId)
+                    .order('nama');
+
+                const desaSelect = document.getElementById('editLembagaDesa');
+                desaSelect.innerHTML = '<option value="">-- Pilih Desa --</option>';
+                (data || []).forEach(item => {
+                    desaSelect.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
+                });
+
+            } catch (e) {
+                console.error('Error loading desa:', e);
+            }
+        }
+
+        // ============================================================
         // ===== LOAD LEMBAGA DATA =====
         // ============================================================
         async function loadLembagaData(lembagaId) {
@@ -578,9 +760,12 @@
                 document.getElementById('lembagaNama').textContent = data.nama || '-';
                 document.getElementById('lembagaJenis').textContent = data.jenis_lembaga || '-';
                 document.getElementById('lembagaNslp').textContent = data.nslp || '-';
+                document.getElementById('lembagaPimpinan').textContent = data.pimpinan || '-';
                 document.getElementById('lembagaAlamat').textContent = data.alamat || '-';
                 document.getElementById('lembagaKecamatan').textContent = data.kecamatan || '-';
                 document.getElementById('lembagaDesa').textContent = data.desa || '-';
+                document.getElementById('lembagaNoHp').textContent = data.no_hp || '-';
+                document.getElementById('lembagaEmail').textContent = data.email || '-';
 
             } catch (e) {
                 console.error('Error loading lembaga data:', e);
@@ -594,6 +779,157 @@
             if (userProfile?.lembaga_id) {
                 loadLembagaData(userProfile.lembaga_id);
                 showToast('Data lembaga diperbarui', 'success');
+            }
+        }
+
+        // ============================================================
+        // ===== EDIT LEMBAGA MODAL =====
+        // ============================================================
+        async function openEditLembagaModal() {
+            if (!lembagaData) {
+                showToast('Data lembaga belum dimuat', 'error');
+                return;
+            }
+
+            // Load master data
+            await loadMasterData();
+
+            // Isi form dengan data lembaga
+            document.getElementById('editLembagaNama').value = lembagaData.nama || '';
+            document.getElementById('editLembagaJenis').value = lembagaData.jenis_lembaga || 'LPQ';
+            document.getElementById('editLembagaNslp').value = lembagaData.nslp || '';
+            document.getElementById('editLembagaPimpinan').value = lembagaData.pimpinan || '';
+            document.getElementById('editLembagaAlamat').value = lembagaData.alamat || '';
+            document.getElementById('editLembagaNoHp').value = lembagaData.no_hp || '';
+            document.getElementById('editLembagaEmail').value = lembagaData.email || '';
+            document.getElementById('editLembagaKabupaten').value = lembagaData.kabupaten || 'Tegal';
+            document.getElementById('editLembagaProvinsi').value = lembagaData.provinsi || 'Jawa Tengah';
+
+            // Set kecamatan & desa
+            if (lembagaData.kecamatan_id) {
+                document.getElementById('editLembagaKecamatan').value = lembagaData.kecamatan_id;
+                await loadDesaOptions(lembagaData.kecamatan_id);
+                if (lembagaData.desa_id) {
+                    document.getElementById('editLembagaDesa').value = lembagaData.desa_id;
+                }
+            }
+
+            document.getElementById('editLembagaModal').classList.add('active');
+        }
+
+        function closeEditLembagaModal() {
+            document.getElementById('editLembagaModal').classList.remove('active');
+        }
+
+        // ============================================================
+        // ===== SAVE LEMBAGA =====
+        // ============================================================
+        async function saveLembaga() {
+            const btn = document.getElementById('btnSaveLembaga');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-sm"></span> Menyimpan...';
+
+            try {
+                const nama = document.getElementById('editLembagaNama').value.trim();
+                if (!nama) {
+                    showToast('Nama lembaga wajib diisi!', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
+                    return;
+                }
+
+                const kecamatanId = document.getElementById('editLembagaKecamatan').value;
+                const desaId = document.getElementById('editLembagaDesa').value;
+
+                // Ambil nama kecamatan dan desa dari master
+                let kecamatanNama = '';
+                let desaNama = '';
+
+                if (kecamatanId) {
+                    const { data: kecData } = await supabaseClient
+                        .from('master_kecamatan')
+                        .select('nama')
+                        .eq('id', kecamatanId)
+                        .single();
+                    if (kecData) kecamatanNama = kecData.nama;
+                }
+
+                if (desaId) {
+                    const { data: desaData } = await supabaseClient
+                        .from('master_kelurahan')
+                        .select('nama')
+                        .eq('id', desaId)
+                        .single();
+                    if (desaData) desaNama = desaData.nama;
+                }
+
+                const data = {
+                    nama: nama,
+                    jenis_lembaga: document.getElementById('editLembagaJenis').value,
+                    nslp: document.getElementById('editLembagaNslp').value.trim(),
+                    pimpinan: document.getElementById('editLembagaPimpinan').value.trim(),
+                    alamat: document.getElementById('editLembagaAlamat').value.trim(),
+                    kecamatan_id: kecamatanId || null,
+                    desa_id: desaId || null,
+                    kecamatan: kecamatanNama,
+                    desa: desaNama,
+                    kabupaten: document.getElementById('editLembagaKabupaten').value.trim() || 'Tegal',
+                    provinsi: document.getElementById('editLembagaProvinsi').value.trim() || 'Jawa Tengah',
+                    no_hp: document.getElementById('editLembagaNoHp').value.trim(),
+                    email: document.getElementById('editLembagaEmail').value.trim(),
+                    updated_at: new Date().toISOString()
+                };
+
+                const { error } = await supabaseClient
+                    .from('lembaga')
+                    .update(data)
+                    .eq('id', userProfile.lembaga_id);
+
+                if (error) throw error;
+
+                showToast('Profil lembaga berhasil diperbarui!', 'success');
+                closeEditLembagaModal();
+
+                // Refresh data
+                await loadLembagaData(userProfile.lembaga_id);
+
+                // Update juga data pendidik yang terkait dengan lembaga ini
+                await updatePendidikLembagaData(userProfile.lembaga_id, data);
+
+            } catch (e) {
+                console.error('Error saving lembaga:', e);
+                showToast('Gagal menyimpan: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
+            }
+        }
+
+        // ============================================================
+        // ===== UPDATE PENDIDIK LEMBAGA DATA =====
+        // ============================================================
+        async function updatePendidikLembagaData(lembagaId, lembagaData) {
+            try {
+                // Update semua pendidik di lembaga ini
+                const { error } = await supabaseClient
+                    .from('pendidik')
+                    .update({
+                        kecamatan_lembaga: lembagaData.kecamatan || '',
+                        desa_lembaga: lembagaData.desa || '',
+                        kecamatan_lembaga_id: lembagaData.kecamatan_id || null,
+                        desa_lembaga_id: lembagaData.desa_id || null,
+                        jenis_lembaga: lembagaData.jenis_lembaga || 'LPQ',
+                        nslp_lembaga: lembagaData.nslp || '',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('lembaga_id', lembagaId);
+
+                if (error) throw error;
+                console.log('✅ Data pendidik berhasil disinkronkan dengan lembaga');
+
+            } catch (e) {
+                console.warn('Gagal update data pendidik:', e);
+                // Tidak perlu showToast karena ini operasi background
             }
         }
 
@@ -634,7 +970,6 @@
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
             document.getElementById('passwordModal').classList.add('active');
-            // Focus ke input pertama
             setTimeout(() => {
                 document.getElementById('oldPassword').focus();
             }, 100);
@@ -647,7 +982,6 @@
             document.getElementById('confirmPassword').value = '';
         }
 
-        // Enter key di modal
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('oldPassword').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') document.getElementById('newPassword').focus();
@@ -680,14 +1014,12 @@
                 return;
             }
 
-            // Disable button sementara
             const btn = document.querySelector('#passwordModal .btn-success');
             const originalText = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            btn.innerHTML = '<span class="spinner-sm"></span> Memproses...';
 
             try {
-                // Verifikasi password lama
                 const { error: signInError } = await supabaseClient.auth.signInWithPassword({
                     email: userProfile.email,
                     password: oldPass
@@ -700,7 +1032,6 @@
                     return;
                 }
 
-                // Update password
                 const { error } = await supabaseClient.auth.updateUser({
                     password: newPass
                 });
@@ -890,6 +1221,9 @@
         // ===== EXPOSE FUNCTIONS =====
         // ============================================================
         window.refreshLembagaInfo = refreshLembagaInfo;
+        window.openEditLembagaModal = openEditLembagaModal;
+        window.closeEditLembagaModal = closeEditLembagaModal;
+        window.saveLembaga = saveLembaga;
         window.updateUsername = updateUsername;
         window.openChangePassword = openChangePassword;
         window.closePasswordModal = closePasswordModal;
