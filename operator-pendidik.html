@@ -88,7 +88,7 @@
             background: white;
             border-radius: 16px;
             padding: 28px 30px;
-            max-width: 700px;
+            max-width: 800px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -177,6 +177,43 @@
             color: #666 !important;
             cursor: not-allowed !important;
             border-color: #e8e8e8 !important;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 16px 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .lama-mengabdi-display {
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #e8e8e8;
+            color: #666;
+            font-size: 0.9rem;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .rekening-box {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 8px;
+        }
+        .rekening-box .rekening-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         @media (max-width: 640px) {
@@ -347,7 +384,8 @@
             <div class="modal-body">
                 <input type="hidden" id="editId">
 
-                <!-- Identitas -->
+                <!-- IDENTITAS PENDIDIK -->
+                <div class="section-title"><i class="fas fa-id-card"></i> Identitas Pendidik</div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>NIK <span style="color:red;">*</span></label>
@@ -392,10 +430,40 @@
                         <input type="text" id="editPendidikan" placeholder="S1 / D3 / SMA / dll">
                     </div>
                 </div>
+
+                <!-- ALAMAT LENGKAP -->
+                <div class="section-title"><i class="fas fa-map-marker-alt"></i> Alamat</div>
                 <div class="form-group full-width">
-                    <label>Alamat</label>
-                    <input type="text" id="editAlamat" placeholder="Alamat lengkap">
+                    <label>Alamat Lengkap</label>
+                    <input type="text" id="editAlamat" placeholder="Alamat lengkap (Jalan, RT/RW, dll)">
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Desa / Kelurahan (Pengajar)</label>
+                        <select id="editDesaPengajar">
+                            <option value="">-- Pilih Desa --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kecamatan (Pengajar)</label>
+                        <select id="editKecamatanPengajar" onchange="loadDesaOptions(this.value, 'editDesaPengajar')">
+                            <option value="">-- Pilih Kecamatan --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kabupaten (Pengajar)</label>
+                        <input type="text" id="editKabupatenPengajar" placeholder="Kabupaten" value="Tegal">
+                    </div>
+                    <div class="form-group">
+                        <label>Provinsi</label>
+                        <input type="text" id="editProvinsi" placeholder="Provinsi" value="Jawa Tengah">
+                    </div>
+                </div>
+
+                <!-- KONTAK -->
+                <div class="section-title"><i class="fas fa-phone"></i> Kontak</div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>No. HP</label>
@@ -406,73 +474,65 @@
                         <input type="email" id="editEmail" placeholder="Alamat email">
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nomor Rekening</label>
-                        <input type="text" id="editNomorRekening" placeholder="Nomor rekening">
+
+                <!-- REKENING BUPATI -->
+                <div class="section-title"><i class="fas fa-university"></i> Rekening Insentif Bupati</div>
+                <div class="rekening-box">
+                    <div class="rekening-title"><i class="fas fa-landmark"></i> Rekening 1 - Insentif Bupati</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nomor Rekening</label>
+                            <input type="text" id="editNomorRekeningBupati" placeholder="Nomor rekening">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Bank</label>
+                            <input type="text" id="editNamaBankBupati" placeholder="Nama bank (BRI/BNI/Mandiri/dll)">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Nama Bank</label>
-                        <input type="text" id="editNamaBank" placeholder="Nama bank">
+                    <div class="form-group full-width">
+                        <label>Nama Pemilik Rekening</label>
+                        <input type="text" id="editPemilikRekeningBupati" placeholder="Nama sesuai rekening">
                     </div>
                 </div>
 
-                <!-- Data Mengajar -->
+                <!-- REKENING GUBERNUR -->
+                <div class="section-title"><i class="fas fa-university"></i> Rekening Insentif Gubernur</div>
+                <div class="rekening-box">
+                    <div class="rekening-title"><i class="fas fa-landmark"></i> Rekening 2 - Insentif Gubernur</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nomor Rekening</label>
+                            <input type="text" id="editNomorRekeningGubernur" placeholder="Nomor rekening">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Bank</label>
+                            <input type="text" id="editNamaBankGubernur" placeholder="Nama bank (BRI/BNI/Mandiri/dll)">
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Nama Pemilik Rekening</label>
+                        <input type="text" id="editPemilikRekeningGubernur" placeholder="Nama sesuai rekening">
+                    </div>
+                </div>
+
+                <!-- DATA MENGAJAR -->
+                <div class="section-title"><i class="fas fa-chalkboard-teacher"></i> Data Mengajar</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>TMT Mengajar</label>
+                        <input type="date" id="editTmt" onchange="hitungLamaMengabdi()">
+                    </div>
+                    <div class="form-group">
+                        <label>Lama Mengabdi (otomatis)</label>
+                        <div class="lama-mengabdi-display" id="lamaMengabdiDisplay">0 Tahun</div>
+                        <input type="hidden" id="editLamaMengabdi" value="0">
+                    </div>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Lembaga</label>
                         <input type="text" id="editLembagaName" class="lembaga-readonly" readonly placeholder="Lembaga Anda">
                     </div>
-                    <div class="form-group">
-                        <label>NSLP Lembaga</label>
-                        <input type="text" id="editNslpLembaga" class="lembaga-readonly" readonly>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Kecamatan Lembaga</label>
-                        <input type="text" id="editKecamatanLembaga" class="lembaga-readonly" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Desa Lembaga</label>
-                        <input type="text" id="editDesaLembaga" class="lembaga-readonly" readonly>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>RT/RW Pengajar</label>
-                        <input type="text" id="editRtRwPengajar" placeholder="RT/RW tempat mengajar">
-                    </div>
-                    <div class="form-group">
-                        <label>Kecamatan Pengajar</label>
-                        <select id="editKecamatanPengajar">
-                            <option value="">-- Pilih Kecamatan --</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Desa Pengajar</label>
-                        <select id="editDesaPengajar">
-                            <option value="">-- Pilih Desa --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Kabupaten Pengajar</label>
-                        <input type="text" id="editKabupatenPengajar" placeholder="Kabupaten" value="Tegal">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>TMT Mengajar</label>
-                        <input type="date" id="editTmt">
-                    </div>
-                    <div class="form-group">
-                        <label>Lama Mengabdi (tahun)</label>
-                        <input type="number" id="editLamaMengabdi" placeholder="Jumlah tahun" min="0" step="1">
-                    </div>
-                </div>
-                <div class="form-row">
                     <div class="form-group">
                         <label>Jenis Lembaga</label>
                         <select id="editJenisLembaga">
@@ -481,6 +541,8 @@
                             <option value="PONPES">PONPES</option>
                         </select>
                     </div>
+                </div>
+                <div class="form-row">
                     <div class="form-group">
                         <label>Status</label>
                         <select id="editStatus">
@@ -488,16 +550,13 @@
                             <option value="false">Tidak Aktif</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <!-- Kosong untuk keseimbangan -->
+                    </div>
                 </div>
-                <div class="form-group full-width">
-                    <label>Status Verifikasi</label>
-                    <select id="editVerifikasi">
-                        <option value="Draft">Draft</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Diverifikasi">Diverifikasi</option>
-                    </select>
-                </div>
-                <div class="form-group full-width" id="verifikasiAction" style="display:none;">
+
+                <!-- VERIFIKASI -->
+                <div class="form-group full-width" id="verifikasiAction" style="display:none; margin-top: 12px;">
                     <button class="btn btn-primary" onclick="requestVerification()">
                         <i class="fas fa-check-circle"></i> Ajukan Verifikasi
                     </button>
@@ -560,7 +619,6 @@
         let isNewRecord = false;
         let userProfile = null;
         let lembagaData = null;
-        let kecamatanList = [];
 
         // ============================================================
         // ===== TOAST =====
@@ -648,22 +706,10 @@
 
                 // Set readonly fields di modal
                 document.getElementById('editLembagaName').value = data.nama || '';
-                document.getElementById('editNslpLembaga').value = data.nslp || '';
-                document.getElementById('editKecamatanLembaga').value = data.kecamatan || '';
-                document.getElementById('editDesaLembaga').value = data.desa || '';
                 document.getElementById('editJenisLembaga').value = data.jenis_lembaga || 'LPQ';
 
                 // Load kecamatan options
                 await loadKecamatanOptions();
-
-                // Auto-fill kecamatan & desa pengajar dari lembaga
-                if (data.kecamatan_id) {
-                    document.getElementById('editKecamatanPengajar').value = data.kecamatan_id;
-                    await loadDesaOptions(data.kecamatan_id, 'editDesaPengajar');
-                    if (data.desa_id) {
-                        document.getElementById('editDesaPengajar').value = data.desa_id;
-                    }
-                }
 
             } catch (e) {
                 console.error('Error loading lembaga data:', e);
@@ -679,10 +725,9 @@
                 .select('id, nama')
                 .order('nama');
             if (error) throw error;
-            kecamatanList = data || [];
             const select = document.getElementById('editKecamatanPengajar');
             select.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
-            kecamatanList.forEach(item => {
+            data.forEach(item => {
                 select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
             });
         }
@@ -707,6 +752,33 @@
         document.getElementById('editKecamatanPengajar').addEventListener('change', function() {
             loadDesaOptions(this.value, 'editDesaPengajar');
         });
+
+        // ============================================================
+        // ===== HITUNG LAMA MENGABDI =====
+        // ============================================================
+        function hitungLamaMengabdi() {
+            const tmtValue = document.getElementById('editTmt').value;
+            const display = document.getElementById('lamaMengabdiDisplay');
+            const hidden = document.getElementById('editLamaMengabdi');
+            
+            if (!tmtValue) {
+                display.textContent = '0 Tahun';
+                hidden.value = '0';
+                return;
+            }
+
+            const tmt = new Date(tmtValue);
+            const now = new Date();
+            let years = now.getFullYear() - tmt.getFullYear();
+            const monthDiff = now.getMonth() - tmt.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < tmt.getDate())) {
+                years--;
+            }
+            
+            const result = Math.max(0, years);
+            display.textContent = `${result} Tahun`;
+            hidden.value = result;
+        }
 
         // ============================================================
         // ===== FUNGSI LOAD DATA =====
@@ -901,52 +973,40 @@
             document.getElementById('editIbuKandung').value = '';
             document.getElementById('editPendidikan').value = '';
             document.getElementById('editAlamat').value = '';
+            document.getElementById('editKabupatenPengajar').value = 'Tegal';
+            document.getElementById('editProvinsi').value = 'Jawa Tengah';
             document.getElementById('editNoHp').value = '';
             document.getElementById('editEmail').value = '';
-            document.getElementById('editNomorRekening').value = '';
-            document.getElementById('editNamaBank').value = '';
-            document.getElementById('editRtRwPengajar').value = '';
-            document.getElementById('editKabupatenPengajar').value = 'Tegal';
+            
+            // Reset rekening Bupati
+            document.getElementById('editNomorRekeningBupati').value = '';
+            document.getElementById('editNamaBankBupati').value = '';
+            document.getElementById('editPemilikRekeningBupati').value = '';
+            
+            // Reset rekening Gubernur
+            document.getElementById('editNomorRekeningGubernur').value = '';
+            document.getElementById('editNamaBankGubernur').value = '';
+            document.getElementById('editPemilikRekeningGubernur').value = '';
+            
             document.getElementById('editTmt').value = '';
-            document.getElementById('editLamaMengabdi').value = '';
             document.getElementById('editStatus').value = 'true';
-            document.getElementById('editVerifikasi').value = 'Draft';
+            document.getElementById('lamaMengabdiDisplay').textContent = '0 Tahun';
+            document.getElementById('editLamaMengabdi').value = '0';
+
+            // Reset dropdown
+            document.getElementById('editKecamatanPengajar').value = '';
+            document.getElementById('editDesaPengajar').innerHTML = '<option value="">-- Pilih Desa --</option>';
 
             // Auto-fill lembaga
             if (lembagaData) {
                 document.getElementById('editLembagaName').value = lembagaData.nama || '';
-                document.getElementById('editNslpLembaga').value = lembagaData.nslp || '';
-                document.getElementById('editKecamatanLembaga').value = lembagaData.kecamatan || '';
-                document.getElementById('editDesaLembaga').value = lembagaData.desa || '';
                 document.getElementById('editJenisLembaga').value = lembagaData.jenis_lembaga || 'LPQ';
             }
 
-            // Disable readonly fields
-            document.getElementById('editLembagaName').disabled = true;
-            document.getElementById('editNslpLembaga').disabled = true;
-            document.getElementById('editKecamatanLembaga').disabled = true;
-            document.getElementById('editDesaLembaga').disabled = true;
-
             // Enable editable fields
-            document.getElementById('editNik').disabled = false;
-            document.getElementById('editNama').disabled = false;
-            document.getElementById('editTempatLahir').disabled = false;
-            document.getElementById('editTanggalLahir').disabled = false;
-            document.getElementById('editJenisKelamin').disabled = false;
-            document.getElementById('editStatusPerkawinan').disabled = false;
-            document.getElementById('editIbuKandung').disabled = false;
-            document.getElementById('editPendidikan').disabled = false;
-            document.getElementById('editAlamat').disabled = false;
-            document.getElementById('editNoHp').disabled = false;
-            document.getElementById('editEmail').disabled = false;
-            document.getElementById('editNomorRekening').disabled = false;
-            document.getElementById('editNamaBank').disabled = false;
-            document.getElementById('editRtRwPengajar').disabled = false;
-            document.getElementById('editKabupatenPengajar').disabled = false;
-            document.getElementById('editTmt').disabled = false;
-            document.getElementById('editLamaMengabdi').disabled = false;
-            document.getElementById('editStatus').disabled = false;
-            document.getElementById('editVerifikasi').disabled = false;
+            document.querySelectorAll('#pendidikModal .modal-body input:not(.lembaga-readonly), #pendidikModal .modal-body select').forEach(el => {
+                el.disabled = false;
+            });
 
             openModal();
         }
@@ -1013,35 +1073,54 @@
                 document.getElementById('editIbuKandung').value = data.ibu_kandung || '';
                 document.getElementById('editPendidikan').value = data.pendidikan_terakhir || '';
                 document.getElementById('editAlamat').value = data.alamat || '';
+                document.getElementById('editKabupatenPengajar').value = data.kabupaten_pengajar || 'Tegal';
+                document.getElementById('editProvinsi').value = data.provinsi || 'Jawa Tengah';
                 document.getElementById('editNoHp').value = data.no_hp || '';
                 document.getElementById('editEmail').value = data.email || '';
-                document.getElementById('editNomorRekening').value = data.nomor_rekening || '';
-                document.getElementById('editNamaBank').value = data.nama_bank || '';
-                document.getElementById('editRtRwPengajar').value = data.rt_rw_pengajar || '';
-                document.getElementById('editKabupatenPengajar').value = data.kabupaten_pengajar || 'Tegal';
+                
+                // Rekening Bupati
+                document.getElementById('editNomorRekeningBupati').value = data.nomor_rekening_bupati || '';
+                document.getElementById('editNamaBankBupati').value = data.nama_bank_bupati || '';
+                document.getElementById('editPemilikRekeningBupati').value = data.pemilik_rekening_bupati || '';
+                
+                // Rekening Gubernur
+                document.getElementById('editNomorRekeningGubernur').value = data.nomor_rekening_gubernur || '';
+                document.getElementById('editNamaBankGubernur').value = data.nama_bank_gubernur || '';
+                document.getElementById('editPemilikRekeningGubernur').value = data.pemilik_rekening_gubernur || '';
+                
                 document.getElementById('editTmt').value = data.tmt_mengajar || '';
-                document.getElementById('editLamaMengabdi').value = data.lama_mengabdi || '';
                 document.getElementById('editStatus').value = data.status_aktif ? 'true' : 'false';
-                document.getElementById('editVerifikasi').value = data.status_verifikasi || 'Draft';
+
+                // Set dropdown kecamatan & desa
+                if (data.kecamatan_pengajar_id) {
+                    document.getElementById('editKecamatanPengajar').value = data.kecamatan_pengajar_id;
+                    await loadDesaOptions(data.kecamatan_pengajar_id, 'editDesaPengajar');
+                    if (data.desa_pengajar_id) {
+                        document.getElementById('editDesaPengajar').value = data.desa_pengajar_id;
+                    }
+                }
+
+                // Hitung lama mengabdi
+                if (data.tmt_mengajar) {
+                    const tmt = new Date(data.tmt_mengajar);
+                    const now = new Date();
+                    let years = now.getFullYear() - tmt.getFullYear();
+                    const monthDiff = now.getMonth() - tmt.getMonth();
+                    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < tmt.getDate())) {
+                        years--;
+                    }
+                    const result = Math.max(0, years);
+                    document.getElementById('lamaMengabdiDisplay').textContent = `${result} Tahun`;
+                    document.getElementById('editLamaMengabdi').value = result;
+                } else {
+                    document.getElementById('lamaMengabdiDisplay').textContent = '0 Tahun';
+                    document.getElementById('editLamaMengabdi').value = '0';
+                }
 
                 // Auto-fill lembaga
                 if (lembagaData) {
                     document.getElementById('editLembagaName').value = lembagaData.nama || '';
-                    document.getElementById('editNslpLembaga').value = lembagaData.nslp || '';
-                    document.getElementById('editKecamatanLembaga').value = lembagaData.kecamatan || '';
-                    document.getElementById('editDesaLembaga').value = lembagaData.desa || '';
-                }
-
-                // Set dropdown kecamatan & desa
-                document.getElementById('editKecamatanPengajar').value = data.kecamatan_pengajar_id || '';
-                if (data.kecamatan_pengajar_id) {
-                    await loadDesaOptions(data.kecamatan_pengajar_id, 'editDesaPengajar');
-                    document.getElementById('editDesaPengajar').value = data.desa_pengajar_id || '';
-                }
-
-                // Show verification button if status is Draft
-                if (data.status_verifikasi === 'Draft' || data.status_verifikasi === 'Pending') {
-                    document.getElementById('verifikasiAction').style.display = 'block';
+                    document.getElementById('editJenisLembaga').value = data.jenis_lembaga || lembagaData.jenis_lembaga || 'LPQ';
                 }
 
                 enableInputs(true);
@@ -1121,26 +1200,33 @@
                 alamat: document.getElementById('editAlamat').value.trim(),
                 no_hp: document.getElementById('editNoHp').value.trim(),
                 email: document.getElementById('editEmail').value.trim(),
-                nomor_rekening: document.getElementById('editNomorRekening').value.trim(),
-                nama_bank: document.getElementById('editNamaBank').value.trim(),
-                lembaga_id: userProfile.lembaga_id,
-                nslp_lembaga: lembagaData?.nslp || '',
-                kecamatan_lembaga: lembagaData?.kecamatan || '',
-                desa_lembaga: lembagaData?.desa || '',
-                rt_rw_pengajar: document.getElementById('editRtRwPengajar').value.trim(),
+                
+                // Rekening Bupati
+                nomor_rekening_bupati: document.getElementById('editNomorRekeningBupati').value.trim(),
+                nama_bank_bupati: document.getElementById('editNamaBankBupati').value.trim(),
+                pemilik_rekening_bupati: document.getElementById('editPemilikRekeningBupati').value.trim(),
+                
+                // Rekening Gubernur
+                nomor_rekening_gubernur: document.getElementById('editNomorRekeningGubernur').value.trim(),
+                nama_bank_gubernur: document.getElementById('editNamaBankGubernur').value.trim(),
+                pemilik_rekening_gubernur: document.getElementById('editPemilikRekeningGubernur').value.trim(),
+                
                 desa_pengajar_id: document.getElementById('editDesaPengajar').value || null,
                 kecamatan_pengajar_id: document.getElementById('editKecamatanPengajar').value || null,
                 kabupaten_pengajar: document.getElementById('editKabupatenPengajar').value.trim() || 'Tegal',
+                provinsi: document.getElementById('editProvinsi').value.trim() || 'Jawa Tengah',
                 tmt_mengajar: document.getElementById('editTmt').value || null,
-                lama_mengabdi: parseInt(document.getElementById('editLamaMengabdi').value) || null,
+                lama_mengabdi: parseInt(document.getElementById('editLamaMengabdi').value) || 0,
+                lembaga_id: userProfile.lembaga_id,
+                nslp_lembaga: lembagaData?.nslp || '',
                 jenis_lembaga: document.getElementById('editJenisLembaga').value,
                 status_aktif: document.getElementById('editStatus').value === 'true',
-                status_verifikasi: document.getElementById('editVerifikasi').value,
                 updated_at: new Date().toISOString()
             };
 
             if (!isEdit) {
                 data.created_at = new Date().toISOString();
+                data.status_verifikasi = 'Draft';
             }
 
             try {
@@ -1213,12 +1299,38 @@
                     return;
                 }
 
+                // Get desa and kecamatan names
+                const desaIds = data.map(d => d.desa_pengajar_id).filter(Boolean);
+                const kecIds = data.map(d => d.kecamatan_pengajar_id).filter(Boolean);
+                
+                let desaMap = {};
+                let kecMap = {};
+                
+                if (desaIds.length > 0) {
+                    const { data: desaData } = await supabaseClient
+                        .from('master_kelurahan')
+                        .select('id, nama')
+                        .in('id', desaIds);
+                    desaData.forEach(d => desaMap[d.id] = d.nama);
+                }
+                
+                if (kecIds.length > 0) {
+                    const { data: kecData } = await supabaseClient
+                        .from('master_kecamatan')
+                        .select('id, nama')
+                        .in('id', kecIds);
+                    kecData.forEach(d => kecMap[d.id] = d.nama);
+                }
+
                 const headers = [
                     'NIK', 'Nama Lengkap', 'Tempat Lahir', 'Tanggal Lahir',
                     'Jenis Kelamin', 'Status Perkawinan', 'Ibu Kandung',
-                    'Pendidikan Terakhir', 'Alamat', 'No HP', 'Email',
-                    'Nomor Rekening', 'Nama Bank', 'RT/RW', 'TMT Mengajar',
-                    'Lama Mengabdi', 'Jenis Lembaga', 'Status', 'Status Verifikasi'
+                    'Pendidikan Terakhir', 'Alamat', 'Desa Pengajar', 'Kecamatan Pengajar', 
+                    'Kabupaten Pengajar', 'Provinsi', 'No HP', 'Email',
+                    'No Rekening Bupati', 'Nama Bank Bupati', 'Pemilik Rekening Bupati',
+                    'No Rekening Gubernur', 'Nama Bank Gubernur', 'Pemilik Rekening Gubernur',
+                    'TMT Mengajar', 'Lama Mengabdi',
+                    'Lembaga', 'Jenis Lembaga', 'Status', 'Status Verifikasi'
                 ];
 
                 const rows = data.map(item => [
@@ -1231,13 +1343,21 @@
                     item.ibu_kandung || '',
                     item.pendidikan_terakhir || '',
                     item.alamat || '',
+                    desaMap[item.desa_pengajar_id] || '',
+                    kecMap[item.kecamatan_pengajar_id] || '',
+                    item.kabupaten_pengajar || 'Tegal',
+                    item.provinsi || 'Jawa Tengah',
                     item.no_hp || '',
                     item.email || '',
-                    item.nomor_rekening || '',
-                    item.nama_bank || '',
-                    item.rt_rw_pengajar || '',
+                    item.nomor_rekening_bupati || '',
+                    item.nama_bank_bupati || '',
+                    item.pemilik_rekening_bupati || '',
+                    item.nomor_rekening_gubernur || '',
+                    item.nama_bank_gubernur || '',
+                    item.pemilik_rekening_gubernur || '',
                     item.tmt_mengajar || '',
-                    item.lama_mengabdi || '',
+                    item.lama_mengabdi || 0,
+                    lembagaData?.nama || '',
                     item.jenis_lembaga || 'LPQ',
                     item.status_aktif ? 'Aktif' : 'Tidak Aktif',
                     item.status_verifikasi || 'Draft'
@@ -1272,19 +1392,23 @@
             const headers = [
                 'NIK', 'Nama Lengkap', 'Tempat Lahir', 'Tanggal Lahir',
                 'Jenis Kelamin', 'Status Perkawinan', 'Ibu Kandung',
-                'Pendidikan Terakhir', 'Alamat', 'No HP', 'Email',
-                'Nomor Rekening', 'Nama Bank', 'RT/RW Pengajar',
-                'Kecamatan Pengajar', 'Desa Pengajar', 'Kabupaten Pengajar',
-                'TMT Mengajar', 'Lama Mengabdi', 'Jenis Lembaga', 'Status'
+                'Pendidikan Terakhir', 'Alamat', 'Desa Pengajar', 'Kecamatan Pengajar',
+                'Kabupaten Pengajar', 'Provinsi', 'No HP', 'Email',
+                'No Rekening Bupati', 'Nama Bank Bupati', 'Pemilik Rekening Bupati',
+                'No Rekening Gubernur', 'Nama Bank Gubernur', 'Pemilik Rekening Gubernur',
+                'TMT Mengajar', 'Lama Mengabdi',
+                'Lembaga', 'Jenis Lembaga', 'Status'
             ];
 
             const exampleRow = [
                 '3328123401234567', 'Ahmad Fauzi', 'Tegal', '1990-01-15',
                 'LAKI-LAKI', 'Menikah', 'Siti Aminah',
-                'S1', 'Jl. Merdeka No. 5', '08123456789', 'ahmad@email.com',
-                '1234567890', 'BRI', '001/002',
-                'Margasari', 'Karangdawa', 'Tegal',
-                '2020-07-01', '3', 'MDT', 'Aktif'
+                'S1', 'Jl. Merdeka No. 5 RT 001/002', 'Karangdawa', 'Margasari',
+                'Tegal', 'Jawa Tengah', '08123456789', 'ahmad@email.com',
+                '1234567890', 'BRI', 'Ahmad Fauzi',
+                '0987654321', 'BNI', 'Ahmad Fauzi',
+                '2020-07-01', '3',
+                'MDT Al-Falah', 'MDT', 'Aktif'
             ];
 
             const wb = XLSX.utils.book_new();
@@ -1339,6 +1463,19 @@
                         return;
                     }
 
+                    // Get all kecamatan and desa data for mapping
+                    const { data: kecData } = await supabaseClient
+                        .from('master_kecamatan')
+                        .select('id, nama');
+                    const kecMap = {};
+                    kecData.forEach(k => kecMap[k.nama.toLowerCase()] = k.id);
+
+                    const { data: desaData } = await supabaseClient
+                        .from('master_kelurahan')
+                        .select('id, nama, kecamatan_id');
+                    const desaMap = {};
+                    desaData.forEach(d => desaMap[d.nama.toLowerCase()] = d);
+
                     let success = 0, failed = 0;
                     for (const row of json) {
                         try {
@@ -1349,30 +1486,22 @@
                             if (!nama) { failed++; continue; }
 
                             // Cari kecamatan ID
-                            let kecPengajarId = null, desaPengajarId = null;
-                            const kecNama = row['Kecamatan Pengajar'] || '';
-                            const desaNama = row['Desa Pengajar'] || '';
-
-                            if (kecNama) {
-                                const { data: kecData } = await supabaseClient
-                                    .from('master_kecamatan')
-                                    .select('id')
-                                    .eq('nama', kecNama)
-                                    .maybeSingle();
-                                if (kecData) kecPengajarId = kecData.id;
-                            }
-
-                            if (desaNama && kecPengajarId) {
-                                const { data: desaData } = await supabaseClient
-                                    .from('master_kelurahan')
-                                    .select('id')
-                                    .eq('nama', desaNama)
-                                    .eq('kecamatan_id', kecPengajarId)
-                                    .maybeSingle();
-                                if (desaData) desaPengajarId = desaData.id;
+                            const kecNama = (row['Kecamatan Pengajar'] || '').toLowerCase();
+                            const desaNama = (row['Desa Pengajar'] || '').toLowerCase();
+                            
+                            let kecId = kecMap[kecNama] || null;
+                            let desaId = null;
+                            
+                            if (desaNama && desaMap[desaNama]) {
+                                const desa = desaMap[desaNama];
+                                if (!kecId || desa.kecamatan_id === kecId) {
+                                    desaId = desa.id;
+                                    if (!kecId) kecId = desa.kecamatan_id;
+                                }
                             }
 
                             const status = row['Status'] || 'Aktif';
+                            const lamaMengabdi = parseInt(row['Lama Mengabdi']) || 0;
 
                             const dataPendidik = {
                                 nik: nik,
@@ -1387,18 +1516,25 @@
                                 alamat: row['Alamat'] || '',
                                 no_hp: row['No HP']?.toString() || '',
                                 email: row['Email'] || '',
-                                nomor_rekening: row['Nomor Rekening']?.toString() || '',
-                                nama_bank: row['Nama Bank'] || '',
+                                
+                                // Rekening Bupati
+                                nomor_rekening_bupati: row['No Rekening Bupati']?.toString() || '',
+                                nama_bank_bupati: row['Nama Bank Bupati'] || '',
+                                pemilik_rekening_bupati: row['Pemilik Rekening Bupati'] || '',
+                                
+                                // Rekening Gubernur
+                                nomor_rekening_gubernur: row['No Rekening Gubernur']?.toString() || '',
+                                nama_bank_gubernur: row['Nama Bank Gubernur'] || '',
+                                pemilik_rekening_gubernur: row['Pemilik Rekening Gubernur'] || '',
+                                
+                                desa_pengajar_id: desaId,
+                                kecamatan_pengajar_id: kecId,
+                                kabupaten_pengajar: row['Kabupaten Pengajar'] || 'Tegal',
+                                provinsi: row['Provinsi'] || 'Jawa Tengah',
+                                tmt_mengajar: parseDate(row['TMT Mengajar']),
+                                lama_mengabdi: lamaMengabdi,
                                 lembaga_id: userProfile.lembaga_id,
                                 nslp_lembaga: lembagaData?.nslp || '',
-                                kecamatan_lembaga: lembagaData?.kecamatan || '',
-                                desa_lembaga: lembagaData?.desa || '',
-                                rt_rw_pengajar: row['RT/RW Pengajar'] || '',
-                                kecamatan_pengajar_id: kecPengajarId,
-                                desa_pengajar_id: desaPengajarId,
-                                kabupaten_pengajar: row['Kabupaten Pengajar'] || 'Tegal',
-                                tmt_mengajar: parseDate(row['TMT Mengajar']),
-                                lama_mengabdi: parseInt(row['Lama Mengabdi']) || null,
                                 jenis_lembaga: mapJenjang(row['Jenis Lembaga']),
                                 status_aktif: status.toLowerCase() === 'aktif',
                                 status_verifikasi: 'Draft',
@@ -1508,6 +1644,8 @@
         window.enableEditMode = enableEditMode;
         window.requestVerification = requestVerification;
         window.showToast = showToast;
+        window.hitungLamaMengabdi = hitungLamaMengabdi;
+        window.loadDesaOptions = loadDesaOptions;
     </script>
 </body>
 </html>
