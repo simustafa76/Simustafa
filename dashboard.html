@@ -8,6 +8,406 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* ============================================================
+           KYC SPECIFIC STYLES
+           ============================================================ */
+        
+        /* KYC Status Badge */
+        .kyc-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .kyc-status-badge.draft { background: #f5f5f5; color: #888; }
+        .kyc-status-badge.pending { background: #fff3e0; color: #ff9800; }
+        .kyc-status-badge.verified { background: #e8f5e9; color: #4CAF50; }
+        .kyc-status-badge.rejected { background: #ffebee; color: #f44336; }
+
+        /* KYC Progress */
+        .kyc-progress {
+            background: #f0f2f5;
+            border-radius: 8px;
+            height: 6px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .kyc-progress .bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+
+        /* KYC Card */
+        .kyc-card {
+            border-left: 4px solid #1976d2;
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 16px;
+        }
+
+        /* KYC Stats Mini */
+        .kyc-stats-mini {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .kyc-stats-mini .stat-item {
+            background: #f8faf8;
+            border-radius: 8px;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .kyc-stats-mini .stat-item .label {
+            font-size: 0.6rem;
+            color: #888;
+        }
+        .kyc-stats-mini .stat-item .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+        .kyc-stats-mini .stat-item .value.pending { color: #ff9800; }
+        .kyc-stats-mini .stat-item .value.verified { color: #4CAF50; }
+        .kyc-stats-mini .stat-item .value.rejected { color: #f44336; }
+
+        /* KYC Table */
+        .kyc-table-wrapper {
+            overflow-x: auto;
+        }
+        .kyc-table-wrapper table {
+            width: 100%;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+        .kyc-table-wrapper table th {
+            padding: 8px 10px;
+            text-align: left;
+            background: #f8faf8;
+            border-bottom: 2px solid #f0f2f5;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #888;
+        }
+        .kyc-table-wrapper table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f5f6f8;
+        }
+        .kyc-table-wrapper table tr:hover {
+            background: #f8faf8;
+            cursor: pointer;
+        }
+        .kyc-table-wrapper table tr.kyc-pending {
+            background: #fffde7;
+        }
+        .kyc-table-wrapper table tr.kyc-pending:hover {
+            background: #fff9c4;
+        }
+
+        /* ===== MODAL KYC ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            padding: 28px 30px;
+            max-width: 850px;
+            width: 100%;
+            max-height: 92vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInModal 0.25s ease;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        .modal-header h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #888;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .modal-header .close-btn:hover {
+            color: #333;
+        }
+
+        /* Status Bar */
+        .kyc-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #f8faf8;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        .kyc-status-bar .item .label {
+            font-size: 0.65rem;
+            color: #888;
+        }
+        .kyc-status-bar .item .value {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Tab Navigation */
+        .kyc-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #f0f2f5;
+            overflow-x: auto;
+        }
+        .kyc-tabs .tab-btn {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        .kyc-tabs .tab-btn:hover {
+            color: var(--primary);
+            background: var(--primary-bg);
+        }
+        .kyc-tabs .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Tab Content */
+        .kyc-tab-content {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        .kyc-tab-content.active {
+            display: block;
+        }
+
+        /* Info Grid */
+        .kyc-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .kyc-info-grid .field {
+            padding: 6px 10px;
+            background: #f8faf8;
+            border-radius: 6px;
+        }
+        .kyc-info-grid .field .label {
+            font-size: 0.6rem;
+            color: #888;
+        }
+        .kyc-info-grid .field .value {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .kyc-info-grid .field.full {
+            grid-column: 1 / -1;
+        }
+
+        /* Dokumen Preview */
+        .dokumen-preview {
+            margin-top: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            max-height: 450px;
+            display: none;
+            background: #fafafa;
+        }
+        .dokumen-preview img {
+            width: 100%;
+            height: auto;
+            max-height: 450px;
+            object-fit: contain;
+        }
+        .dokumen-preview iframe {
+            width: 100%;
+            height: 450px;
+            border: none;
+        }
+        .dokumen-preview .empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        .dokumen-preview .empty i {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+
+        /* Action Box */
+        .kyc-action-box {
+            padding: 16px;
+            background: #fff8e1;
+            border-radius: 10px;
+            border-left: 4px solid var(--warning);
+            margin-top: 16px;
+        }
+        .kyc-action-box .action-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+        .kyc-action-box .action-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .kyc-action-box .action-row input {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        .kyc-action-box .action-row input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f2f5;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 0.7rem;
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #43a047;
+        }
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #e65100;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .modal-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            .kyc-info-grid {
+                grid-template-columns: 1fr;
+            }
+            .kyc-action-box .action-row {
+                flex-direction: column;
+            }
+            .kyc-action-box .action-row input {
+                min-width: auto;
+            }
+            .kyc-status-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .kyc-stats-mini {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -40,7 +440,7 @@
             <p>Data Terpadu Pendidik Keagamaan Kabupaten Tegal</p>
         </div>
 
-        <!-- Stats Grid -->
+        <!-- ===== STATS GRID ===== -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card" onclick="navigateTo('lembaga?tab=kecamatan')">
                 <div class="icon purple"><i class="fas fa-map-marker-alt"></i></div>
@@ -86,7 +486,68 @@
             </div>
         </div>
 
-        <!-- Charts -->
+        <!-- ===== KYC SECTION ===== -->
+        <div class="kyc-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-id-card" style="color:#1976d2;font-size:1.2rem;"></i>
+                    <span style="font-size:0.95rem;font-weight:600;color:var(--primary);">Verifikasi KYC</span>
+                    <span class="badge pending" style="font-size:0.6rem;">
+                        <i class="fas fa-clock"></i> Menunggu: <span id="kycPendingCount">0</span>
+                    </span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#888;">
+                    <span>Progress:</span>
+                    <span id="kycProgressText">0%</span>
+                    <div class="kyc-progress" style="width:120px;">
+                        <div class="bar" id="kycProgressBar" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KYC Stats Mini -->
+            <div class="kyc-stats-mini">
+                <div class="stat-item">
+                    <div class="label">Total</div>
+                    <div class="value" id="kycTotal">0</div>
+                </div>
+                <div class="stat-item" style="background:#fff3e0;">
+                    <div class="label">Menunggu</div>
+                    <div class="value pending" id="kycPending">0</div>
+                </div>
+                <div class="stat-item" style="background:#e8f5e9;">
+                    <div class="label">Terverifikasi</div>
+                    <div class="value verified" id="kycVerified">0</div>
+                </div>
+                <div class="stat-item" style="background:#ffebee;">
+                    <div class="label">Ditolak</div>
+                    <div class="value rejected" id="kycRejected">0</div>
+                </div>
+            </div>
+
+            <!-- Daftar Pengajuan KYC -->
+            <div class="kyc-table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>NIK</th>
+                            <th>Lembaga</th>
+                            <th>Status</th>
+                            <th>Diajukan</th>
+                            <th style="text-align:center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kycTableBody">
+                        <tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">
+                            <div class="spinner" style="margin:0 auto;"></div>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== CHARTS ===== -->
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:16px;">
             <div class="card">
                 <div class="card-title">Sebaran Pendidik per Kecamatan</div>
@@ -98,7 +559,7 @@
             </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- ===== RECENT ACTIVITY ===== -->
         <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
                 <div class="card-title" style="margin-bottom:0;">Aktivitas Terbaru</div>
@@ -144,17 +605,223 @@
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
 
+    <!-- ===== MODAL KYC DETAIL ===== -->
+    <div class="modal-overlay" id="kycModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2><i class="fas fa-id-card" style="color:#1976d2;margin-right:8px;"></i>Detail Verifikasi KYC</h2>
+                <button class="close-btn" onclick="closeKycModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="kycPendidikId">
+                
+                <!-- Status Bar -->
+                <div class="kyc-status-bar">
+                    <div class="item">
+                        <div class="label">Status Verifikasi</div>
+                        <div class="value" id="kycDetailStatus">-</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">Status Keaktifan</div>
+                        <div class="value" id="kycDetailAktif">-</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">Tanggal Pengajuan</div>
+                        <div class="value" id="kycDetailTanggal">-</div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="kyc-tabs">
+                    <button class="tab-btn active" data-tab="identitas" onclick="switchKycTab('identitas', this)">
+                        <i class="fas fa-user"></i> Identitas
+                    </button>
+                    <button class="tab-btn" data-tab="mengajar" onclick="switchKycTab('mengajar', this)">
+                        <i class="fas fa-chalkboard-teacher"></i> Data Mengajar
+                    </button>
+                    <button class="tab-btn" data-tab="dokumen" onclick="switchKycTab('dokumen', this)">
+                        <i class="fas fa-file-alt"></i> Dokumen
+                    </button>
+                </div>
+
+                <!-- Tab: Identitas -->
+                <div id="tab-identitas" class="kyc-tab-content active">
+                    <div class="kyc-info-grid">
+                        <div class="field">
+                            <div class="label">NIK</div>
+                            <div class="value" id="kycDetailNik">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Nama Lengkap</div>
+                            <div class="value" id="kycDetailNama">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Tempat Lahir</div>
+                            <div class="value" id="kycDetailTempatLahir">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Tanggal Lahir</div>
+                            <div class="value" id="kycDetailTanggalLahir">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Jenis Kelamin</div>
+                            <div class="value" id="kycDetailJenisKelamin">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Status Perkawinan</div>
+                            <div class="value" id="kycDetailStatusPerkawinan">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Ibu Kandung</div>
+                            <div class="value" id="kycDetailIbuKandung">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Pendidikan Terakhir</div>
+                            <div class="value" id="kycDetailPendidikan">-</div>
+                        </div>
+                        <div class="field full">
+                            <div class="label">Alamat</div>
+                            <div class="value" id="kycDetailAlamat">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">No. HP</div>
+                            <div class="value" id="kycDetailNoHp">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Email</div>
+                            <div class="value" id="kycDetailEmail">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Nomor Rekening</div>
+                            <div class="value" id="kycDetailNomorRekening">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Nama Bank</div>
+                            <div class="value" id="kycDetailNamaBank">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Data Mengajar -->
+                <div id="tab-mengajar" class="kyc-tab-content" style="display:none;">
+                    <div class="kyc-info-grid">
+                        <div class="field full">
+                            <div class="label">Lembaga</div>
+                            <div class="value" id="kycDetailLembaga">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">NSLP Lembaga</div>
+                            <div class="value" id="kycDetailNslpLembaga">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Jenis Lembaga</div>
+                            <div class="value" id="kycDetailJenisLembaga">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Kecamatan Lembaga</div>
+                            <div class="value" id="kycDetailKecamatanLembaga">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Desa Lembaga</div>
+                            <div class="value" id="kycDetailDesaLembaga">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">RT/RW</div>
+                            <div class="value" id="kycDetailRtRw">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Kecamatan Pengajar</div>
+                            <div class="value" id="kycDetailKecamatanPengajar">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Desa Pengajar</div>
+                            <div class="value" id="kycDetailDesaPengajar">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Kabupaten Pengajar</div>
+                            <div class="value" id="kycDetailKabupatenPengajar">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">TMT Mengajar</div>
+                            <div class="value" id="kycDetailTmt">-</div>
+                        </div>
+                        <div class="field full">
+                            <div class="label">Lama Mengabdi</div>
+                            <div class="value" id="kycDetailLamaMengabdi">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Dokumen -->
+                <div id="tab-dokumen" class="kyc-tab-content" style="display:none;">
+                    <div style="margin-bottom:12px;">
+                        <div style="font-size:0.7rem;font-weight:600;color:#555;margin-bottom:4px;">
+                            <i class="fas fa-file-alt"></i> Dokumen KYC (KTP + Buku Rekening)
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 12px;background:#f8faf8;border-radius:8px;">
+                            <span id="kycDokumenName" style="font-size:0.85rem;font-weight:500;">Belum ada dokumen</span>
+                            <button class="btn btn-primary btn-sm" onclick="previewKycDocument()">
+                                <i class="fas fa-eye"></i> Lihat
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="downloadKycDocument()">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                        <div class="dokumen-preview" id="dokumenPreview">
+                            <img id="dokumenPreviewImg" src="" alt="Dokumen KYC">
+                            <iframe id="dokumenPreviewPdf" src=""></iframe>
+                            <div class="empty" id="dokumenPreviewEmpty">
+                                <i class="fas fa-file-image"></i>
+                                Klik "Lihat" untuk menampilkan dokumen
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Catatan -->
+                    <div style="padding:12px 16px;background:#f8faf8;border-radius:10px;">
+                        <div style="font-size:0.7rem;color:#888;">Catatan Verifikasi</div>
+                        <div style="font-weight:500;" id="kycDetailCatatan">Tidak ada catatan</div>
+                    </div>
+                </div>
+
+                <!-- Action Box -->
+                <div class="kyc-action-box" id="kycActionBox" style="display:none;">
+                    <div class="action-title">
+                        <i class="fas fa-gavel"></i> Tindakan Verifikasi
+                    </div>
+                    <div class="action-row">
+                        <input type="text" id="kycKeterangan" placeholder="Keterangan (opsional)">
+                        <button class="btn btn-success" onclick="verifyKyc('accept')">
+                            <i class="fas fa-check-circle"></i> Terima & Verifikasi
+                        </button>
+                        <button class="btn btn-danger" onclick="verifyKyc('reject')">
+                            <i class="fas fa-times-circle"></i> Tolak
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeKycModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
     <script>
         // ============================================================
-        // ===== DASHBOARD SPECIFIC =====
+        // ===== DASHBOARD + KYC =====
         // ============================================================
         let sebaranChart = null;
         let bantuanChart = null;
+        let currentKycPendidik = null;
+        let currentKycDokumenUrl = null;
+        let currentKycTab = 'identitas';
 
-        // Load dashboard data
+        // ============================================================
+        // ===== LOAD DASHBOARD =====
+        // ============================================================
         async function loadDashboard() {
             try {
                 const [kecamatan, kelurahan, lembaga, pendidik, bantuan, laporan] = await Promise.all([
@@ -184,7 +851,9 @@
             }
         }
 
-        // Load charts
+        // ============================================================
+        // ===== LOAD CHARTS =====
+        // ============================================================
         async function loadCharts() {
             try {
                 // Sebaran Chart
@@ -247,7 +916,9 @@
             } catch (e) { console.error(e); }
         }
 
-        // Load recent activity
+        // ============================================================
+        // ===== LOAD RECENT ACTIVITY =====
+        // ============================================================
         async function loadRecent() {
             try {
                 const { data } = await supabaseClient
@@ -273,23 +944,414 @@
             } catch (e) { console.error(e); }
         }
 
-        // Refresh
+        // ============================================================
+        // ===== LOAD KYC DATA =====
+        // ============================================================
+        async function loadKYCData() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('pendidik')
+                    .select(`
+                        id,
+                        nik,
+                        nama_lengkap,
+                        status_verifikasi,
+                        dokumen_kyc,
+                        lembaga_id,
+                        updated_at,
+                        lembaga!pendidik_lembaga_id_fkey(nama, nslp)
+                    `)
+                    .not('dokumen_kyc', 'is', null)
+                    .order('updated_at', { ascending: false });
+
+                if (error) throw error;
+
+                const kycData = data || [];
+
+                // Hitung statistik
+                const total = kycData.length;
+                const pending = kycData.filter(d => d.status_verifikasi === 'Pending').length;
+                const verified = kycData.filter(d => d.status_verifikasi === 'Diverifikasi').length;
+                const rejected = kycData.filter(d => d.status_verifikasi === 'Ditolak').length;
+
+                // Update stats
+                document.getElementById('kycTotal').textContent = total;
+                document.getElementById('kycPending').textContent = pending;
+                document.getElementById('kycVerified').textContent = verified;
+                document.getElementById('kycRejected').textContent = rejected;
+                document.getElementById('kycPendingCount').textContent = pending;
+
+                // Progress
+                const progress = total > 0 ? ((verified / total) * 100) : 0;
+                document.getElementById('kycProgressText').textContent = `${Math.round(progress)}%`;
+                document.getElementById('kycProgressBar').style.width = `${Math.min(progress, 100)}%`;
+
+                // Render tabel
+                renderKYCTable(kycData);
+
+            } catch (e) {
+                console.error('Error loading KYC data:', e);
+                document.getElementById('kycTableBody').innerHTML = 
+                    `<tr><td colspan="6" style="text-align:center;padding:20px;color:#f44336;">
+                        Gagal memuat data KYC: ${e.message}
+                    </td></tr>`;
+            }
+        }
+
+        // ============================================================
+        // ===== RENDER KYC TABLE =====
+        // ============================================================
+        function renderKYCTable(data) {
+            const tbody = document.getElementById('kycTableBody');
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">
+                        <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+                        Belum ada pengajuan KYC
+                    </td></tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = data.map(item => {
+                let statusClass = 'draft';
+                let statusText = 'Draft';
+                if (item.status_verifikasi === 'Diverifikasi') {
+                    statusClass = 'verified';
+                    statusText = '✅ Terverifikasi';
+                } else if (item.status_verifikasi === 'Pending') {
+                    statusClass = 'pending';
+                    statusText = '⏳ Menunggu';
+                } else if (item.status_verifikasi === 'Ditolak') {
+                    statusClass = 'rejected';
+                    statusText = '❌ Ditolak';
+                }
+
+                const isPending = item.status_verifikasi === 'Pending' || item.status_verifikasi === 'Draft';
+
+                return `
+                    <tr onclick="openKycModal('${item.id}')" style="cursor:pointer;${isPending ? 'background:#fffde7;' : ''}">
+                        <td><strong>${item.nama_lengkap || '-'}</strong></td>
+                        <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${item.nik || '-'}</code></td>
+                        <td>${item.lembaga?.nama || item.nslp_lembaga || '-'}</td>
+                        <td><span class="kyc-status-badge ${statusClass}">${statusText}</span></td>
+                        <td style="font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
+                        <td style="text-align:center;">
+                            ${isPending ? `
+                                <span class="badge pending" style="font-size:0.6rem;">
+                                    <i class="fas fa-clock"></i> Perlu Verifikasi
+                                </span>
+                            ` : `
+                                <span class="badge ${item.status_verifikasi === 'Diverifikasi' ? 'active' : 'inactive'}" style="font-size:0.6rem;">
+                                    ${item.status_verifikasi === 'Diverifikasi' ? '✓ Selesai' : '✗ Ditolak'}
+                                </span>
+                            `}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // ===== KYC TAB SWITCHER =====
+        // ============================================================
+        function switchKycTab(tab, btn) {
+            currentKycTab = tab;
+            
+            // Sembunyikan semua tab content
+            document.querySelectorAll('.kyc-tab-content').forEach(el => {
+                el.style.display = 'none';
+                el.classList.remove('active');
+            });
+            
+            // Tampilkan tab yang dipilih
+            const target = document.getElementById(`tab-${tab}`);
+            if (target) {
+                target.style.display = 'block';
+                target.classList.add('active');
+            }
+            
+            // Update active tab button
+            document.querySelectorAll('.kyc-tabs .tab-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            if (btn) {
+                btn.classList.add('active');
+            }
+        }
+
+        // ============================================================
+        // ===== OPEN KYC MODAL =====
+        // ============================================================
+        async function openKycModal(pendidikId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('pendidik')
+                    .select(`
+                        *,
+                        lembaga!pendidik_lembaga_id_fkey(
+                            id, nama, nslp, jenis_lembaga, alamat, kecamatan, desa
+                        )
+                    `)
+                    .eq('id', pendidikId)
+                    .single();
+
+                if (error) throw error;
+
+                currentKycPendidik = data;
+                currentKycDokumenUrl = data.dokumen_kyc || null;
+
+                // ===== IDENTITAS =====
+                document.getElementById('kycDetailNama').textContent = data.nama_lengkap || '-';
+                document.getElementById('kycDetailNik').textContent = data.nik || '-';
+                document.getElementById('kycDetailTempatLahir').textContent = data.tempat_lahir || '-';
+                document.getElementById('kycDetailTanggalLahir').textContent = data.tanggal_lahir || '-';
+                document.getElementById('kycDetailJenisKelamin').textContent = data.jenis_kelamin || '-';
+                document.getElementById('kycDetailStatusPerkawinan').textContent = data.status_perkawinan || '-';
+                document.getElementById('kycDetailIbuKandung').textContent = data.ibu_kandung || '-';
+                document.getElementById('kycDetailPendidikan').textContent = data.pendidikan_terakhir || '-';
+                document.getElementById('kycDetailAlamat').textContent = data.alamat || '-';
+                document.getElementById('kycDetailNoHp').textContent = data.no_hp || '-';
+                document.getElementById('kycDetailEmail').textContent = data.email || '-';
+                document.getElementById('kycDetailNomorRekening').textContent = data.nomor_rekening || '-';
+                document.getElementById('kycDetailNamaBank').textContent = data.nama_bank || '-';
+
+                // ===== DATA MENGAJAR =====
+                document.getElementById('kycDetailLembaga').textContent = data.lembaga?.nama || data.nslp_lembaga || '-';
+                document.getElementById('kycDetailNslpLembaga').textContent = data.lembaga?.nslp || data.nslp_lembaga || '-';
+                document.getElementById('kycDetailJenisLembaga').textContent = data.lembaga?.jenis_lembaga || data.jenis_lembaga || '-';
+                document.getElementById('kycDetailKecamatanLembaga').textContent = data.lembaga?.kecamatan || data.kecamatan_lembaga || '-';
+                document.getElementById('kycDetailDesaLembaga').textContent = data.lembaga?.desa || data.desa_lembaga || '-';
+                document.getElementById('kycDetailRtRw').textContent = data.rt_rw_pengajar || '-';
+                document.getElementById('kycDetailKecamatanPengajar').textContent = data.kecamatan_pengajar || '-';
+                document.getElementById('kycDetailDesaPengajar').textContent = data.desa_pengajar || '-';
+                document.getElementById('kycDetailKabupatenPengajar').textContent = data.kabupaten_pengajar || 'Tegal';
+                document.getElementById('kycDetailTmt').textContent = data.tmt_mengajar || '-';
+                document.getElementById('kycDetailLamaMengabdi').textContent = data.lama_mengabdi ? data.lama_mengabdi + ' tahun' : '-';
+
+                // ===== STATUS =====
+                let statusText = data.status_verifikasi || 'Draft';
+                let statusClass = 'draft';
+                if (statusText === 'Diverifikasi') { 
+                    statusClass = 'verified'; 
+                    statusText = '✅ Terverifikasi'; 
+                } else if (statusText === 'Pending') { 
+                    statusClass = 'pending'; 
+                    statusText = '⏳ Menunggu Verifikasi'; 
+                } else if (statusText === 'Ditolak') { 
+                    statusClass = 'rejected'; 
+                    statusText = '❌ Ditolak'; 
+                } else { 
+                    statusText = '📝 Draft'; 
+                }
+                document.getElementById('kycDetailStatus').innerHTML = `<span class="kyc-status-badge ${statusClass}" style="font-size:0.9rem;padding:4px 14px;">${statusText}</span>`;
+
+                // Status Aktif
+                const aktifText = data.status_aktif ? 'Aktif' : 'Tidak Aktif';
+                const aktifClass = data.status_aktif ? 'active' : 'inactive';
+                document.getElementById('kycDetailAktif').innerHTML = `<span class="badge ${aktifClass}" style="font-size:0.8rem;">${aktifText}</span>`;
+
+                // Tanggal
+                document.getElementById('kycDetailTanggal').textContent = formatDate(data.updated_at);
+
+                // Catatan
+                document.getElementById('kycDetailCatatan').textContent = data.catatan_verifikasi || 'Tidak ada catatan';
+
+                // ===== DOKUMEN =====
+                const dokumenName = document.getElementById('kycDokumenName');
+                const preview = document.getElementById('dokumenPreview');
+                const img = document.getElementById('dokumenPreviewImg');
+                const pdf = document.getElementById('dokumenPreviewPdf');
+                const empty = document.getElementById('dokumenPreviewEmpty');
+
+                // Reset preview
+                preview.style.display = 'none';
+                img.style.display = 'none';
+                pdf.style.display = 'none';
+                empty.style.display = 'none';
+
+                if (data.dokumen_kyc) {
+                    const fileName = data.dokumen_kyc.split('/').pop() || 'Dokumen KYC';
+                    dokumenName.textContent = `📄 ${fileName}`;
+                } else {
+                    dokumenName.textContent = '❌ Belum ada dokumen';
+                }
+
+                // ===== ACTION BOX =====
+                const actionBox = document.getElementById('kycActionBox');
+                const isPending = data.status_verifikasi === 'Pending' || data.status_verifikasi === 'Draft';
+                
+                if (isPending) {
+                    actionBox.style.display = 'block';
+                    document.getElementById('kycKeterangan').value = '';
+                } else {
+                    actionBox.style.display = 'none';
+                }
+
+                document.getElementById('kycPendidikId').value = data.id;
+
+                // Reset ke tab pertama
+                switchKycTab('identitas', document.querySelector('.kyc-tabs .tab-btn'));
+
+                document.getElementById('kycModal').classList.add('active');
+
+            } catch (e) {
+                console.error('Error opening KYC modal:', e);
+                showToast('Gagal memuat detail KYC: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== CLOSE KYC MODAL =====
+        // ============================================================
+        function closeKycModal() {
+            document.getElementById('kycModal').classList.remove('active');
+            document.getElementById('dokumenPreview').style.display = 'none';
+            currentKycPendidik = null;
+            currentKycDokumenUrl = null;
+        }
+
+        // ============================================================
+        // ===== PREVIEW DOKUMEN =====
+        // ============================================================
+        function previewKycDocument() {
+            const preview = document.getElementById('dokumenPreview');
+            const img = document.getElementById('dokumenPreviewImg');
+            const pdf = document.getElementById('dokumenPreviewPdf');
+            const empty = document.getElementById('dokumenPreviewEmpty');
+
+            if (!currentKycDokumenUrl) {
+                showToast('Tidak ada dokumen untuk dilihat', 'warning');
+                return;
+            }
+
+            // Sembunyikan semua
+            img.style.display = 'none';
+            pdf.style.display = 'none';
+            empty.style.display = 'none';
+            preview.style.display = 'block';
+
+            const url = currentKycDokumenUrl.toLowerCase();
+            
+            if (url.endsWith('.pdf')) {
+                pdf.src = currentKycDokumenUrl;
+                pdf.style.display = 'block';
+            } else if (url.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) {
+                img.src = currentKycDokumenUrl;
+                img.style.display = 'block';
+            } else {
+                img.src = currentKycDokumenUrl;
+                img.style.display = 'block';
+                img.onerror = function() {
+                    img.style.display = 'none';
+                    empty.style.display = 'block';
+                    empty.innerHTML = '<i class="fas fa-file" style="font-size:2rem;display:block;margin-bottom:8px;"></i>File tidak dapat ditampilkan. Silakan download.';
+                };
+            }
+        }
+
+        // ============================================================
+        // ===== DOWNLOAD DOKUMEN =====
+        // ============================================================
+        function downloadKycDocument() {
+            if (currentKycDokumenUrl) {
+                window.open(currentKycDokumenUrl, '_blank');
+            } else {
+                showToast('Tidak ada dokumen untuk didownload', 'warning');
+            }
+        }
+
+        // ============================================================
+        // ===== VERIFY KYC =====
+        // ============================================================
+        async function verifyKyc(action) {
+            if (!currentKycPendidik) {
+                showToast('Data tidak ditemukan', 'error');
+                return;
+            }
+
+            const keterangan = document.getElementById('kycKeterangan').value.trim();
+            const status = action === 'accept' ? 'Diverifikasi' : 'Ditolak';
+            const statusText = action === 'accept' ? 'menerima' : 'menolak';
+
+            if (!confirm(`Yakin ${statusText} verifikasi untuk ${currentKycPendidik.nama_lengkap}?`)) return;
+
+            try {
+                const updateData = {
+                    status_verifikasi: status,
+                    verified_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+
+                if (keterangan) {
+                    updateData.catatan_verifikasi = keterangan;
+                }
+
+                const { error } = await supabaseClient
+                    .from('pendidik')
+                    .update(updateData)
+                    .eq('id', currentKycPendidik.id);
+
+                if (error) throw error;
+
+                showToast(`Verifikasi ${statusText} untuk ${currentKycPendidik.nama_lengkap} berhasil!`, 'success');
+                closeKycModal();
+                
+                // Refresh semua data
+                await loadKYCData();
+                await loadDashboard();
+
+            } catch (e) {
+                console.error('Error verifying KYC:', e);
+                showToast('Gagal verifikasi: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== REFRESH =====
+        // ============================================================
         function refreshData() {
             showToast('Memperbarui data...', 'info');
+            loadKYCData();
             loadDashboard();
         }
 
-        // Init
+        // ============================================================
+        // ===== NAVIGATE =====
+        // ============================================================
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        // ============================================================
+        // ===== INIT =====
+        // ============================================================
         document.addEventListener('DOMContentLoaded', async function() {
             await checkAuth();
             updateDate();
-            loadDashboard();
+            await loadKYCData();
+            await loadDashboard();
+            
             setInterval(updateDate, 60000);
-            setInterval(() => { loadDashboard(); }, 300000);
+            setInterval(() => { 
+                loadKYCData();
+                loadDashboard(); 
+            }, 300000);
         });
 
+        // ============================================================
+        // ===== EXPOSE =====
+        // ============================================================
         window.refreshData = refreshData;
         window.navigateTo = navigateTo;
+        window.openKycModal = openKycModal;
+        window.closeKycModal = closeKycModal;
+        window.previewKycDocument = previewKycDocument;
+        window.downloadKycDocument = downloadKycDocument;
+        window.verifyKyc = verifyKyc;
+        window.switchKycTab = switchKycTab;
+        window.showToast = showToast;
     </script>
 </body>
 </html>

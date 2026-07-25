@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Pengaturan - Operator SI-MUSTAFA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .setting-section {
+            background: white;
+            border-radius: 14px;
+            padding: 20px 22px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 16px;
+        }
+        .setting-section .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        .setting-section .section-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .setting-section .section-title i {
+            margin-right: 10px;
+            color: var(--primary-light);
+        }
+        .setting-section .section-desc {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 2px;
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f6f8;
+        }
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        .setting-item .item-label {
+            font-size: 0.85rem;
+            color: #333;
+        }
+        .setting-item .item-label small {
+            display: block;
+            font-size: 0.7rem;
+            color: #888;
+            font-weight: 400;
+        }
+        .setting-item .item-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .setting-item .item-control .btn {
+            padding: 4px 12px;
+            font-size: 0.7rem;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 2px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: #fafafa;
+            transition: 0.2s;
+        }
+        .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: white;
+        }
+        .form-group input[readonly] {
+            background: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .lembaga-info-box {
+            background: var(--primary-bg);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+        }
+        .lembaga-info-box .label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .lembaga-info-box .value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #43a047;
+        }
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            padding: 28px 30px;
+            max-width: 450px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInModal 0.25s ease;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        .modal-header h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #888;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .modal-header .close-btn:hover {
+            color: #333;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f2f5;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 90%;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--error); }
+        .toast-info { background: var(--primary); }
+        .toast-warning { background: var(--warning); }
+
+        @media (max-width: 640px) {
+            .setting-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .setting-item .item-control {
+                justify-content: flex-start;
+            }
+            .modal-container {
+                padding: 20px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">
+                <img src="assets/logo-kemenag.png" alt="Logo" 
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+                <div>
+                    <h1>SI-<span>MUSTAFA</span></h1>
+                    <small>Operator Lembaga</small>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="header-date" id="currentDate"></span>
+            <div class="header-user" onclick="showToast('Profile', 'info')">
+                <div class="avatar" id="userAvatar">O</div>
+                <span class="user-name" id="userName">Operator</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+        <div class="page-header">
+            <h1><i class="fas fa-cog" style="color:var(--primary);margin-right:10px;"></i>Pengaturan</h1>
+            <p>Kelola profil lembaga dan keamanan akun Anda</p>
+        </div>
+
+        <!-- ===== PROFIL LEMBAGA ===== -->
+        <div class="setting-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title"><i class="fas fa-building"></i>Profil Lembaga</div>
+                    <div class="section-desc">Informasi lembaga tempat Anda bertugas</div>
+                </div>
+            </div>
+
+            <div class="lembaga-info-box">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+                    <div>
+                        <div class="label">Nama Lembaga</div>
+                        <div class="value" id="lembagaNama">-</div>
+                    </div>
+                    <div>
+                        <div class="label">Jenis Lembaga</div>
+                        <div class="value" id="lembagaJenis">-</div>
+                    </div>
+                    <div>
+                        <div class="label">NSLP/NSPP</div>
+                        <div class="value" id="lembagaNslp">-</div>
+                    </div>
+                    <div>
+                        <div class="label">Alamat</div>
+                        <div class="value" id="lembagaAlamat">-</div>
+                    </div>
+                    <div>
+                        <div class="label">Kecamatan</div>
+                        <div class="value" id="lembagaKecamatan">-</div>
+                    </div>
+                    <div>
+                        <div class="label">Desa/Kelurahan</div>
+                        <div class="value" id="lembagaDesa">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                <button class="btn btn-outline" onclick="refreshLembagaInfo()"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+        </div>
+
+        <!-- ===== AKUN & KEAMANAN ===== -->
+        <div class="setting-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title"><i class="fas fa-user-shield"></i>Akun & Keamanan</div>
+                    <div class="section-desc">Kelola akun dan keamanan data Anda</div>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="item-label">
+                    Nama Pengguna
+                    <small>Nama yang terdaftar di sistem</small>
+                </div>
+                <div class="item-control">
+                    <input type="text" id="userNameInput" style="padding:6px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.85rem;width:200px;">
+                    <button class="btn btn-primary" onclick="updateUsername()"><i class="fas fa-save"></i> Update</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="item-label">
+                    Email
+                    <small>Email login Anda (tidak dapat diubah)</small>
+                </div>
+                <div class="item-control">
+                    <input type="email" id="userEmailInput" style="padding:6px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.85rem;width:200px;" readonly>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="item-label">
+                    Ganti Password
+                    <small>Perbarui password akun Anda</small>
+                </div>
+                <div class="item-control">
+                    <button class="btn btn-primary" onclick="openChangePassword()"><i class="fas fa-key"></i> Ganti Password</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="item-label">
+                    Logout dari Semua Perangkat
+                    <small>Akun akan keluar dari semua perangkat yang terhubung</small>
+                </div>
+                <div class="item-control">
+                    <button class="btn btn-danger" onclick="logoutAllDevices()"><i class="fas fa-sign-out-alt"></i> Logout Semua</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DATA & BACKUP ===== -->
+        <div class="setting-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title"><i class="fas fa-database"></i>Data & Backup</div>
+                    <div class="section-desc">Kelola data dan backup lembaga Anda</div>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="item-label">
+                    Export Data Pendidik
+                    <small>Download semua data pendidik lembaga Anda</small>
+                </div>
+                <div class="item-control">
+                    <button class="btn btn-primary" onclick="exportData()"><i class="fas fa-file-excel"></i> Export</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="item-label">
+                    Backup Data
+                    <small>Backup semua data lembaga Anda</small>
+                </div>
+                <div class="item-control">
+                    <button class="btn btn-primary" onclick="backupData()"><i class="fas fa-download"></i> Backup</button>
+                </div>
+            </div>
+
+            <div style="margin-top:12px;padding:12px 16px;background:#fff3e0;border-radius:10px;font-size:0.8rem;color:#856404;border-left:3px solid var(--warning);">
+                <i class="fas fa-info-circle"></i> 
+                Backup terakhir: <strong id="lastBackup">Belum pernah backup</strong>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <nav class="bottom-nav">
+        <a class="nav-item" href="operator.html">
+            <i class="fas fa-chart-pie"></i>
+            <span>Dashboard</span>
+        </a>
+        <a class="nav-item" href="operator-pendidik.html">
+            <i class="fas fa-user-graduate"></i>
+            <span>Pendidik</span>
+            <span class="nav-badge" id="navPendidikCount">0</span>
+        </a>
+        <a class="nav-item" href="operator-bantuan.html">
+            <i class="fas fa-hand-holding-heart"></i>
+            <span>Bantuan</span>
+        </a>
+        <a class="nav-item active" href="operator-pengaturan.html">
+            <i class="fas fa-cog"></i>
+            <span>Pengaturan</span>
+        </a>
+    </nav>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ===== MODAL GANTI PASSWORD ===== -->
+    <div class="modal-overlay" id="passwordModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2><i class="fas fa-key" style="color:var(--primary);margin-right:8px;"></i>Ganti Password</h2>
+                <button class="close-btn" onclick="closePasswordModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Password Lama <span style="color:red;">*</span></label>
+                    <input type="password" id="oldPassword" placeholder="Masukkan password lama" autocomplete="current-password">
+                </div>
+                <div class="form-group">
+                    <label>Password Baru <span style="color:red;">*</span></label>
+                    <input type="password" id="newPassword" placeholder="Masukkan password baru (min 6 karakter)" autocomplete="new-password">
+                    <small style="color:#888;font-size:0.7rem;">Minimal 6 karakter</small>
+                </div>
+                <div class="form-group">
+                    <label>Konfirmasi Password <span style="color:red;">*</span></label>
+                    <input type="password" id="confirmPassword" placeholder="Konfirmasi password baru" autocomplete="new-password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closePasswordModal()">Batal</button>
+                <button class="btn btn-success" onclick="changePassword()"><i class="fas fa-save"></i> Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        // ============================================================
+        // ===== PENGATURAN OPERATOR =====
+        // ============================================================
+        let userProfile = null;
+        let lembagaData = null;
+
+        // ============================================================
+        // ===== TOAST =====
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            if (!toast) { alert(message); return; }
+            toast.textContent = message;
+            toast.className = 'toast toast-' + type;
+            void toast.offsetWidth;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // ============================================================
+        // ===== DATE =====
+        // ============================================================
+        function updateDate() {
+            const el = document.getElementById('currentDate');
+            if (!el) return;
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            el.textContent = now.toLocaleDateString('id-ID', options);
+        }
+
+        // ============================================================
+        // ===== AUTH CHECK =====
+        // ============================================================
+        async function checkAuth() {
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error || !session) {
+                    window.location.href = 'index.html';
+                    return false;
+                }
+                const { data: userData } = await supabaseClient
+                    .from('users')
+                    .select('id, name, email, role, lembaga_id')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (!userData || userData.role !== 'operator') {
+                    window.location.href = 'dashboard.html';
+                    return false;
+                }
+
+                userProfile = userData;
+
+                const nameEl = document.getElementById('userName');
+                const avatarEl = document.getElementById('userAvatar');
+                if (nameEl) nameEl.textContent = userData.name || 'Operator';
+                if (avatarEl) avatarEl.textContent = (userData.name || 'O').charAt(0).toUpperCase();
+
+                document.getElementById('userNameInput').value = userData.name || '';
+                document.getElementById('userEmailInput').value = userData.email || '';
+
+                if (userData.lembaga_id) {
+                    await loadLembagaData(userData.lembaga_id);
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = 'index.html';
+                return false;
+            }
+        }
+
+        // ============================================================
+        // ===== LOAD LEMBAGA DATA =====
+        // ============================================================
+        async function loadLembagaData(lembagaId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('lembaga')
+                    .select('*')
+                    .eq('id', lembagaId)
+                    .single();
+
+                if (error) throw error;
+                lembagaData = data;
+
+                document.getElementById('lembagaNama').textContent = data.nama || '-';
+                document.getElementById('lembagaJenis').textContent = data.jenis_lembaga || '-';
+                document.getElementById('lembagaNslp').textContent = data.nslp || '-';
+                document.getElementById('lembagaAlamat').textContent = data.alamat || '-';
+                document.getElementById('lembagaKecamatan').textContent = data.kecamatan || '-';
+                document.getElementById('lembagaDesa').textContent = data.desa || '-';
+
+            } catch (e) {
+                console.error('Error loading lembaga data:', e);
+            }
+        }
+
+        // ============================================================
+        // ===== REFRESH LEMBAGA INFO =====
+        // ============================================================
+        function refreshLembagaInfo() {
+            if (userProfile?.lembaga_id) {
+                loadLembagaData(userProfile.lembaga_id);
+                showToast('Data lembaga diperbarui', 'success');
+            }
+        }
+
+        // ============================================================
+        // ===== UPDATE USERNAME =====
+        // ============================================================
+        async function updateUsername() {
+            const newName = document.getElementById('userNameInput').value.trim();
+            if (!newName) {
+                showToast('Nama tidak boleh kosong!', 'error');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('users')
+                    .update({ name: newName, updated_at: new Date().toISOString() })
+                    .eq('id', userProfile.id);
+
+                if (error) throw error;
+
+                userProfile.name = newName;
+                document.getElementById('userName').textContent = newName;
+                document.getElementById('userAvatar').textContent = newName.charAt(0).toUpperCase();
+
+                showToast('Nama berhasil diperbarui!', 'success');
+            } catch (e) {
+                console.error(e);
+                showToast('Gagal update nama: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== CHANGE PASSWORD (MODAL) =====
+        // ============================================================
+        function openChangePassword() {
+            document.getElementById('oldPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('passwordModal').classList.add('active');
+            // Focus ke input pertama
+            setTimeout(() => {
+                document.getElementById('oldPassword').focus();
+            }, 100);
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+            document.getElementById('oldPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        // Enter key di modal
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('oldPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') document.getElementById('newPassword').focus();
+            });
+            document.getElementById('newPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') document.getElementById('confirmPassword').focus();
+            });
+            document.getElementById('confirmPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') changePassword();
+            });
+        });
+
+        async function changePassword() {
+            const oldPass = document.getElementById('oldPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+
+            if (!oldPass || !newPass || !confirmPass) {
+                showToast('Semua field harus diisi!', 'error');
+                return;
+            }
+
+            if (newPass.length < 6) {
+                showToast('Password baru minimal 6 karakter!', 'error');
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                showToast('Password baru dan konfirmasi tidak cocok!', 'error');
+                return;
+            }
+
+            // Disable button sementara
+            const btn = document.querySelector('#passwordModal .btn-success');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+            try {
+                // Verifikasi password lama
+                const { error: signInError } = await supabaseClient.auth.signInWithPassword({
+                    email: userProfile.email,
+                    password: oldPass
+                });
+
+                if (signInError) {
+                    showToast('Password lama salah!', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    return;
+                }
+
+                // Update password
+                const { error } = await supabaseClient.auth.updateUser({
+                    password: newPass
+                });
+
+                if (error) throw error;
+
+                showToast('Password berhasil diubah!', 'success');
+                closePasswordModal();
+
+            } catch (e) {
+                console.error(e);
+                showToast('Gagal ganti password: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // ============================================================
+        // ===== LOGOUT ALL DEVICES =====
+        // ============================================================
+        async function logoutAllDevices() {
+            if (!confirm('Logout dari semua perangkat yang terhubung?')) return;
+            try {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'index.html';
+            } catch (e) {
+                showToast('Gagal logout: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== EXPORT DATA =====
+        // ============================================================
+        async function exportData() {
+            if (!userProfile?.lembaga_id) {
+                showToast('Data lembaga tidak ditemukan', 'error');
+                return;
+            }
+
+            try {
+                showToast('Mengambil data...', 'info');
+
+                const { data, error } = await supabaseClient
+                    .from('pendidik')
+                    .select('*')
+                    .eq('lembaga_id', userProfile.lembaga_id)
+                    .order('nama_lengkap', { ascending: true });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    showToast('Tidak ada data untuk diexport', 'warning');
+                    return;
+                }
+
+                const headers = [
+                    'NIK', 'Nama Lengkap', 'Tempat Lahir', 'Tanggal Lahir',
+                    'Jenis Kelamin', 'Status Perkawinan', 'Ibu Kandung',
+                    'Pendidikan Terakhir', 'Alamat', 'No HP', 'Email',
+                    'Nomor Rekening', 'Nama Bank', 'RT/RW', 'TMT Mengajar',
+                    'Lama Mengabdi', 'Jenis Lembaga', 'Status', 'Status Verifikasi'
+                ];
+
+                const rows = data.map(item => [
+                    item.nik || '',
+                    item.nama_lengkap || '',
+                    item.tempat_lahir || '',
+                    item.tanggal_lahir || '',
+                    item.jenis_kelamin || '',
+                    item.status_perkawinan || '',
+                    item.ibu_kandung || '',
+                    item.pendidikan_terakhir || '',
+                    item.alamat || '',
+                    item.no_hp || '',
+                    item.email || '',
+                    item.nomor_rekening || '',
+                    item.nama_bank || '',
+                    item.rt_rw_pengajar || '',
+                    item.tmt_mengajar || '',
+                    item.lama_mengabdi || '',
+                    item.jenis_lembaga || 'LPQ',
+                    item.status_aktif ? 'Aktif' : 'Tidak Aktif',
+                    item.status_verifikasi || 'Draft'
+                ]);
+
+                if (typeof XLSX === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+                    document.head.appendChild(script);
+                    await new Promise(resolve => script.onload = resolve);
+                }
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
+                XLSX.utils.book_append_sheet(wb, ws, 'Pendidik');
+
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([wbout], { type: 'application/octet-stream' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                const date = new Date().toISOString().split('T')[0];
+                link.download = `data_pendidik_${date}.xlsx`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+
+                showToast(`Export berhasil! ${data.length} data`, 'success');
+
+            } catch (e) {
+                console.error(e);
+                showToast('Gagal export: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== BACKUP DATA =====
+        // ============================================================
+        async function backupData() {
+            if (!userProfile?.lembaga_id) {
+                showToast('Data lembaga tidak ditemukan', 'error');
+                return;
+            }
+
+            try {
+                showToast('Membuat backup...', 'info');
+
+                const tables = ['pendidik', 'bantuan'];
+                const backupData = { lembaga_id: userProfile.lembaga_id, data: {} };
+
+                for (const table of tables) {
+                    const { data, error } = await supabaseClient
+                        .from(table)
+                        .select('*')
+                        .eq('lembaga_id', userProfile.lembaga_id);
+
+                    if (error) throw error;
+                    backupData.data[table] = data || [];
+                }
+
+                backupData.tanggal = new Date().toISOString();
+                backupData.total_pendidik = backupData.data.pendidik?.length || 0;
+                backupData.total_bantuan = backupData.data.bantuan?.length || 0;
+
+                const json = JSON.stringify(backupData, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                const date = new Date().toISOString().split('T')[0];
+                link.download = `backup_lembaga_${date}.json`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+
+                document.getElementById('lastBackup').textContent = new Date().toLocaleString('id-ID');
+                showToast(`Backup berhasil! ${backupData.total_pendidik} pendidik, ${backupData.total_bantuan} bantuan`, 'success');
+
+            } catch (e) {
+                console.error(e);
+                showToast('Gagal backup: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== UPDATE PENDIDIK BADGE =====
+        // ============================================================
+        async function updatePendidikBadge() {
+            if (!userProfile?.lembaga_id) return;
+            const { count } = await supabaseClient
+                .from('pendidik')
+                .select('*', { count: 'exact', head: true })
+                .eq('lembaga_id', userProfile.lembaga_id)
+                .eq('status_aktif', true);
+            document.getElementById('navPendidikCount').textContent = count || 0;
+        }
+
+        // ============================================================
+        // ===== INIT =====
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            updateDate();
+            updatePendidikBadge();
+            setInterval(updateDate, 60000);
+        });
+
+        // ============================================================
+        // ===== EXPOSE FUNCTIONS =====
+        // ============================================================
+        window.refreshLembagaInfo = refreshLembagaInfo;
+        window.updateUsername = updateUsername;
+        window.openChangePassword = openChangePassword;
+        window.closePasswordModal = closePasswordModal;
+        window.changePassword = changePassword;
+        window.logoutAllDevices = logoutAllDevices;
+        window.exportData = exportData;
+        window.backupData = backupData;
+        window.showToast = showToast;
+    </script>
+</body>
+</html>
