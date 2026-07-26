@@ -856,17 +856,17 @@
 
             <div class="login-hint">
                 <i class="fas fa-info-circle"></i>
-                <span>Masuk dengan <strong>Email</strong> dan <strong>Kata sandi</strong>.</span>
+                <span>Masuk dengan <strong>Email</strong> yang telah didaftarkan.</span>
             </div>
 
             <form id="loginForm" novalidate>
                 <div class="form-group">
-                    <label for="identifier">Email</label>
+                    <label for="email">Alamat Email</label>
                     <div class="input-wrapper">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="identifier" placeholder="Masukkan email" required autocomplete="username">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="Masukkan email Anda" required autocomplete="email">
                     </div>
-                    <div class="input-hint" id="inputHint">💡 Contoh:admin@simustafa.com</div>
+                    <div class="input-hint" id="inputHint">💡 Contoh: admin@simustafa.com</div>
                 </div>
 
                 <div class="form-group">
@@ -906,17 +906,13 @@
     </div>
 
     <!-- ========== SCRIPT ========== -->
-    <script src="js/supabase-client.js"></script>
     <script>
         // ============================================================
         // KONFIGURASI
         // ============================================================
-        var DOMAIN_EMAIL = '@simustafa.local';
-        var DEFAULT_PASSWORD = 'nik123456';
-
         var form = document.getElementById('loginForm');
-        var identifier = document.getElementById('identifier');
-        var password = document.getElementById('password');
+        var emailInput = document.getElementById('email');
+        var passwordInput = document.getElementById('password');
         var btn = document.getElementById('loginBtn');
         var btnText = document.getElementById('btnText');
         var btnLoader = document.getElementById('btnLoader');
@@ -928,52 +924,12 @@
         var inputHint = document.getElementById('inputHint');
 
         // ============================================================
-        // PASTIKAN supabaseClient TERSEDIA
+        // SUPABASE CLIENT
         // ============================================================
-        // Gunakan supabaseClient dari file js/supabase-client.js
-        // Jika belum terdefinisi, buat instance baru
-        var client = supabaseClient;
+        var SUPABASE_URL = 'https://hhiypidstbzqmdmxfqns.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoaXlwaWRzdGJ6cW1kbXhmcW5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTExMzUsImV4cCI6MjEwMDIyNzEzNX0.0OHp0pMBiONMci88qLMkNCquaQeJfTICSBYQQrfPmwU';
 
-        // ============================================================
-        // FUNGSI KONVERSI
-        // ============================================================
-        function isNIK(value) {
-            return /^\d{16}$/.test(value.replace(/\s/g, ''));
-        }
-
-        function nikToEmail(nik) {
-            return 'nik_' + nik.replace(/\s/g, '') + DOMAIN_EMAIL;
-        }
-
-        function detectIdentifier(value) {
-            var clean = value.trim();
-            if (!clean) return { type: 'empty' };
-            if (clean.includes('@')) return { type: 'email', value: clean };
-            if (isNIK(clean)) {
-                return { type: 'nik', value: clean.replace(/\s/g, ''), email: nikToEmail(clean) };
-            }
-            return { type: 'unknown' };
-        }
-
-        // ============================================================
-        // LIVE HINT
-        // ============================================================
-        identifier.addEventListener('input', function() {
-            var raw = this.value.trim();
-            if (!raw) {
-                inputHint.innerHTML =
-                    '💡 Contoh: <strong>3328012010810001</strong> (NIK) atau <strong>admin@simustafa.com</strong>';
-                return;
-            }
-            var d = detectIdentifier(raw);
-            if (d.type === 'nik') {
-                inputHint.innerHTML = '🔑 Login sebagai NIK: <strong>' + d.value + '</strong> → ' + d.email;
-            } else if (d.type === 'email') {
-                inputHint.innerHTML = '📧 Login sebagai Email: <strong>' + d.value + '</strong>';
-            } else {
-                inputHint.innerHTML = '⚠️ Masukkan NIK 16 digit atau Email yang valid.';
-            }
-        });
+        var client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ============================================================
         // UTILITY
@@ -999,8 +955,26 @@
         function clearAlerts() {
             errorMsg.style.display = 'none';
             successMsg.style.display = 'none';
-            identifier.classList.remove('error');
-            password.classList.remove('error');
+            emailInput.classList.remove('error');
+            passwordInput.classList.remove('error');
+        }
+
+        // ============================================================
+        // GET REDIRECT URL BERDASARKAN ROLE
+        // ============================================================
+        function getRedirectUrl(role) {
+            var validRoles = ['super_admin', 'admin_kab', 'batko', 'fkdt', 'ponpes', 'operator'];
+            
+            if (!validRoles.includes(role)) {
+                console.warn('Role tidak dikenali:', role, '-> redirect ke dashboard');
+                return 'dashboard.html';
+            }
+
+            if (role === 'operator') {
+                return 'operator.html';
+            }
+
+            return 'dashboard.html';
         }
 
         // ============================================================
@@ -1010,80 +984,101 @@
             e.preventDefault();
             clearAlerts();
 
-            var rawInput = identifier.value.trim();
-            var pass = password.value.trim();
+            var email = emailInput.value.trim();
+            var pass = passwordInput.value.trim();
 
-            if (!rawInput || !pass) {
-                showError('NIK/Email dan kata sandi harus diisi!');
-                if (!rawInput) identifier.classList.add('error');
-                if (!pass) password.classList.add('error');
+            if (!email || !pass) {
+                showError('Email dan kata sandi harus diisi!');
+                if (!email) emailInput.classList.add('error');
+                if (!pass) passwordInput.classList.add('error');
                 return;
             }
 
-            var d = detectIdentifier(rawInput);
-            if (d.type === 'empty' || d.type === 'unknown') {
-                showError('Masukkan NIK 16 digit atau Email yang valid.');
-                identifier.classList.add('error');
+            // Validasi email sederhana
+            if (!email.includes('@')) {
+                showError('Masukkan alamat email yang valid!');
+                emailInput.classList.add('error');
                 return;
             }
 
-            var loginEmail = d.type === 'nik' ? d.email : d.value;
             setLoading(true);
 
             try {
+                // ===== LOGIN =====
                 var result = await client.auth.signInWithPassword({
-                    email: loginEmail,
+                    email: email,
                     password: pass
                 });
 
                 if (result.error) {
-                    // Fallback: coba password default untuk NIK
-                    if (d.type === 'nik' && result.error.message.includes('Invalid login credentials')) {
-                        var retry = await client.auth.signInWithPassword({
-                            email: loginEmail,
-                            password: DEFAULT_PASSWORD
-                        });
-                        if (retry.error) {
-                            throw new Error(
-                                'NIK atau password salah. Jika pertama kali, gunakan password default: <strong>' +
-                                DEFAULT_PASSWORD + '</strong>');
-                        }
-                        showSuccess('Login berhasil! (password default). Segera ganti password Anda.');
-                        setTimeout(function() {
-                            window.location.href = 'dashboard.html';
-                        }, 1500);
-                        return;
-                    }
                     throw result.error;
                 }
 
-                // Simpan remember me
+                // ===== SIMPAN REMEMBER ME =====
                 if (rememberMe.checked) {
-                    localStorage.setItem('rememberIdentifier', rawInput);
+                    localStorage.setItem('rememberEmail', email);
                 } else {
-                    localStorage.removeItem('rememberIdentifier');
+                    localStorage.removeItem('rememberEmail');
                 }
 
-                // Ambil role user
+                // ===== AMBIL ROLE USER =====
+                var userId = result.data.user.id;
                 var userResult = await client
                     .from('users')
-                    .select('role')
-                    .eq('id', result.data.user.id)
-                    .single();
+                    .select('role, name, active')
+                    .eq('id', userId)
+                    .maybeSingle();
 
-                var role = userResult.data?.role || 'viewer';
+                var role = 'operator';
 
-                // Redirect berdasarkan role
-                var redirectUrl = 'dashboard.html';
-                if (role === 'admin') {
-                    redirectUrl = 'dashboard.html';
-                } else if (role === 'operator') {
-                    redirectUrl = 'operator.html';
-                } else if (role === 'pendidik') {
-                    redirectUrl = 'pendidik.html';
+                if (userResult.error) {
+                    console.warn('Error fetching user role:', userResult.error);
+                } else if (!userResult.data) {
+                    // User tidak ditemukan di tabel users -> buat default
+                    console.warn('User not found in users table, creating default entry...');
+                    
+                    var defaultUser = {
+                        id: userId,
+                        email: email,
+                        name: result.data.user.user_metadata?.full_name || email.split('@')[0] || 'User',
+                        role: 'operator',
+                        active: true,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+
+                    var { error: insertError } = await client
+                        .from('users')
+                        .insert([defaultUser]);
+
+                    if (insertError) {
+                        console.error('Failed to create default user:', insertError);
+                        showError('Gagal membuat data pengguna. Hubungi admin.');
+                        setLoading(false);
+                        return;
+                    }
+
+                    role = 'operator';
+                    showSuccess('Login berhasil! Akun default telah dibuat.');
                 } else {
-                    redirectUrl = 'dashboard.html';
+                    role = userResult.data.role || 'operator';
+                    
+                    if (userResult.data.active === false) {
+                        showError('Akun Anda dinonaktifkan. Hubungi admin.');
+                        setLoading(false);
+                        return;
+                    }
+                    
+                    // Update last_login
+                    await client
+                        .from('users')
+                        .update({ last_login: new Date().toISOString() })
+                        .eq('id', userId);
                 }
+
+                // ===== REDIRECT =====
+                var redirectUrl = getRedirectUrl(role);
+                console.log('Login berhasil! Role:', role, 'Redirect ke:', redirectUrl);
 
                 showSuccess('Login berhasil! Mengalihkan...');
                 setTimeout(function() {
@@ -1091,10 +1086,21 @@
                 }, 1000);
 
             } catch (err) {
-                console.error(err);
-                showError(err.message || 'Login gagal. Periksa NIK/Email dan password.');
-                identifier.classList.add('error');
-                password.classList.add('error');
+                console.error('Login error:', err);
+                
+                var errorMessage = err.message || 'Login gagal. Periksa email dan password.';
+                
+                if (errorMessage.includes('Invalid login credentials')) {
+                    errorMessage = 'Email atau password salah. Silakan coba lagi.';
+                } else if (errorMessage.includes('Email not confirmed')) {
+                    errorMessage = 'Email belum dikonfirmasi. Periksa kotak masuk email Anda.';
+                } else if (errorMessage.includes('rate limit')) {
+                    errorMessage = 'Terlalu banyak percobaan. Tunggu beberapa menit.';
+                }
+                
+                showError(errorMessage);
+                emailInput.classList.add('error');
+                passwordInput.classList.add('error');
             } finally {
                 setLoading(false);
             }
@@ -1107,31 +1113,30 @@
             try {
                 var sessionResult = await client.auth.getSession();
                 var session = sessionResult.data.session;
+                
                 if (session) {
                     var userResult = await client
                         .from('users')
                         .select('role')
                         .eq('id', session.user.id)
-                        .single();
+                        .maybeSingle();
 
-                    var role = userResult.data?.role || 'viewer';
-                    var redirectUrl = 'dashboard.html';
-                    if (role === 'operator') {
-                        redirectUrl = 'operator.html';
-                    } else if (role === 'pendidik') {
-                        redirectUrl = 'profil.html';
-                    }
+                    var role = userResult.data?.role || 'operator';
+                    var redirectUrl = getRedirectUrl(role);
+                    
+                    console.log('Session aktif, role:', role, 'redirect ke:', redirectUrl);
                     window.location.href = redirectUrl;
                     return;
                 }
-                var saved = localStorage.getItem('rememberIdentifier');
+                
+                // Restore remember me
+                var saved = localStorage.getItem('rememberEmail');
                 if (saved) {
-                    identifier.value = saved;
+                    emailInput.value = saved;
                     rememberMe.checked = true;
-                    identifier.dispatchEvent(new Event('input'));
                 }
             } catch (e) {
-                console.error(e);
+                console.error('Session check error:', e);
             }
         }
 
@@ -1141,13 +1146,13 @@
         form.addEventListener('submit', handleLogin);
         document.addEventListener('DOMContentLoaded', checkSession);
 
-        password.addEventListener('keypress', function(e) {
+        passwordInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') form.dispatchEvent(new Event('submit'));
         });
-        identifier.addEventListener('keypress', function(e) {
+        emailInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                password.focus();
+                passwordInput.focus();
             }
         });
     </script>

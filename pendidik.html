@@ -655,1025 +655,1072 @@
     </script>
 
     <script>
-        // ============================================================
-        // VARIABLES
-        // ============================================================
-        let currentPage = 1;
-        const pageSize = 50;
-        let totalData = 0;
-        let currentFilter = { search: '', status: 'all' };
-        let currentPendidikData = null;
+// ============================================================
+// ===== VARIABLES =====
+// ============================================================
+let currentPage = 1;
+const pageSize = 50;
+let totalData = 0;
+let currentFilter = { search: '', status: 'all' };
+let currentPendidikData = null;
 
-        // ============================================================
-        // TOAST
-        // ============================================================
-        function showToast(message, type) {
-            const toast = document.getElementById('toast');
-            if (!toast) { alert(message); return; }
-            toast.textContent = message;
-            toast.className = 'toast toast-' + (type || 'info');
-            void toast.offsetWidth;
-            toast.classList.add('show');
-            clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
+// ============================================================
+// ===== TOAST =====
+// ============================================================
+function showToast(message, type) {
+    const toast = document.getElementById('toast');
+    if (!toast) { alert(message); return; }
+    toast.textContent = message;
+    toast.className = 'toast toast-' + (type || 'info');
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 4000);
+}
+
+// ============================================================
+// ===== DATE =====
+// ============================================================
+function updateDate() {
+    const el = document.getElementById('currentDate');
+    if (!el) return;
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    el.textContent = now.toLocaleDateString('id-ID', options);
+}
+
+// ============================================================
+// ===== MASTER DATA =====
+// ============================================================
+async function loadKecamatanOptions() {
+    const { data, error } = await supabaseClient
+        .from('master_kecamatan')
+        .select('id, nama')
+        .order('nama');
+    if (error) throw error;
+    const select = document.getElementById('editKecamatanPengajar');
+    if (!select) return;
+    select.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+    data.forEach(item => {
+        select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
+    });
+}
+
+async function loadDesaOptions(kecamatanId, targetSelectId) {
+    let query = supabaseClient
+        .from('master_kelurahan')
+        .select('id, nama')
+        .order('nama');
+    if (kecamatanId) {
+        query = query.eq('kecamatan_id', kecamatanId);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    const select = document.getElementById(targetSelectId);
+    if (!select) return;
+    select.innerHTML = '<option value="">-- Pilih Desa --</option>';
+    data.forEach(item => {
+        select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
+    });
+}
+
+// ============================================================
+// ===== SHOW FILTER BADGE =====
+// ============================================================
+function showFilterBadge(filter) {
+    const oldBadge = document.querySelector('.role-badge-filter');
+    if (oldBadge) oldBadge.remove();
+
+    if (!filter.jenis_lembaga && !filter.kecamatan_id) return;
+
+    const label = {
+        'LPQ': '📘 LPQ',
+        'MDT': '📗 MDT',
+        'PONPES': '📕 PONPES'
+    };
+
+    const badge = document.createElement('div');
+    badge.className = 'role-badge-filter';
+    badge.style.cssText = `
+        background: #006400;
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-right: 8px;
+    `;
+    
+    let text = '📌 ';
+    if (filter.jenis_lembaga) {
+        text += label[filter.jenis_lembaga] || filter.jenis_lembaga;
+    }
+    if (filter.kecamatan_id) {
+        supabaseClient
+            .from('master_kecamatan')
+            .select('nama')
+            .eq('id', filter.kecamatan_id)
+            .single()
+            .then(({ data }) => {
+                badge.textContent = `📌 ${text}${data ? ' - ' + data.nama : ''}`;
+            });
+    } else {
+        badge.textContent = `📌 ${text}`;
+    }
+
+    const filterSection = document.querySelector('.filter-section');
+    if (filterSection) {
+        filterSection.prepend(badge);
+    }
+}
+
+// ============================================================
+// ===== LOAD DATA =====
+// ============================================================
+async function loadPendidik() {
+    try {
+        const user = getUser();
+        const filter = getRoleFilter();
+
+        let query = supabaseClient
+            .from('pendidik')
+            .select(`
+                *,
+                lembaga!pendidik_lembaga_id_fkey(nama, nslp),
+                master_kecamatan!fk_pendidik_kec_lembaga(nama)
+            `, { count: 'exact' });
+
+        if (filter.restrict) {
+            document.getElementById('pendidikTableBody').innerHTML = 
+                `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">
+                    <i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+                    Anda tidak memiliki akses ke data ini
+                </td></tr>`;
+            return;
         }
 
-        // ============================================================
-        // DATE
-        // ============================================================
-        function updateDate() {
-            const el = document.getElementById('currentDate');
-            if (!el) return;
+        if (filter.kecamatan_id) {
+            query = query.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+        }
+        if (filter.jenis_lembaga) {
+            query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+        }
+
+        if (currentFilter.search) {
+            const searchTerm = currentFilter.search.trim();
+            query = query.or(
+                `nik.ilike.%${searchTerm}%,nama_lengkap.ilike.%${searchTerm}%,` +
+                `lembaga.nama.ilike.%${searchTerm}%,nslp_lembaga.ilike.%${searchTerm}%`
+            );
+        }
+
+        if (currentFilter.status === 'active') {
+            query = query.eq('status_aktif', true);
+        } else if (currentFilter.status === 'inactive') {
+            query = query.eq('status_aktif', false);
+        }
+
+        const from = (currentPage - 1) * pageSize;
+        const { data, count, error } = await query
+            .order('updated_at', { ascending: false })
+            .range(from, from + pageSize - 1);
+
+        if (error) throw error;
+
+        totalData = count || 0;
+        renderTable(data || []);
+        updatePagination();
+        updateStats();
+
+        // 🔴 SEMBUNYIKAN TOMBOL TAMBAH UNTUK OPERATOR
+        const userRole = user?.role || '';
+        const btnTambah = document.querySelector('.btn-success');
+        if (btnTambah && userRole === 'operator') {
+            btnTambah.style.display = 'none';
+        } else if (btnTambah) {
+            btnTambah.style.display = 'inline-flex';
+        }
+
+        // 🔴 SEMBUNYIKAN TOMBOL IMPORT UNTUK BUKAN ADMIN
+        const btnImport = document.querySelector('.btn-outline[onclick*="openImportModal"]');
+        if (btnImport && !['super_admin', 'admin_kab'].includes(userRole)) {
+            btnImport.style.display = 'none';
+        } else if (btnImport) {
+            btnImport.style.display = 'inline-flex';
+        }
+
+        showFilterBadge(filter);
+
+    } catch (e) {
+        console.error('Error loading pendidik:', e);
+        document.getElementById('pendidikTableBody').innerHTML =
+            `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">Gagal memuat data: ${e.message}</td></tr>`;
+    }
+}
+
+// ============================================================
+// ===== RENDER TABLE =====
+// ============================================================
+function renderTable(data) {
+    const tbody = document.getElementById('pendidikTableBody');
+    const totalEl = document.getElementById('totalData');
+    totalEl.textContent = `${totalData} data`;
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">
+                <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>Belum ada data</td></tr>`;
+        return;
+    }
+
+    const start = (currentPage - 1) * pageSize;
+    tbody.innerHTML = data.map((item, i) => {
+        const statusBadge = item.status_aktif ? 'active' : 'inactive';
+        const statusText = item.status_aktif ? 'Aktif' : 'Tidak Aktif';
+        const lembagaName = item.lembaga?.nama || item.nslp_lembaga || '-';
+        const kecamatanName = item.master_kecamatan?.nama || item.kecamatan_lembaga || '-';
+        
+        return `
+            <tr onclick="viewPendidik('${item.id}')" style="cursor:pointer;">
+                <td>${start + i + 1}</td>
+                <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${item.nik || '-'}</code></td>
+                <td><strong>${item.nama_lengkap || '-'}</strong></td>
+                <td>${lembagaName}</td>
+                <td>${kecamatanName}</td>
+                <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                <td>
+                    <button class="btn btn-outline" style="padding:2px 8px;font-size:0.65rem;" onclick="event.stopPropagation(); viewPendidik('${item.id}')"><i class="fas fa-eye"></i></button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ============================================================
+// ===== STATISTIK (DIPERBAIKI DENGAN FILTER ROLE) =====
+// ============================================================
+async function updateStats() {
+    try {
+        const user = getUser();
+        const filter = getRoleFilter();
+
+        let queryTotal = supabaseClient.from('pendidik').select('*', { count: 'exact', head: true });
+        let queryAktif = supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true);
+        let queryNonaktif = supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', false);
+        let queryProses = supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).in('status_verifikasi', ['Draft', 'Pending']);
+
+        if (filter.kecamatan_id) {
+            queryTotal = queryTotal.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+            queryAktif = queryAktif.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+            queryNonaktif = queryNonaktif.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+            queryProses = queryProses.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+        }
+        if (filter.jenis_lembaga) {
+            queryTotal = queryTotal.eq('jenis_lembaga', filter.jenis_lembaga);
+            queryAktif = queryAktif.eq('jenis_lembaga', filter.jenis_lembaga);
+            queryNonaktif = queryNonaktif.eq('jenis_lembaga', filter.jenis_lembaga);
+            queryProses = queryProses.eq('jenis_lembaga', filter.jenis_lembaga);
+        }
+
+        const [total, aktif, nonaktif, proses] = await Promise.all([
+            queryTotal,
+            queryAktif,
+            queryNonaktif,
+            queryProses
+        ]);
+
+        document.getElementById('totalPendidikStat').textContent = total.count || 0;
+        document.getElementById('totalAktif').textContent = aktif.count || 0;
+        document.getElementById('totalNonaktif').textContent = nonaktif.count || 0;
+        document.getElementById('totalProses').textContent = proses.count || 0;
+        document.getElementById('navPendidikCount').textContent = total.count || 0;
+
+    } catch (e) { console.error(e); }
+}
+
+// ============================================================
+// ===== PAGINATION =====
+// ============================================================
+function updatePagination() {
+    const totalPages = Math.ceil(totalData / pageSize);
+    document.getElementById('pageInfo').textContent = `Halaman ${currentPage} dari ${totalPages || 1}`;
+    document.getElementById('prevPage').disabled = currentPage <= 1;
+    document.getElementById('nextPage').disabled = currentPage >= totalPages;
+}
+
+function changePage(delta) {
+    const totalPages = Math.ceil(totalData / pageSize);
+    const newPage = currentPage + delta;
+    if (newPage < 1 || newPage > totalPages) return;
+    currentPage = newPage;
+    loadPendidik();
+}
+
+// ============================================================
+// ===== FILTER =====
+// ============================================================
+function applyFilter() {
+    currentFilter.search = document.getElementById('searchInput').value.trim();
+    currentFilter.status = document.getElementById('statusFilter').value;
+    currentPage = 1;
+    loadPendidik();
+}
+
+function resetFilter() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = 'all';
+    currentFilter = { search: '', status: 'all' };
+    currentPage = 1;
+    loadPendidik();
+}
+
+// ============================================================
+// ===== TAMBAH DATA =====
+// ============================================================
+function openAddModal() {
+    const user = getUser();
+    if (user?.role === 'operator') {
+        window.location.href = 'operator-pendidik.html';
+    } else {
+        // Untuk admin, buka modal tambah di halaman ini
+        showToast('Fitur tambah pendidik untuk admin', 'info');
+        // Atau bisa arahkan ke halaman tambah pendidik
+        window.location.href = 'tambah-pendidik.html';
+    }
+}
+
+// ============================================================
+// ===== VIEW PENDIDIK =====
+// ============================================================
+async function viewPendidik(id) {
+    document.getElementById('modalTitle').textContent = 'Detail Pendidik';
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('pendidik')
+            .select(`
+                *,
+                lembaga:lembaga_id (nama, nslp),
+                kecamatan_lembaga_ref:master_kecamatan!fk_pendidik_kec_lembaga (nama),
+                kecamatan_pengajar_ref:master_kecamatan!fk_pendidik_kec_pengajar (nama),
+                desa_pengajar_ref:master_kelurahan!fk_pendidik_desa_pengajar (nama)
+            `)
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+        if (!data) {
+            showToast('Data tidak ditemukan', 'error');
+            return;
+        }
+
+        currentPendidikData = data;
+
+        document.getElementById('editId').value = data.id;
+        document.getElementById('editNik').value = data.nik || '';
+        document.getElementById('editNama').value = data.nama_lengkap || '';
+        document.getElementById('editTempatLahir').value = data.tempat_lahir || '';
+        document.getElementById('editTanggalLahir').value = data.tanggal_lahir || '';
+        document.getElementById('editJenisKelamin').value = data.jenis_kelamin || '';
+        document.getElementById('editStatusPerkawinan').value = data.status_perkawinan || '';
+        document.getElementById('editIbuKandung').value = data.ibu_kandung || '';
+        document.getElementById('editPendidikan').value = data.pendidikan_terakhir || '';
+        document.getElementById('editAlamat').value = data.alamat || '';
+        document.getElementById('editNoHp').value = data.no_hp || '';
+        document.getElementById('editEmail').value = data.email || '';
+        document.getElementById('editKabupatenPengajar').value = data.kabupaten_pengajar || 'Tegal';
+        document.getElementById('editProvinsi').value = data.provinsi || 'Jawa Tengah';
+        document.getElementById('editTmt').value = data.tmt_mengajar || '';
+        document.getElementById('editStatus').value = data.status_aktif ? 'true' : 'false';
+        document.getElementById('editVerifikasi').value = data.status_verifikasi || 'Draft';
+        document.getElementById('editJenisLembaga').value = data.jenis_lembaga || 'LPQ';
+        
+        document.getElementById('editNomorRekeningBupati').value = data.nomor_rekening_bupati || '';
+        document.getElementById('editNamaBankBupati').value = data.nama_bank_bupati || '';
+        document.getElementById('editPemilikRekeningBupati').value = data.pemilik_rekening_bupati || '';
+        
+        document.getElementById('editNomorRekeningGubernur').value = data.nomor_rekening_gubernur || '';
+        document.getElementById('editNamaBankGubernur').value = data.nama_bank_gubernur || '';
+        document.getElementById('editPemilikRekeningGubernur').value = data.pemilik_rekening_gubernur || '';
+
+        document.getElementById('editLembagaName').value = data.lembaga?.nama || data.nslp_lembaga || '';
+
+        if (data.kecamatan_pengajar_id) {
+            document.getElementById('editKecamatanPengajar').value = data.kecamatan_pengajar_id;
+            await loadDesaOptions(data.kecamatan_pengajar_id, 'editDesaPengajar');
+            document.getElementById('editDesaPengajar').value = data.desa_pengajar_id || '';
+        }
+
+        if (data.tmt_mengajar) {
+            const tmt = new Date(data.tmt_mengajar);
             const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            el.textContent = now.toLocaleDateString('id-ID', options);
-        }
-
-        // ============================================================
-        // AUTH CHECK
-        // ============================================================
-        async function checkAuth() {
-            try {
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
-                if (error || !session) {
-                    window.location.href = 'index.html';
-                    return false;
-                }
-                try {
-                    const { data: userData } = await supabaseClient
-                        .from('users')
-                        .select('name, role')
-                        .eq('id', session.user.id)
-                        .single();
-                    if (userData) {
-                        const nameEl = document.getElementById('userName');
-                        const avatarEl = document.getElementById('userAvatar');
-                        if (nameEl) nameEl.textContent = userData.name || 'User';
-                        if (avatarEl) avatarEl.textContent = (userData.name || 'U').charAt(0).toUpperCase();
-                    }
-                } catch (e) {
-                    const nameEl = document.getElementById('userName');
-                    const avatarEl = document.getElementById('userAvatar');
-                    if (nameEl) nameEl.textContent = session.user.email || 'User';
-                    if (avatarEl) avatarEl.textContent = (session.user.email || 'U').charAt(0).toUpperCase();
-                }
-                return true;
-            } catch (error) {
-                console.error('Auth check error:', error);
-                window.location.href = 'index.html';
-                return false;
+            let years = now.getFullYear() - tmt.getFullYear();
+            const monthDiff = now.getMonth() - tmt.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < tmt.getDate())) {
+                years--;
             }
+            const result = Math.max(0, years);
+            document.getElementById('lamaMengabdiDisplay').textContent = `${result} Tahun`;
+            document.getElementById('editLamaMengabdi').value = result;
+        } else {
+            document.getElementById('lamaMengabdiDisplay').textContent = '0 Tahun';
+            document.getElementById('editLamaMengabdi').value = '0';
         }
 
-        // ============================================================
-        // MASTER DATA
-        // ============================================================
-        async function loadKecamatanOptions() {
-            const { data, error } = await supabaseClient
+        openModal();
+
+    } catch (e) {
+        console.error(e);
+        showToast('Gagal memuat detail: ' + e.message, 'error');
+    }
+}
+
+// ============================================================
+// ===== MODAL =====
+// ============================================================
+function openModal() {
+    document.getElementById('pendidikModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('pendidikModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// ============================================================
+// ===== GENERATE PDF =====
+// ============================================================
+function generatePDF() {
+    if (!currentPendidikData) {
+        showToast('Tidak ada data untuk diunduh', 'error');
+        return;
+    }
+
+    const data = currentPendidikData;
+    document.getElementById('spinnerOverlay').classList.add('active');
+
+    setTimeout(() => {
+        try {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const margin = 15;
+
+            const primaryColor = [26, 35, 126];
+            const darkColor = [33, 33, 33];
+            const grayColor = [110, 110, 110];
+            const lightGray = [245, 246, 248];
+            const borderColor = [210, 210, 210];
+            const greenColor = [46, 125, 50];
+            const redColor = [198, 40, 40];
+            const orangeColor = [230, 81, 0];
+            const blueColor = [13, 71, 161];
+
+            const now = new Date();
+            const docNumber = `PDK/${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${(data.nik || '0000').slice(-4)}`;
+
+            let y = margin;
+
+            // Logo
+            try {
+                const logoImg = document.querySelector('.header-logo img');
+                if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
+                    pdf.addImage(logoImg, 'PNG', margin, y, 18, 18);
+                }
+            } catch (e) { /* logo opsional */ }
+
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(13);
+            pdf.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
+            pdf.text('KEMENTERIAN AGAMA REPUBLIK INDONESIA', pageWidth / 2, y + 5, { align: 'center' });
+
+            pdf.setFontSize(11);
+            pdf.text('KANTOR KEMENTERIAN AGAMA KABUPATEN TEGAL', pageWidth / 2, y + 10.5, { align: 'center' });
+
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(8.5);
+            pdf.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
+            pdf.text('Jl. Contoh Alamat No. 1, Slawi, Kabupaten Tegal, Jawa Tengah', pageWidth / 2, y + 15, { align: 'center' });
+
+            y += 19;
+
+            pdf.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            pdf.setLineWidth(1);
+            pdf.line(margin, y, pageWidth - margin, y);
+            y += 1.3;
+            pdf.setLineWidth(0.3);
+            pdf.line(margin, y, pageWidth - margin, y);
+            y += 6;
+
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(14);
+            pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            pdf.text('LEMBAR DATA PENDIDIK', pageWidth / 2, y, { align: 'center' });
+            y += 5;
+
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(9);
+            pdf.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
+            pdf.text(`Nomor: ${docNumber}`, pageWidth / 2, y, { align: 'center' });
+            y += 8;
+
+            // QR Code
+            let qrDataUrl = null;
+            try {
+                const qrContainer = document.createElement('div');
+                const qrPayload = `NIK:${data.nik || '-'}|DOC:${docNumber}|CETAK:${now.toISOString()}`;
+                new QRCode(qrContainer, {
+                    text: qrPayload,
+                    width: 128,
+                    height: 128,
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+                const qrCanvas = qrContainer.querySelector('canvas');
+                if (qrCanvas) qrDataUrl = qrCanvas.toDataURL('image/png');
+            } catch (e) { /* QR opsional */ }
+
+            if (qrDataUrl) {
+                pdf.addImage(qrDataUrl, 'PNG', pageWidth - margin - 22, margin, 22, 22);
+                pdf.setFontSize(6.5);
+                pdf.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
+                pdf.text('Kode Verifikasi', pageWidth - margin - 11, margin + 25, { align: 'center' });
+            }
+
+            function sectionTitle(title, yPos) {
+                pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                pdf.rect(margin, yPos, 3, 5, 'F');
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(11);
+                pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                pdf.text(title, margin + 6, yPos + 4);
+                return yPos + 9;
+            }
+
+            function fieldTable(rows, yPos) {
+                pdf.autoTable({
+                    startY: yPos,
+                    margin: { left: margin, right: margin },
+                    theme: 'grid',
+                    styles: {
+                        fontSize: 9,
+                        cellPadding: 2.5,
+                        textColor: darkColor,
+                        lineColor: borderColor,
+                        lineWidth: 0.2
+                    },
+                    columnStyles: {
+                        0: { fontStyle: 'bold', fillColor: lightGray, cellWidth: 45, textColor: grayColor, fontSize: 8 },
+                        1: { cellWidth: 42 },
+                        2: { fontStyle: 'bold', fillColor: lightGray, cellWidth: 45, textColor: grayColor, fontSize: 8 },
+                        3: 'auto'
+                    },
+                    body: rows
+                });
+                return pdf.lastAutoTable.finalY + 5;
+            }
+
+            function checkPageBreak(yPos, needed = 35) {
+                if (yPos + needed > pageHeight - 35) {
+                    pdf.addPage();
+                    return margin + 5;
+                }
+                return yPos;
+            }
+
+            y = checkPageBreak(y, 60);
+            y = sectionTitle('IDENTITAS PENDIDIK', y);
+            y = fieldTable([
+                ['NIK', data.nik || '-', 'Nama Lengkap', data.nama_lengkap || '-'],
+                ['Tempat Lahir', data.tempat_lahir || '-', 'Tanggal Lahir', data.tanggal_lahir || '-'],
+                ['Jenis Kelamin', data.jenis_kelamin || '-', 'Status Perkawinan', data.status_perkawinan || '-'],
+                ['Ibu Kandung', data.ibu_kandung || '-', 'Pendidikan Terakhir', data.pendidikan_terakhir || '-']
+            ], y);
+
+            y = checkPageBreak(y, 50);
+            y = sectionTitle('ALAMAT', y);
+            const desaName = document.getElementById('editDesaPengajar').selectedOptions[0]?.text || '-';
+            const kecName = document.getElementById('editKecamatanPengajar').selectedOptions[0]?.text || '-';
+            y = fieldTable([
+                ['Alamat Lengkap', data.alamat || '-', '', ''],
+                ['Desa/Kelurahan', desaName, 'Kecamatan', kecName],
+                ['Kabupaten', data.kabupaten_pengajar || 'Tegal', 'Provinsi', data.provinsi || 'Jawa Tengah']
+            ], y);
+
+            y = checkPageBreak(y, 30);
+            y = sectionTitle('KONTAK', y);
+            y = fieldTable([
+                ['No. HP', data.no_hp || '-', 'Email', data.email || '-']
+            ], y);
+
+            y = checkPageBreak(y, 45);
+            y = sectionTitle('REKENING INSENTIF', y);
+            pdf.autoTable({
+                startY: y,
+                margin: { left: margin, right: margin },
+                theme: 'grid',
+                head: [['Jenis Insentif', 'Nomor Rekening', 'Nama Bank', 'Pemilik Rekening']],
+                headStyles: { fillColor: primaryColor, fontSize: 8.5, halign: 'center' },
+                styles: { fontSize: 9, cellPadding: 2.5, lineColor: borderColor, lineWidth: 0.2 },
+                bodyStyles: { halign: 'center' },
+                body: [
+                    ['Bupati', data.nomor_rekening_bupati || '-', data.nama_bank_bupati || '-', data.pemilik_rekening_bupati || '-'],
+                    ['Gubernur', data.nomor_rekening_gubernur || '-', data.nama_bank_gubernur || '-', data.pemilik_rekening_gubernur || '-']
+                ]
+            });
+            y = pdf.lastAutoTable.finalY + 5;
+
+            y = checkPageBreak(y, 45);
+            y = sectionTitle('DATA MENGAJAR', y);
+            const lamaMengabdi = document.getElementById('lamaMengabdiDisplay').textContent || '0 Tahun';
+            const statusText = data.status_aktif ? 'AKTIF' : 'TIDAK AKTIF';
+            const verifText = data.status_verifikasi || 'Draft';
+
+            pdf.autoTable({
+                startY: y,
+                margin: { left: margin, right: margin },
+                theme: 'grid',
+                styles: { fontSize: 9, cellPadding: 2.5, lineColor: borderColor, lineWidth: 0.2 },
+                columnStyles: {
+                    0: { fontStyle: 'bold', fillColor: lightGray, cellWidth: 45, textColor: grayColor, fontSize: 8 },
+                    1: { cellWidth: 42 },
+                    2: { fontStyle: 'bold', fillColor: lightGray, cellWidth: 45, textColor: grayColor, fontSize: 8 },
+                    3: 'auto'
+                },
+                body: [
+                    ['TMT Mengajar', data.tmt_mengajar || '-', 'Lama Mengabdi', lamaMengabdi],
+                    ['Lembaga', data.lembaga?.nama || data.nslp_lembaga || '-', 'Jenis Lembaga', data.jenis_lembaga || 'LPQ'],
+                    ['Status', statusText, 'Status Verifikasi', verifText]
+                ],
+                didParseCell: function(hookData) {
+                    if (hookData.row.index === 2) {
+                        if (hookData.column.index === 1) {
+                            hookData.cell.styles.textColor = data.status_aktif ? greenColor : redColor;
+                            hookData.cell.styles.fontStyle = 'bold';
+                        }
+                        if (hookData.column.index === 3) {
+                            if (verifText === 'Diverifikasi') hookData.cell.styles.textColor = blueColor;
+                            else if (verifText === 'Pending') hookData.cell.styles.textColor = orangeColor;
+                            else hookData.cell.styles.textColor = redColor;
+                            hookData.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                }
+            });
+
+            const totalPages = pdf.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                pdf.setPage(i);
+                pdf.setDrawColor(borderColor[0], borderColor[1], borderColor[2]);
+                pdf.setLineWidth(0.3);
+                pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(7.5);
+                pdf.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
+                pdf.text('Dokumen ini dicetak dari Sistem Informasi SI-MUSTAFA dan sah tanpa tanda tangan basah', pageWidth / 2, pageHeight - 15, { align: 'center' });
+                pdf.text(`© ${now.getFullYear()} Kementerian Agama Kabupaten Tegal`, pageWidth / 2, pageHeight - 11, { align: 'center' });
+                pdf.text(`Halaman ${i} dari ${totalPages}`, pageWidth - margin, pageHeight - 11, { align: 'right' });
+            }
+
+            const filename = `Data_Pendidik_${data.nik || 'detail'}.pdf`;
+            pdf.save(filename);
+
+            document.getElementById('spinnerOverlay').classList.remove('active');
+            showToast('PDF berhasil diunduh!', 'success');
+
+        } catch (error) {
+            document.getElementById('spinnerOverlay').classList.remove('active');
+            console.error('Error generating PDF:', error);
+            showToast('Gagal generate PDF: ' + error.message, 'error');
+        }
+    }, 300);
+}
+
+// ============================================================
+// ===== EXPORT DATA =====
+// ============================================================
+async function exportData() {
+    try {
+        showToast('Mengambil data...', 'info');
+
+        const user = getUser();
+        const filter = getRoleFilter();
+
+        let query = supabaseClient
+            .from('pendidik')
+            .select(`
+                *,
+                lembaga!pendidik_lembaga_id_fkey(nama, nslp),
+                master_kecamatan!fk_pendidik_kec_lembaga(nama)
+            `);
+
+        if (filter.kecamatan_id) {
+            query = query.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+        }
+        if (filter.jenis_lembaga) {
+            query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+        }
+
+        if (currentFilter.search) {
+            const searchTerm = currentFilter.search.trim();
+            query = query.or(
+                `nik.ilike.%${searchTerm}%,nama_lengkap.ilike.%${searchTerm}%,` +
+                `lembaga.nama.ilike.%${searchTerm}%,nslp_lembaga.ilike.%${searchTerm}%`
+            );
+        }
+
+        if (currentFilter.status === 'active') {
+            query = query.eq('status_aktif', true);
+        } else if (currentFilter.status === 'inactive') {
+            query = query.eq('status_aktif', false);
+        }
+
+        const { data, error } = await query.order('nama_lengkap', { ascending: true });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            showToast('Tidak ada data, mendownload template...', 'warning');
+            downloadTemplate();
+            return;
+        }
+
+        const headers = [
+            'NIK', 'Nama Lengkap', 'Tempat Lahir', 'Tanggal Lahir',
+            'Jenis Kelamin', 'Status Perkawinan', 'Ibu Kandung',
+            'Pendidikan Terakhir', 'Alamat', 'No HP', 'Email',
+            'No Rekening Bupati', 'Nama Bank Bupati', 'Pemilik Rekening Bupati',
+            'No Rekening Gubernur', 'Nama Bank Gubernur', 'Pemilik Rekening Gubernur',
+            'Lembaga', 'NSLP Lembaga', 'Kecamatan Lembaga', 'Desa Lembaga',
+            'Kecamatan Pengajar', 'Desa Pengajar', 'Kabupaten Pengajar', 'Provinsi',
+            'TMT Mengajar', 'Lama Mengabdi',
+            'Jenis Lembaga', 'Status', 'Status Verifikasi'
+        ];
+
+        const rows = data.map(item => [
+            item.nik || '',
+            item.nama_lengkap || '',
+            item.tempat_lahir || '',
+            item.tanggal_lahir || '',
+            item.jenis_kelamin || '',
+            item.status_perkawinan || '',
+            item.ibu_kandung || '',
+            item.pendidikan_terakhir || '',
+            item.alamat || '',
+            item.no_hp || '',
+            item.email || '',
+            item.nomor_rekening_bupati || '',
+            item.nama_bank_bupati || '',
+            item.pemilik_rekening_bupati || '',
+            item.nomor_rekening_gubernur || '',
+            item.nama_bank_gubernur || '',
+            item.pemilik_rekening_gubernur || '',
+            item.lembaga?.nama || item.nslp_lembaga || '',
+            item.nslp_lembaga || '',
+            item.master_kecamatan?.nama || item.kecamatan_lembaga || '',
+            item.desa_lembaga || '',
+            item.kecamatan_pengajar || '',
+            item.desa_pengajar || '',
+            item.kabupaten_pengajar || 'Tegal',
+            item.provinsi || 'Jawa Tengah',
+            item.tmt_mengajar || '',
+            item.lama_mengabdi || '',
+            item.jenis_lembaga || 'LPQ',
+            item.status_aktif ? 'Aktif' : 'Tidak Aktif',
+            item.status_verifikasi || 'Draft'
+        ]);
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+        ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
+        XLSX.utils.book_append_sheet(wb, ws, 'Pendidik');
+
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([wbout], { type: 'application/octet-stream' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        const date = new Date().toISOString().split('T')[0];
+        link.download = `data_pendidik_${date}.xlsx`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+        showToast(`Export berhasil! ${data.length} data`, 'success');
+
+    } catch (e) {
+        console.error(e);
+        showToast('Gagal export: ' + e.message, 'error');
+    }
+}
+
+// ============================================================
+// ===== DOWNLOAD TEMPLATE =====
+// ============================================================
+function downloadTemplate() {
+    const headers = [
+        'NIK', 'Nama Lengkap', 'Tempat Lahir', 'Tanggal Lahir',
+        'Jenis Kelamin', 'Status Perkawinan', 'Ibu Kandung',
+        'Pendidikan Terakhir', 'Alamat', 'No HP', 'Email',
+        'No Rekening Bupati', 'Nama Bank Bupati', 'Pemilik Rekening Bupati',
+        'No Rekening Gubernur', 'Nama Bank Gubernur', 'Pemilik Rekening Gubernur',
+        'Lembaga', 'NSLP Lembaga', 'Kecamatan Lembaga', 'Desa Lembaga',
+        'Kecamatan Pengajar', 'Desa Pengajar', 'Kabupaten Pengajar', 'Provinsi',
+        'TMT Mengajar', 'Lama Mengabdi',
+        'Jenis Lembaga', 'Status', 'Status Verifikasi'
+    ];
+
+    const exampleRow = [
+        '3328123401234567', 'Ahmad Fauzi', 'Tegal', '1990-01-15',
+        'LAKI-LAKI', 'Menikah', 'Siti Aminah',
+        'S1', 'Jl. Merdeka No. 5', '08123456789', 'ahmad@email.com',
+        '1234567890', 'BRI', 'Ahmad Fauzi',
+        '0987654321', 'BNI', 'Ahmad Fauzi',
+        'MDTU Lafutuhiyah', '1234567890', 'Margasari', 'Karangdawa',
+        'Margasari', 'Karangdawa', 'Tegal', 'Jawa Tengah',
+        '2020-07-01', '3',
+        'MDT', 'Aktif', 'Diverifikasi'
+    ];
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
+    ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
+    XLSX.utils.book_append_sheet(wb, ws, 'Template Pendidik');
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'template_pendidik.xlsx';
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    showToast('Template berhasil diunduh!', 'success');
+}
+
+// ============================================================
+// ===== IMPORT =====
+// ============================================================
+function openImportModal() {
+    document.getElementById('importModal').classList.add('active');
+}
+
+function closeImportModal() {
+    document.getElementById('importModal').classList.remove('active');
+    document.getElementById('fileInputPendidik').value = '';
+}
+
+async function importPendidik() {
+    const fileInput = document.getElementById('fileInputPendidik');
+    const file = fileInput.files[0];
+    if (!file) {
+        showToast('Pilih file Excel terlebih dahulu!', 'error');
+        return;
+    }
+
+    showToast('Memproses import...', 'info');
+    closeImportModal();
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+            if (json.length === 0) {
+                showToast('File kosong!', 'error');
+                return;
+            }
+
+            const { data: kecData } = await supabaseClient
                 .from('master_kecamatan')
-                .select('id, nama')
-                .order('nama');
-            if (error) throw error;
-            const select = document.getElementById('editKecamatanPengajar');
-            select.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
-            data.forEach(item => {
-                select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
-            });
-        }
+                .select('id, nama');
+            const kecMap = {};
+            kecData.forEach(k => kecMap[k.nama.toLowerCase()] = k.id);
 
-        async function loadDesaOptions(kecamatanId, targetSelectId) {
-            let query = supabaseClient
+            const { data: desaData } = await supabaseClient
                 .from('master_kelurahan')
-                .select('id, nama')
-                .order('nama');
-            if (kecamatanId) {
-                query = query.eq('kecamatan_id', kecamatanId);
-            }
-            const { data, error } = await query;
-            if (error) throw error;
-            const select = document.getElementById(targetSelectId);
-            select.innerHTML = '<option value="">-- Pilih Desa --</option>';
-            data.forEach(item => {
-                select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
-            });
-        }
+                .select('id, nama, kecamatan_id');
+            const desaMap = {};
+            desaData.forEach(d => desaMap[d.nama.toLowerCase()] = d);
 
-        // ============================================================
-        // LOAD DATA
-        // ============================================================
-        async function loadPendidik() {
-            try {
-                let query = supabaseClient
-                    .from('pendidik')
-                    .select(`
-                        *,
-                        lembaga!pendidik_lembaga_id_fkey(nama, nslp),
-                        master_kecamatan!fk_pendidik_kec_lembaga(nama)
-                    `, { count: 'exact' });
-
-                if (currentFilter.search) {
-                    const searchTerm = currentFilter.search.trim();
-                    query = query.or(
-                        `nik.ilike.%${searchTerm}%,nama_lengkap.ilike.%${searchTerm}%,` +
-                        `lembaga.nama.ilike.%${searchTerm}%,nslp_lembaga.ilike.%${searchTerm}%`
-                    );
-                }
-
-                if (currentFilter.status === 'active') {
-                    query = query.eq('status_aktif', true);
-                } else if (currentFilter.status === 'inactive') {
-                    query = query.eq('status_aktif', false);
-                }
-
-                const from = (currentPage - 1) * pageSize;
-                const to = from + pageSize - 1;
-
-                const { data, count, error } = await query
-                    .order('updated_at', { ascending: false })
-                    .range(from, to);
-
-                if (error) throw error;
-
-                totalData = count || 0;
-                renderTable(data || []);
-                updatePagination();
-                updateStats();
-
-            } catch (e) {
-                console.error('Error loading pendidik:', e);
-                document.getElementById('pendidikTableBody').innerHTML =
-                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">Gagal memuat data: ${e.message}</td></tr>`;
-            }
-        }
-
-        // ============================================================
-        // RENDER TABLE
-        // ============================================================
-        function renderTable(data) {
-            const tbody = document.getElementById('pendidikTableBody');
-            const totalEl = document.getElementById('totalData');
-            totalEl.textContent = `${totalData} data`;
-
-            if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">
-                        <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>Belum ada data</td></tr>`;
-                return;
-            }
-
-            const start = (currentPage - 1) * pageSize;
-            tbody.innerHTML = data.map((item, i) => {
-                const statusBadge = item.status_aktif ? 'active' : 'inactive';
-                const statusText = item.status_aktif ? 'Aktif' : 'Tidak Aktif';
-                const lembagaName = item.lembaga?.nama || item.nslp_lembaga || '-';
-                const kecamatanName = item.master_kecamatan?.nama || item.kecamatan_lembaga || '-';
-                
-                return `
-                    <tr onclick="viewPendidik('${item.id}')" style="cursor:pointer;">
-                        <td>${start + i + 1}</td>
-                        <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${item.nik || '-'}</code></td>
-                        <td><strong>${item.nama_lengkap || '-'}</strong></td>
-                        <td>${lembagaName}</td>
-                        <td>${kecamatanName}</td>
-                        <td><span class="badge ${statusBadge}">${statusText}</span></td>
-                        <td>
-                            <button class="btn btn-outline" style="padding:2px 8px;font-size:0.65rem;" onclick="event.stopPropagation(); viewPendidik('${item.id}')"><i class="fas fa-eye"></i></button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // ============================================================
-        // STATISTIK
-        // ============================================================
-        async function updateStats() {
-            try {
-                const { count: total } = await supabaseClient
-                    .from('pendidik')
-                    .select('*', { count: 'exact', head: true });
-
-                const { count: aktif } = await supabaseClient
-                    .from('pendidik')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status_aktif', true);
-
-                const { count: nonaktif } = await supabaseClient
-                    .from('pendidik')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status_aktif', false);
-
-                const { count: proses } = await supabaseClient
-                    .from('pendidik')
-                    .select('*', { count: 'exact', head: true })
-                    .in('status_verifikasi', ['Draft', 'Pending']);
-
-                document.getElementById('totalPendidikStat').textContent = total || 0;
-                document.getElementById('totalAktif').textContent = aktif || 0;
-                document.getElementById('totalNonaktif').textContent = nonaktif || 0;
-                document.getElementById('totalProses').textContent = proses || 0;
-                document.getElementById('navPendidikCount').textContent = total || 0;
-
-            } catch (e) { console.error(e); }
-        }
-
-        // ============================================================
-        // PAGINATION
-        // ============================================================
-        function updatePagination() {
-            const totalPages = Math.ceil(totalData / pageSize);
-            document.getElementById('pageInfo').textContent = `Halaman ${currentPage} dari ${totalPages || 1}`;
-            document.getElementById('prevPage').disabled = currentPage <= 1;
-            document.getElementById('nextPage').disabled = currentPage >= totalPages;
-        }
-
-        function changePage(delta) {
-            const totalPages = Math.ceil(totalData / pageSize);
-            const newPage = currentPage + delta;
-            if (newPage < 1 || newPage > totalPages) return;
-            currentPage = newPage;
-            loadPendidik();
-        }
-
-        // ============================================================
-        // FILTER
-        // ============================================================
-        function applyFilter() {
-            currentFilter.search = document.getElementById('searchInput').value.trim();
-            currentFilter.status = document.getElementById('statusFilter').value;
-            currentPage = 1;
-            loadPendidik();
-        }
-
-        function resetFilter() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('statusFilter').value = 'all';
-            currentFilter = { search: '', status: 'all' };
-            currentPage = 1;
-            loadPendidik();
-        }
-
-        // ============================================================
-        // TAMBAH DATA
-        // ============================================================
-        function openAddModal() {
-            window.location.href = 'operator-pendidik.html';
-        }
-
-        // ============================================================
-        // VIEW PENDIDIK
-        // ============================================================
-        async function viewPendidik(id) {
-            document.getElementById('modalTitle').textContent = 'Detail Pendidik';
-
-            try {
-                const { data, error } = await supabaseClient
-                    .from('pendidik')
-                    .select(`
-                        *,
-                        lembaga:lembaga_id (nama, nslp),
-                        kecamatan_lembaga_ref:master_kecamatan!fk_pendidik_kec_lembaga (nama),
-                        kecamatan_pengajar_ref:master_kecamatan!fk_pendidik_kec_pengajar (nama),
-                        desa_pengajar_ref:master_kelurahan!fk_pendidik_desa_pengajar (nama)
-                    `)
-                    .eq('id', id)
-                    .single();
-
-                if (error) throw error;
-                if (!data) {
-                    showToast('Data tidak ditemukan', 'error');
-                    return;
-                }
-
-                currentPendidikData = data;
-
-                document.getElementById('editId').value = data.id;
-                document.getElementById('editNik').value = data.nik || '';
-                document.getElementById('editNama').value = data.nama_lengkap || '';
-                document.getElementById('editTempatLahir').value = data.tempat_lahir || '';
-                document.getElementById('editTanggalLahir').value = data.tanggal_lahir || '';
-                document.getElementById('editJenisKelamin').value = data.jenis_kelamin || '';
-                document.getElementById('editStatusPerkawinan').value = data.status_perkawinan || '';
-                document.getElementById('editIbuKandung').value = data.ibu_kandung || '';
-                document.getElementById('editPendidikan').value = data.pendidikan_terakhir || '';
-                document.getElementById('editAlamat').value = data.alamat || '';
-                document.getElementById('editNoHp').value = data.no_hp || '';
-                document.getElementById('editEmail').value = data.email || '';
-                document.getElementById('editKabupatenPengajar').value = data.kabupaten_pengajar || 'Tegal';
-                document.getElementById('editProvinsi').value = data.provinsi || 'Jawa Tengah';
-                document.getElementById('editTmt').value = data.tmt_mengajar || '';
-                document.getElementById('editStatus').value = data.status_aktif ? 'true' : 'false';
-                document.getElementById('editVerifikasi').value = data.status_verifikasi || 'Draft';
-                document.getElementById('editJenisLembaga').value = data.jenis_lembaga || 'LPQ';
-                
-                document.getElementById('editNomorRekeningBupati').value = data.nomor_rekening_bupati || '';
-                document.getElementById('editNamaBankBupati').value = data.nama_bank_bupati || '';
-                document.getElementById('editPemilikRekeningBupati').value = data.pemilik_rekening_bupati || '';
-                
-                document.getElementById('editNomorRekeningGubernur').value = data.nomor_rekening_gubernur || '';
-                document.getElementById('editNamaBankGubernur').value = data.nama_bank_gubernur || '';
-                document.getElementById('editPemilikRekeningGubernur').value = data.pemilik_rekening_gubernur || '';
-
-                document.getElementById('editLembagaName').value = data.lembaga?.nama || data.nslp_lembaga || '';
-
-                if (data.kecamatan_pengajar_id) {
-                    document.getElementById('editKecamatanPengajar').value = data.kecamatan_pengajar_id;
-                    await loadDesaOptions(data.kecamatan_pengajar_id, 'editDesaPengajar');
-                    document.getElementById('editDesaPengajar').value = data.desa_pengajar_id || '';
-                }
-
-                if (data.tmt_mengajar) {
-                    const tmt = new Date(data.tmt_mengajar);
-                    const now = new Date();
-                    let years = now.getFullYear() - tmt.getFullYear();
-                    const monthDiff = now.getMonth() - tmt.getMonth();
-                    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < tmt.getDate())) {
-                        years--;
-                    }
-                    const result = Math.max(0, years);
-                    document.getElementById('lamaMengabdiDisplay').textContent = `${result} Tahun`;
-                    document.getElementById('editLamaMengabdi').value = result;
-                } else {
-                    document.getElementById('lamaMengabdiDisplay').textContent = '0 Tahun';
-                    document.getElementById('editLamaMengabdi').value = '0';
-                }
-
-                openModal();
-
-            } catch (e) {
-                console.error(e);
-                showToast('Gagal memuat detail: ' + e.message, 'error');
-            }
-        }
-
-        // ============================================================
-        // MODAL
-        // ============================================================
-        function openModal() {
-            document.getElementById('pendidikModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            document.getElementById('pendidikModal').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // ============================================================
-        // GENERATE PDF - VERSI RESMI PROFESIONAL
-        // ============================================================
-        function generatePDF() {
-            if (!currentPendidikData) {
-                showToast('Tidak ada data untuk diunduh', 'error');
-                return;
-            }
-
-            const data = currentPendidikData;
-            document.getElementById('spinnerOverlay').classList.add('active');
-
-            setTimeout(() => {
+            let success = 0, failed = 0;
+            for (const row of json) {
                 try {
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const nik = row['NIK']?.toString().replace(/\D/g, '') || '';
+                    if (!nik || nik.length !== 16) { failed++; continue; }
 
-                    const pageWidth = 210;
-                    const pageHeight = 297;
-                    const margin = 15;
+                    const nama = row['Nama Lengkap'] || '';
+                    if (!nama) { failed++; continue; }
 
-                    // Warna resmi
-                    const primaryColor = [26, 35, 126];
-                    const darkColor = [33, 33, 33];
-                    const grayColor = [110, 110, 110];
-                    const lightGray = [245, 246, 248];
-                    const borderColor = [210, 210, 210];
-                    const greenColor = [46, 125, 50];
-                    const redColor = [198, 40, 40];
-                    const orangeColor = [230, 81, 0];
-                    const blueColor = [13, 71, 161];
-
-                    // Nomor dokumen unik
-                    const now = new Date();
-                    const docNumber = `PDK/${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${(data.nik || '0000').slice(-4)}`;
-
-                    let y = margin;
-
-                    // ============================================
-                    // KOP SURAT RESMI
-                    // ============================================
-                    // Logo
-                    try {
-                        const logoImg = document.querySelector('.header-logo img');
-                        if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
-                            pdf.addImage(logoImg, 'PNG', margin, y, 18, 18);
-                        }
-                    } catch (e) { /* logo opsional */ }
-
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setFontSize(13);
-                    pdf.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-                    pdf.text('KEMENTERIAN AGAMA REPUBLIK INDONESIA', pageWidth / 2, y + 5, { align: 'center' });
-
-                    pdf.setFontSize(11);
-                    pdf.text('KANTOR KEMENTERIAN AGAMA KABUPATEN TEGAL', pageWidth / 2, y + 10.5, { align: 'center' });
-
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setFontSize(8.5);
-                    pdf.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-                    pdf.text('Jl. Contoh Alamat No. 1, Slawi, Kabupaten Tegal, Jawa Tengah', pageWidth / 2, y + 15, { align: 'center' });
-
-                    y += 19;
-
-                    // Garis ganda
-                    pdf.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-                    pdf.setLineWidth(1);
-                    pdf.line(margin, y, pageWidth - margin, y);
-                    y += 1.3;
-                    pdf.setLineWidth(0.3);
-                    pdf.line(margin, y, pageWidth - margin, y);
-                    y += 6;
-
-                    // ============================================
-                    // JUDUL + NOMOR
-                    // ============================================
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setFontSize(14);
-                    pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-                    pdf.text('LEMBAR DATA PENDIDIK', pageWidth / 2, y, { align: 'center' });
-                    y += 5;
-
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setFontSize(9);
-                    pdf.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-                    pdf.text(`Nomor: ${docNumber}`, pageWidth / 2, y, { align: 'center' });
-                    y += 8;
-
-                    // QR Code
-                    let qrDataUrl = null;
-                    try {
-                        const qrContainer = document.createElement('div');
-                        const qrPayload = `NIK:${data.nik || '-'}|DOC:${docNumber}|CETAK:${now.toISOString()}`;
-                        new QRCode(qrContainer, {
-                            text: qrPayload,
-                            width: 128,
-                            height: 128,
-                            correctLevel: QRCode.CorrectLevel.M
-                        });
-                        const qrCanvas = qrContainer.querySelector('canvas');
-                        if (qrCanvas) qrDataUrl = qrCanvas.toDataURL('image/png');
-                    } catch (e) { /* QR opsional */ }
-
-                    if (qrDataUrl) {
-                        pdf.addImage(qrDataUrl, 'PNG', pageWidth - margin - 22, margin, 22, 22);
-                        pdf.setFontSize(6.5);
-                        pdf.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-                        pdf.text('Kode Verifikasi', pageWidth - margin - 11, margin + 25, { align: 'center' });
-                    }
-
-                    // ============================================
-                    // HELPERS
-                    // ============================================
-                    function sectionTitle(title, yPos) {
-                        pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-                        pdf.rect(margin, yPos, 3, 5, 'F');
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.setFontSize(11);
-                        pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-                        pdf.text(title, margin + 6, yPos + 4);
-                        return yPos + 9;
-                    }
-
-                    function fieldTable(rows, yPos) {
-                        pdf.autoTable({
-                            startY: yPos,
-                            margin: { left: margin, right: margin },
-                            theme: 'grid',
-                            styles: {
-                                fontSize: 9,
-                                cellPadding: 2.5,
-                                textColor: darkColor,
-                                lineColor: borderColor,
-                                lineWidth: 0.2
-                            },
-                            columnStyles: {
-                                0: { fontStyle: 'bold', fillColor: lightGray, cellWidth: 45, textColor: grayColor, fontSize: 8 },
-                                1: { cellWidth: 42 },
-                                2: { fontStyle: 'bold', fillColor: lightGray, cellWidth: 45, textColor: grayColor, fontSize: 8 },
-                                3: 'auto'
-                            },
-                            body: rows
-                        });
-                        return pdf.lastAutoTable.finalY + 5;
-                    }
-
-                    function checkPageBreak(yPos, needed = 35) {
-                        if (yPos + needed > pageHeight - 35) {
-                            pdf.addPage();
-                            return margin + 5;
-                        }
-                        return yPos;
-                    }
-
-                    // ============================================
-                    // IDENTITAS PENDIDIK
-                    // ============================================
-                    y = checkPageBreak(y, 60);
-                    y = sectionTitle('IDENTITAS PENDIDIK', y);
-                    y = fieldTable([
-                        ['NIK', data.nik || '-', 'Nama Lengkap', data.nama_lengkap || '-'],
-                        ['Tempat Lahir', data.tempat_lahir || '-', 'Tanggal Lahir', data.tanggal_lahir || '-'],
-                        ['Jenis Kelamin', data.jenis_kelamin || '-', 'Status Perkawinan', data.status_perkawinan || '-'],
-                        ['Ibu Kandung', data.ibu_kandung || '-', 'Pendidikan Terakhir', data.pendidikan_terakhir || '-']
-                    ], y);
-
-                    // ============================================
-                    // ALAMAT
-                    // ============================================
-                    y = checkPageBreak(y, 50);
-                    y = sectionTitle('ALAMAT', y);
-                    const desaName = document.getElementById('editDesaPengajar').selectedOptions[0]?.text || '-';
-                    const kecName = document.getElementById('editKecamatanPengajar').selectedOptions[0]?.text || '-';
-                    y = fieldTable([
-                        ['Alamat Lengkap', data.alamat || '-', '', ''],
-                        ['Desa/Kelurahan', desaName, 'Kecamatan', kecName],
-                        ['Kabupaten', data.kabupaten_pengajar || 'Tegal', 'Provinsi', data.provinsi || 'Jawa Tengah']
-                    ], y);
-
-                    // ============================================
-                    // KONTAK
-                    // ============================================
-                    y = checkPageBreak(y, 30);
-                    y = sectionTitle('KONTAK', y);
-                    y = fieldTable([
-                        ['No. HP', data.no_hp || '-', 'Email', data.email || '-']
-                    ], y);
-
-                    // ============================================
-                    // REKENING INSENTIF
-                    // ============================================
-                    y = checkPageBreak(y, 45);
-                    y = sectionTitle('REKENING INSENTIF', y);
-                    pdf.autoTable({
-                        startY: y,
-                        margin: { left: margin, right: margin },
-                        theme: 'grid',
-                        head: [['Jenis Insentif', 'Nomor Rekening', 'Nama Bank', 'Pemilik Rekening']],
-                        headStyles: { fillColor: primaryColor, fontSize: 8.5, halign: 'center' },
-                        styles: { fontSize: 9, cellPadding: 2.5, lineColor: borderColor, lineWidth: 0.2 },
-                        bodyStyles: { halign: 'center' },
-                        body: [
-                            ['Bupati', data.nomor_rekening_bupati || '-', data.nama_bank_bupati || '-', data.pemilik_rekening_bupati || '-'],
-                            ['Gubernur', data.nomor_rekening_gubernur || '-', data.nama_bank_gubernur || '-', data.pemilik_rekening_gubernur || '-']
-                        ]
-                    });
-                    y = pdf.lastAutoTable.finalY + 5;
-
-                    // ============================================
-                    // DATA MENGAJAR
-                    // ============================================
-                    y = checkPageBreak(y, 45);
-                    y = sectionTitle('DATA MENGAJAR', y);
-                    const lamaMengabdi = document.getElementById('lamaMengabdiDisplay').textContent || '0 Tahun';
-                    const statusText = data.status_aktif ? 'AKTIF' : 'TIDAK AKTIF';
-                    const verifText = data.status_verifikasi || 'Draft';
-
-                    pdf.autoTable({
-                        startY: y,
-                        margin: { left: margin, right: margin },
-                        theme: 'grid',
-                        styles: { fontSize: 9, cellPadding: 2.5, lineColor: borderColor, lineWidth: 0.2 },
-                        columnStyles: {
-                            0: { fontStyle: 'bold', fillColor: lightGray, cellWidth: 45, textColor: grayColor, fontSize: 8 },
-                            1: { cellWidth: 42 },
-                            2: { fontStyle: 'bold', fillColor: lightGray, cellWidth: 45, textColor: grayColor, fontSize: 8 },
-                            3: 'auto'
-                        },
-                        body: [
-                            ['TMT Mengajar', data.tmt_mengajar || '-', 'Lama Mengabdi', lamaMengabdi],
-                            ['Lembaga', data.lembaga?.nama || data.nslp_lembaga || '-', 'Jenis Lembaga', data.jenis_lembaga || 'LPQ'],
-                            ['Status', statusText, 'Status Verifikasi', verifText]
-                        ],
-                        didParseCell: function(hookData) {
-                            if (hookData.row.index === 2) {
-                                if (hookData.column.index === 1) {
-                                    hookData.cell.styles.textColor = data.status_aktif ? greenColor : redColor;
-                                    hookData.cell.styles.fontStyle = 'bold';
-                                }
-                                if (hookData.column.index === 3) {
-                                    if (verifText === 'Diverifikasi') hookData.cell.styles.textColor = blueColor;
-                                    else if (verifText === 'Pending') hookData.cell.styles.textColor = orangeColor;
-                                    else hookData.cell.styles.textColor = redColor;
-                                    hookData.cell.styles.fontStyle = 'bold';
-                                }
-                            }
-                        }
-                    });
-
-                    // ============================================
-                    // FOOTER + NOMOR HALAMAN
-                    // ============================================
-                    const totalPages = pdf.internal.getNumberOfPages();
-                    for (let i = 1; i <= totalPages; i++) {
-                        pdf.setPage(i);
-                        pdf.setDrawColor(borderColor[0], borderColor[1], borderColor[2]);
-                        pdf.setLineWidth(0.3);
-                        pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
-
-                        pdf.setFont('helvetica', 'normal');
-                        pdf.setFontSize(7.5);
-                        pdf.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-                        pdf.text('Dokumen ini dicetak dari Sistem Informasi SI-MUSTAFA dan sah tanpa tanda tangan basah', pageWidth / 2, pageHeight - 15, { align: 'center' });
-                        pdf.text(`© ${now.getFullYear()} Kementerian Agama Kabupaten Tegal`, pageWidth / 2, pageHeight - 11, { align: 'center' });
-                        pdf.text(`Halaman ${i} dari ${totalPages}`, pageWidth - margin, pageHeight - 11, { align: 'right' });
-                    }
-
-                    // ============================================
-                    // SAVE
-                    // ============================================
-                    const filename = `Data_Pendidik_${data.nik || 'detail'}.pdf`;
-                    pdf.save(filename);
-
-                    document.getElementById('spinnerOverlay').classList.remove('active');
-                    showToast('PDF berhasil diunduh!', 'success');
-
-                } catch (error) {
-                    document.getElementById('spinnerOverlay').classList.remove('active');
-                    console.error('Error generating PDF:', error);
-                    showToast('Gagal generate PDF: ' + error.message, 'error');
-                }
-            }, 300);
-        }
-
-        // ============================================================
-        // EXPORT DATA
-        // ============================================================
-        async function exportData() {
-            try {
-                showToast('Mengambil data...', 'info');
-
-                let query = supabaseClient
-                    .from('pendidik')
-                    .select(`
-                        *,
-                        lembaga!pendidik_lembaga_id_fkey(nama, nslp),
-                        master_kecamatan!fk_pendidik_kec_lembaga(nama)
-                    `);
-
-                if (currentFilter.search) {
-                    const searchTerm = currentFilter.search.trim();
-                    query = query.or(
-                        `nik.ilike.%${searchTerm}%,nama_lengkap.ilike.%${searchTerm}%,` +
-                        `lembaga.nama.ilike.%${searchTerm}%,nslp_lembaga.ilike.%${searchTerm}%`
-                    );
-                }
-
-                if (currentFilter.status === 'active') {
-                    query = query.eq('status_aktif', true);
-                } else if (currentFilter.status === 'inactive') {
-                    query = query.eq('status_aktif', false);
-                }
-
-                const { data, error } = await query.order('nama_lengkap', { ascending: true });
-
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    showToast('Tidak ada data, mendownload template...', 'warning');
-                    downloadTemplate();
-                    return;
-                }
-
-                const headers = [
-                    'NIK', 'Nama Lengkap', 'Tempat Lahir', 'Tanggal Lahir',
-                    'Jenis Kelamin', 'Status Perkawinan', 'Ibu Kandung',
-                    'Pendidikan Terakhir', 'Alamat', 'No HP', 'Email',
-                    'No Rekening Bupati', 'Nama Bank Bupati', 'Pemilik Rekening Bupati',
-                    'No Rekening Gubernur', 'Nama Bank Gubernur', 'Pemilik Rekening Gubernur',
-                    'Lembaga', 'NSLP Lembaga', 'Kecamatan Lembaga', 'Desa Lembaga',
-                    'Kecamatan Pengajar', 'Desa Pengajar', 'Kabupaten Pengajar', 'Provinsi',
-                    'TMT Mengajar', 'Lama Mengabdi',
-                    'Jenis Lembaga', 'Status', 'Status Verifikasi'
-                ];
-
-                const rows = data.map(item => [
-                    item.nik || '',
-                    item.nama_lengkap || '',
-                    item.tempat_lahir || '',
-                    item.tanggal_lahir || '',
-                    item.jenis_kelamin || '',
-                    item.status_perkawinan || '',
-                    item.ibu_kandung || '',
-                    item.pendidikan_terakhir || '',
-                    item.alamat || '',
-                    item.no_hp || '',
-                    item.email || '',
-                    item.nomor_rekening_bupati || '',
-                    item.nama_bank_bupati || '',
-                    item.pemilik_rekening_bupati || '',
-                    item.nomor_rekening_gubernur || '',
-                    item.nama_bank_gubernur || '',
-                    item.pemilik_rekening_gubernur || '',
-                    item.lembaga?.nama || item.nslp_lembaga || '',
-                    item.nslp_lembaga || '',
-                    item.master_kecamatan?.nama || item.kecamatan_lembaga || '',
-                    item.desa_lembaga || '',
-                    item.kecamatan_pengajar || '',
-                    item.desa_pengajar || '',
-                    item.kabupaten_pengajar || 'Tegal',
-                    item.provinsi || 'Jawa Tengah',
-                    item.tmt_mengajar || '',
-                    item.lama_mengabdi || '',
-                    item.jenis_lembaga || 'LPQ',
-                    item.status_aktif ? 'Aktif' : 'Tidak Aktif',
-                    item.status_verifikasi || 'Draft'
-                ]);
-
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
-                XLSX.utils.book_append_sheet(wb, ws, 'Pendidik');
-
-                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                const blob = new Blob([wbout], { type: 'application/octet-stream' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                const date = new Date().toISOString().split('T')[0];
-                link.download = `data_pendidik_${date}.xlsx`;
-                link.click();
-                URL.revokeObjectURL(link.href);
-
-                showToast(`Export berhasil! ${data.length} data`, 'success');
-
-            } catch (e) {
-                console.error(e);
-                showToast('Gagal export: ' + e.message, 'error');
-            }
-        }
-
-        // ============================================================
-        // DOWNLOAD TEMPLATE
-        // ============================================================
-        function downloadTemplate() {
-            const headers = [
-                'NIK', 'Nama Lengkap', 'Tempat Lahir', 'Tanggal Lahir',
-                'Jenis Kelamin', 'Status Perkawinan', 'Ibu Kandung',
-                'Pendidikan Terakhir', 'Alamat', 'No HP', 'Email',
-                'No Rekening Bupati', 'Nama Bank Bupati', 'Pemilik Rekening Bupati',
-                'No Rekening Gubernur', 'Nama Bank Gubernur', 'Pemilik Rekening Gubernur',
-                'Lembaga', 'NSLP Lembaga', 'Kecamatan Lembaga', 'Desa Lembaga',
-                'Kecamatan Pengajar', 'Desa Pengajar', 'Kabupaten Pengajar', 'Provinsi',
-                'TMT Mengajar', 'Lama Mengabdi',
-                'Jenis Lembaga', 'Status', 'Status Verifikasi'
-            ];
-
-            const exampleRow = [
-                '3328123401234567', 'Ahmad Fauzi', 'Tegal', '1990-01-15',
-                'LAKI-LAKI', 'Menikah', 'Siti Aminah',
-                'S1', 'Jl. Merdeka No. 5', '08123456789', 'ahmad@email.com',
-                '1234567890', 'BRI', 'Ahmad Fauzi',
-                '0987654321', 'BNI', 'Ahmad Fauzi',
-                'MDTU Lafutuhiyah', '1234567890', 'Margasari', 'Karangdawa',
-                'Margasari', 'Karangdawa', 'Tegal', 'Jawa Tengah',
-                '2020-07-01', '3',
-                'MDT', 'Aktif', 'Diverifikasi'
-            ];
-
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
-            ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
-            XLSX.utils.book_append_sheet(wb, ws, 'Template Pendidik');
-
-            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-            const blob = new Blob([wbout], { type: 'application/octet-stream' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'template_pendidik.xlsx';
-            link.click();
-            URL.revokeObjectURL(link.href);
-
-            showToast('Template berhasil diunduh!', 'success');
-        }
-
-        // ============================================================
-        // IMPORT
-        // ============================================================
-        function openImportModal() {
-            document.getElementById('importModal').classList.add('active');
-        }
-
-        function closeImportModal() {
-            document.getElementById('importModal').classList.remove('active');
-            document.getElementById('fileInputPendidik').value = '';
-        }
-
-        async function importPendidik() {
-            const fileInput = document.getElementById('fileInputPendidik');
-            const file = fileInput.files[0];
-            if (!file) {
-                showToast('Pilih file Excel terlebih dahulu!', 'error');
-                return;
-            }
-
-            showToast('Memproses import...', 'info');
-            closeImportModal();
-
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-                    if (json.length === 0) {
-                        showToast('File kosong!', 'error');
-                        return;
-                    }
-
-                    const { data: kecData } = await supabaseClient
-                        .from('master_kecamatan')
-                        .select('id, nama');
-                    const kecMap = {};
-                    kecData.forEach(k => kecMap[k.nama.toLowerCase()] = k.id);
-
-                    const { data: desaData } = await supabaseClient
-                        .from('master_kelurahan')
-                        .select('id, nama, kecamatan_id');
-                    const desaMap = {};
-                    desaData.forEach(d => desaMap[d.nama.toLowerCase()] = d);
-
-                    let success = 0, failed = 0;
-                    for (const row of json) {
-                        try {
-                            const nik = row['NIK']?.toString().replace(/\D/g, '') || '';
-                            if (!nik || nik.length !== 16) { failed++; continue; }
-
-                            const nama = row['Nama Lengkap'] || '';
-                            if (!nama) { failed++; continue; }
-
-                            const kecNama = (row['Kecamatan Pengajar'] || '').toLowerCase();
-                            const desaNama = (row['Desa Pengajar'] || '').toLowerCase();
-                            
-                            let kecId = kecMap[kecNama] || null;
-                            let desaId = null;
-                            
-                            if (desaNama && desaMap[desaNama]) {
-                                const desa = desaMap[desaNama];
-                                if (!kecId || desa.kecamatan_id === kecId) {
-                                    desaId = desa.id;
-                                    if (!kecId) kecId = desa.kecamatan_id;
-                                }
-                            }
-
-                            let lembagaId = null;
-                            const lembagaNama = row['Lembaga'] || '';
-                            if (lembagaNama) {
-                                const { data: lemData } = await supabaseClient
-                                    .from('lembaga')
-                                    .select('id')
-                                    .eq('nama', lembagaNama)
-                                    .maybeSingle();
-                                if (lemData) lembagaId = lemData.id;
-                            }
-
-                            const status = row['Status'] || 'Aktif';
-                            const lamaMengabdi = parseInt(row['Lama Mengabdi']) || 0;
-
-                            const dataPendidik = {
-                                nik: nik,
-                                nama_lengkap: nama,
-                                tempat_lahir: row['Tempat Lahir'] || '',
-                                tanggal_lahir: parseDate(row['Tanggal Lahir']),
-                                jenis_kelamin: row['Jenis Kelamin']?.toUpperCase().includes('LAKI') ? 'LAKI-LAKI' :
-                                    row['Jenis Kelamin']?.toUpperCase().includes('PEREMPUAN') ? 'PEREMPUAN' : '',
-                                status_perkawinan: row['Status Perkawinan'] || '',
-                                ibu_kandung: row['Ibu Kandung'] || '',
-                                pendidikan_terakhir: row['Pendidikan Terakhir'] || '',
-                                alamat: row['Alamat'] || '',
-                                no_hp: row['No HP']?.toString() || '',
-                                email: row['Email'] || '',
-                                nomor_rekening_bupati: row['No Rekening Bupati']?.toString() || '',
-                                nama_bank_bupati: row['Nama Bank Bupati'] || '',
-                                pemilik_rekening_bupati: row['Pemilik Rekening Bupati'] || '',
-                                nomor_rekening_gubernur: row['No Rekening Gubernur']?.toString() || '',
-                                nama_bank_gubernur: row['Nama Bank Gubernur'] || '',
-                                pemilik_rekening_gubernur: row['Pemilik Rekening Gubernur'] || '',
-                                lembaga_id: lembagaId,
-                                nslp_lembaga: row['NSLP Lembaga']?.toString() || '',
-                                kecamatan_lembaga: row['Kecamatan Lembaga'] || '',
-                                desa_lembaga: row['Desa Lembaga'] || '',
-                                kecamatan_pengajar_id: kecId,
-                                desa_pengajar_id: desaId,
-                                kabupaten_pengajar: row['Kabupaten Pengajar'] || 'Tegal',
-                                provinsi: row['Provinsi'] || 'Jawa Tengah',
-                                tmt_mengajar: parseDate(row['TMT Mengajar']),
-                                lama_mengabdi: lamaMengabdi,
-                                jenis_lembaga: mapJenjang(row['Jenis Lembaga']),
-                                status_aktif: status.toLowerCase() === 'aktif',
-                                status_verifikasi: row['Status Verifikasi'] || 'Draft',
-                                created_at: new Date().toISOString(),
-                                updated_at: new Date().toISOString()
-                            };
-
-                            const { error } = await supabaseClient
-                                .from('pendidik')
-                                .insert([dataPendidik]);
-                            if (error) throw error;
-                            success++;
-                        } catch (err) {
-                            failed++;
-                            console.error(err);
+                    const kecNama = (row['Kecamatan Pengajar'] || '').toLowerCase();
+                    const desaNama = (row['Desa Pengajar'] || '').toLowerCase();
+                    
+                    let kecId = kecMap[kecNama] || null;
+                    let desaId = null;
+                    
+                    if (desaNama && desaMap[desaNama]) {
+                        const desa = desaMap[desaNama];
+                        if (!kecId || desa.kecamatan_id === kecId) {
+                            desaId = desa.id;
+                            if (!kecId) kecId = desa.kecamatan_id;
                         }
                     }
 
-                    showToast(`Import selesai: ${success} berhasil, ${failed} gagal`, success > 0 ? 'success' : 'error');
-                    loadPendidik();
-
-                } catch (error) {
-                    showToast('Gagal membaca file: ' + error.message, 'error');
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        // ============================================================
-        // HELPERS
-        // ============================================================
-        function parseDate(dateStr) {
-            if (!dateStr) return null;
-            if (typeof dateStr === 'string' && dateStr.trim() === '') return null;
-            if (typeof dateStr === 'number') {
-                const excelDate = new Date((dateStr - 25569) * 86400 * 1000);
-                if (!isNaN(excelDate)) return excelDate.toISOString().split('T')[0];
-            }
-            if (typeof dateStr === 'string') {
-                const clean = dateStr.trim();
-                if (clean.includes('/')) {
-                    const parts = clean.split('/');
-                    if (parts.length === 3) {
-                        const day = parts[0].padStart(2, '0');
-                        const month = parts[1].padStart(2, '0');
-                        let year = parts[2];
-                        if (year.length === 2) year = '20' + year;
-                        return `${year}-${month}-${day}`;
+                    let lembagaId = null;
+                    const lembagaNama = row['Lembaga'] || '';
+                    if (lembagaNama) {
+                        const { data: lemData } = await supabaseClient
+                            .from('lembaga')
+                            .select('id')
+                            .eq('nama', lembagaNama)
+                            .maybeSingle();
+                        if (lemData) lembagaId = lemData.id;
                     }
+
+                    const status = row['Status'] || 'Aktif';
+                    const lamaMengabdi = parseInt(row['Lama Mengabdi']) || 0;
+
+                    const dataPendidik = {
+                        nik: nik,
+                        nama_lengkap: nama,
+                        tempat_lahir: row['Tempat Lahir'] || '',
+                        tanggal_lahir: parseDate(row['Tanggal Lahir']),
+                        jenis_kelamin: row['Jenis Kelamin']?.toUpperCase().includes('LAKI') ? 'LAKI-LAKI' :
+                            row['Jenis Kelamin']?.toUpperCase().includes('PEREMPUAN') ? 'PEREMPUAN' : '',
+                        status_perkawinan: row['Status Perkawinan'] || '',
+                        ibu_kandung: row['Ibu Kandung'] || '',
+                        pendidikan_terakhir: row['Pendidikan Terakhir'] || '',
+                        alamat: row['Alamat'] || '',
+                        no_hp: row['No HP']?.toString() || '',
+                        email: row['Email'] || '',
+                        nomor_rekening_bupati: row['No Rekening Bupati']?.toString() || '',
+                        nama_bank_bupati: row['Nama Bank Bupati'] || '',
+                        pemilik_rekening_bupati: row['Pemilik Rekening Bupati'] || '',
+                        nomor_rekening_gubernur: row['No Rekening Gubernur']?.toString() || '',
+                        nama_bank_gubernur: row['Nama Bank Gubernur'] || '',
+                        pemilik_rekening_gubernur: row['Pemilik Rekening Gubernur'] || '',
+                        lembaga_id: lembagaId,
+                        nslp_lembaga: row['NSLP Lembaga']?.toString() || '',
+                        kecamatan_lembaga: row['Kecamatan Lembaga'] || '',
+                        desa_lembaga: row['Desa Lembaga'] || '',
+                        kecamatan_pengajar_id: kecId,
+                        desa_pengajar_id: desaId,
+                        kabupaten_pengajar: row['Kabupaten Pengajar'] || 'Tegal',
+                        provinsi: row['Provinsi'] || 'Jawa Tengah',
+                        tmt_mengajar: parseDate(row['TMT Mengajar']),
+                        lama_mengabdi: lamaMengabdi,
+                        jenis_lembaga: mapJenjang(row['Jenis Lembaga']),
+                        status_aktif: status.toLowerCase() === 'aktif',
+                        status_verifikasi: row['Status Verifikasi'] || 'Draft',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+
+                    const { error } = await supabaseClient
+                        .from('pendidik')
+                        .insert([dataPendidik]);
+                    if (error) throw error;
+                    success++;
+                } catch (err) {
+                    failed++;
+                    console.error(err);
                 }
-                if (clean.match(/^\d{4}-\d{2}-\d{2}$/)) return clean;
             }
-            return null;
-        }
 
-        function mapJenjang(value) {
-            const mapping = {
-                'MADIN': 'MDT', 'MDT_ULA': 'MDT', 'MDT_WUSTHA': 'MDT', 'MDT_ULYA': 'MDT',
-                'TPQ': 'LPQ', 'TQA': 'LPQ', 'TKQ': 'LPQ', 'PAUDQU': 'LPQ', 'RTQ': 'LPQ',
-                'SALAF': 'PONPES', 'PDF': 'PONPES', 'SPM': 'PONPES', 'PKPPS': 'PONPES',
-                'LPQ': 'LPQ', 'MDT': 'MDT', 'PONPES': 'PONPES'
-            };
-            return mapping[value] || 'LPQ';
-        }
-
-        // ============================================================
-        // REFRESH
-        // ============================================================
-        function refreshData() {
-            showToast('Memperbarui data...', 'info');
-            loadPendidik();
-        }
-
-        // ============================================================
-        // INIT
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', async function() {
-            await checkAuth();
-            updateDate();
-            await loadKecamatanOptions();
+            showToast(`Import selesai: ${success} berhasil, ${failed} gagal`, success > 0 ? 'success' : 'error');
             loadPendidik();
 
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') applyFilter();
-            });
+        } catch (error) {
+            showToast('Gagal membaca file: ' + error.message, 'error');
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
 
-            setInterval(updateDate, 60000);
-        });
+// ============================================================
+// ===== HELPERS =====
+// ============================================================
+function parseDate(dateStr) {
+    if (!dateStr) return null;
+    if (typeof dateStr === 'string' && dateStr.trim() === '') return null;
+    if (typeof dateStr === 'number') {
+        const excelDate = new Date((dateStr - 25569) * 86400 * 1000);
+        if (!isNaN(excelDate)) return excelDate.toISOString().split('T')[0];
+    }
+    if (typeof dateStr === 'string') {
+        const clean = dateStr.trim();
+        if (clean.includes('/')) {
+            const parts = clean.split('/');
+            if (parts.length === 3) {
+                const day = parts[0].padStart(2, '0');
+                const month = parts[1].padStart(2, '0');
+                let year = parts[2];
+                if (year.length === 2) year = '20' + year;
+                return `${year}-${month}-${day}`;
+            }
+        }
+        if (clean.match(/^\d{4}-\d{2}-\d{2}$/)) return clean;
+    }
+    return null;
+}
 
-        // ============================================================
-        // EXPOSE
-        // ============================================================
-        window.applyFilter = applyFilter;
-        window.resetFilter = resetFilter;
-        window.changePage = changePage;
-        window.refreshData = refreshData;
-        window.openAddModal = openAddModal;
-        window.openImportModal = openImportModal;
-        window.closeImportModal = closeImportModal;
-        window.importPendidik = importPendidik;
-        window.exportData = exportData;
-        window.downloadTemplate = downloadTemplate;
-        window.viewPendidik = viewPendidik;
-        window.closeModal = closeModal;
-        window.generatePDF = generatePDF;
-        window.showToast = showToast;
+function mapJenjang(value) {
+    const mapping = {
+        'MADIN': 'MDT', 'MDT_ULA': 'MDT', 'MDT_WUSTHA': 'MDT', 'MDT_ULYA': 'MDT',
+        'TPQ': 'LPQ', 'TQA': 'LPQ', 'TKQ': 'LPQ', 'PAUDQU': 'LPQ', 'RTQ': 'LPQ',
+        'SALAF': 'PONPES', 'PDF': 'PONPES', 'SPM': 'PONPES', 'PKPPS': 'PONPES',
+        'LPQ': 'LPQ', 'MDT': 'MDT', 'PONPES': 'PONPES'
+    };
+    return mapping[value] || 'LPQ';
+}
+
+// ============================================================
+// ===== REFRESH =====
+// ============================================================
+function refreshData() {
+    showToast('Memperbarui data...', 'info');
+    loadPendidik();
+}
+
+// ============================================================
+// ===== INIT =====
+// ============================================================
+document.addEventListener('DOMContentLoaded', async function() {
+    await checkAuth();
+    updateDate();
+    await loadKecamatanOptions();
+    loadPendidik();
+
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') applyFilter();
+    });
+
+    setInterval(updateDate, 60000);
+});
+
+// ============================================================
+// ===== EXPOSE =====
+// ============================================================
+window.applyFilter = applyFilter;
+window.resetFilter = resetFilter;
+window.changePage = changePage;
+window.refreshData = refreshData;
+window.openAddModal = openAddModal;
+window.openImportModal = openImportModal;
+window.closeImportModal = closeImportModal;
+window.importPendidik = importPendidik;
+window.exportData = exportData;
+window.downloadTemplate = downloadTemplate;
+window.viewPendidik = viewPendidik;
+window.closeModal = closeModal;
+window.generatePDF = generatePDF;
+window.showToast = showToast;
     </script>
 </body>
 </html>

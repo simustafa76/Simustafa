@@ -240,7 +240,7 @@
                 <label><i class="fas fa-search"></i> Cari</label>
                 <input type="text" id="searchInput" placeholder="Nama lembaga..." oninput="applyFilter()">
             </div>
-            <div class="filter-item">
+            <div class="filter-item" id="jenisFilterContainer">
                 <label>Jenis Lembaga</label>
                 <select id="jenisFilter" onchange="applyFilter()">
                     <option value="all">Semua</option>
@@ -249,13 +249,13 @@
                     <option value="PONPES">PONPES</option>
                 </select>
             </div>
-            <div class="filter-item">
+            <div class="filter-item" id="kecamatanFilterContainer">
                 <label>Kecamatan</label>
                 <select id="kecamatanFilter" onchange="applyFilter()">
                     <option value="">Semua Kecamatan</option>
                 </select>
             </div>
-            <div class="filter-item">
+            <div class="filter-item" id="desaFilterContainer">
                 <label>Desa</label>
                 <select id="desaFilter" onchange="applyFilter()">
                     <option value="">Semua Desa</option>
@@ -270,13 +270,13 @@
                 </select>
             </div>
             <div class="filter-actions">
-                <button class="btn btn-success" onclick="openAddModal()">
+                <button class="btn btn-success" onclick="openAddModal()" id="btnTambah">
                     <i class="fas fa-plus"></i> Tambah
                 </button>
-                <button class="btn btn-outline" onclick="openImportModal()">
+                <button class="btn btn-outline" onclick="openImportModal()" id="btnImport">
                     <i class="fas fa-file-import"></i> Import
                 </button>
-                <button class="btn btn-primary" onclick="exportData()">
+                <button class="btn btn-primary" onclick="exportData()" id="btnExport">
                     <i class="fas fa-file-excel"></i> Export
                 </button>
             </div>
@@ -539,52 +539,152 @@
         });
 
         // ============================================================
-        // ===== FUNGSI LOAD DATA =====
+        // ===== FUNGSI LOAD DATA LEMBAGA (DIPERBAIKI) =====
         // ============================================================
         async function loadLembaga() {
             try {
+                const user = getUser();
+                const filter = getRoleFilter();
+
                 let query = supabaseClient
                     .from('lembaga')
                     .select(`
-                            *,
-                            master_kecamatan!lembaga_kecamatan_id_fkey(nama),
-                            master_kelurahan!lembaga_desa_id_fkey(nama)
-                        `, { count: 'exact' });
+                        *,
+                        master_kecamatan!lembaga_kecamatan_id_fkey(nama),
+                        master_kelurahan!lembaga_desa_id_fkey(nama)
+                    `, { count: 'exact' });
 
+                // 🔴 TERAPKAN FILTER ROLE
+                if (filter.restrict) {
+                    document.getElementById('lembagaTableBody').innerHTML = 
+                        `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">
+                            <i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+                            Anda tidak memiliki akses ke data ini
+                        </td></tr>`;
+                    return;
+                }
+
+                // 🔴 FILTER BERDASARKAN ROLE
+                if (filter.kecamatan_id) {
+                    query = query.eq('kecamatan_id', filter.kecamatan_id);
+                }
+                if (filter.jenis_lembaga) {
+                    query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+                }
+
+                // 🔴 FILTER PENCARIAN
                 if (currentFilters.search) {
                     query = query.or(`nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`);
                 }
-                if (currentFilters.jenis !== 'all') {
+
+                // 🔴 FILTER JENIS (hanya jika tidak ada filter dari role)
+                if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') {
                     query = query.eq('jenis_lembaga', currentFilters.jenis);
                 }
+
+                // 🔴 FILTER STATUS
                 if (currentFilters.status !== 'all') {
                     query = query.eq('status_aktif', currentFilters.status === 'true');
                 }
-                if (currentFilters.kecamatan) {
+
+                // 🔴 FILTER KECAMATAN & DESA (hanya jika tidak ada filter dari role)
+                if (!filter.kecamatan_id && currentFilters.kecamatan) {
                     query = query.eq('kecamatan_id', currentFilters.kecamatan);
                 }
-                if (currentFilters.desa) {
+                if (!filter.kecamatan_id && currentFilters.desa) {
                     query = query.eq('desa_id', currentFilters.desa);
                 }
 
                 const from = (currentPage - 1) * pageSize;
-                const to = from + pageSize - 1;
-
                 const { data, count, error } = await query
                     .order('nama', { ascending: true })
-                    .range(from, to);
+                    .range(from, from + pageSize - 1);
 
                 if (error) throw error;
 
                 totalData = count || 0;
-                renderTable(data);
+                renderTable(data || []);
                 updatePagination();
                 updateStats();
+
+                // 🔴 SEMBUNYIKAN FILTER JENIS JIKA SUDAH ADA FILTER DARI ROLE
+                if (filter.jenis_lembaga) {
+                    const jenisContainer = document.getElementById('jenisFilterContainer');
+                    if (jenisContainer) jenisContainer.style.display = 'none';
+                    
+                    // Tampilkan badge
+                    showRoleBadge(filter.jenis_lembaga);
+                } else {
+                    const jenisContainer = document.getElementById('jenisFilterContainer');
+                    if (jenisContainer) jenisContainer.style.display = 'block';
+                    
+                    const badge = document.querySelector('.role-badge-filter');
+                    if (badge) badge.remove();
+                }
+
+                // 🔴 SEMBUNYIKAN FILTER KECAMATAN JIKA SUDAH ADA FILTER DARI ROLE
+                if (filter.kecamatan_id) {
+                    const kecContainer = document.getElementById('kecamatanFilterContainer');
+                    if (kecContainer) kecContainer.style.display = 'none';
+                    
+                    const desaContainer = document.getElementById('desaFilterContainer');
+                    if (desaContainer) desaContainer.style.display = 'none';
+                } else {
+                    const kecContainer = document.getElementById('kecamatanFilterContainer');
+                    if (kecContainer) kecContainer.style.display = 'block';
+                    
+                    const desaContainer = document.getElementById('desaFilterContainer');
+                    if (desaContainer) desaContainer.style.display = 'block';
+                }
+
+                // 🔴 SEMBUNYIKAN TOMBOL TAMBAH & IMPORT UNTUK OPERATOR
+                const userRole = user?.role || '';
+                if (userRole === 'operator') {
+                    document.getElementById('btnTambah').style.display = 'none';
+                    document.getElementById('btnImport').style.display = 'none';
+                } else {
+                    document.getElementById('btnTambah').style.display = 'inline-flex';
+                    document.getElementById('btnImport').style.display = 'inline-flex';
+                }
 
             } catch (e) {
                 console.error('Error loading lembaga:', e);
                 document.getElementById('lembagaTableBody').innerHTML =
                     `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">Gagal memuat data: ${e.message}</td></tr>`;
+            }
+        }
+
+        // ============================================================
+        // ===== SHOW ROLE BADGE =====
+        // ============================================================
+        function showRoleBadge(jenis) {
+            const label = {
+                'LPQ': '📘 BATKO - LPQ',
+                'MDT': '📗 FKDT - MDT',
+                'PONPES': '📕 PONPES'
+            };
+            
+            // Hapus badge lama
+            const oldBadge = document.querySelector('.role-badge-filter');
+            if (oldBadge) oldBadge.remove();
+
+            const badge = document.createElement('div');
+            badge.className = 'role-badge-filter';
+            badge.style.cssText = `
+                background: #006400;
+                color: white;
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                display: inline-block;
+                margin-right: 8px;
+            `;
+            badge.textContent = `📌 ${label[jenis] || jenis}`;
+
+            const filterSection = document.querySelector('.filter-section');
+            if (filterSection) {
+                filterSection.prepend(badge);
             }
         }
 
@@ -621,29 +721,49 @@
         // ============================================================
         async function updateStats() {
             try {
-                const { count: total } = await supabaseClient
-                    .from('lembaga')
-                    .select('*', { count: 'exact', head: true });
+                const user = getUser();
+                const filter = getRoleFilter();
 
-                const { count: lpq } = await supabaseClient
-                    .from('lembaga')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('jenis_lembaga', 'LPQ');
+                let query = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true });
+                let queryLpq = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'LPQ');
+                let queryMdt = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'MDT');
+                let queryPonpes = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'PONPES');
 
-                const { count: mdt } = await supabaseClient
-                    .from('lembaga')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('jenis_lembaga', 'MDT');
+                if (filter.kecamatan_id) {
+                    query = query.eq('kecamatan_id', filter.kecamatan_id);
+                    queryLpq = queryLpq.eq('kecamatan_id', filter.kecamatan_id);
+                    queryMdt = queryMdt.eq('kecamatan_id', filter.kecamatan_id);
+                    queryPonpes = queryPonpes.eq('kecamatan_id', filter.kecamatan_id);
+                }
+                if (filter.jenis_lembaga) {
+                    query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+                    // Hanya satu jenis yang difilter, jadi yang lain 0
+                    if (filter.jenis_lembaga === 'LPQ') {
+                        queryLpq = queryLpq.eq('jenis_lembaga', 'LPQ');
+                        queryMdt = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'MDT').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
+                        queryPonpes = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'PONPES').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
+                    } else if (filter.jenis_lembaga === 'MDT') {
+                        queryMdt = queryMdt.eq('jenis_lembaga', 'MDT');
+                        queryLpq = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'LPQ').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
+                        queryPonpes = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'PONPES').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
+                    } else if (filter.jenis_lembaga === 'PONPES') {
+                        queryPonpes = queryPonpes.eq('jenis_lembaga', 'PONPES');
+                        queryLpq = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'LPQ').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
+                        queryMdt = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'MDT').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
+                    }
+                }
 
-                const { count: ponpes } = await supabaseClient
-                    .from('lembaga')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('jenis_lembaga', 'PONPES');
+                const [total, lpq, mdt, ponpes] = await Promise.all([
+                    query,
+                    queryLpq,
+                    queryMdt,
+                    queryPonpes
+                ]);
 
-                document.getElementById('totalLembagaStat').textContent = total || 0;
-                document.getElementById('totalLPQ').textContent = lpq || 0;
-                document.getElementById('totalMDT').textContent = mdt || 0;
-                document.getElementById('totalPONPES').textContent = ponpes || 0;
+                document.getElementById('totalLembagaStat').textContent = total.count || 0;
+                document.getElementById('totalLPQ').textContent = lpq.count || 0;
+                document.getElementById('totalMDT').textContent = mdt.count || 0;
+                document.getElementById('totalPONPES').textContent = ponpes.count || 0;
 
             } catch (e) { console.error(e); }
         }
@@ -856,14 +976,12 @@
                 let error;
 
                 if (isEdit) {
-                    // Update existing
                     const { error: updateError } = await supabaseClient
                         .from('lembaga')
                         .update(data)
                         .eq('id', id);
                     error = updateError;
                 } else {
-                    // Insert new
                     data.created_at = new Date().toISOString();
                     const { error: insertError } = await supabaseClient
                         .from('lembaga')
@@ -907,7 +1025,9 @@
             try {
                 showToast('Mengambil data...', 'info');
 
-                // Build query sesuai filter
+                const user = getUser();
+                const filter = getRoleFilter();
+
                 let query = supabaseClient
                     .from('lembaga')
                     .select(`
@@ -916,19 +1036,26 @@
                             master_kelurahan!lembaga_desa_id_fkey(nama)
                         `);
 
+                if (filter.kecamatan_id) {
+                    query = query.eq('kecamatan_id', filter.kecamatan_id);
+                }
+                if (filter.jenis_lembaga) {
+                    query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+                }
+
                 if (currentFilters.search) {
                     query = query.or(`nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`);
                 }
-                if (currentFilters.jenis !== 'all') {
+                if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') {
                     query = query.eq('jenis_lembaga', currentFilters.jenis);
                 }
                 if (currentFilters.status !== 'all') {
                     query = query.eq('status_aktif', currentFilters.status === 'true');
                 }
-                if (currentFilters.kecamatan) {
+                if (!filter.kecamatan_id && currentFilters.kecamatan) {
                     query = query.eq('kecamatan_id', currentFilters.kecamatan);
                 }
-                if (currentFilters.desa) {
+                if (!filter.kecamatan_id && currentFilters.desa) {
                     query = query.eq('desa_id', currentFilters.desa);
                 }
 
@@ -936,14 +1063,12 @@
 
                 if (error) throw error;
 
-                // Jika tidak ada data, download template
                 if (!data || data.length === 0) {
                     showToast('Tidak ada data, mendownload template...', 'warning');
                     downloadTemplate();
                     return;
                 }
 
-                // Buat header untuk export
                 const headers = [
                     'NAMA LEMBAGA', 'JENIS LEMBAGA', 'JENJANG', 'NSLP/NSPP',
                     'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
@@ -954,7 +1079,7 @@
                 const rows = data.map(item => [
                     item.nama || '',
                     item.jenis_lembaga || '',
-                    item.jenjang_id || '', // Bisa ditampilkan nama jenjang jika perlu
+                    item.jenjang_id || '',
                     item.nslp || '',
                     item.tahun_berdiri || '',
                     item.pimpinan || '',
@@ -968,16 +1093,11 @@
                     item.status_aktif ? 'Aktif' : 'Tidak Aktif'
                 ]);
 
-                // Buat workbook
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-
-                // Set column widths
                 ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
-
                 XLSX.utils.book_append_sheet(wb, ws, 'Lembaga');
 
-                // Generate file
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
                 const blob = new Blob([wbout], { type: 'application/octet-stream' });
                 const link = document.createElement('a');
@@ -1015,9 +1135,7 @@
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
-
             ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
-
             XLSX.utils.book_append_sheet(wb, ws, 'Template Lembaga');
 
             const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -1067,8 +1185,7 @@
                         return;
                     }
 
-                    let success = 0,
-                        failed = 0;
+                    let success = 0, failed = 0;
                     for (const row of json) {
                         try {
                             const nama = row['NAMA LEMBAGA'] || row['Nama Lembaga'] || '';
@@ -1077,7 +1194,6 @@
                             const jenis = row['JENIS LEMBAGA'] || row['Jenis Lembaga'] || '';
                             const mappedJenis = mapJenjang(jenis) || 'LPQ';
 
-                            // Cari kecamatan_id dari master_kecamatan
                             let kecamatanId = null;
                             const kecamatanNama = row['KECAMATAN'] || row['Kecamatan'] || '';
                             if (kecamatanNama) {
@@ -1089,7 +1205,6 @@
                                 if (kecData) kecamatanId = kecData.id;
                             }
 
-                            // Cari desa_id dari master_kelurahan
                             let desaId = null;
                             const desaNama = row['DESA/KELURAHAN'] || row['Desa'] || '';
                             if (desaNama && kecamatanId) {
@@ -1102,7 +1217,6 @@
                                 if (desaData) desaId = desaData.id;
                             }
 
-                            // Cari jenjang_id dari master_jenjang
                             let jenjangId = null;
                             const jenjangNama = row['JENJANG'] || '';
                             if (jenjangNama) {

@@ -384,6 +384,14 @@
             cursor: not-allowed;
         }
 
+        /* Hide charts section for non-admin */
+        .charts-section {
+            display: none;
+        }
+        .charts-section.visible {
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 640px) {
             .modal-container {
@@ -431,6 +439,9 @@
             </div>
         </div>
     </header>
+
+    <!-- ===== FILTER INFO ===== -->
+    <div id="filterInfo" style="margin-bottom:12px;"></div>
 
     <!-- ===== MAIN CONTENT ===== -->
     <main class="main-content">
@@ -491,7 +502,7 @@
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
                 <div style="display:flex;align-items:center;gap:8px;">
                     <i class="fas fa-id-card" style="color:#1976d2;font-size:1.2rem;"></i>
-                    <span style="font-size:0.95rem;font-weight:600;color:var(--primary);">Verifikasi KYC</span>
+                    <span style="font-size:0.95rem;font-weight:600;color:var(--primary);">Verifikasi dokumen</span>
                     <span class="badge pending" style="font-size:0.6rem;">
                         <i class="fas fa-clock"></i> Menunggu: <span id="kycPendingCount">0</span>
                     </span>
@@ -547,31 +558,35 @@
             </div>
         </div>
 
-        <!-- ===== CHARTS ===== -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:16px;">
-            <div class="card">
-                <div class="card-title">Sebaran Pendidik per Kecamatan</div>
-                <div style="height:200px;"><canvas id="sebaranChart"></canvas></div>
-            </div>
-            <div class="card">
-                <div class="card-title">Statistik Bantuan</div>
-                <div style="height:200px;"><canvas id="bantuanChart"></canvas></div>
+        <!-- ===== CHARTS - HANYA UNTUK ADMIN KAB / SUPER ADMIN ===== -->
+        <div id="chartsSection" class="charts-section">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:16px;">
+                <div class="card">
+                    <div class="card-title">Sebaran Pendidik per Desa</div>
+                    <div style="height:200px;"><canvas id="sebaranChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Statistik Bantuan</div>
+                    <div style="height:200px;"><canvas id="bantuanChart"></canvas></div>
+                </div>
             </div>
         </div>
 
-        <!-- ===== RECENT ACTIVITY ===== -->
-        <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                <div class="card-title" style="margin-bottom:0;">Aktivitas Terbaru</div>
-                <button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead><tr><th>Nama</th><th>Lembaga</th><th>Status</th><th>Update</th></tr></thead>
-                    <tbody id="recentTableBody">
-                        <tr><td colspan="4" style="text-align:center;padding:20px;color:#999;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
-                    </tbody>
-                </table>
+        <!-- ===== RECENT ACTIVITY - HANYA UNTUK ADMIN KAB / SUPER ADMIN ===== -->
+        <div id="recentSection" class="charts-section">
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                    <div class="card-title" style="margin-bottom:0;">Aktivitas Terbaru</div>
+                    <button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Nama</th><th>Lembaga</th><th>Status</th><th>Update</th></tr></thead>
+                        <tbody id="recentTableBody">
+                            <tr><td colspan="4" style="text-align:center;padding:20px;color:#999;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -820,34 +835,108 @@
         let currentKycTab = 'identitas';
 
         // ============================================================
+        // ===== TOGGLE CHARTS BERDASARKAN ROLE =====
+        // ============================================================
+        function toggleChartsByRole() {
+            const user = getUser();
+            if (!user) return;
+
+            const chartsSection = document.getElementById('chartsSection');
+            const recentSection = document.getElementById('recentSection');
+
+            // Admin Kab atau Super Admin → tampilkan chart & recent
+            if (user.role === 'admin_kab' || user.role === 'super_admin') {
+                if (chartsSection) chartsSection.classList.add('visible');
+                if (recentSection) recentSection.classList.add('visible');
+            } else {
+                // BATKO, FKDT, PONPES, Operator → sembunyikan
+                if (chartsSection) chartsSection.classList.remove('visible');
+                if (recentSection) recentSection.classList.remove('visible');
+            }
+        }
+
+        // ============================================================
         // ===== LOAD DASHBOARD =====
         // ============================================================
         async function loadDashboard() {
             try {
-                const [kecamatan, kelurahan, lembaga, pendidik, bantuan, laporan] = await Promise.all([
+                const user = getUser();
+                const filter = getRoleFilter();
+
+                // 🔴 Cek apakah user memiliki akses
+                if (filter.restrict) {
+                    document.querySelector('.stats-grid').innerHTML = `
+                        <div style="grid-column:1/-1;text-align:center;padding:40px;color:#f44336;">
+                            <i class="fas fa-lock" style="font-size:32px;display:block;margin-bottom:12px;"></i>
+                            Anda tidak memiliki akses ke data ini
+                        </div>
+                    `;
+                    return;
+                }
+
+                // 🔴 BUILD QUERY DENGAN FILTER ROLE
+                let lembagaQuery = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true });
+                let pendidikQuery = supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true);
+                let bantuanQuery = supabaseClient.from('bantuan').select('*', { count: 'exact', head: true })
+                    .eq('tahun_anggaran', new Date().getFullYear()).eq('status', 'cair');
+
+                // Filter berdasarkan role
+                if (filter.kecamatan_id) {
+                    lembagaQuery = lembagaQuery.eq('kecamatan_id', filter.kecamatan_id);
+                    pendidikQuery = pendidikQuery.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+                    bantuanQuery = bantuanQuery.eq('kecamatan_id', filter.kecamatan_id);
+                }
+                if (filter.jenis_lembaga) {
+                    lembagaQuery = lembagaQuery.eq('jenis_lembaga', filter.jenis_lembaga);
+                    pendidikQuery = pendidikQuery.eq('jenis_lembaga', filter.jenis_lembaga);
+                    bantuanQuery = bantuanQuery.eq('jenis_lembaga', filter.jenis_lembaga);
+                }
+
+                const [kecamatan, kelurahan, lembaga, pendidik, bantuan] = await Promise.all([
                     supabaseClient.from('master_kecamatan').select('*', { count: 'exact', head: true }),
                     supabaseClient.from('master_kelurahan').select('*', { count: 'exact', head: true }),
-                    supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }),
-                    supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true),
-                    supabaseClient.from('bantuan').select('*', { count: 'exact', head: true })
-                        .eq('tahun_anggaran', new Date().getFullYear()).eq('status', 'cair'),
-                    supabaseClient.from('pendidik').select('*', { count: 'exact', head: true })
-                        .gte('updated_at', new Date(new Date().setDate(1)).toISOString())
+                    lembagaQuery,
+                    pendidikQuery,
+                    bantuanQuery
                 ]);
 
+                // Update UI dengan data yang sudah difilter...
                 document.getElementById('totalKecamatan').textContent = kecamatan.count || 0;
                 document.getElementById('totalKelurahan').textContent = kelurahan.count || 0;
                 document.getElementById('totalLembaga').textContent = lembaga.count || 0;
                 document.getElementById('totalPendidik').textContent = pendidik.count || 0;
                 document.getElementById('totalBantuan').textContent = bantuan.count || 0;
-                document.getElementById('totalLaporan').textContent = laporan.count || 0;
-                document.getElementById('navPendidikCount').textContent = pendidik.count || 0;
 
-                loadCharts();
-                loadRecent();
+                // Tampilkan informasi filter di dashboard
+                showFilterInfo(filter);
+
+                // Toggle charts berdasarkan role
+                toggleChartsByRole();
+
             } catch (e) {
                 console.error(e);
                 showToast('Gagal memuat data', 'error');
+            }
+        }
+
+        function showFilterInfo(filter) {
+            const infoEl = document.getElementById('filterInfo');
+            if (!infoEl) return;
+
+            if (filter.jenis_lembaga && filter.kecamatan_id) {
+                const jenisNames = { 'LPQ': 'LPQ (BATKO)', 'MDT': 'MDT (FKDT)', 'PONPES': 'PONPES' };
+                supabaseClient
+                    .from('master_kecamatan')
+                    .select('nama')
+                    .eq('id', filter.kecamatan_id)
+                    .single()
+                    .then(({ data }) => {
+                        infoEl.textContent = `📌 Menampilkan: ${jenisNames[filter.jenis_lembaga] || filter.jenis_lembaga} di Kecamatan ${data?.nama || ''}`;
+                        infoEl.style.cssText = 'background:#e8f5e9;padding:8px 16px;border-radius:8px;font-size:0.8rem;color:#2e7d32;margin-bottom:12px;';
+                    });
+            } else {
+                infoEl.textContent = '📊 Menampilkan semua data';
+                infoEl.style.cssText = 'background:#f8faf8;padding:8px 16px;border-radius:8px;font-size:0.8rem;color:#888;margin-bottom:12px;';
             }
         }
 
@@ -856,34 +945,43 @@
         // ============================================================
         async function loadCharts() {
             try {
-                // Sebaran Chart
+                // Sebaran Chart - per Desa
                 const { data } = await supabaseClient
                     .from('pendidik')
-                    .select('kecamatan_lembaga')
+                    .select('desa_pengajar, kecamatan_pengajar')
                     .eq('status_aktif', true);
 
                 const counts = {};
                 (data || []).forEach(d => {
-                    const key = d.kecamatan_lembaga || 'Tidak Diketahui';
+                    const key = d.desa_pengajar || d.kecamatan_pengajar || 'Tidak Diketahui';
                     counts[key] = (counts[key] || 0) + 1;
                 });
 
-                const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,10);
+                const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,15);
                 
-                const ctx1 = document.getElementById('sebaranChart').getContext('2d');
-                if (sebaranChart) sebaranChart.destroy();
-                sebaranChart = new Chart(ctx1, {
-                    type: 'bar',
-                    data: {
-                        labels: sorted.map(d => d[0]),
-                        datasets: [{
-                            data: sorted.map(d => d[1]),
-                            backgroundColor: ['#006400','#008000','#2e7d32','#388e3c','#43a047','#4caf50','#66bb6a','#81c784','#a5d6a7','#c8e6c9'],
-                            borderRadius: 4
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                });
+                const ctx1 = document.getElementById('sebaranChart')?.getContext('2d');
+                if (ctx1) {
+                    if (sebaranChart) sebaranChart.destroy();
+                    sebaranChart = new Chart(ctx1, {
+                        type: 'bar',
+                        data: {
+                            labels: sorted.map(d => d[0]),
+                            datasets: [{
+                                data: sorted.map(d => d[1]),
+                                backgroundColor: ['#006400','#008000','#2e7d32','#388e3c','#43a047','#4caf50','#66bb6a','#81c784','#a5d6a7','#c8e6c9','#a5d6a7','#81c784','#66bb6a','#4caf50','#43a047'],
+                                borderRadius: 4
+                            }]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false, 
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { ticks: { font: { size: 8 } } }
+                            }
+                        }
+                    });
+                }
 
                 // Bantuan Chart
                 const { data: bData } = await supabaseClient
@@ -896,24 +994,26 @@
                 const totals = {};
                 (bData || []).forEach(d => { totals[d.tahun_anggaran] = (totals[d.tahun_anggaran] || 0) + (d.nominal || 0); });
 
-                const ctx2 = document.getElementById('bantuanChart').getContext('2d');
-                if (bantuanChart) bantuanChart.destroy();
-                bantuanChart = new Chart(ctx2, {
-                    type: 'line',
-                    data: {
-                        labels: years,
-                        datasets: [{
-                            data: years.map(y => totals[y] || 0),
-                            borderColor: '#006400',
-                            backgroundColor: 'rgba(0,100,0,0.08)',
-                            fill: true,
-                            tension: 0.3
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                });
+                const ctx2 = document.getElementById('bantuanChart')?.getContext('2d');
+                if (ctx2) {
+                    if (bantuanChart) bantuanChart.destroy();
+                    bantuanChart = new Chart(ctx2, {
+                        type: 'line',
+                        data: {
+                            labels: years,
+                            datasets: [{
+                                data: years.map(y => totals[y] || 0),
+                                borderColor: '#006400',
+                                backgroundColor: 'rgba(0,100,0,0.08)',
+                                fill: true,
+                                tension: 0.3
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                    });
+                }
 
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error('Chart error:', e); }
         }
 
         // ============================================================
@@ -928,6 +1028,8 @@
                     .limit(5);
 
                 const tbody = document.getElementById('recentTableBody');
+                if (!tbody) return;
+                
                 if (!data || data.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Belum ada data</td></tr>`;
                     return;
@@ -1059,20 +1161,17 @@
         function switchKycTab(tab, btn) {
             currentKycTab = tab;
             
-            // Sembunyikan semua tab content
             document.querySelectorAll('.kyc-tab-content').forEach(el => {
                 el.style.display = 'none';
                 el.classList.remove('active');
             });
             
-            // Tampilkan tab yang dipilih
             const target = document.getElementById(`tab-${tab}`);
             if (target) {
                 target.style.display = 'block';
                 target.classList.add('active');
             }
             
-            // Update active tab button
             document.querySelectorAll('.kyc-tabs .tab-btn').forEach(b => {
                 b.classList.remove('active');
             });
@@ -1165,7 +1264,6 @@
                 const pdf = document.getElementById('dokumenPreviewPdf');
                 const empty = document.getElementById('dokumenPreviewEmpty');
 
-                // Reset preview
                 preview.style.display = 'none';
                 img.style.display = 'none';
                 pdf.style.display = 'none';
@@ -1191,7 +1289,6 @@
 
                 document.getElementById('kycPendidikId').value = data.id;
 
-                // Reset ke tab pertama
                 switchKycTab('identitas', document.querySelector('.kyc-tabs .tab-btn'));
 
                 document.getElementById('kycModal').classList.add('active');
@@ -1226,7 +1323,6 @@
                 return;
             }
 
-            // Sembunyikan semua
             img.style.display = 'none';
             pdf.style.display = 'none';
             empty.style.display = 'none';
@@ -1298,7 +1394,6 @@
                 showToast(`Verifikasi ${statusText} untuk ${currentKycPendidik.nama_lengkap} berhasil!`, 'success');
                 closeKycModal();
                 
-                // Refresh semua data
                 await loadKYCData();
                 await loadDashboard();
 
@@ -1330,8 +1425,14 @@
         document.addEventListener('DOMContentLoaded', async function() {
             await checkAuth();
             updateDate();
+            
+            // Toggle charts berdasarkan role (sebelum load data)
+            toggleChartsByRole();
+            
             await loadKYCData();
             await loadDashboard();
+            await loadCharts();
+            await loadRecent();
             
             setInterval(updateDate, 60000);
             setInterval(() => { 

@@ -140,6 +140,24 @@
             color: var(--primary);
         }
 
+        /* Role Badge di Header */
+        .role-badge {
+            background: #006400;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 12px;
+        }
+
+        .role-scope {
+            font-size: 0.65rem;
+            color: #888;
+            margin-right: 12px;
+        }
+
         /* ===== MAIN CONTENT ===== */
         .main-content {
             flex: 1;
@@ -450,9 +468,12 @@
             font-weight: 600;
         }
 
-        .user-list-item .user-role.admin { background: #fff3e0; color: #e65100; }
+        .user-list-item .user-role.super_admin { background: #ffebee; color: #c62828; }
+        .user-list-item .user-role.admin_kab { background: #fff3e0; color: #e65100; }
+        .user-list-item .user-role.batko { background: #e3f2fd; color: #0d47a1; }
+        .user-list-item .user-role.fkdt { background: #e8f5e9; color: #1b5e20; }
+        .user-list-item .user-role.ponpes { background: #f3e5f5; color: #4a148c; }
         .user-list-item .user-role.operator { background: #e3f2fd; color: #1976d2; }
-        .user-list-item .user-role.viewer { background: #f3e5f5; color: #7b1fa2; }
 
         .user-list-item .user-status {
             width: 8px;
@@ -503,6 +524,12 @@
             min-width: 150px;
         }
 
+        .form-inline select:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
         .form-inline input {
             padding: 8px 12px;
             border: 2px solid #e0e0e0;
@@ -523,6 +550,23 @@
             background: #f5f5f5;
             color: #666;
             cursor: not-allowed;
+        }
+
+        .form-inline input:not([readonly]) {
+            background: white;
+        }
+
+        .info-box {
+            margin-top: 4px;
+            padding: 6px 12px;
+            background: #e8f5e9;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #2e7d32;
+        }
+
+        .info-box i {
+            margin-right: 6px;
         }
 
         /* Buttons */
@@ -620,6 +664,24 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Access Denied */
+        .access-denied {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .access-denied i {
+            font-size: 48px;
+            color: #f44336;
+            display: block;
+            margin-bottom: 16px;
+        }
+        .access-denied h2 {
+            color: #f44336;
+        }
+        .access-denied p {
+            color: #888;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .header-date { display: none; }
@@ -634,6 +696,8 @@
             .form-inline { flex-direction: column; }
             .form-inline input, .form-inline select { min-width: auto; }
             .user-list-item { flex-wrap: wrap; }
+            .role-badge { font-size: 0.6rem; padding: 2px 10px; margin-right: 6px; }
+            .role-scope { font-size: 0.55rem; margin-right: 6px; }
         }
 
         @media (max-width: 480px) {
@@ -670,7 +734,7 @@
     </header>
 
     <!-- ===== MAIN CONTENT ===== -->
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
 
         <div class="page-header">
             <h1><i class="fas fa-cog" style="color:var(--primary);margin-right:10px;"></i>Pengaturan</h1>
@@ -696,48 +760,24 @@
         <!-- ===== TAB: USERS ===== -->
         <div id="tab-users" class="tab-content active">
 
-            <div class="setting-section">
+            <div class="setting-section" id="addUserSection">
                 <div class="section-header">
                     <div>
-                        <div class="section-title"><i class="fas fa-user-plus"></i>Tambah Pengguna</div>
-                        <div class="section-desc">Pilih wilayah → lembaga → operator (pendidik) → auto-fill data</div>
+                        <div class="section-title" id="addUserTitle"><i class="fas fa-user-plus"></i>Tambah Pengguna</div>
+                        <div class="section-desc" id="addUserDesc">Pilih wilayah → lembaga → auto-fill data</div>
                     </div>
                 </div>
                 
-                <!-- 1. Kecamatan -->
-                <div class="form-inline">
-                    <select id="inputKecamatan">
-                        <option value="">-- Pilih Kecamatan --</option>
-                    </select>
-                    <select id="inputDesa">
-                        <option value="">-- Pilih Desa --</option>
-                    </select>
+                <!-- ===== FORM DINAMIS ===== -->
+                <div id="formContainer">
+                    <!-- Akan diisi oleh JavaScript -->
                 </div>
 
-                <!-- 2. Lembaga (Filter berdasarkan desa) -->
-                <div class="form-inline" style="margin-top:8px;">
-                    <select id="inputLembaga" style="flex:2;">
-                        <option value="">-- Pilih Lembaga --</option>
-                    </select>
-                </div>
-
-                <!-- 3. Operator (Pendidik dari lembaga yang dipilih) -->
-                <div class="form-inline" style="margin-top:8px;">
-                    <select id="inputPendidik" style="flex:2;">
-                        <option value="">-- Pilih Operator (Pendidik) --</option>
-                    </select>
-                    <select id="inputRole">
-                        <option value="operator">Operator</option>
-                        <option value="admin">Admin</option>
-                        <option value="viewer">Viewer</option>
-                    </select>
-                </div>
-
-                <!-- 4. Auto-fill fields (readonly) -->
-                <div class="form-inline" style="margin-top:8px;">
-                    <input type="text" id="inputName" placeholder="Nama lengkap (auto-fill)" readonly>
-                    <input type="email" id="inputEmail" placeholder="Email (auto-fill)" readonly>
-                    <input type="text" id="inputPassword" placeholder="Password (auto-fill)" readonly>
+                <!-- Auto-fill / Manual fields -->
+                <div class="form-inline" style="margin-top:8px;" id="autoFillContainer">
+                    <input type="text" id="inputName" placeholder="Nama lengkap" readonly>
+                    <input type="email" id="inputEmail" placeholder="Email" readonly>
+                    <input type="text" id="inputPassword" placeholder="Password" readonly>
                 </div>
 
                 <div style="margin-top:8px; display:flex; justify-content:flex-end; gap:8px;">
@@ -750,7 +790,7 @@
                 <div class="section-header">
                     <div>
                         <div class="section-title"><i class="fas fa-list"></i>Daftar Pengguna</div>
-                        <div class="section-desc">Kelola akun pengguna yang terdaftar di sistem</div>
+                        <div class="section-desc" id="userListDesc">Kelola akun pengguna yang terdaftar di sistem</div>
                     </div>
                     <button class="btn btn-outline" onclick="loadUsers()"><i class="fas fa-sync"></i> Refresh</button>
                 </div>
@@ -897,7 +937,7 @@
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px;">
                     <div style="background:#f8faf8;border-radius:10px;padding:12px 16px;">
                         <div style="font-size:0.7rem;color:#888;">Versi</div>
-                        <div style="font-weight:600;font-size:1rem;">v1.0.0</div>
+                        <div style="font-weight:600;font-size:1rem;">v2.0.0</div>
                     </div>
                     <div style="background:#f8faf8;border-radius:10px;padding:12px 16px;">
                         <div style="font-size:0.7rem;color:#888;">Framework</div>
@@ -959,6 +999,14 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ============================================================
+        // ===== GLOBAL VARIABLES =====
+        // ============================================================
+        let currentUser = null;
+        let currentUserRole = '';
+        let allLembaga = [];
+        let allPendidik = [];
+
+        // ============================================================
         // ===== TOAST =====
         // ============================================================
         function showToast(message, type = 'info') {
@@ -999,25 +1047,36 @@
                     return false;
                 }
                 
-                try {
-                    const { data: userData } = await supabaseClient
-                        .from('users')
-                        .select('name, role')
-                        .eq('id', session.user.id)
-                        .single();
-                    
-                    if (userData) {
-                        const nameEl = document.getElementById('userName');
-                        const avatarEl = document.getElementById('userAvatar');
-                        if (nameEl) nameEl.textContent = userData.name || 'User';
-                        if (avatarEl) avatarEl.textContent = (userData.name || 'U').charAt(0).toUpperCase();
-                    }
-                } catch (e) {
-                    const nameEl = document.getElementById('userName');
-                    const avatarEl = document.getElementById('userAvatar');
-                    if (nameEl) nameEl.textContent = session.user.email || 'User';
-                    if (avatarEl) avatarEl.textContent = (session.user.email || 'U').charAt(0).toUpperCase();
+                const { data: userData, error: userError } = await supabaseClient
+                    .from('users')
+                    .select('id, name, email, role, kecamatan_id, lembaga_id, active')
+                    .eq('id', session.user.id)
+                    .single();
+                
+                if (userError || !userData || !userData.active) {
+                    console.error('User data error:', userError);
+                    await supabaseClient.auth.signOut();
+                    window.location.href = 'index.html';
+                    return false;
                 }
+
+                currentUser = {
+                    id: userData.id,
+                    name: userData.name || session.user.email,
+                    email: session.user.email,
+                    role: userData.role || 'operator',
+                    kecamatan_id: userData.kecamatan_id,
+                    lembaga_id: userData.lembaga_id
+                };
+                currentUserRole = currentUser.role;
+
+                // Update UI
+                const nameEl = document.getElementById('userName');
+                const avatarEl = document.getElementById('userAvatar');
+                if (nameEl) nameEl.textContent = currentUser.name;
+                if (avatarEl) avatarEl.textContent = currentUser.name.charAt(0).toUpperCase();
+
+                updateRoleUI(currentUser);
                 
                 return true;
                 
@@ -1025,6 +1084,85 @@
                 console.error('Auth check error:', error);
                 window.location.href = 'index.html';
                 return false;
+            }
+        }
+
+        // ============================================================
+        // ===== UPDATE ROLE UI =====
+        // ============================================================
+        function updateRoleUI(user) {
+            const oldBadge = document.querySelector('.role-badge');
+            if (oldBadge) oldBadge.remove();
+
+            const roleNames = {
+                'super_admin': '🛡️ Super Admin',
+                'admin_kab': '🏛️ Admin Kabupaten',
+                'batko': '📘 BATKO',
+                'fkdt': '📗 FKDT',
+                'ponpes': '📕 PONPES',
+                'operator': '📋 Operator'
+            };
+
+            const badge = document.createElement('span');
+            badge.className = 'role-badge';
+            badge.textContent = roleNames[user.role] || user.role.toUpperCase();
+            badge.style.cssText = `
+                background: #006400;
+                color: white;
+                padding: 4px 14px;
+                border-radius: 20px;
+                font-size: 0.7rem;
+                font-weight: 600;
+                display: inline-block;
+                margin-right: 12px;
+            `;
+
+            const headerRight = document.querySelector('.header-right');
+            if (headerRight) {
+                headerRight.prepend(badge);
+            }
+
+            // Scope
+            const oldScope = document.querySelector('.role-scope');
+            if (oldScope) oldScope.remove();
+
+            if (user.role === 'super_admin' || user.role === 'admin_kab') {
+                return;
+            }
+
+            const scope = document.createElement('span');
+            scope.className = 'role-scope';
+            scope.style.cssText = `
+                font-size: 0.65rem;
+                color: #888;
+                margin-right: 12px;
+            `;
+
+            if (user.kecamatan_id) {
+                supabaseClient
+                    .from('master_kecamatan')
+                    .select('nama')
+                    .eq('id', user.kecamatan_id)
+                    .single()
+                    .then(({ data }) => {
+                        const jenis = {
+                            'batko': 'LPQ',
+                            'fkdt': 'MDT',
+                            'ponpes': 'PONPES'
+                        };
+                        scope.textContent = `📍 ${data?.nama || 'Kecamatan'} • ${jenis[user.role] || ''}`;
+                        if (headerRight) headerRight.prepend(scope);
+                    });
+            } else if (user.lembaga_id) {
+                supabaseClient
+                    .from('lembaga')
+                    .select('nama')
+                    .eq('id', user.lembaga_id)
+                    .single()
+                    .then(({ data }) => {
+                        scope.textContent = `🏫 ${data?.nama || 'Lembaga'}`;
+                        if (headerRight) headerRight.prepend(scope);
+                    });
             }
         }
 
@@ -1061,140 +1199,307 @@
         }
 
         // ============================================================
-        // ===== MASTER DATA UNTUK DROPDOWN =====
+        // ===== GET ALLOWED ROLES =====
         // ============================================================
-        
-        // Load kecamatan
-        async function loadKecamatanOptions() {
+        function getAllowedRolesToAdd(userRole) {
+            switch (userRole) {
+                case 'super_admin':
+                case 'admin_kab':
+                    return ['batko', 'fkdt', 'ponpes', 'operator'];
+                case 'batko':
+                case 'fkdt':
+                case 'ponpes':
+                    return ['operator'];
+                default:
+                    return [];
+            }
+        }
+
+        function getRoleLabel(role) {
+            const labels = {
+                'super_admin': '🛡️ Super Admin',
+                'admin_kab': '🏛️ Admin Kabupaten',
+                'batko': '📘 BATKO (LPQ Kecamatan)',
+                'fkdt': '📗 FKDT (MDT Kecamatan)',
+                'ponpes': '📕 PONPES (Kecamatan)',
+                'operator': '📋 Operator Lembaga'
+            };
+            return labels[role] || role;
+        }
+
+        // ============================================================
+        // ===== BUILD FORM DINAMIS SESUAI ROLE =====
+        // ============================================================
+        function buildForm() {
+            const container = document.getElementById('formContainer');
+            const role = currentUserRole;
+            
+            let html = '';
+
+            if (role === 'super_admin' || role === 'admin_kab') {
+                // ADMIN KABUPATEN: Kecamatan + Role (manual input)
+                html = `
+                    <div class="form-inline">
+                        <select id="inputKecamatan" style="flex:1;">
+                            <option value="">-- Pilih Kecamatan --</option>
+                        </select>
+                        <select id="inputRole" style="flex:1;">
+                            <option value="">-- Pilih Role --</option>
+                            <option value="batko">BATKO (LPQ Kecamatan)</option>
+                            <option value="fkdt">FKDT (MDT Kecamatan)</option>
+                            <option value="ponpes">PONPES (Kecamatan)</option>
+                            <option value="operator">Operator Lembaga</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="inputLembaga" value="">
+                    <input type="hidden" id="inputDesa" value="">
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i> Isi Nama, Email, dan Password secara manual
+                    </div>
+                `;
+            } else if (role === 'batko') {
+                // BATKO: Desa → Lembaga LPQ → Pendidik (auto-fill)
+                html = `
+                    <div class="form-inline">
+                        <select id="inputDesa" style="flex:1;" onchange="loadLembagaByDesa()">
+                            <option value="">-- Pilih Desa --</option>
+                        </select>
+                        <select id="inputLembaga" style="flex:2;" onchange="loadPendidikByLembaga()">
+                            <option value="">-- Pilih Lembaga LPQ --</option>
+                        </select>
+                    </div>
+                    <div class="form-inline" style="margin-top:8px;">
+                        <select id="inputPendidik" style="flex:2;" onchange="autoFillFromPendidik()">
+                            <option value="">-- Pilih Pendidik (Operator) --</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="inputKecamatan" value="${currentUser.kecamatan_id || ''}">
+                    <input type="hidden" id="inputRole" value="operator">
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i> Nama, Email, dan Password akan terisi otomatis dari data pendidik
+                    </div>
+                `;
+            } else if (role === 'fkdt') {
+                // FKDT: Desa → Lembaga MDT → Pendidik (auto-fill)
+                html = `
+                    <div class="form-inline">
+                        <select id="inputDesa" style="flex:1;" onchange="loadLembagaByDesa()">
+                            <option value="">-- Pilih Desa --</option>
+                        </select>
+                        <select id="inputLembaga" style="flex:2;" onchange="loadPendidikByLembaga()">
+                            <option value="">-- Pilih Lembaga MDT --</option>
+                        </select>
+                    </div>
+                    <div class="form-inline" style="margin-top:8px;">
+                        <select id="inputPendidik" style="flex:2;" onchange="autoFillFromPendidik()">
+                            <option value="">-- Pilih Pendidik (Operator) --</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="inputKecamatan" value="${currentUser.kecamatan_id || ''}">
+                    <input type="hidden" id="inputRole" value="operator">
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i> Nama, Email, dan Password akan terisi otomatis dari data pendidik
+                    </div>
+                `;
+            } else if (role === 'ponpes') {
+                // PONPES: Desa → Lembaga PONPES → Pendidik (auto-fill)
+                html = `
+                    <div class="form-inline">
+                        <select id="inputDesa" style="flex:1;" onchange="loadLembagaByDesa()">
+                            <option value="">-- Pilih Desa --</option>
+                        </select>
+                        <select id="inputLembaga" style="flex:2;" onchange="loadPendidikByLembaga()">
+                            <option value="">-- Pilih Lembaga PONPES --</option>
+                        </select>
+                    </div>
+                    <div class="form-inline" style="margin-top:8px;">
+                        <select id="inputPendidik" style="flex:2;" onchange="autoFillFromPendidik()">
+                            <option value="">-- Pilih Pendidik (Operator) --</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="inputKecamatan" value="${currentUser.kecamatan_id || ''}">
+                    <input type="hidden" id="inputRole" value="operator">
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i> Nama, Email, dan Password akan terisi otomatis dari data pendidik
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            // Set readonly/editable pada input fields
+            const nameInput = document.getElementById('inputName');
+            const emailInput = document.getElementById('inputEmail');
+            const passInput = document.getElementById('inputPassword');
+
+            if (role === 'super_admin' || role === 'admin_kab') {
+                // MANUAL: tidak readonly
+                nameInput.removeAttribute('readonly');
+                emailInput.removeAttribute('readonly');
+                passInput.removeAttribute('readonly');
+                nameInput.placeholder = 'Nama lengkap';
+                emailInput.placeholder = 'Email';
+                passInput.placeholder = 'Password (min 6 karakter)';
+                nameInput.value = '';
+                emailInput.value = '';
+                passInput.value = '';
+            } else {
+                // AUTO-FILL: readonly
+                nameInput.setAttribute('readonly', true);
+                emailInput.setAttribute('readonly', true);
+                passInput.setAttribute('readonly', true);
+                nameInput.placeholder = 'Nama lengkap (auto-fill)';
+                emailInput.placeholder = 'Email (auto-fill)';
+                passInput.placeholder = 'Password (auto-fill)';
+                nameInput.value = '';
+                emailInput.value = '';
+                passInput.value = '';
+            }
+
+            // Load data setelah form dibuat
+            if (role === 'super_admin' || role === 'admin_kab') {
+                loadKecamatanOptionsAdmin();
+            } else if (['batko', 'fkdt', 'ponpes'].includes(role)) {
+                loadDesaOptionsKecamatan();
+            }
+        }
+
+        // ============================================================
+        // ===== LOAD DATA UNTUK ADMIN KAB =====
+        // ============================================================
+        async function loadKecamatanOptionsAdmin() {
             const { data, error } = await supabaseClient
                 .from('master_kecamatan')
                 .select('id, nama')
                 .order('nama');
+            
             if (error) throw error;
             const select = document.getElementById('inputKecamatan');
+            if (!select) return;
             select.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
             data.forEach(item => {
                 select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
             });
         }
 
-        // Load desa berdasarkan kecamatan
-        async function loadDesaOptions(kecamatanId) {
-            let query = supabaseClient
+        // ============================================================
+        // ===== LOAD DATA UNTUK BATKO/FKDT/PONPES =====
+        // ============================================================
+        async function loadDesaOptionsKecamatan() {
+            if (!currentUser.kecamatan_id) return;
+            
+            const { data, error } = await supabaseClient
                 .from('master_kelurahan')
                 .select('id, nama')
+                .eq('kecamatan_id', currentUser.kecamatan_id)
                 .order('nama');
-            if (kecamatanId) {
-                query = query.eq('kecamatan_id', kecamatanId);
-            }
-            const { data, error } = await query;
+            
             if (error) throw error;
             const select = document.getElementById('inputDesa');
+            if (!select) return;
             select.innerHTML = '<option value="">-- Pilih Desa --</option>';
             data.forEach(item => {
                 select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
             });
         }
 
-        // Load lembaga berdasarkan desa
-        async function loadLembagaOptions(desaId) {
+        async function loadLembagaByDesa() {
+            const role = currentUserRole;
+            let jenisLembaga = '';
+            if (role === 'batko') jenisLembaga = 'LPQ';
+            else if (role === 'fkdt') jenisLembaga = 'MDT';
+            else if (role === 'ponpes') jenisLembaga = 'PONPES';
+
+            const desaId = document.getElementById('inputDesa')?.value || '';
+
             let query = supabaseClient
                 .from('lembaga')
-                .select('id, nama, nslp')
+                .select('id, nama, nslp, jenis_lembaga')
+                .eq('jenis_lembaga', jenisLembaga)
+                .eq('kecamatan_id', currentUser.kecamatan_id)
                 .order('nama');
+            
             if (desaId) {
                 query = query.eq('desa_id', desaId);
             }
+
             const { data, error } = await query;
             if (error) throw error;
+            
+            allLembaga = data || [];
             const select = document.getElementById('inputLembaga');
+            if (!select) return;
             select.innerHTML = '<option value="">-- Pilih Lembaga --</option>';
             data.forEach(item => {
-                select.innerHTML += `<option value="${item.id}" data-nslp="${item.nslp || ''}">${item.nama}</option>`;
+                const label = { 'LPQ': '📘', 'MDT': '📗', 'PONPES': '📕' };
+                select.innerHTML += `<option value="${item.id}" data-nslp="${item.nslp || ''}" data-jenis="${item.jenis_lembaga}">
+                    ${label[item.jenis_lembaga] || ''} ${item.nama}
+                </option>`;
             });
+
+            // Reset pendidik
+            const pendidikSelect = document.getElementById('inputPendidik');
+            if (pendidikSelect) {
+                pendidikSelect.innerHTML = '<option value="">-- Pilih Pendidik (Operator) --</option>';
+            }
+            clearAutoFill();
         }
 
-        // Load pendidik berdasarkan lembaga
-        async function loadPendidikOptions(lembagaId) {
-            let query = supabaseClient
+        async function loadPendidikByLembaga() {
+            const lembagaId = document.getElementById('inputLembaga')?.value || '';
+            
+            if (!lembagaId) {
+                const pendidikSelect = document.getElementById('inputPendidik');
+                if (pendidikSelect) {
+                    pendidikSelect.innerHTML = '<option value="">-- Pilih Pendidik (Operator) --</option>';
+                }
+                clearAutoFill();
+                return;
+            }
+
+            const { data, error } = await supabaseClient
                 .from('pendidik')
-                .select('id, nama_lengkap, email, nik, lembaga_id')
+                .select('id, nama_lengkap, email, nik')
+                .eq('lembaga_id', lembagaId)
                 .order('nama_lengkap');
             
-            if (lembagaId) {
-                query = query.eq('lembaga_id', lembagaId);
-            }
-            
-            const { data, error } = await query;
             if (error) throw error;
             
+            allPendidik = data || [];
             const select = document.getElementById('inputPendidik');
-            select.innerHTML = '<option value="">-- Pilih Operator (Pendidik) --</option>';
+            if (!select) return;
+            select.innerHTML = '<option value="">-- Pilih Pendidik (Operator) --</option>';
             data.forEach(item => {
-                select.innerHTML += `<option value="${item.id}" data-email="${item.email || ''}" data-nik="${item.nik || ''}" data-lembaga="${item.lembaga_id || ''}">${item.nama_lengkap} (${item.email || 'no email'})</option>`;
+                select.innerHTML += `<option value="${item.id}" data-email="${item.email || ''}" data-nik="${item.nik || ''}">
+                    ${item.nama_lengkap} ${item.email ? '(' + item.email + ')' : ''}
+                </option>`;
             });
+
+            clearAutoFill();
         }
 
         // ============================================================
-        // ===== CASCADING LOGIC =====
+        // ===== AUTO FILL DARI PENDIDIK =====
         // ============================================================
-        
-        // 1. Kecamatan → Desa
-        document.getElementById('inputKecamatan').addEventListener('change', function() {
-            const kecamatanId = this.value;
-            loadDesaOptions(kecamatanId);
-            // Reset desa & lembaga & pendidik
-            document.getElementById('inputDesa').value = '';
-            document.getElementById('inputLembaga').innerHTML = '<option value="">-- Pilih Lembaga --</option>';
-            document.getElementById('inputPendidik').innerHTML = '<option value="">-- Pilih Operator (Pendidik) --</option>';
-            clearAutoFill();
-        });
-
-        // 2. Desa → Lembaga
-        document.getElementById('inputDesa').addEventListener('change', function() {
-            const desaId = this.value;
-            loadLembagaOptions(desaId);
-            // Reset lembaga & pendidik
-            document.getElementById('inputLembaga').value = '';
-            document.getElementById('inputPendidik').innerHTML = '<option value="">-- Pilih Operator (Pendidik) --</option>';
-            clearAutoFill();
-        });
-
-        // 3. Lembaga → Operator (Pendidik)
-        document.getElementById('inputLembaga').addEventListener('change', function() {
-            const lembagaId = this.value;
-            loadPendidikOptions(lembagaId);
-            // Reset pendidik
-            document.getElementById('inputPendidik').value = '';
-            clearAutoFill();
-        });
-
-        // 4. Operator (Pendidik) → Auto-fill Nama, Email, Password
-        document.getElementById('inputPendidik').addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const nama = selectedOption?.text?.split(' (')[0] || '';
-            const email = selectedOption?.dataset?.email || '';
-            const nik = selectedOption?.dataset?.nik || '';
-            const lembagaId = selectedOption?.dataset?.lembaga || '';
+        function autoFillFromPendidik() {
+            const pendidikId = document.getElementById('inputPendidik')?.value || '';
             
-            // Auto-fill nama, email, password
-            document.getElementById('inputName').value = nama;
-            document.getElementById('inputEmail').value = email;
-            
-            // Password: gunakan NIK jika ada, atau NSLP lembaga, atau default
-            let password = nik || '';
-            if (!password && lembagaId) {
-                // Cari NSLP dari lembaga yang dipilih
-                const lembagaSelect = document.getElementById('inputLembaga');
-                const selectedLembaga = lembagaSelect.options[lembagaSelect.selectedIndex];
-                password = selectedLembaga?.dataset?.nslp || '';
+            if (!pendidikId) {
+                clearAutoFill();
+                return;
             }
-            document.getElementById('inputPassword').value = password || 'password123';
-        });
 
-        // ============================================================
-        // ===== CLEAR AUTO-FILL =====
-        // ============================================================
+            const pendidik = allPendidik.find(p => p.id === pendidikId);
+            if (!pendidik) {
+                clearAutoFill();
+                return;
+            }
+
+            document.getElementById('inputName').value = pendidik.nama_lengkap || '';
+            document.getElementById('inputEmail').value = pendidik.email || '';
+            document.getElementById('inputPassword').value = pendidik.nik || 'password123';
+        }
+
         function clearAutoFill() {
             document.getElementById('inputName').value = '';
             document.getElementById('inputEmail').value = '';
@@ -1205,48 +1510,101 @@
         // ===== RESET FORM =====
         // ============================================================
         function resetForm() {
-            document.getElementById('inputKecamatan').value = '';
-            document.getElementById('inputDesa').innerHTML = '<option value="">-- Pilih Desa --</option>';
-            document.getElementById('inputLembaga').innerHTML = '<option value="">-- Pilih Lembaga --</option>';
-            document.getElementById('inputPendidik').innerHTML = '<option value="">-- Pilih Operator (Pendidik) --</option>';
             document.getElementById('inputName').value = '';
             document.getElementById('inputEmail').value = '';
             document.getElementById('inputPassword').value = '';
-            document.getElementById('inputRole').value = 'operator';
+            
+            const kecamatan = document.getElementById('inputKecamatan');
+            if (kecamatan) kecamatan.value = '';
+            
+            const desa = document.getElementById('inputDesa');
+            if (desa) desa.value = '';
+            
+            const lembaga = document.getElementById('inputLembaga');
+            if (lembaga) lembaga.innerHTML = '<option value="">-- Pilih Lembaga --</option>';
+            
+            const pendidik = document.getElementById('inputPendidik');
+            if (pendidik) pendidik.innerHTML = '<option value="">-- Pilih Pendidik (Operator) --</option>';
+            
+            const role = document.getElementById('inputRole');
+            if (role) role.value = '';
+            
             showToast('Form telah direset', 'info');
         }
 
         // ============================================================
-        // ===== ADD USER (DIPERBAIKI) =====
+        // ===== GET VALUE DARI FORM =====
+        // ============================================================
+        function getFormValues() {
+            const role = currentUserRole;
+            let result = {
+                name: document.getElementById('inputName').value.trim(),
+                email: document.getElementById('inputEmail').value.trim(),
+                password: document.getElementById('inputPassword').value.trim(),
+                role: document.getElementById('inputRole')?.value || 'operator',
+                lembagaId: document.getElementById('inputLembaga')?.value || null,
+                kecamatanId: document.getElementById('inputKecamatan')?.value || currentUser.kecamatan_id || null,
+                desaId: document.getElementById('inputDesa')?.value || null,
+                pendidikId: document.getElementById('inputPendidik')?.value || null
+            };
+
+            // Untuk BATKO/FKDT/PONPES, role sudah di-hidden = operator
+            if (['batko', 'fkdt', 'ponpes'].includes(role)) {
+                result.role = 'operator';
+            }
+
+            return result;
+        }
+
+        // ============================================================
+        // ===== ADD USER =====
         // ============================================================
         async function addUser() {
-            const name = document.getElementById('inputName').value.trim();
-            const email = document.getElementById('inputEmail').value.trim();
-            const password = document.getElementById('inputPassword').value.trim();
-            const role = document.getElementById('inputRole').value;
-            const lembagaId = document.getElementById('inputLembaga').value || null;
-            const kecamatanId = document.getElementById('inputKecamatan').value || null;
-            const desaId = document.getElementById('inputDesa').value || null;
+            const values = getFormValues();
+            const role = currentUserRole;
 
-            if (!name || !email || !password) {
+            // ===== VALIDASI DASAR =====
+            if (!values.name || !values.email || !values.password) {
                 showToast('Nama, Email, dan Password harus diisi!', 'error');
                 return;
             }
-            if (password.length < 6) {
+            if (values.password.length < 6) {
                 showToast('Password minimal 6 karakter!', 'error');
                 return;
             }
-            if (role === 'operator' && !lembagaId) {
-                showToast('Operator harus dipilih lembaga!', 'error');
-                return;
+
+            // ===== VALIDASI UNTUK ADMIN KAB =====
+            if (role === 'super_admin' || role === 'admin_kab') {
+                // Harus pilih kecamatan untuk BATKO/FKDT/PONPES
+                if (['batko', 'fkdt', 'ponpes'].includes(values.role) && !values.kecamatanId) {
+                    showToast('Role ' + values.role.toUpperCase() + ' harus dipilih kecamatan!', 'error');
+                    return;
+                }
+                // Operator harus punya lembaga (tapi admin kab input manual, lembagaId = null)
+                if (values.role === 'operator' && !values.lembagaId) {
+                    showToast('Operator harus dipilih lembaga! (pilih lembaga dari dropdown)', 'error');
+                    return;
+                }
             }
 
-            // CEK EMAIL DUPLIKAT
+            // ===== VALIDASI UNTUK BATKO/FKDT/PONPES =====
+            if (['batko', 'fkdt', 'ponpes'].includes(role)) {
+                if (!values.lembagaId) {
+                    showToast('Pilih lembaga terlebih dahulu!', 'error');
+                    return;
+                }
+                if (!values.pendidikId) {
+                    showToast('Pilih pendidik sebagai operator!', 'error');
+                    return;
+                }
+            }
+
+            // ===== CEK EMAIL DUPLIKAT =====
             try {
                 const { data: existingUser } = await supabaseClient
                     .from('users')
                     .select('email')
-                    .eq('email', email)
+                    .eq('email', values.email)
                     .maybeSingle();
 
                 if (existingUser) {
@@ -1262,10 +1620,10 @@
             try {
                 // 1. Buat user di auth
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                    email: email,
-                    password: password,
+                    email: values.email,
+                    password: values.password,
                     options: {
-                        data: { full_name: name, role: role }
+                        data: { full_name: values.name, role: values.role }
                     }
                 });
 
@@ -1286,13 +1644,13 @@
                 // 2. Insert ke tabel users
                 const userData = {
                     id: authData.user.id,
-                    email: email,
-                    name: name,
-                    role: role,
+                    email: values.email,
+                    name: values.name,
+                    role: values.role,
                     active: true,
-                    lembaga_id: (role === 'operator' && lembagaId) ? lembagaId : null,
-                    kecamatan_id: kecamatanId || null,
-                    desa_id: desaId || null
+                    lembaga_id: values.lembagaId || null,
+                    kecamatan_id: values.kecamatanId || null,
+                    desa_id: values.desaId || null
                 };
 
                 const { error: userError } = await supabaseClient
@@ -1300,7 +1658,6 @@
                     .insert([userData]);
 
                 if (userError) {
-                    // Cleanup: hapus user di auth jika gagal insert
                     try {
                         await supabaseClient.auth.admin.deleteUser(authData.user.id);
                     } catch (cleanupError) {
@@ -1310,11 +1667,11 @@
                 }
 
                 // 3. Jika operator, update operator_id di lembaga
-                if (role === 'operator' && lembagaId) {
+                if (values.role === 'operator' && values.lembagaId) {
                     const { error: updateError } = await supabaseClient
                         .from('lembaga')
                         .update({ operator_id: authData.user.id })
-                        .eq('id', lembagaId);
+                        .eq('id', values.lembagaId);
 
                     if (updateError) {
                         console.warn('Gagal update operator_id:', updateError);
@@ -1323,23 +1680,17 @@
                 }
 
                 resetForm();
-                showToast(`Pengguna ${name} berhasil ditambahkan!`, 'success');
+                showToast(`Pengguna ${values.name} berhasil ditambahkan!`, 'success');
                 loadUsers();
 
             } catch (e) {
                 console.error('Add user error:', e);
-                if (e.message.includes('duplicate key') || e.message.includes('already registered')) {
-                    showToast('Email sudah terdaftar! Gunakan email lain.', 'error');
-                } else if (e.message.includes('rate limit')) {
-                    showToast('Terlalu banyak percobaan. Tunggu beberapa menit.', 'error');
-                } else {
-                    showToast('Gagal tambah pengguna: ' + e.message, 'error');
-                }
+                showToast('Gagal tambah pengguna: ' + e.message, 'error');
             }
         }
 
         // ============================================================
-        // ===== DELETE USER (DIPERBAIKI) =====
+        // ===== DELETE USER =====
         // ============================================================
         async function deleteUser(userId) {
             if (!confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) return;
@@ -1353,14 +1704,12 @@
 
                 if (lembagaError) throw lembagaError;
 
-                // Jika user adalah operator, update dulu
                 if (lembagaData && lembagaData.length > 0) {
                     const lembagaNames = lembagaData.map(l => l.nama).join(', ');
                     const confirmMsg = `User ini adalah operator dari lembaga:\n${lembagaNames}\n\nHapus akan menghapus keterkaitan ini. Lanjutkan?`;
                     
                     if (!confirm(confirmMsg)) return;
                     
-                    // Update lembaga: set operator_id menjadi NULL
                     for (const lembaga of lembagaData) {
                         const { error: updateError } = await supabaseClient
                             .from('lembaga')
@@ -1393,11 +1742,7 @@
 
             } catch (e) {
                 console.error('Delete user error:', e);
-                if (e.code === '23503') {
-                    showToast('Tidak bisa menghapus user karena masih terhubung dengan lembaga. Hubungi administrator.', 'error');
-                } else {
-                    showToast('Gagal hapus pengguna: ' + e.message, 'error');
-                }
+                showToast('Gagal hapus pengguna: ' + e.message, 'error');
             }
         }
 
@@ -1406,11 +1751,65 @@
         // ============================================================
         async function loadUsers() {
             try {
-                const { data, error } = await supabaseClient
+                let query = supabaseClient
                     .from('users')
-                    .select('*, lembaga(nama)')
+                    .select('*')
                     .order('created_at', { ascending: false });
 
+                // FILTER BERDASARKAN ROLE YANG LOGIN
+                if (currentUserRole === 'batko') {
+                    query = query
+                        .eq('role', 'operator')
+                        .eq('kecamatan_id', currentUser.kecamatan_id);
+                    
+                    const { data: lpqLembaga } = await supabaseClient
+                        .from('lembaga')
+                        .select('id')
+                        .eq('jenis_lembaga', 'LPQ')
+                        .eq('kecamatan_id', currentUser.kecamatan_id);
+                    const lpqIds = lpqLembaga?.map(l => l.id) || [];
+                    if (lpqIds.length > 0) {
+                        query = query.in('lembaga_id', lpqIds);
+                    } else {
+                        query = query.eq('lembaga_id', '00000000-0000-0000-0000-000000000000');
+                    }
+                    
+                } else if (currentUserRole === 'fkdt') {
+                    query = query
+                        .eq('role', 'operator')
+                        .eq('kecamatan_id', currentUser.kecamatan_id);
+                    
+                    const { data: mdtLembaga } = await supabaseClient
+                        .from('lembaga')
+                        .select('id')
+                        .eq('jenis_lembaga', 'MDT')
+                        .eq('kecamatan_id', currentUser.kecamatan_id);
+                    const mdtIds = mdtLembaga?.map(l => l.id) || [];
+                    if (mdtIds.length > 0) {
+                        query = query.in('lembaga_id', mdtIds);
+                    } else {
+                        query = query.eq('lembaga_id', '00000000-0000-0000-0000-000000000000');
+                    }
+                    
+                } else if (currentUserRole === 'ponpes') {
+                    query = query
+                        .eq('role', 'operator')
+                        .eq('kecamatan_id', currentUser.kecamatan_id);
+                    
+                    const { data: ponpesLembaga } = await supabaseClient
+                        .from('lembaga')
+                        .select('id')
+                        .eq('jenis_lembaga', 'PONPES')
+                        .eq('kecamatan_id', currentUser.kecamatan_id);
+                    const ponpesIds = ponpesLembaga?.map(l => l.id) || [];
+                    if (ponpesIds.length > 0) {
+                        query = query.in('lembaga_id', ponpesIds);
+                    } else {
+                        query = query.eq('lembaga_id', '00000000-0000-0000-0000-000000000000');
+                    }
+                }
+
+                const { data, error } = await query;
                 if (error) throw error;
 
                 const container = document.getElementById('userList');
@@ -1418,32 +1817,74 @@
                     container.innerHTML = `
                         <div style="text-align:center;padding:30px;color:#999;">
                             <i class="fas fa-users" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                            Belum ada pengguna terdaftar
+                            Belum ada pengguna terdaftar${['batko', 'fkdt', 'ponpes'].includes(currentUserRole) ? ' di wilayah Anda' : ''}
                         </div>
                     `;
                     return;
                 }
 
-                container.innerHTML = data.map(user => `
-                    <div class="user-list-item">
-                        <div class="user-avatar-sm">${(user.name || 'U').charAt(0).toUpperCase()}</div>
-                        <div class="user-info">
-                            <div class="name">${user.name || '-'}</div>
-                            <div class="email">${user.email || '-'}</div>
-                            ${user.lembaga ? `<div class="email" style="color:var(--primary);">🏫 ${user.lembaga.nama}</div>` : ''}
+                // Ambil nama kecamatan dan lembaga untuk setiap user
+                const usersWithDetail = await Promise.all(data.map(async (user) => {
+                    let kecamatanName = '';
+                    let lembagaName = '';
+
+                    if (user.kecamatan_id) {
+                        const { data: kecData } = await supabaseClient
+                            .from('master_kecamatan')
+                            .select('nama')
+                            .eq('id', user.kecamatan_id)
+                            .maybeSingle();
+                        kecamatanName = kecData?.nama || '';
+                    }
+
+                    if (user.lembaga_id) {
+                        const { data: lemData } = await supabaseClient
+                            .from('lembaga')
+                            .select('nama')
+                            .eq('id', user.lembaga_id)
+                            .maybeSingle();
+                        lembagaName = lemData?.nama || '';
+                    }
+
+                    return { ...user, kecamatan_name: kecamatanName, lembaga_name: lembagaName };
+                }));
+
+                container.innerHTML = usersWithDetail.map(user => {
+                    const roleLabels = {
+                        'super_admin': '🛡️ Super Admin',
+                        'admin_kab': '🏛️ Admin Kab',
+                        'batko': '📘 BATKO',
+                        'fkdt': '📗 FKDT',
+                        'ponpes': '📕 PONPES',
+                        'operator': '📋 Operator'
+                    };
+                    
+                    const roleClass = user.role || 'viewer';
+                    const lembagaName = user.lembaga_name || '-';
+                    const kecamatanName = user.kecamatan_name || '-';
+                    
+                    return `
+                        <div class="user-list-item">
+                            <div class="user-avatar-sm">${(user.name || 'U').charAt(0).toUpperCase()}</div>
+                            <div class="user-info">
+                                <div class="name">${user.name || '-'}</div>
+                                <div class="email">${user.email || '-'}</div>
+                                ${user.role === 'operator' ? `<div class="email" style="color:var(--primary);">🏫 ${lembagaName}</div>` : ''}
+                                ${['batko', 'fkdt', 'ponpes'].includes(user.role) ? `<div class="email" style="color:#888;">📍 ${kecamatanName}</div>` : ''}
+                            </div>
+                            <span class="user-role ${roleClass}">${roleLabels[user.role] || user.role}</span>
+                            <span class="user-status ${user.active !== false ? 'active' : 'inactive'}"></span>
+                            <div style="display:flex;gap:4px;">
+                                <button class="btn-icon" onclick="showToast('Edit user: ${user.name}', 'info')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon danger" onclick="deleteUser('${user.id}')" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
-                        <span class="user-role ${user.role || 'viewer'}">${user.role || 'Viewer'}</span>
-                        <span class="user-status ${user.active !== false ? 'active' : 'inactive'}"></span>
-                        <div style="display:flex;gap:4px;">
-                            <button class="btn-icon" onclick="showToast('Edit user: ${user.name}', 'info')" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-icon danger" onclick="deleteUser('${user.id}')" title="Hapus">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
 
             } catch (e) {
                 console.error(e);
@@ -1453,6 +1894,60 @@
                         Gagal memuat data: ${e.message}
                     </div>
                 `;
+            }
+        }
+
+        // ============================================================
+        // ===== APPLY UI RESTRICTIONS =====
+        // ============================================================
+        function applyUIRestrictions() {
+            const role = currentUserRole;
+            const isOperator = role === 'operator';
+
+            // OPERATOR TIDAK BOLEH AKSES
+            if (isOperator) {
+                document.getElementById('mainContent').innerHTML = `
+                    <div class="access-denied">
+                        <i class="fas fa-lock"></i>
+                        <h2>Akses Ditolak</h2>
+                        <p>Anda tidak memiliki izin untuk mengakses halaman Pengaturan.</p>
+                        <a href="dashboard.html" class="btn btn-primary" style="margin-top:16px;display:inline-block;">
+                            <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Update judul
+            const titleEl = document.getElementById('addUserTitle');
+            const descEl = document.getElementById('addUserDesc');
+            
+            if (role === 'super_admin' || role === 'admin_kab') {
+                titleEl.innerHTML = '<i class="fas fa-user-plus"></i>Tambah Pengguna (Admin Kabupaten)';
+                descEl.textContent = 'Pilih kecamatan dan role, lalu isi manual Nama, Email, Password';
+            } else if (role === 'batko') {
+                titleEl.innerHTML = '<i class="fas fa-user-plus"></i>Tambah Operator LPQ';
+                descEl.textContent = 'Pilih desa → lembaga LPQ → pendidik, auto-fill data';
+            } else if (role === 'fkdt') {
+                titleEl.innerHTML = '<i class="fas fa-user-plus"></i>Tambah Operator MDT';
+                descEl.textContent = 'Pilih desa → lembaga MDT → pendidik, auto-fill data';
+            } else if (role === 'ponpes') {
+                titleEl.innerHTML = '<i class="fas fa-user-plus"></i>Tambah Operator PONPES';
+                descEl.textContent = 'Pilih desa → lembaga PONPES → pendidik, auto-fill data';
+            }
+
+            // Update deskripsi daftar user
+            const listDesc = document.getElementById('userListDesc');
+            if (role === 'super_admin' || role === 'admin_kab') {
+                listDesc.textContent = 'Kelola semua akun pengguna yang terdaftar di sistem';
+            } else if (['batko', 'fkdt', 'ponpes'].includes(role)) {
+                const roleName = {
+                    'batko': 'LPQ',
+                    'fkdt': 'MDT',
+                    'ponpes': 'PONPES'
+                };
+                listDesc.textContent = `Kelola akun Operator ${roleName[role]} di Kecamatan Anda`;
             }
         }
 
@@ -1473,7 +1968,7 @@
         async function backupDatabase() {
             showToast('Mengambil backup database...', 'info');
             try {
-                const tables = ['master_kecamatan', 'master_kelurahan', 'master_jenjang', 'lembaga', 'pendidik', 'bantuan', 'mutasi'];
+                const tables = ['master_kecamatan', 'master_kelurahan', 'master_jenjang', 'lembaga', 'pendidik', 'bantuan'];
                 const backupData = {};
 
                 for (const table of tables) {
@@ -1514,7 +2009,7 @@
 
                 showToast('Memulai restore data...', 'info');
 
-                const tables = ['master_kecamatan', 'master_kelurahan', 'master_jenjang', 'lembaga', 'pendidik', 'bantuan', 'mutasi'];
+                const tables = ['master_kecamatan', 'master_kelurahan', 'master_jenjang', 'lembaga', 'pendidik', 'bantuan'];
                 
                 for (const table of tables) {
                     if (data[table] && data[table].length > 0) {
@@ -1560,11 +2055,11 @@
             await checkAuth();
             updateDate();
 
-            // Load master data untuk dropdown
-            await loadKecamatanOptions();
-            await loadDesaOptions('');
-            await loadLembagaOptions('');
-            await loadPendidikOptions('');
+            // Terapkan restriksi UI berdasarkan role
+            applyUIRestrictions();
+
+            // Build form dinamis sesuai role
+            buildForm();
 
             // Load data users
             await loadUsers();
@@ -1593,6 +2088,9 @@
         window.showToast = showToast;
         window.resetForm = resetForm;
         window.handleLogout = handleLogout;
+        window.loadLembagaByDesa = loadLembagaByDesa;
+        window.loadPendidikByLembaga = loadPendidikByLembaga;
+        window.autoFillFromPendidik = autoFillFromPendidik;
     </script>
 </body>
 </html>

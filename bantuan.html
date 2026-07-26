@@ -46,9 +46,10 @@
             display: flex;
             align-items: flex-end;
             gap: 8px;
+            flex-wrap: wrap;
         }
         .filter-actions .btn {
-            padding: 8px 16px;
+            white-space: nowrap;
         }
 
         /* ===== STAT MINI ===== */
@@ -77,6 +78,14 @@
         }
         .stat-mini .stat-card .value.green { color: var(--success); }
         .stat-mini .stat-card .value.orange { color: var(--warning); }
+        .stat-mini .stat-card .value.blue { color: #1976d2; }
+        .stat-mini .stat-card .value.purple { color: #7b1fa2; }
+
+        /* ===== STATUS BADGE ===== */
+        .badge-diajukan { background: #fff3e0; color: #e65100; }
+        .badge-diverifikasi { background: #e3f2fd; color: #0d47a1; }
+        .badge-cair { background: #e8f5e9; color: #1b5e20; }
+        .badge-batal { background: #ffebee; color: #c62828; }
 
         /* ===== MODAL ===== */
         .modal-overlay {
@@ -99,7 +108,7 @@
             background: white;
             border-radius: 16px;
             padding: 28px 30px;
-            max-width: 500px;
+            max-width: 550px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -166,6 +175,12 @@
             resize: vertical;
             min-height: 60px;
         }
+        .modal-body .form-group input:disabled,
+        .modal-body .form-group select:disabled {
+            background: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
         .modal-footer {
             display: flex;
             justify-content: flex-end;
@@ -173,6 +188,21 @@
             margin-top: 20px;
             padding-top: 16px;
             border-top: 1px solid #f0f2f5;
+        }
+
+        /* Action Buttons di Modal */
+        .action-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: #f8faf8;
+            border-radius: 10px;
+        }
+        .action-group .btn {
+            flex: 1;
+            justify-content: center;
         }
 
         @media (max-width: 640px) {
@@ -190,6 +220,14 @@
             .filter-actions .btn {
                 flex: 1;
                 justify-content: center;
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+            .action-group {
+                flex-direction: column;
+            }
+            .action-group .btn {
+                flex: none;
             }
         }
     </style>
@@ -228,16 +266,20 @@
         <!-- ===== STATISTIK RINGKAS ===== -->
         <div class="stat-mini">
             <div class="stat-card">
-                <div class="label">Total Bantuan</div>
+                <div class="label">Total Pengajuan</div>
                 <div class="value" id="totalBantuan">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Diajukan</div>
+                <div class="value orange" id="totalDiajukan">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Diverifikasi</div>
+                <div class="value blue" id="totalDiverifikasi">0</div>
             </div>
             <div class="stat-card">
                 <div class="label">Sudah Cair</div>
                 <div class="value green" id="totalCair">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Proses</div>
-                <div class="value orange" id="totalProses">0</div>
             </div>
             <div class="stat-card">
                 <div class="label">Total Nominal</div>
@@ -261,7 +303,8 @@
                 <label>Status</label>
                 <select id="filterStatus" onchange="applyFilter()">
                     <option value="all">Semua</option>
-                    <option value="proses">Proses</option>
+                    <option value="diajukan">Diajukan</option>
+                    <option value="diverifikasi">Diverifikasi</option>
                     <option value="cair">Cair</option>
                     <option value="batal">Batal</option>
                 </select>
@@ -274,9 +317,8 @@
             </div>
             <div class="filter-actions">
                 <button class="btn btn-outline" onclick="resetFilter()"><i class="fas fa-undo"></i> Reset</button>
-                <button class="btn btn-success" onclick="openTambahModal()"><i class="fas fa-plus"></i> Tambah</button>
-                <button class="btn btn-primary" onclick="openImportModal()"><i class="fas fa-file-import"></i> Import</button>
-                <button class="btn btn-primary" onclick="generateCalon()"><i class="fas fa-users"></i> Generate Calon</button>
+                <button class="btn btn-primary" onclick="openImportModal()" id="btnImport"><i class="fas fa-file-import"></i> Import</button>
+                <button class="btn btn-primary" onclick="exportData()" id="btnExport"><i class="fas fa-file-excel"></i> Export</button>
             </div>
         </div>
 
@@ -342,24 +384,24 @@
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
 
-    <!-- ===== MODAL TAMBAH / EDIT BANTUAN ===== -->
+    <!-- ===== MODAL DETAIL / EDIT ===== -->
     <div class="modal-overlay" id="bantuanModal">
         <div class="modal-container">
             <div class="modal-header">
-                <h2 id="modalTitle">Tambah Bantuan</h2>
+                <h2 id="modalTitle">Detail Bantuan</h2>
                 <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editId">
                 <div class="form-group">
-                    <label>Pendidik <span style="color:red;">*</span></label>
-                    <select id="editPendidikId">
+                    <label>Pendidik</label>
+                    <select id="editPendidikId" disabled>
                         <option value="">-- Pilih Pendidik --</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Jenis Bantuan <span style="color:red;">*</span></label>
-                    <select id="editJenis">
+                    <label>Jenis Bantuan</label>
+                    <select id="editJenis" disabled>
                         <option value="kabupaten">Kabupaten</option>
                         <option value="provinsi">Provinsi</option>
                         <option value="kemenag">Kemenag</option>
@@ -367,60 +409,34 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Nominal (Rp) <span style="color:red;">*</span></label>
-                    <input type="number" id="editNominal" placeholder="0" min="0" step="1000">
+                    <label>Nominal (Rp)</label>
+                    <input type="number" id="editNominal" placeholder="0" min="0" step="1000" disabled>
                 </div>
                 <div class="form-group">
-                    <label>Tahun Anggaran <span style="color:red;">*</span></label>
-                    <input type="number" id="editTahun" placeholder="2026" min="2000" max="2099">
+                    <label>Tahun Anggaran</label>
+                    <input type="number" id="editTahun" placeholder="2026" min="2000" max="2099" disabled>
                 </div>
                 <div class="form-group">
                     <label>Status</label>
-                    <select id="editStatus">
-                        <option value="proses">Proses</option>
+                    <select id="editStatus" disabled>
+                        <option value="diajukan">Diajukan</option>
+                        <option value="diverifikasi">Diverifikasi</option>
                         <option value="cair">Cair</option>
                         <option value="batal">Batal</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Keterangan</label>
-                    <textarea id="editKeterangan" placeholder="Catatan tambahan..."></textarea>
+                    <textarea id="editKeterangan" placeholder="Catatan tambahan..." disabled></textarea>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal()">Batal</button>
-                <button class="btn btn-success" id="btnSave" onclick="saveBantuan()"><i class="fas fa-save"></i> Simpan</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- ===== MODAL GENERATE CALON ===== -->
-    <div class="modal-overlay" id="calonModal">
-        <div class="modal-container" style="max-width:600px;">
-            <div class="modal-header">
-                <h2>Calon Penerima Bantuan</h2>
-                <button class="close-btn" onclick="closeCalonModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <p style="font-size:0.85rem;color:#666;margin-bottom:12px;">Pendidik aktif dengan masa mengajar ≥ 2 tahun.</p>
-                <div style="max-height:300px;overflow-y:auto;">
-                    <table style="width:100%;font-size:0.8rem;border-collapse:collapse;">
-                        <thead>
-                            <tr style="background:#f8fafc;">
-                                <th style="padding:6px 8px;text-align:left;">Nama</th>
-                                <th style="padding:6px 8px;text-align:left;">NIK</th>
-                                <th style="padding:6px 8px;text-align:left;">Lembaga</th>
-                                <th style="padding:6px 8px;text-align:left;">TMT</th>
-                            </tr>
-                        </thead>
-                        <tbody id="calonTableBody">
-                            <tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Memuat...</td></tr>
-                        </tbody>
-                    </table>
+                <!-- ===== ACTION GROUP (dinamis berdasarkan role) ===== -->
+                <div id="actionGroup" class="action-group" style="display:none;">
+                    <!-- Akan diisi oleh JavaScript -->
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeCalonModal()">Tutup</button>
+                <button class="btn btn-outline" onclick="closeModal()">Tutup</button>
             </div>
         </div>
     </div>
@@ -433,7 +449,14 @@
                 <button class="close-btn" onclick="closeImportModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
-                <p style="font-size:0.9rem;color:#666;margin-bottom:12px;">Upload file Excel (.xlsx, .xls) dengan format: Pendidik (NIK/Nama), Jenis, Nominal, Tahun, Status, Keterangan.</p>
+                <p style="font-size:0.9rem;color:#666;margin-bottom:12px;">
+                    Upload file Excel (.xlsx, .xls) dengan format:
+                    <br>NIK, Jenis Bantuan, Nominal, Tahun, Status, Keterangan
+                    <br><br>
+                    <button class="btn btn-outline" onclick="downloadTemplate()" style="font-size:0.8rem;">
+                        <i class="fas fa-download"></i> Download Template
+                    </button>
+                </p>
                 <input type="file" id="fileInputBantuan" accept=".xlsx,.xls" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:8px;">
             </div>
             <div class="modal-footer">
@@ -458,16 +481,93 @@
         let totalData = 0;
         let currentFilter = { jenis: 'all', status: 'all', tahun: 'all' };
         let pendidikOptions = [];
+        let currentBantuanData = null;
+
+        // ============================================================
+        // ===== TOAST =====
+        // ============================================================
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            if (!toast) { alert(message); return; }
+            toast.textContent = message;
+            toast.className = 'toast toast-' + (type || 'info');
+            void toast.offsetWidth;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // ============================================================
+        // ===== DATE =====
+        // ============================================================
+        function updateDate() {
+            const el = document.getElementById('currentDate');
+            if (!el) return;
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            el.textContent = now.toLocaleDateString('id-ID', options);
+        }
+
+        // ============================================================
+        // ===== AUTH CHECK =====
+        // ============================================================
+        async function checkAuth() {
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error || !session) {
+                    window.location.href = 'index.html';
+                    return false;
+                }
+                try {
+                    const { data: userData } = await supabaseClient
+                        .from('users')
+                        .select('name, role, kecamatan_id, lembaga_id')
+                        .eq('id', session.user.id)
+                        .single();
+                    if (userData) {
+                        const nameEl = document.getElementById('userName');
+                        const avatarEl = document.getElementById('userAvatar');
+                        if (nameEl) nameEl.textContent = userData.name || 'User';
+                        if (avatarEl) avatarEl.textContent = (userData.name || 'U').charAt(0).toUpperCase();
+                    }
+                } catch (e) {
+                    const nameEl = document.getElementById('userName');
+                    const avatarEl = document.getElementById('userAvatar');
+                    if (nameEl) nameEl.textContent = session.user.email || 'User';
+                    if (avatarEl) avatarEl.textContent = (session.user.email || 'U').charAt(0).toUpperCase();
+                }
+                return true;
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = 'index.html';
+                return false;
+            }
+        }
 
         // ============================================================
         // ===== FUNGSI LOAD PENDIDIK UNTUK DROPDOWN =====
         // ============================================================
         async function loadPendidikOptions() {
             try {
-                const { data, error } = await supabaseClient
+                const user = getUser();
+                const filter = getRoleFilter();
+
+                let query = supabaseClient
                     .from('pendidik')
                     .select('id, nik, nama_lengkap')
                     .order('nama_lengkap');
+
+                // Filter berdasarkan role untuk dropdown pendidik
+                if (filter.kecamatan_id) {
+                    query = query.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+                }
+                if (filter.jenis_lembaga) {
+                    query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+                }
+
+                const { data, error } = await query;
                 if (error) throw error;
                 pendidikOptions = data || [];
                 const select = document.getElementById('editPendidikId');
@@ -486,10 +586,58 @@
         // ============================================================
         async function loadBantuan() {
             try {
+                const user = getUser();
+                const filter = getRoleFilter();
+
                 let query = supabaseClient
                     .from('bantuan')
                     .select('*, pendidik(nama_lengkap, nik)', { count: 'exact' });
 
+                if (filter.restrict) {
+                    document.getElementById('bantuanTableBody').innerHTML = 
+                        `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">
+                            <i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+                            Anda tidak memiliki akses ke data ini
+                        </td></tr>`;
+                    return;
+                }
+
+                // Filter berdasarkan role (kecamatan & jenis lembaga)
+                if (filter.kecamatan_id) {
+                    const { data: pendidikIds } = await supabaseClient
+                        .from('pendidik')
+                        .select('id')
+                        .eq('kecamatan_lembaga_id', filter.kecamatan_id);
+                    const ids = pendidikIds?.map(p => p.id) || [];
+                    if (ids.length > 0) {
+                        query = query.in('pendidik_id', ids);
+                    } else {
+                        document.getElementById('bantuanTableBody').innerHTML = 
+                            `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">
+                                Tidak ada data bantuan untuk wilayah ini
+                            </td></tr>`;
+                        return;
+                    }
+                }
+
+                if (filter.jenis_lembaga) {
+                    const { data: pendidikIds } = await supabaseClient
+                        .from('pendidik')
+                        .select('id')
+                        .eq('jenis_lembaga', filter.jenis_lembaga);
+                    const ids = pendidikIds?.map(p => p.id) || [];
+                    if (ids.length > 0) {
+                        query = query.in('pendidik_id', ids);
+                    } else {
+                        document.getElementById('bantuanTableBody').innerHTML = 
+                            `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">
+                                Tidak ada data bantuan untuk jenis lembaga ini
+                            </td></tr>`;
+                        return;
+                    }
+                }
+
+                // Filter UI
                 if (currentFilter.jenis !== 'all') {
                     query = query.eq('jenis', currentFilter.jenis);
                 }
@@ -501,11 +649,9 @@
                 }
 
                 const from = (currentPage - 1) * pageSize;
-                const to = from + pageSize - 1;
-
                 const { data, count, error } = await query
                     .order('created_at', { ascending: false })
-                    .range(from, to);
+                    .range(from, from + pageSize - 1);
 
                 if (error) throw error;
 
@@ -514,10 +660,73 @@
                 updatePagination();
                 loadStats();
 
+                // Sembunyikan tombol Import untuk non-admin
+                const userRole = user?.role || '';
+                const btnImport = document.getElementById('btnImport');
+                if (btnImport && !['super_admin', 'admin_kab'].includes(userRole)) {
+                    btnImport.style.display = 'none';
+                } else if (btnImport) {
+                    btnImport.style.display = 'inline-flex';
+                }
+
+                // Tampilkan badge filter
+                showFilterBadge(filter);
+
             } catch (e) {
                 console.error('Error loading bantuan:', e);
                 document.getElementById('bantuanTableBody').innerHTML =
                     `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">Gagal memuat data: ${e.message}</td></tr>`;
+            }
+        }
+
+        // ============================================================
+        // ===== SHOW FILTER BADGE =====
+        // ============================================================
+        function showFilterBadge(filter) {
+            const oldBadge = document.querySelector('.role-badge-filter');
+            if (oldBadge) oldBadge.remove();
+
+            if (!filter.jenis_lembaga && !filter.kecamatan_id) return;
+
+            const label = {
+                'LPQ': '📘 LPQ',
+                'MDT': '📗 MDT',
+                'PONPES': '📕 PONPES'
+            };
+
+            const badge = document.createElement('div');
+            badge.className = 'role-badge-filter';
+            badge.style.cssText = `
+                background: #006400;
+                color: white;
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                display: inline-block;
+                margin-right: 8px;
+            `;
+            
+            let text = '📌 ';
+            if (filter.jenis_lembaga) {
+                text += label[filter.jenis_lembaga] || filter.jenis_lembaga;
+            }
+            if (filter.kecamatan_id) {
+                supabaseClient
+                    .from('master_kecamatan')
+                    .select('nama')
+                    .eq('id', filter.kecamatan_id)
+                    .single()
+                    .then(({ data }) => {
+                        badge.textContent = `📌 ${text}${data ? ' - ' + data.nama : ''}`;
+                    });
+            } else {
+                badge.textContent = `📌 ${text}`;
+            }
+
+            const filterSection = document.querySelector('.filter-section');
+            if (filterSection) {
+                filterSection.prepend(badge);
             }
         }
 
@@ -536,23 +745,33 @@
             }
 
             const start = (currentPage - 1) * pageSize;
-            tbody.innerHTML = data.map((item, i) => `
-                <tr onclick="viewBantuan('${item.id}')" style="cursor:pointer;">
-                    <td>${start + i + 1}</td>
-                    <td>
-                        <strong>${item.pendidik?.nama_lengkap || '-'}</strong>
-                        <br><small style="color:#888;font-size:0.65rem;">${item.pendidik?.nik || ''}</small>
-                    </td>
-                    <td><span class="badge active">${capitalize(item.jenis)}</span></td>
-                    <td><strong>Rp ${formatRupiah(item.nominal)}</strong></td>
-                    <td>${item.tahun_anggaran || '-'}</td>
-                    <td><span class="badge ${item.status === 'cair' ? 'active' : item.status === 'proses' ? 'pending' : 'inactive'}">${capitalize(item.status)}</span></td>
-                    <td>
-                        <button class="btn btn-outline" style="padding:2px 8px;font-size:0.65rem;" onclick="event.stopPropagation(); editBantuan('${item.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-outline" style="padding:2px 8px;font-size:0.65rem;border-color:#f44336;color:#f44336;" onclick="event.stopPropagation(); deleteBantuan('${item.id}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
+            const statusMap = {
+                'diajukan': { class: 'badge-diajukan', label: 'Diajukan' },
+                'diverifikasi': { class: 'badge-diverifikasi', label: 'Diverifikasi' },
+                'cair': { class: 'badge-cair', label: 'Cair' },
+                'batal': { class: 'badge-batal', label: 'Batal' }
+            };
+
+            tbody.innerHTML = data.map((item, i) => {
+                const status = statusMap[item.status] || statusMap['diajukan'];
+                return `
+                    <tr onclick="viewBantuan('${item.id}')" style="cursor:pointer;">
+                        <td>${start + i + 1}</td>
+                        <td>
+                            <strong>${item.pendidik?.nama_lengkap || '-'}</strong>
+                            <br><small style="color:#888;font-size:0.65rem;">${item.pendidik?.nik || ''}</small>
+                        </td>
+                        <td><span class="badge active">${capitalize(item.jenis)}</span></td>
+                        <td><strong>Rp ${formatRupiah(item.nominal)}</strong></td>
+                        <td>${item.tahun_anggaran || '-'}</td>
+                        <td><span class="badge ${status.class}">${status.label}</span></td>
+                        <td>
+                            <button class="btn btn-outline" style="padding:2px 8px;font-size:0.65rem;" onclick="event.stopPropagation(); viewBantuan('${item.id}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-outline" style="padding:2px 8px;font-size:0.65rem;border-color:#f44336;color:#f44336;" onclick="event.stopPropagation(); deleteBantuan('${item.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // ============================================================
@@ -560,30 +779,60 @@
         // ============================================================
         async function loadStats() {
             try {
-                const { count: total } = await supabaseClient
-                    .from('bantuan')
-                    .select('*', { count: 'exact', head: true });
+                const user = getUser();
+                const filter = getRoleFilter();
 
-                const { count: cair } = await supabaseClient
-                    .from('bantuan')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status', 'cair');
+                let queryTotal = supabaseClient.from('bantuan').select('*', { count: 'exact', head: true });
+                let queryDiajukan = supabaseClient.from('bantuan').select('*', { count: 'exact', head: true }).eq('status', 'diajukan');
+                let queryDiverifikasi = supabaseClient.from('bantuan').select('*', { count: 'exact', head: true }).eq('status', 'diverifikasi');
+                let queryCair = supabaseClient.from('bantuan').select('*', { count: 'exact', head: true }).eq('status', 'cair');
+                let queryNominal = supabaseClient.from('bantuan').select('nominal').eq('status', 'cair');
 
-                const { count: proses } = await supabaseClient
-                    .from('bantuan')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status', 'proses');
+                // Filter berdasarkan role (kecamatan & jenis lembaga)
+                if (filter.kecamatan_id) {
+                    const { data: pendidikIds } = await supabaseClient
+                        .from('pendidik')
+                        .select('id')
+                        .eq('kecamatan_lembaga_id', filter.kecamatan_id);
+                    const ids = pendidikIds?.map(p => p.id) || [];
+                    if (ids.length > 0) {
+                        queryTotal = queryTotal.in('pendidik_id', ids);
+                        queryDiajukan = queryDiajukan.in('pendidik_id', ids);
+                        queryDiverifikasi = queryDiverifikasi.in('pendidik_id', ids);
+                        queryCair = queryCair.in('pendidik_id', ids);
+                        queryNominal = queryNominal.in('pendidik_id', ids);
+                    }
+                }
 
-                const { data: nominalData } = await supabaseClient
-                    .from('bantuan')
-                    .select('nominal')
-                    .eq('status', 'cair');
+                if (filter.jenis_lembaga) {
+                    const { data: pendidikIds } = await supabaseClient
+                        .from('pendidik')
+                        .select('id')
+                        .eq('jenis_lembaga', filter.jenis_lembaga);
+                    const ids = pendidikIds?.map(p => p.id) || [];
+                    if (ids.length > 0) {
+                        queryTotal = queryTotal.in('pendidik_id', ids);
+                        queryDiajukan = queryDiajukan.in('pendidik_id', ids);
+                        queryDiverifikasi = queryDiverifikasi.in('pendidik_id', ids);
+                        queryCair = queryCair.in('pendidik_id', ids);
+                        queryNominal = queryNominal.in('pendidik_id', ids);
+                    }
+                }
 
-                const totalNominal = (nominalData || []).reduce((sum, d) => sum + (d.nominal || 0), 0);
+                const [total, diajukan, diverifikasi, cair, nominalData] = await Promise.all([
+                    queryTotal,
+                    queryDiajukan,
+                    queryDiverifikasi,
+                    queryCair,
+                    queryNominal
+                ]);
 
-                document.getElementById('totalBantuan').textContent = total || 0;
-                document.getElementById('totalCair').textContent = cair || 0;
-                document.getElementById('totalProses').textContent = proses || 0;
+                const totalNominal = (nominalData.data || []).reduce((sum, d) => sum + (d.nominal || 0), 0);
+
+                document.getElementById('totalBantuan').textContent = total.count || 0;
+                document.getElementById('totalDiajukan').textContent = diajukan.count || 0;
+                document.getElementById('totalDiverifikasi').textContent = diverifikasi.count || 0;
+                document.getElementById('totalCair').textContent = cair.count || 0;
                 document.getElementById('totalNominal').textContent = `Rp ${formatRupiah(totalNominal)}`;
 
             } catch (e) { console.error(e); }
@@ -652,151 +901,143 @@
         }
 
         // ============================================================
-        // ===== MODAL TAMBAH / EDIT =====
+        // ===== VIEW BANTUAN =====
         // ============================================================
-        function openTambahModal() {
-            document.getElementById('modalTitle').textContent = 'Tambah Bantuan';
-            document.getElementById('editId').value = '';
-            document.getElementById('editPendidikId').value = '';
-            document.getElementById('editJenis').value = 'kabupaten';
-            document.getElementById('editNominal').value = '';
-            document.getElementById('editTahun').value = new Date().getFullYear();
-            document.getElementById('editStatus').value = 'proses';
-            document.getElementById('editKeterangan').value = '';
-            document.getElementById('btnSave').textContent = 'Simpan';
-            document.getElementById('bantuanModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('bantuanModal').classList.remove('active');
-        }
-
         async function viewBantuan(id) {
             try {
                 const { data, error } = await supabaseClient
                     .from('bantuan')
-                    .select('*')
+                    .select('*, pendidik(nama_lengkap, nik)')
                     .eq('id', id)
                     .single();
+
                 if (error) throw error;
                 if (!data) {
                     showToast('Data tidak ditemukan', 'error');
                     return;
                 }
-                // Tampilkan modal untuk view (tidak bisa diedit)
+
+                currentBantuanData = data;
+
                 document.getElementById('modalTitle').textContent = 'Detail Bantuan';
                 document.getElementById('editId').value = data.id;
                 document.getElementById('editPendidikId').value = data.pendidik_id || '';
                 document.getElementById('editJenis').value = data.jenis || 'kabupaten';
                 document.getElementById('editNominal').value = data.nominal || '';
                 document.getElementById('editTahun').value = data.tahun_anggaran || '';
-                document.getElementById('editStatus').value = data.status || 'proses';
+                document.getElementById('editStatus').value = data.status || 'diajukan';
                 document.getElementById('editKeterangan').value = data.keterangan || '';
-                document.getElementById('btnSave').textContent = 'Simpan';
+
                 // Disable semua input (view only)
                 const inputs = document.querySelectorAll('#bantuanModal .modal-body input, #bantuanModal .modal-body select, #bantuanModal .modal-body textarea');
                 inputs.forEach(el => el.disabled = true);
                 document.getElementById('btnSave').style.display = 'none';
+
+                // ===== BUILD ACTION BUTTONS BERDASARKAN ROLE =====
+                const user = getUser();
+                const actionGroup = document.getElementById('actionGroup');
+                actionGroup.innerHTML = '';
+                actionGroup.style.display = 'none';
+
+                const status = data.status;
+
+                // Super Admin & Admin Kab: bisa verifikasi dan cairkan
+                if (['super_admin', 'admin_kab'].includes(user.role)) {
+                    let buttons = '';
+                    
+                    if (status === 'diajukan') {
+                        buttons += `<button class="btn btn-primary" onclick="updateStatus('${data.id}', 'diverifikasi')">
+                            <i class="fas fa-check-circle"></i> Verifikasi
+                        </button>`;
+                    }
+                    
+                    if (status === 'diverifikasi') {
+                        buttons += `<button class="btn btn-success" onclick="updateStatus('${data.id}', 'cair')">
+                            <i class="fas fa-money-bill-wave"></i> Cairkan
+                        </button>`;
+                    }
+                    
+                    if (status !== 'batal' && status !== 'cair') {
+                        buttons += `<button class="btn btn-danger" onclick="updateStatus('${data.id}', 'batal')">
+                            <i class="fas fa-times-circle"></i> Batalkan
+                        </button>`;
+                    }
+
+                    if (buttons) {
+                        actionGroup.innerHTML = buttons;
+                        actionGroup.style.display = 'flex';
+                    }
+                }
+
+                // BATKO, FKDT, PONPES (Admin Kecamatan): bisa verifikasi
+                if (['batko', 'fkdt', 'ponpes'].includes(user.role)) {
+                    if (status === 'diajukan') {
+                        actionGroup.innerHTML = `
+                            <button class="btn btn-primary" onclick="updateStatus('${data.id}', 'diverifikasi')">
+                                <i class="fas fa-check-circle"></i> Verifikasi (Setujui)
+                            </button>
+                            <button class="btn btn-danger" onclick="updateStatus('${data.id}', 'batal')">
+                                <i class="fas fa-times-circle"></i> Tolak
+                            </button>
+                        `;
+                        actionGroup.style.display = 'flex';
+                    }
+                }
+
+                // Operator: tidak ada aksi (hanya lihat)
+                // (tidak menampilkan action group)
+
                 document.getElementById('bantuanModal').classList.add('active');
+
             } catch (e) {
                 console.error(e);
                 showToast('Gagal memuat detail: ' + e.message, 'error');
             }
         }
 
-        async function editBantuan(id) {
+        // ============================================================
+        // ===== UPDATE STATUS =====
+        // ============================================================
+        async function updateStatus(id, newStatus) {
+            const statusLabels = {
+                'diajukan': 'Diajukan',
+                'diverifikasi': 'Diverifikasi',
+                'cair': 'Cair',
+                'batal': 'Batal'
+            };
+
+            const confirmMsg = `Yakin mengubah status menjadi ${statusLabels[newStatus]}?`;
+            if (!confirm(confirmMsg)) return;
+
             try {
-                const { data, error } = await supabaseClient
+                const { error } = await supabaseClient
                     .from('bantuan')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
+                    .update({
+                        status: newStatus,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', id);
+
                 if (error) throw error;
-                if (!data) {
-                    showToast('Data tidak ditemukan', 'error');
-                    return;
-                }
-                document.getElementById('modalTitle').textContent = 'Edit Bantuan';
-                document.getElementById('editId').value = data.id;
-                document.getElementById('editPendidikId').value = data.pendidik_id || '';
-                document.getElementById('editJenis').value = data.jenis || 'kabupaten';
-                document.getElementById('editNominal').value = data.nominal || '';
-                document.getElementById('editTahun').value = data.tahun_anggaran || '';
-                document.getElementById('editStatus').value = data.status || 'proses';
-                document.getElementById('editKeterangan').value = data.keterangan || '';
-                document.getElementById('btnSave').textContent = 'Simpan';
-                // Enable semua input
-                const inputs = document.querySelectorAll('#bantuanModal .modal-body input, #bantuanModal .modal-body select, #bantuanModal .modal-body textarea');
-                inputs.forEach(el => el.disabled = false);
-                document.getElementById('btnSave').style.display = 'inline-flex';
-                document.getElementById('bantuanModal').classList.add('active');
+
+                showToast(`Status berhasil diubah menjadi ${statusLabels[newStatus]}`, 'success');
+                closeModal();
+                loadBantuan();
+
             } catch (e) {
                 console.error(e);
-                showToast('Gagal memuat data: ' + e.message, 'error');
+                showToast('Gagal update status: ' + e.message, 'error');
             }
         }
 
         // ============================================================
-        // ===== SAVE BANTUAN =====
+        // ===== MODAL =====
         // ============================================================
-        async function saveBantuan() {
-            const id = document.getElementById('editId').value;
-            const pendidikId = document.getElementById('editPendidikId').value;
-            const jenis = document.getElementById('editJenis').value;
-            const nominal = parseFloat(document.getElementById('editNominal').value);
-            const tahun = parseInt(document.getElementById('editTahun').value);
-            const status = document.getElementById('editStatus').value;
-            const keterangan = document.getElementById('editKeterangan').value.trim();
-
-            if (!pendidikId) {
-                showToast('Pilih pendidik terlebih dahulu!', 'error');
-                return;
-            }
-            if (!nominal || nominal <= 0) {
-                showToast('Nominal harus diisi dan lebih dari 0!', 'error');
-                return;
-            }
-            if (!tahun || tahun < 2000 || tahun > 2099) {
-                showToast('Tahun anggaran tidak valid!', 'error');
-                return;
-            }
-
-            const data = {
-                pendidik_id: pendidikId,
-                jenis: jenis,
-                nominal: nominal,
-                tahun_anggaran: tahun,
-                status: status,
-                keterangan: keterangan,
-                updated_at: new Date().toISOString()
-            };
-
-            try {
-                let error;
-                if (id) {
-                    // Update
-                    const result = await supabaseClient
-                        .from('bantuan')
-                        .update(data)
-                        .eq('id', id);
-                    error = result.error;
-                } else {
-                    // Insert
-                    data.created_at = new Date().toISOString();
-                    const result = await supabaseClient
-                        .from('bantuan')
-                        .insert([data]);
-                    error = result.error;
-                }
-                if (error) throw error;
-
-                showToast(id ? 'Bantuan berhasil diperbarui!' : 'Bantuan berhasil ditambahkan!', 'success');
-                closeModal();
-                loadBantuan();
-            } catch (e) {
-                console.error(e);
-                showToast('Gagal menyimpan: ' + e.message, 'error');
-            }
+        function closeModal() {
+            document.getElementById('bantuanModal').classList.remove('active');
+            document.getElementById('actionGroup').innerHTML = '';
+            document.getElementById('actionGroup').style.display = 'none';
+            currentBantuanData = null;
         }
 
         // ============================================================
@@ -818,48 +1059,6 @@
         }
 
         // ============================================================
-        // ===== GENERATE CALON =====
-        // ============================================================
-        async function generateCalon() {
-            showToast('Mencari calon penerima bantuan...', 'info');
-            try {
-                const twoYearsAgo = new Date();
-                twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-                const dateStr = twoYearsAgo.toISOString().split('T')[0];
-
-                const { data, error } = await supabaseClient
-                    .from('pendidik')
-                    .select('id, nama_lengkap, nik, nslp_lembaga, tmt_mengajar')
-                    .eq('status_aktif', true)
-                    .lte('tmt_mengajar', dateStr);
-
-                if (error) throw error;
-
-                const tbody = document.getElementById('calonTableBody');
-                if (!data || data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Tidak ada calon penerima yang memenuhi kriteria.</td></tr>`;
-                } else {
-                    tbody.innerHTML = data.map(item => `
-                        <tr>
-                            <td style="padding:6px 8px;">${item.nama_lengkap || '-'}</td>
-                            <td style="padding:6px 8px;">${item.nik || '-'}</td>
-                            <td style="padding:6px 8px;">${item.nslp_lembaga || '-'}</td>
-                            <td style="padding:6px 8px;">${item.tmt_mengajar || '-'}</td>
-                        </tr>
-                    `).join('');
-                }
-                document.getElementById('calonModal').classList.add('active');
-            } catch (e) {
-                console.error(e);
-                showToast('Gagal generate calon: ' + e.message, 'error');
-            }
-        }
-
-        function closeCalonModal() {
-            document.getElementById('calonModal').classList.remove('active');
-        }
-
-        // ============================================================
         // ===== IMPORT BANTUAN =====
         // ============================================================
         function openImportModal() {
@@ -869,6 +1068,26 @@
         function closeImportModal() {
             document.getElementById('importModal').classList.remove('active');
             document.getElementById('fileInputBantuan').value = '';
+        }
+
+        function downloadTemplate() {
+            const headers = ['NIK', 'Jenis Bantuan', 'Nominal', 'Tahun', 'Status', 'Keterangan'];
+            const exampleRow = ['3328123401234567', 'kabupaten', '500000', '2026', 'diajukan', ''];
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
+            ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
+            XLSX.utils.book_append_sheet(wb, ws, 'Template Bantuan');
+
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'template_bantuan.xlsx';
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+            showToast('Template berhasil diunduh!', 'success');
         }
 
         async function importBantuan() {
@@ -890,7 +1109,12 @@
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
-                    // Ambil semua NIK yang ada di file untuk dicocokkan dengan pendidik
+                    if (json.length === 0) {
+                        showToast('File kosong!', 'error');
+                        return;
+                    }
+
+                    // Ambil semua NIK yang ada di file
                     const nikList = json.map(row => row['NIK']?.toString().trim() || '');
                     const { data: pendidikData } = await supabaseClient
                         .from('pendidik')
@@ -913,7 +1137,7 @@
                             const jenis = row['Jenis Bantuan'] || row['Jenis'] || 'kabupaten';
                             const nominal = parseFloat(row['Nominal']) || 0;
                             const tahun = parseInt(row['Tahun']) || new Date().getFullYear();
-                            const status = row['Status']?.toLowerCase() || 'proses';
+                            const status = row['Status']?.toLowerCase() || 'diajukan';
                             const keterangan = row['Keterangan'] || '';
 
                             if (nominal <= 0) {
@@ -921,12 +1145,16 @@
                                 continue;
                             }
 
+                            // Validasi status
+                            const validStatus = ['diajukan', 'diverifikasi', 'cair', 'batal'];
+                            const finalStatus = validStatus.includes(status) ? status : 'diajukan';
+
                             const dataBantuan = {
                                 pendidik_id: pendidikId,
                                 jenis: jenis,
                                 nominal: nominal,
                                 tahun_anggaran: tahun,
-                                status: status,
+                                status: finalStatus,
                                 keterangan: keterangan,
                                 created_at: new Date().toISOString(),
                                 updated_at: new Date().toISOString()
@@ -951,6 +1179,101 @@
                 }
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        // ============================================================
+        // ===== EXPORT DATA =====
+        // ============================================================
+        async function exportData() {
+            try {
+                showToast('Mengambil data...', 'info');
+
+                const user = getUser();
+                const filter = getRoleFilter();
+
+                let query = supabaseClient
+                    .from('bantuan')
+                    .select('*, pendidik(nama_lengkap, nik)');
+
+                if (filter.kecamatan_id) {
+                    const { data: pendidikIds } = await supabaseClient
+                        .from('pendidik')
+                        .select('id')
+                        .eq('kecamatan_lembaga_id', filter.kecamatan_id);
+                    const ids = pendidikIds?.map(p => p.id) || [];
+                    if (ids.length > 0) {
+                        query = query.in('pendidik_id', ids);
+                    }
+                }
+
+                if (filter.jenis_lembaga) {
+                    const { data: pendidikIds } = await supabaseClient
+                        .from('pendidik')
+                        .select('id')
+                        .eq('jenis_lembaga', filter.jenis_lembaga);
+                    const ids = pendidikIds?.map(p => p.id) || [];
+                    if (ids.length > 0) {
+                        query = query.in('pendidik_id', ids);
+                    }
+                }
+
+                if (currentFilter.jenis !== 'all') {
+                    query = query.eq('jenis', currentFilter.jenis);
+                }
+                if (currentFilter.status !== 'all') {
+                    query = query.eq('status', currentFilter.status);
+                }
+                if (currentFilter.tahun !== 'all') {
+                    query = query.eq('tahun_anggaran', parseInt(currentFilter.tahun));
+                }
+
+                const { data, error } = await query.order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    showToast('Tidak ada data untuk diexport', 'warning');
+                    return;
+                }
+
+                const headers = ['NIK', 'Nama Pendidik', 'Jenis Bantuan', 'Nominal', 'Tahun Anggaran', 'Status', 'Keterangan'];
+                const statusLabels = {
+                    'diajukan': 'Diajukan',
+                    'diverifikasi': 'Diverifikasi',
+                    'cair': 'Cair',
+                    'batal': 'Batal'
+                };
+
+                const rows = data.map(item => [
+                    item.pendidik?.nik || '',
+                    item.pendidik?.nama_lengkap || '',
+                    item.jenis || '',
+                    item.nominal || 0,
+                    item.tahun_anggaran || '',
+                    statusLabels[item.status] || item.status || '',
+                    item.keterangan || ''
+                ]);
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
+                XLSX.utils.book_append_sheet(wb, ws, 'Bantuan');
+
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([wbout], { type: 'application/octet-stream' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                const date = new Date().toISOString().split('T')[0];
+                link.download = `data_bantuan_${date}.xlsx`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+
+                showToast(`Export berhasil! ${data.length} data`, 'success');
+
+            } catch (e) {
+                console.error(e);
+                showToast('Gagal export: ' + e.message, 'error');
+            }
         }
 
         // ============================================================
@@ -1003,17 +1326,15 @@
         window.resetFilter = resetFilter;
         window.changePage = changePage;
         window.refreshData = refreshData;
-        window.openTambahModal = openTambahModal;
         window.closeModal = closeModal;
-        window.saveBantuan = saveBantuan;
         window.deleteBantuan = deleteBantuan;
         window.viewBantuan = viewBantuan;
-        window.editBantuan = editBantuan;
-        window.generateCalon = generateCalon;
-        window.closeCalonModal = closeCalonModal;
+        window.updateStatus = updateStatus;
         window.openImportModal = openImportModal;
         window.closeImportModal = closeImportModal;
         window.importBantuan = importBantuan;
+        window.exportData = exportData;
+        window.downloadTemplate = downloadTemplate;
         window.showToast = showToast;
     </script>
 </body>
