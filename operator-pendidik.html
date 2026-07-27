@@ -7,67 +7,696 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
-        .filter-section {
+        /* ============================================================
+           SI-MUSTAFA - OPERATOR PENDIDIK (SIDEBAR)
+           ============================================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --sidebar-width: 250px;
+            --header-height: 64px;
+            --primary: #006400;
+            --primary-light: #4CAF50;
+            --primary-dark: #0a2e1a;
+            --gold: #FFD700;
+            --gold-dark: #DAA520;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #f44336;
+            --info: #2196F3;
+            --purple: #9C27B0;
+            --bg-gray: #f0f4f0;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 30px rgba(0, 100, 0, 0.15);
+        }
+
+        body {
+            background: var(--bg-gray);
+            min-height: 100vh;
             display: flex;
-            flex-wrap: wrap;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(180deg, #0a2e1a 0%, #1a5a3a 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(0);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .sidebar-brand {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
             gap: 12px;
-            background: white;
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: var(--header-height);
+            flex-shrink: 0;
         }
-        .filter-section .filter-item {
+
+        .sidebar-brand img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .sidebar-brand .brand-text h1 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-brand .brand-text h1 span {
+            color: var(--gold);
+        }
+
+        .sidebar-brand .brand-text small {
+            font-size: 0.55rem;
+            opacity: 0.7;
+            font-weight: 300;
+        }
+
+        .sidebar-menu {
             flex: 1;
-            min-width: 160px;
+            padding: 12px 0;
+            list-style: none;
         }
-        .filter-section .filter-item label {
+
+        .sidebar-menu .menu-label {
+            padding: 8px 20px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 600;
+        }
+
+        .sidebar-menu .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .sidebar-menu .menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .sidebar-menu .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--gold);
+            border-left-color: var(--gold);
+        }
+
+        .sidebar-menu .menu-item i {
+            width: 20px;
+            font-size: 1.1rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-menu .menu-item .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar-footer .user-info .name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-footer .user-info .role {
+            font-size: 0.6rem;
+            opacity: 0.6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-footer .logout-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 8px;
+            transition: 0.2s;
+            border-radius: 6px;
+        }
+
+        .sidebar-footer .logout-btn:hover {
+            color: #ff6b6b;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        /* ===== OVERLAY ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
             display: block;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 40px 40px 40px;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: white;
+            padding: 0 40px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e8ecf1;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-left .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .header-left .sidebar-toggle:hover {
+            background: var(--bg-gray);
+            color: var(--primary);
+        }
+
+        .header-left .page-title h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .header-left .page-title p {
             font-size: 0.7rem;
             color: #888;
-            margin-bottom: 2px;
         }
-        .filter-section input,
-        .filter-section select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            background: white;
-        }
-        .filter-section input:focus,
-        .filter-section select:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-        .filter-actions {
+
+        .header-right {
             display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
         }
-        .filter-actions .btn {
+
+        .header-date {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .header-right .role-badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .header-right .role-scope {
+            font-size: 0.6rem;
+            color: #888;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .header-user:hover {
+            background: var(--bg-gray);
+        }
+
+        .header-user .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .header-user .user-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        /* ===== WELCOME SECTION ===== */
+        .welcome-section {
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5a3a 50%, #2e7d32 100%);
+            border-radius: 14px;
+            padding: 24px 36px;
+            margin-bottom: 24px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 8px 32px rgba(0, 100, 0, 0.3);
+        }
+
+        .welcome-section .welcome-text h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .welcome-section .welcome-text h2 span {
+            color: var(--gold);
+        }
+
+        .welcome-section .welcome-text p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .welcome-section .welcome-text p i {
+            margin-right: 6px;
+            color: var(--gold);
+        }
+
+        .welcome-section .welcome-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 8px 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             white-space: nowrap;
         }
 
+        .welcome-section .welcome-badge i {
+            color: var(--gold);
+        }
+
+        /* ===== STAT MINI ===== */
         .stat-mini {
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
             margin-bottom: 12px;
         }
+
         .stat-mini .stat-item {
             font-size: 0.85rem;
             color: #555;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            border-left: 3px solid var(--primary);
         }
+
         .stat-mini .stat-item strong {
             color: var(--primary);
             font-size: 1.1rem;
         }
 
+        .stat-mini .stat-item:nth-child(2) { border-left-color: var(--success); }
+        .stat-mini .stat-item:nth-child(3) { border-left-color: var(--danger); }
+        .stat-mini .stat-item:nth-child(4) { border-left-color: var(--warning); }
+
+        /* ===== FILTER ===== */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #f5faf5 100%);
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 100, 0, 0.08);
+            margin-bottom: 16px;
+            align-items: flex-end;
+            position: relative;
+        }
+
+        .filter-section .filter-item {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filter-section .filter-item label {
+            display: block;
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .filter-section .filter-item input,
+        .filter-section .filter-item select {
+            width: 100%;
+            padding: 8px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .filter-section .filter-item input:focus,
+        .filter-section .filter-item select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.08);
+        }
+
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-actions .btn {
+            white-space: nowrap;
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px 24px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .card .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .card .card-title i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table-responsive table {
+            width: 100%;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+
+        .table-responsive table th {
+            padding: 10px 12px;
+            text-align: left;
+            background: #eaf0ea;
+            color: #1b5e20;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #c8e6c9;
+            position: sticky;
+            top: 0;
+        }
+
+        .table-responsive table tbody tr:nth-child(even) {
+            background: #f6faf6;
+        }
+
+        .table-responsive table tbody tr:nth-child(odd) {
+            background: #ffffff;
+        }
+
+        .table-responsive table tbody tr:hover {
+            background: #e8f5e9;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .table-responsive table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f4f0;
+            vertical-align: middle;
+        }
+
+        /* ===== BADGE ===== */
+        .badge {
+            padding: 3px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge.inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .badge.pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #43a047;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 0.7rem;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 90%;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+        .toast-info { background: var(--primary); }
+        .toast-warning { background: var(--warning); }
+
+        /* ===== SPINNER ===== */
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f0f2f5;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -75,7 +704,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 2000;
             justify-content: center;
             align-items: center;
@@ -84,6 +713,7 @@
         .modal-overlay.active {
             display: flex;
         }
+
         .modal-container {
             background: white;
             border-radius: 16px;
@@ -92,13 +722,15 @@
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: fadeInModal 0.25s ease;
         }
+
         @keyframes fadeInModal {
             from { opacity: 0; transform: scale(0.95) translateY(10px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -107,11 +739,13 @@
             padding-bottom: 12px;
             border-bottom: 2px solid #f0f2f5;
         }
+
         .modal-header h2 {
             font-size: 1.2rem;
             color: var(--primary);
             font-weight: 700;
         }
+
         .modal-header .close-btn {
             background: none;
             border: none;
@@ -123,17 +757,21 @@
         .modal-header .close-btn:hover {
             color: #333;
         }
+
         .modal-body .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
+
         .modal-body .form-group {
             margin-bottom: 14px;
         }
+
         .modal-body .form-group.full-width {
             grid-column: 1 / -1;
         }
+
         .modal-body .form-group label {
             display: block;
             font-size: 0.75rem;
@@ -141,6 +779,7 @@
             color: #555;
             margin-bottom: 2px;
         }
+
         .modal-body .form-group input,
         .modal-body .form-group select {
             width: 100%;
@@ -151,12 +790,14 @@
             background: #fafafa;
             transition: 0.2s;
         }
+
         .modal-body .form-group input:focus,
         .modal-body .form-group select:focus {
             border-color: var(--primary);
             outline: none;
             background: white;
         }
+
         .modal-body .form-group input:disabled,
         .modal-body .form-group select:disabled {
             background: #f5f5f5;
@@ -164,6 +805,7 @@
             cursor: not-allowed;
             border-color: #e8e8e8;
         }
+
         .modal-footer {
             display: flex;
             justify-content: flex-end;
@@ -171,12 +813,6 @@
             margin-top: 20px;
             padding-top: 16px;
             border-top: 1px solid #f0f2f5;
-        }
-        .lembaga-readonly {
-            background: #f5f5f5 !important;
-            color: #666 !important;
-            cursor: not-allowed !important;
-            border-color: #e8e8e8 !important;
         }
 
         .section-title {
@@ -186,6 +822,30 @@
             margin: 16px 0 12px 0;
             padding-bottom: 6px;
             border-bottom: 2px solid #f0f2f5;
+        }
+
+        .rekening-box {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 8px;
+        }
+
+        .rekening-box .rekening-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .lembaga-readonly {
+            background: #f5f5f5 !important;
+            color: #666 !important;
+            cursor: not-allowed !important;
+            border-color: #e8e8e8 !important;
         }
 
         .lama-mengabdi-display {
@@ -200,29 +860,32 @@
             align-items: center;
         }
 
-        .rekening-box {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            margin-bottom: 8px;
-        }
-        .rekening-box .rekening-title {
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        @media (max-width: 640px) {
-            .modal-container {
-                padding: 20px;
-                margin: 10px;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
             }
-            .modal-body .form-row {
-                grid-template-columns: 1fr;
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 16px 20px 30px 20px;
+            }
+            .header {
+                padding: 0 20px;
+            }
+            .header-left .page-title p {
+                display: none;
+            }
+            .header-date {
+                display: none;
+            }
+            .header-right .role-scope {
+                display: none;
             }
             .filter-section .filter-item {
                 min-width: 100%;
@@ -237,38 +900,169 @@
                 font-size: 0.7rem;
                 padding: 6px 10px;
             }
+            .stat-mini {
+                gap: 10px;
+            }
+            .stat-mini .stat-item {
+                font-size: 0.75rem;
+                padding: 6px 14px;
+            }
+            .stat-mini .stat-item strong {
+                font-size: 0.95rem;
+            }
+            .welcome-section {
+                padding: 16px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .welcome-section .welcome-text h2 {
+                font-size: 1rem;
+            }
+            .welcome-section .welcome-text p {
+                font-size: 0.75rem;
+            }
+            .welcome-section .welcome-badge {
+                font-size: 0.65rem;
+                padding: 4px 12px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .table-responsive table {
+                font-size: 0.75rem;
+            }
+            .table-responsive table th,
+            .table-responsive table td {
+                padding: 6px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 12px;
+                height: 56px;
+            }
+            .header-left .page-title h1 {
+                font-size: 0.85rem;
+            }
+            .header-left .sidebar-toggle {
+                font-size: 1rem;
+                padding: 2px 6px;
+            }
+            .header-user .user-name {
+                display: none;
+            }
+            .header-right .role-badge {
+                display: none;
+            }
+            .main-content {
+                padding: 12px 12px 20px 12px;
+            }
+            .stat-mini .stat-item {
+                font-size: 0.7rem;
+                padding: 4px 10px;
+            }
+            .stat-mini .stat-item strong {
+                font-size: 0.85rem;
+            }
+            .card {
+                padding: 16px;
+            }
+            .filter-section {
+                padding: 12px 16px;
+            }
+            .modal-container {
+                padding: 16px;
+                margin: 10px;
+            }
+            .welcome-section {
+                padding: 14px 16px;
+            }
+            .welcome-section .welcome-text h2 {
+                font-size: 0.9rem;
+            }
+            .table-responsive table {
+                font-size: 0.7rem;
+            }
+            .table-responsive table th,
+            .table-responsive table td {
+                padding: 4px 6px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="header-left">
-            <div class="header-logo">
-                <img src="assets/logo-kemenag.png" alt="Logo" 
-                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
-                <div>
-                    <h1>SI-<span>MUSTAFA</span></h1>
-                    <small>Operator Lembaga</small>
-                </div>
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="assets/logo-kemenag.png" alt="Logo" 
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+            <div class="brand-text">
+                <h1>SI-<span>MUSTAFA</span></h1>
+                <small>Operator Lembaga</small>
             </div>
         </div>
-        <div class="header-right">
-            <span class="header-date" id="currentDate"></span>
-            <div class="header-user" onclick="showToast('Profile', 'info')">
-                <div class="avatar" id="userAvatar">O</div>
-                <span class="user-name" id="userName">Operator</span>
+
+                <ul class="sidebar-menu">
+            <li class="menu-label">Menu Operator</li>
+            <li><a class="menu-item active" href="operator.html"><i class="fas fa-chart-pie"></i>Dashboard</a></li>
+            <li><a class="menu-item" href="operator-pendidik.html"><i class="fas fa-user-graduate"></i>Pendidik</a></li>
+            <li><a class="menu-item" href="operator-bantuan.html"><i class="fas fa-hand-holding-heart"></i>Bantuan</a></li>
+            <li><a class="menu-item" href="operator-mutasi.html"><i class="fas fa-exchange-alt"></i>Mutasi</a></li>
+            <li><a class="menu-item" href="operator-pengaturan.html"><i class="fas fa-cog"></i>Pengaturan</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="avatar" id="userAvatar">O</div>
+            <div class="user-info">
+                <div class="name" id="userName">Operator</div>
+                <div class="role" id="userRole">Operator Lembaga</div>
             </div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
         </div>
-    </header>
+    </aside>
+
+    <!-- ===== OVERLAY ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- ===== MAIN CONTENT ===== -->
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
 
-        <div class="page-header">
-            <h1>Data Pendidik</h1>
-            <p id="lembagaInfo">Kelola data pendidik di lembaga Anda</p>
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="page-title">
+                    <h1>Data Pendidik</h1>
+                    <p id="lembagaInfo">Kelola data pendidik di lembaga Anda</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="header-date" id="currentDate"></span>
+                <span class="role-badge" id="headerRoleBadge">Operator</span>
+                <span class="role-scope" id="headerScope"></span>
+                <div class="header-user" onclick="showToast('Profile', 'info')">
+                    <div class="avatar" id="userAvatarSmall">O</div>
+                    <span class="user-name" id="userNameSmall">Operator</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== WELCOME SECTION ===== -->
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h2>Selamat datang, <span id="welcomeName">Operator</span> 👋</h2>
+                <p id="welcomeStatus"><i class="fas fa-user-graduate"></i> <span id="welcomeRole">Operator Lembaga</span></p>
+            </div>
+            <div class="welcome-badge">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="welcomeDate">Loading...</span>
+            </div>
         </div>
 
         <!-- ===== STATISTIK RINGKAS ===== -->
@@ -321,8 +1115,8 @@
         <!-- ===== TABEL PENDIDIK ===== -->
         <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                <div class="card-title" style="margin-bottom:0;">Daftar Pendidik <small id="totalData" style="font-weight:400;color:#888;">0 data</small></div>
-                <button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
+                <div class="card-title" style="margin-bottom:0;"><i class="fas fa-list"></i>Daftar Pendidik <small id="totalData" style="font-weight:400;color:#888;">0 data</small></div>
+                <button class="btn btn-outline btn-sm" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
             </div>
             <div class="table-responsive">
                 <table>
@@ -342,34 +1136,13 @@
                 </table>
             </div>
             <div style="display:flex;justify-content:center;align-items:center;gap:16px;padding-top:12px;border-top:1px solid #f0f2f5;margin-top:12px;">
-                <button class="btn btn-outline" onclick="changePage(-1)" id="prevPage" style="padding:4px 12px;font-size:0.8rem;"><i class="fas fa-chevron-left"></i></button>
+                <button class="btn btn-outline btn-sm" onclick="changePage(-1)" id="prevPage"><i class="fas fa-chevron-left"></i></button>
                 <span id="pageInfo" style="font-size:0.8rem;color:#666;">Halaman 1</span>
-                <button class="btn btn-outline" onclick="changePage(1)" id="nextPage" style="padding:4px 12px;font-size:0.8rem;"><i class="fas fa-chevron-right"></i></button>
+                <button class="btn btn-outline btn-sm" onclick="changePage(1)" id="nextPage"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
 
     </main>
-
-    <!-- ===== BOTTOM NAVIGATION ===== -->
-    <nav class="bottom-nav">
-        <a class="nav-item" href="operator.html">
-            <i class="fas fa-chart-pie"></i>
-            <span>Dashboard</span>
-        </a>
-        <a class="nav-item active" href="operator-pendidik.html">
-            <i class="fas fa-user-graduate"></i>
-            <span>Pendidik</span>
-            <span class="nav-badge" id="navPendidikCount">0</span>
-        </a>
-        <a class="nav-item" href="operator-bantuan.html">
-            <i class="fas fa-hand-holding-heart"></i>
-            <span>Bantuan</span>
-        </a>
-        <a class="nav-item" href="operator-pengaturan.html">
-            <i class="fas fa-cog"></i>
-            <span>Pengaturan</span>
-        </a>
-    </nav>
 
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
@@ -431,11 +1204,11 @@
                     </div>
                 </div>
 
-                <!-- ALAMAT LENGKAP -->
+                <!-- ALAMAT -->
                 <div class="section-title"><i class="fas fa-map-marker-alt"></i> Alamat</div>
                 <div class="form-group full-width">
                     <label>Alamat Lengkap</label>
-                    <input type="text" id="editAlamat" placeholder="Alamat lengkap (Jalan, RT/RW, dll)">
+                    <input type="text" id="editAlamat" placeholder="Alamat lengkap">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -486,7 +1259,7 @@
                         </div>
                         <div class="form-group">
                             <label>Nama Bank</label>
-                            <input type="text" id="editNamaBankBupati" placeholder="Nama bank (BRI/BNI/Mandiri/dll)">
+                            <input type="text" id="editNamaBankBupati" placeholder="Nama bank">
                         </div>
                     </div>
                     <div class="form-group full-width">
@@ -506,7 +1279,7 @@
                         </div>
                         <div class="form-group">
                             <label>Nama Bank</label>
-                            <input type="text" id="editNamaBankGubernur" placeholder="Nama bank (BRI/BNI/Mandiri/dll)">
+                            <input type="text" id="editNamaBankGubernur" placeholder="Nama bank">
                         </div>
                     </div>
                     <div class="form-group full-width">
@@ -621,13 +1394,32 @@
         let lembagaData = null;
 
         // ============================================================
+        // ===== SIDEBAR FUNCTIONS =====
+        // ============================================================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        });
+
+        // ============================================================
         // ===== TOAST =====
         // ============================================================
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             if (!toast) { alert(message); return; }
             toast.textContent = message;
-            toast.className = 'toast toast-' + type;
+            toast.className = `toast toast-${type}`;
             void toast.offsetWidth;
             toast.classList.add('show');
             clearTimeout(toast._timeout);
@@ -645,6 +1437,12 @@
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             el.textContent = now.toLocaleDateString('id-ID', options);
+
+            const welcomeDate = document.getElementById('welcomeDate');
+            if (welcomeDate) {
+                const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+                welcomeDate.textContent = now.toLocaleDateString('id-ID', dateOptions);
+            }
         }
 
         // ============================================================
@@ -657,33 +1455,109 @@
                     window.location.href = 'index.html';
                     return false;
                 }
-                const { data: userData } = await supabaseClient
+
+                const { data: userData, error: userError } = await supabaseClient
                     .from('users')
-                    .select('id, name, role, lembaga_id')
+                    .select('id, name, email, role, kecamatan_id, lembaga_id, active')
                     .eq('id', session.user.id)
                     .single();
 
-                if (!userData || userData.role !== 'operator') {
+                if (userError || !userData || !userData.active) {
+                    console.error('User data error:', userError);
+                    await supabaseClient.auth.signOut();
+                    window.location.href = 'index.html';
+                    return false;
+                }
+
+                if (userData.role !== 'operator') {
                     window.location.href = 'dashboard.html';
+                    return false;
+                }
+
+                if (!userData.lembaga_id) {
+                    showToast('Akun operator tidak memiliki lembaga! Hubungi admin.', 'error');
                     return false;
                 }
 
                 userProfile = userData;
 
-                const nameEl = document.getElementById('userName');
-                const avatarEl = document.getElementById('userAvatar');
-                if (nameEl) nameEl.textContent = userData.name || 'Operator';
-                if (avatarEl) avatarEl.textContent = (userData.name || 'O').charAt(0).toUpperCase();
+                // Update UI
+                updateHeaderUI(userData);
+                updateWelcomeUI(userData);
 
-                if (userData.lembaga_id) {
-                    await loadLembagaData(userData.lembaga_id);
-                }
+                // Load lembaga data
+                await loadLembagaData(userData.lembaga_id);
 
                 return true;
+
             } catch (error) {
                 console.error('Auth check error:', error);
                 window.location.href = 'index.html';
                 return false;
+            }
+        }
+
+        function getUser() {
+            return userProfile;
+        }
+
+        // ============================================================
+        // ===== UPDATE UI =====
+        // ============================================================
+        function updateHeaderUI(user) {
+            if (!user) return;
+
+            const avatarEl = document.getElementById('userAvatar');
+            if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
+
+            const nameEl = document.getElementById('userName');
+            if (nameEl) nameEl.textContent = user.name;
+
+            const roleEl = document.getElementById('userRole');
+            if (roleEl) roleEl.textContent = 'Operator Lembaga';
+
+            const avatarSmall = document.getElementById('userAvatarSmall');
+            if (avatarSmall) avatarSmall.textContent = user.name.charAt(0).toUpperCase();
+
+            const nameSmall = document.getElementById('userNameSmall');
+            if (nameSmall) nameSmall.textContent = user.name;
+
+            const roleBadge = document.getElementById('headerRoleBadge');
+            if (roleBadge) roleBadge.textContent = 'Operator';
+
+            const scopeEl = document.getElementById('headerScope');
+            if (scopeEl && lembagaData) {
+                scopeEl.textContent = `🏫 ${lembagaData.nama || 'Lembaga'}`;
+            }
+        }
+
+        function updateWelcomeUI(user) {
+            if (!user) return;
+
+            const welcomeName = document.getElementById('welcomeName');
+            if (welcomeName) welcomeName.textContent = user.name;
+
+            const welcomeRole = document.getElementById('welcomeRole');
+            if (welcomeRole && lembagaData) {
+                welcomeRole.textContent = `Operator ${lembagaData.nama || 'Lembaga'}`;
+            }
+        }
+
+        // ============================================================
+        // ===== HANDLE LOGOUT =====
+        // ============================================================
+        async function handleLogout() {
+            if (!confirm('Apakah Anda yakin ingin keluar?')) return;
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) throw error;
+                showToast('Logout berhasil!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } catch (e) {
+                console.error('Logout error:', e);
+                showToast('Gagal logout: ' + e.message, 'error');
             }
         }
 
@@ -704,11 +1578,9 @@
                 document.getElementById('lembagaInfo').textContent = 
                     `Kelola data pendidik di ${data.nama} (${data.jenis_lembaga || 'LPQ'})`;
 
-                // Set readonly fields di modal
                 document.getElementById('editLembagaName').value = data.nama || '';
                 document.getElementById('editJenisLembaga').value = data.jenis_lembaga || 'LPQ';
 
-                // Load kecamatan options
                 await loadKecamatanOptions();
 
             } catch (e) {
@@ -781,7 +1653,7 @@
         }
 
         // ============================================================
-        // ===== FUNGSI LOAD DATA =====
+        // ===== LOAD DATA =====
         // ============================================================
         async function loadPendidik() {
             if (!userProfile?.lembaga_id) return;
@@ -806,11 +1678,9 @@
                 }
 
                 const from = (currentPage - 1) * pageSize;
-                const to = from + pageSize - 1;
-
                 const { data, count, error } = await query
                     .order('nama_lengkap', { ascending: true })
-                    .range(from, to);
+                    .range(from, from + pageSize - 1);
 
                 if (error) throw error;
 
@@ -863,8 +1733,8 @@
                         <td><span class="badge ${statusBadge}">${statusText}</span></td>
                         <td><span class="badge ${verifBadge}" style="font-size:0.65rem;">${verifText}</span></td>
                         <td>
-                            <button class="btn btn-outline" style="padding:2px 8px;font-size:0.65rem;" onclick="event.stopPropagation(); editPendidik('${item.id}')"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-outline" style="padding:2px 8px;font-size:0.65rem;border-color:#f44336;color:#f44336;" onclick="event.stopPropagation(); deletePendidik('${item.id}')"><i class="fas fa-trash"></i></button>
+                            <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:0.65rem;" onclick="event.stopPropagation(); editPendidik('${item.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:0.65rem;border-color:#f44336;color:#f44336;" onclick="event.stopPropagation(); deletePendidik('${item.id}')"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -951,67 +1821,6 @@
         }
 
         // ============================================================
-        // ===== TAMBAH DATA MANUAL =====
-        // ============================================================
-        function openAddModal() {
-            isNewRecord = true;
-            modalMode = 'add';
-            document.getElementById('modalTitle').textContent = 'Tambah Pendidik Baru';
-            document.getElementById('btnEditMode').style.display = 'none';
-            document.getElementById('btnSave').style.display = 'inline-flex';
-            document.getElementById('btnSave').innerHTML = '<i class="fas fa-plus"></i> Tambah';
-            document.getElementById('verifikasiAction').style.display = 'none';
-
-            // Reset form
-            document.getElementById('editId').value = '';
-            document.getElementById('editNik').value = '';
-            document.getElementById('editNama').value = '';
-            document.getElementById('editTempatLahir').value = '';
-            document.getElementById('editTanggalLahir').value = '';
-            document.getElementById('editJenisKelamin').value = '';
-            document.getElementById('editStatusPerkawinan').value = '';
-            document.getElementById('editIbuKandung').value = '';
-            document.getElementById('editPendidikan').value = '';
-            document.getElementById('editAlamat').value = '';
-            document.getElementById('editKabupatenPengajar').value = 'Tegal';
-            document.getElementById('editProvinsi').value = 'Jawa Tengah';
-            document.getElementById('editNoHp').value = '';
-            document.getElementById('editEmail').value = '';
-            
-            // Reset rekening Bupati
-            document.getElementById('editNomorRekeningBupati').value = '';
-            document.getElementById('editNamaBankBupati').value = '';
-            document.getElementById('editPemilikRekeningBupati').value = '';
-            
-            // Reset rekening Gubernur
-            document.getElementById('editNomorRekeningGubernur').value = '';
-            document.getElementById('editNamaBankGubernur').value = '';
-            document.getElementById('editPemilikRekeningGubernur').value = '';
-            
-            document.getElementById('editTmt').value = '';
-            document.getElementById('editStatus').value = 'true';
-            document.getElementById('lamaMengabdiDisplay').textContent = '0 Tahun';
-            document.getElementById('editLamaMengabdi').value = '0';
-
-            // Reset dropdown
-            document.getElementById('editKecamatanPengajar').value = '';
-            document.getElementById('editDesaPengajar').innerHTML = '<option value="">-- Pilih Desa --</option>';
-
-            // Auto-fill lembaga
-            if (lembagaData) {
-                document.getElementById('editLembagaName').value = lembagaData.nama || '';
-                document.getElementById('editJenisLembaga').value = lembagaData.jenis_lembaga || 'LPQ';
-            }
-
-            // Enable editable fields
-            document.querySelectorAll('#pendidikModal .modal-body input:not(.lembaga-readonly), #pendidikModal .modal-body select').forEach(el => {
-                el.disabled = false;
-            });
-
-            openModal();
-        }
-
-        // ============================================================
         // ===== MODAL: VIEW & EDIT =====
         // ============================================================
         function openModal() {
@@ -1040,6 +1849,55 @@
             document.getElementById('btnSave').innerHTML = '<i class="fas fa-save"></i> Simpan';
             enableInputs(false);
             showToast('Mode edit diaktifkan, silakan ubah data', 'info');
+        }
+
+        function openAddModal() {
+            isNewRecord = true;
+            modalMode = 'add';
+            document.getElementById('modalTitle').textContent = 'Tambah Pendidik Baru';
+            document.getElementById('btnEditMode').style.display = 'none';
+            document.getElementById('btnSave').style.display = 'inline-flex';
+            document.getElementById('btnSave').innerHTML = '<i class="fas fa-plus"></i> Tambah';
+            document.getElementById('verifikasiAction').style.display = 'none';
+
+            // Reset form
+            document.getElementById('editId').value = '';
+            document.getElementById('editNik').value = '';
+            document.getElementById('editNama').value = '';
+            document.getElementById('editTempatLahir').value = '';
+            document.getElementById('editTanggalLahir').value = '';
+            document.getElementById('editJenisKelamin').value = '';
+            document.getElementById('editStatusPerkawinan').value = '';
+            document.getElementById('editIbuKandung').value = '';
+            document.getElementById('editPendidikan').value = '';
+            document.getElementById('editAlamat').value = '';
+            document.getElementById('editKabupatenPengajar').value = 'Tegal';
+            document.getElementById('editProvinsi').value = 'Jawa Tengah';
+            document.getElementById('editNoHp').value = '';
+            document.getElementById('editEmail').value = '';
+            
+            document.getElementById('editNomorRekeningBupati').value = '';
+            document.getElementById('editNamaBankBupati').value = '';
+            document.getElementById('editPemilikRekeningBupati').value = '';
+            document.getElementById('editNomorRekeningGubernur').value = '';
+            document.getElementById('editNamaBankGubernur').value = '';
+            document.getElementById('editPemilikRekeningGubernur').value = '';
+            
+            document.getElementById('editTmt').value = '';
+            document.getElementById('editStatus').value = 'true';
+            document.getElementById('lamaMengabdiDisplay').textContent = '0 Tahun';
+            document.getElementById('editLamaMengabdi').value = '0';
+
+            document.getElementById('editKecamatanPengajar').value = '';
+            document.getElementById('editDesaPengajar').innerHTML = '<option value="">-- Pilih Desa --</option>';
+
+            if (lembagaData) {
+                document.getElementById('editLembagaName').value = lembagaData.nama || '';
+                document.getElementById('editJenisLembaga').value = lembagaData.jenis_lembaga || 'LPQ';
+            }
+
+            enableInputs(false);
+            openModal();
         }
 
         async function viewPendidik(id) {
@@ -1078,12 +1936,9 @@
                 document.getElementById('editNoHp').value = data.no_hp || '';
                 document.getElementById('editEmail').value = data.email || '';
                 
-                // Rekening Bupati
                 document.getElementById('editNomorRekeningBupati').value = data.nomor_rekening_bupati || '';
                 document.getElementById('editNamaBankBupati').value = data.nama_bank_bupati || '';
                 document.getElementById('editPemilikRekeningBupati').value = data.pemilik_rekening_bupati || '';
-                
-                // Rekening Gubernur
                 document.getElementById('editNomorRekeningGubernur').value = data.nomor_rekening_gubernur || '';
                 document.getElementById('editNamaBankGubernur').value = data.nama_bank_gubernur || '';
                 document.getElementById('editPemilikRekeningGubernur').value = data.pemilik_rekening_gubernur || '';
@@ -1091,7 +1946,6 @@
                 document.getElementById('editTmt').value = data.tmt_mengajar || '';
                 document.getElementById('editStatus').value = data.status_aktif ? 'true' : 'false';
 
-                // Set dropdown kecamatan & desa
                 if (data.kecamatan_pengajar_id) {
                     document.getElementById('editKecamatanPengajar').value = data.kecamatan_pengajar_id;
                     await loadDesaOptions(data.kecamatan_pengajar_id, 'editDesaPengajar');
@@ -1100,7 +1954,6 @@
                     }
                 }
 
-                // Hitung lama mengabdi
                 if (data.tmt_mengajar) {
                     const tmt = new Date(data.tmt_mengajar);
                     const now = new Date();
@@ -1117,10 +1970,16 @@
                     document.getElementById('editLamaMengabdi').value = '0';
                 }
 
-                // Auto-fill lembaga
                 if (lembagaData) {
                     document.getElementById('editLembagaName').value = lembagaData.nama || '';
                     document.getElementById('editJenisLembaga').value = data.jenis_lembaga || lembagaData.jenis_lembaga || 'LPQ';
+                }
+
+                // Jika status masih Draft, tampilkan tombol Ajukan Verifikasi
+                if (data.status_verifikasi === 'Draft') {
+                    document.getElementById('verifikasiAction').style.display = 'block';
+                } else {
+                    document.getElementById('verifikasiAction').style.display = 'none';
                 }
 
                 enableInputs(true);
@@ -1200,17 +2059,12 @@
                 alamat: document.getElementById('editAlamat').value.trim(),
                 no_hp: document.getElementById('editNoHp').value.trim(),
                 email: document.getElementById('editEmail').value.trim(),
-                
-                // Rekening Bupati
                 nomor_rekening_bupati: document.getElementById('editNomorRekeningBupati').value.trim(),
                 nama_bank_bupati: document.getElementById('editNamaBankBupati').value.trim(),
                 pemilik_rekening_bupati: document.getElementById('editPemilikRekeningBupati').value.trim(),
-                
-                // Rekening Gubernur
                 nomor_rekening_gubernur: document.getElementById('editNomorRekeningGubernur').value.trim(),
                 nama_bank_gubernur: document.getElementById('editNamaBankGubernur').value.trim(),
                 pemilik_rekening_gubernur: document.getElementById('editPemilikRekeningGubernur').value.trim(),
-                
                 desa_pengajar_id: document.getElementById('editDesaPengajar').value || null,
                 kecamatan_pengajar_id: document.getElementById('editKecamatanPengajar').value || null,
                 kabupaten_pengajar: document.getElementById('editKabupatenPengajar').value.trim() || 'Tegal',
@@ -1299,7 +2153,6 @@
                     return;
                 }
 
-                // Get desa and kecamatan names
                 const desaIds = data.map(d => d.desa_pengajar_id).filter(Boolean);
                 const kecIds = data.map(d => d.kecamatan_pengajar_id).filter(Boolean);
                 
@@ -1463,7 +2316,6 @@
                         return;
                     }
 
-                    // Get all kecamatan and desa data for mapping
                     const { data: kecData } = await supabaseClient
                         .from('master_kecamatan')
                         .select('id, nama');
@@ -1485,7 +2337,6 @@
                             const nama = row['Nama Lengkap'] || '';
                             if (!nama) { failed++; continue; }
 
-                            // Cari kecamatan ID
                             const kecNama = (row['Kecamatan Pengajar'] || '').toLowerCase();
                             const desaNama = (row['Desa Pengajar'] || '').toLowerCase();
                             
@@ -1516,17 +2367,12 @@
                                 alamat: row['Alamat'] || '',
                                 no_hp: row['No HP']?.toString() || '',
                                 email: row['Email'] || '',
-                                
-                                // Rekening Bupati
                                 nomor_rekening_bupati: row['No Rekening Bupati']?.toString() || '',
                                 nama_bank_bupati: row['Nama Bank Bupati'] || '',
                                 pemilik_rekening_bupati: row['Pemilik Rekening Bupati'] || '',
-                                
-                                // Rekening Gubernur
                                 nomor_rekening_gubernur: row['No Rekening Gubernur']?.toString() || '',
                                 nama_bank_gubernur: row['Nama Bank Gubernur'] || '',
                                 pemilik_rekening_gubernur: row['Pemilik Rekening Gubernur'] || '',
-                                
                                 desa_pengajar_id: desaId,
                                 kecamatan_pengajar_id: kecId,
                                 kabupaten_pengajar: row['Kabupaten Pengajar'] || 'Tegal',
@@ -1646,6 +2492,9 @@
         window.showToast = showToast;
         window.hitungLamaMengabdi = hitungLamaMengabdi;
         window.loadDesaOptions = loadDesaOptions;
+        window.toggleSidebar = toggleSidebar;
+        window.handleLogout = handleLogout;
+        window.getUser = getUser;
     </script>
 </body>
 </html>

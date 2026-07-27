@@ -3,137 +3,700 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Dashboard Operator - SI-MUSTAFA</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <title>Operator Lembaga - SI-MUSTAFA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ===== OPERATOR SPECIFIC ===== */
-        .operator-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--primary);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .operator-badge i {
-            font-size: 0.6rem;
+        /* ============================================================
+           SI-MUSTAFA - OPERATOR LEMBAGA
+           ============================================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .stat-card .info .sub-value {
-            font-size: 0.65rem;
-            color: #888;
-            margin-top: 2px;
+        :root {
+            --sidebar-width: 250px;
+            --header-height: 64px;
+            --primary: #006400;
+            --primary-light: #4CAF50;
+            --primary-dark: #0a2e1a;
+            --gold: #FFD700;
+            --gold-dark: #DAA520;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #f44336;
+            --info: #2196F3;
+            --purple: #9C27B0;
+            --bg-gray: #f0f4f0;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 30px rgba(0, 100, 0, 0.15);
         }
 
-        .verification-progress {
-            background: #f0f2f5;
-            border-radius: 8px;
-            height: 8px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-        .verification-progress .bar {
-            height: 100%;
-            background: var(--primary);
-            border-radius: 8px;
-            transition: width 0.5s ease;
-        }
-
-        /* ===== TREND CHART ===== */
-        .trend-chart-container {
-            background: white;
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 16px;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .quick-actions .action-btn {
-            background: white;
-            border: 2px solid #e8ecf1;
-            border-radius: 12px;
-            padding: 16px 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: #333;
-        }
-        .quick-actions .action-btn:hover {
-            border-color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,100,0,0.12);
-        }
-        .quick-actions .action-btn i {
-            font-size: 1.5rem;
-            color: var(--primary);
-            display: block;
-            margin-bottom: 6px;
-        }
-        .quick-actions .action-btn .label {
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .quick-actions .action-btn .badge-count {
-            display: inline-block;
-            background: var(--error);
-            color: white;
-            font-size: 0.6rem;
-            padding: 1px 8px;
-            border-radius: 10px;
-            margin-top: 4px;
-        }
-
-        /* ===== LEMBAGA INFO CARD ===== */
-        .lembaga-info-card {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border-radius: 14px;
-            padding: 20px 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 20px rgba(0,100,0,0.25);
-        }
-        .lembaga-info-card .lembaga-nama {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-        .lembaga-info-card .lembaga-detail {
-            font-size: 0.8rem;
-            opacity: 0.85;
-            margin-top: 4px;
-        }
-        .lembaga-info-card .lembaga-detail i {
-            margin-right: 6px;
-        }
-        .lembaga-info-card .lembaga-stats {
+        body {
+            background: var(--bg-gray);
+            min-height: 100vh;
             display: flex;
-            gap: 24px;
-            margin-top: 12px;
-            flex-wrap: wrap;
         }
-        .lembaga-info-card .lembaga-stats .stat-item {
-            font-size: 0.75rem;
-            opacity: 0.9;
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(180deg, #0a2e1a 0%, #1a5a3a 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(0);
         }
-        .lembaga-info-card .lembaga-stats .stat-item strong {
-            font-size: 1.2rem;
-            display: block;
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .sidebar-brand {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: var(--header-height);
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .sidebar-brand .brand-text h1 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-brand .brand-text h1 span {
             color: var(--gold);
         }
 
-        /* ===== KYC MODAL ===== */
+        .sidebar-brand .brand-text small {
+            font-size: 0.55rem;
+            opacity: 0.7;
+            font-weight: 300;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 12px 0;
+            list-style: none;
+        }
+
+        .sidebar-menu .menu-label {
+            padding: 8px 20px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 600;
+        }
+
+        .sidebar-menu .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .sidebar-menu .menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .sidebar-menu .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--gold);
+            border-left-color: var(--gold);
+        }
+
+        .sidebar-menu .menu-item i {
+            width: 20px;
+            font-size: 1.1rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-menu .menu-item .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar-footer .user-info .name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-footer .user-info .role {
+            font-size: 0.6rem;
+            opacity: 0.6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-footer .logout-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 8px;
+            transition: 0.2s;
+            border-radius: 6px;
+        }
+
+        .sidebar-footer .logout-btn:hover {
+            color: #ff6b6b;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        /* ===== OVERLAY ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 40px 40px 40px;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: white;
+            padding: 0 40px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e8ecf1;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-left .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .header-left .sidebar-toggle:hover {
+            background: var(--bg-gray);
+            color: var(--primary);
+        }
+
+        .header-left .page-title h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .header-left .page-title p {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-date {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .header-right .role-badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .header-right .role-scope {
+            font-size: 0.6rem;
+            color: #888;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .header-user:hover {
+            background: var(--bg-gray);
+        }
+
+        .header-user .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .header-user .user-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        /* ===== WELCOME SECTION ===== */
+        .welcome-section {
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5a3a 50%, #2e7d32 100%);
+            border-radius: 14px;
+            padding: 24px 36px;
+            margin-bottom: 24px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 8px 32px rgba(0, 100, 0, 0.3);
+        }
+
+        .welcome-section .welcome-text h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .welcome-section .welcome-text h2 span {
+            color: var(--gold);
+        }
+
+        .welcome-section .welcome-text p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .welcome-section .welcome-text p i {
+            margin-right: 6px;
+            color: var(--gold);
+        }
+
+        .welcome-section .welcome-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 8px 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .welcome-section .welcome-badge i {
+            color: var(--gold);
+        }
+
+        /* ===== STAT MINI ===== */
+        .stat-mini {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .stat-mini .stat-item {
+            font-size: 0.85rem;
+            color: #555;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            border-left: 3px solid var(--primary);
+        }
+
+        .stat-mini .stat-item strong {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .stat-mini .stat-item:nth-child(2) { border-left-color: var(--success); }
+        .stat-mini .stat-item:nth-child(3) { border-left-color: var(--danger); }
+        .stat-mini .stat-item:nth-child(4) { border-left-color: var(--warning); }
+
+        /* ===== FILTER ===== */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #f5faf5 100%);
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 100, 0, 0.08);
+            margin-bottom: 16px;
+            align-items: flex-end;
+            position: relative;
+        }
+
+        .filter-section .filter-item {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filter-section .filter-item label {
+            display: block;
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .filter-section .filter-item input,
+        .filter-section .filter-item select {
+            width: 100%;
+            padding: 8px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .filter-section .filter-item input:focus,
+        .filter-section .filter-item select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.08);
+        }
+
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-actions .btn {
+            white-space: nowrap;
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px 24px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .card .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .card .card-title i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table-responsive table {
+            width: 100%;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+
+        .table-responsive table th {
+            padding: 10px 12px;
+            text-align: left;
+            background: #eaf0ea;
+            color: #1b5e20;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #c8e6c9;
+            position: sticky;
+            top: 0;
+        }
+
+        .table-responsive table tbody tr:nth-child(even) {
+            background: #f6faf6;
+        }
+
+        .table-responsive table tbody tr:nth-child(odd) {
+            background: #ffffff;
+        }
+
+        .table-responsive table tbody tr:hover {
+            background: #e8f5e9;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .table-responsive table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f4f0;
+            vertical-align: middle;
+        }
+
+        /* ===== BADGE ===== */
+        .badge {
+            padding: 3px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge.inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .badge.pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #43a047;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 0.7rem;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 90%;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+        .toast-info { background: var(--primary); }
+        .toast-warning { background: var(--warning); }
+
+        /* ===== SPINNER ===== */
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f0f2f5;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -150,21 +713,24 @@
         .modal-overlay.active {
             display: flex;
         }
+
         .modal-container {
             background: white;
             border-radius: 16px;
             padding: 28px 30px;
-            max-width: 550px;
+            max-width: 800px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: fadeInModal 0.25s ease;
         }
+
         @keyframes fadeInModal {
             from { opacity: 0; transform: scale(0.95) translateY(10px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -173,11 +739,13 @@
             padding-bottom: 12px;
             border-bottom: 2px solid #f0f2f5;
         }
+
         .modal-header h2 {
             font-size: 1.2rem;
             color: var(--primary);
             font-weight: 700;
         }
+
         .modal-header .close-btn {
             background: none;
             border: none;
@@ -189,23 +757,22 @@
         .modal-header .close-btn:hover {
             color: #333;
         }
+
         .modal-body .form-group {
             margin-bottom: 14px;
         }
+
         .modal-body .form-group label {
             display: block;
             font-size: 0.75rem;
             font-weight: 600;
             color: #555;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
-        .modal-body .form-group .help-text {
-            font-size: 0.7rem;
-            color: #888;
-            margin-top: 4px;
-        }
+
+        .modal-body .form-group input,
         .modal-body .form-group select,
-        .modal-body .form-group input {
+        .modal-body .form-group textarea {
             width: 100%;
             padding: 8px 12px;
             border: 2px solid #e0e0e0;
@@ -214,64 +781,27 @@
             background: #fafafa;
             transition: 0.2s;
         }
+
+        .modal-body .form-group input:focus,
         .modal-body .form-group select:focus,
-        .modal-body .form-group input:focus {
+        .modal-body .form-group textarea:focus {
             border-color: var(--primary);
             outline: none;
             background: white;
         }
-        .modal-body .form-group input[type="file"] {
-            padding: 10px;
-            background: #f8faf8;
-            border: 2px dashed #ccc;
-            cursor: pointer;
+
+        .modal-body .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
         }
-        .modal-body .form-group input[type="file"]:hover {
-            border-color: var(--primary);
-            background: var(--primary-bg);
+
+        .modal-body .form-group input:disabled,
+        .modal-body .form-group select:disabled {
+            background: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
         }
-        .modal-body .form-group .file-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: #f0f4f0;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            color: #555;
-            margin-top: 4px;
-        }
-        .modal-body .form-group .file-info i {
-            color: var(--success);
-        }
-        .modal-body .form-group .file-info .remove-file {
-            color: var(--error);
-            cursor: pointer;
-            margin-left: auto;
-        }
-        .modal-body .form-group .file-info .remove-file:hover {
-            text-decoration: underline;
-        }
-        .modal-body .kyc-status-info {
-            background: #f8faf8;
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 12px;
-            border-left: 4px solid var(--primary);
-        }
-        .modal-body .kyc-status-info .status-label {
-            font-size: 0.7rem;
-            color: #888;
-            text-transform: uppercase;
-        }
-        .modal-body .kyc-status-info .status-value {
-            font-size: 1rem;
-            font-weight: 600;
-        }
-        .modal-body .kyc-status-info .status-value.verified { color: var(--success); }
-        .modal-body .kyc-status-info .status-value.pending { color: var(--warning); }
-        .modal-body .kyc-status-info .status-value.draft { color: #888; }
-        .modal-body .kyc-status-info .status-value.rejected { color: var(--error); }
+
         .modal-footer {
             display: flex;
             justify-content: flex-end;
@@ -280,335 +810,596 @@
             padding-top: 16px;
             border-top: 1px solid #f0f2f5;
         }
-        .btn {
-            padding: 6px 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 1.5px solid var(--primary);
-        }
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-primary:hover {
-            background: var(--primary-light);
-        }
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-        .btn-success:hover {
-            background: #43a047;
-        }
-        .btn-danger {
-            background: var(--error);
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #d32f2f;
-        }
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
-        @media (max-width: 640px) {
-            .lembaga-info-card {
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 16px 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .rekening-box {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 8px;
+        }
+
+        .rekening-box .rekening-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .lembaga-readonly {
+            background: #f5f5f5 !important;
+            color: #666 !important;
+            cursor: not-allowed !important;
+            border-color: #e8e8e8 !important;
+        }
+
+        .lama-mengabdi-display {
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #e8e8e8;
+            color: #666;
+            font-size: 0.9rem;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Upload Preview */
+        .upload-preview {
+            margin-top: 6px;
+            padding: 6px 12px;
+            background: #f8faf8;
+            border-radius: 6px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .upload-preview.visible {
+            display: flex;
+        }
+
+        .upload-preview .file-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #333;
+            flex: 1;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 16px 20px 30px 20px;
+            }
+            .header {
+                padding: 0 20px;
+            }
+            .header-left .page-title p {
+                display: none;
+            }
+            .header-date {
+                display: none;
+            }
+            .header-right .role-scope {
+                display: none;
+            }
+            .filter-section .filter-item {
+                min-width: 100%;
+            }
+            .filter-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+            .filter-actions .btn {
+                flex: 1;
+                justify-content: center;
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+            .stat-mini {
+                gap: 10px;
+            }
+            .stat-mini .stat-item {
+                font-size: 0.75rem;
+                padding: 6px 14px;
+            }
+            .stat-mini .stat-item strong {
+                font-size: 0.95rem;
+            }
+            .welcome-section {
+                padding: 16px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .welcome-section .welcome-text h2 {
+                font-size: 1rem;
+            }
+            .welcome-section .welcome-text p {
+                font-size: 0.75rem;
+            }
+            .welcome-section .welcome-badge {
+                font-size: 0.65rem;
+                padding: 4px 12px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .table-responsive table {
+                font-size: 0.75rem;
+            }
+            .table-responsive table th,
+            .table-responsive table td {
+                padding: 6px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 12px;
+                height: 56px;
+            }
+            .header-left .page-title h1 {
+                font-size: 0.85rem;
+            }
+            .header-left .sidebar-toggle {
+                font-size: 1rem;
+                padding: 2px 6px;
+            }
+            .header-user .user-name {
+                display: none;
+            }
+            .header-right .role-badge {
+                display: none;
+            }
+            .main-content {
+                padding: 12px 12px 20px 12px;
+            }
+            .stat-mini .stat-item {
+                font-size: 0.7rem;
+                padding: 4px 10px;
+            }
+            .stat-mini .stat-item strong {
+                font-size: 0.85rem;
+            }
+            .card {
                 padding: 16px;
             }
-            .lembaga-info-card .lembaga-stats {
-                gap: 12px;
-            }
-            .quick-actions {
-                grid-template-columns: repeat(2, 1fr);
+            .filter-section {
+                padding: 12px 16px;
             }
             .modal-container {
-                padding: 20px;
+                padding: 16px;
                 margin: 10px;
+            }
+            .welcome-section {
+                padding: 14px 16px;
+            }
+            .welcome-section .welcome-text h2 {
+                font-size: 0.9rem;
+            }
+            .table-responsive table {
+                font-size: 0.7rem;
+            }
+            .table-responsive table th,
+            .table-responsive table td {
+                padding: 4px 6px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="header-left">
-            <div class="header-logo">
-                <img src="assets/logo-kemenag.png" alt="Logo" 
-                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
-                <div>
-                    <h1>SI-<span>MUSTAFA</span></h1>
-                    <small>Operator Lembaga</small>
-                </div>
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="assets/logo-kemenag.png" alt="Logo" 
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+            <div class="brand-text">
+                <h1>SI-<span>MUSTAFA</span></h1>
+                <small>Kemenag Kab. Tegal</small>
             </div>
         </div>
-        <div class="header-right">
-            <span class="header-date" id="currentDate"></span>
-            <div class="header-user" onclick="showToast('Profile', 'info')">
-                <div class="avatar" id="userAvatar">O</div>
-                <span class="user-name" id="userName">Operator</span>
+
+        <ul class="sidebar-menu">
+            <li class="menu-label">Menu Operator</li>
+            <li><a class="menu-item active" href="operator.html"><i class="fas fa-chart-pie"></i>Dashboard</a></li>
+            <li><a class="menu-item" href="operator-pendidik.html"><i class="fas fa-user-graduate"></i>Pendidik</a></li>
+            <li><a class="menu-item" href="operator-bantuan.html"><i class="fas fa-hand-holding-heart"></i>Bantuan</a></li>
+            <li><a class="menu-item" href="operator-mutasi.html"><i class="fas fa-exchange-alt"></i>Mutasi</a></li>
+            <li><a class="menu-item" href="operator-pengaturan.html"><i class="fas fa-cog"></i>Pengaturan</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="avatar" id="userAvatar">A</div>
+            <div class="user-info">
+                <div class="name" id="userName">Operator</div>
+                <div class="role" id="userRole">Operator Lembaga</div>
             </div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
         </div>
-    </header>
+    </aside>
+
+    <!-- ===== OVERLAY ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- ===== MAIN CONTENT ===== -->
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
 
-        <div class="page-header">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                <div>
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="page-title">
                     <h1>Dashboard Operator</h1>
-                    <p id="lembagaInfo">Data lembaga Anda</p>
+                    <p>Kelola data pendidik di lembaga Anda</p>
                 </div>
-                <span class="operator-badge"><i class="fas fa-user-shield"></i> Operator</span>
+            </div>
+            <div class="header-right">
+                <span class="header-date" id="currentDate"></span>
+                <span class="role-badge" id="headerRoleBadge">Operator</span>
+                <span class="role-scope" id="headerScope"></span>
+                <div class="header-user" onclick="showToast('Profile', 'info')">
+                    <div class="avatar" id="userAvatarSmall">A</div>
+                    <span class="user-name" id="userNameSmall">Operator</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== WELCOME SECTION ===== -->
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h2>Selamat datang, <span id="welcomeName">Operator</span> 👋</h2>
+                <p id="welcomeStatus"><i class="fas fa-building"></i> <span id="welcomeRole">Operator Lembaga</span></p>
+            </div>
+            <div class="welcome-badge">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="welcomeDate">Loading...</span>
             </div>
         </div>
 
-        <!-- ===== INFO LEMBAGA ===== -->
-        <div class="lembaga-info-card" id="lembagaInfoCard">
-            <div class="lembaga-nama" id="lembagaNama">Memuat data lembaga...</div>
-            <div class="lembaga-detail">
-                <i class="fas fa-map-marker-alt"></i> <span id="lembagaAlamat">-</span>
-                <span style="margin:0 8px;">|</span>
-                <i class="fas fa-tag"></i> <span id="lembagaJenis">-</span>
-                <span style="margin:0 8px;">|</span>
-                <i class="fas fa-hashtag"></i> NSLP: <span id="lembagaNslp">-</span>
+        <!-- ===== STATISTIK RINGKAS ===== -->
+        <div class="stat-mini">
+            <div class="stat-item">Total Pendidik: <strong id="totalPendidik">0</strong></div>
+            <div class="stat-item">Aktif: <strong id="totalAktif" style="color:#4CAF50;">0</strong></div>
+            <div class="stat-item">Nonaktif: <strong id="totalNonaktif" style="color:#f44336;">0</strong></div>
+            <div class="stat-item">Proses KYC: <strong id="totalKyc" style="color:#ff9800;">0</strong></div>
+        </div>
+
+        <!-- ===== FILTER ===== -->
+        <div class="filter-section">
+            <div class="filter-item" style="flex:2;">
+                <label><i class="fas fa-search"></i> Cari Pendidik</label>
+                <input type="text" id="searchInput" placeholder="Cari Nama atau NIK..." oninput="applyFilter()">
             </div>
-            <div class="lembaga-stats">
-                <div class="stat-item">
-                    <strong id="statTotalPendidik">0</strong>
-                    Total Pendidik
-                </div>
-                <div class="stat-item">
-                    <strong id="statAktifPendidik">0</strong>
-                    Aktif
-                </div>
-                <div class="stat-item">
-                    <strong id="statNonaktifPendidik">0</strong>
-                    Nonaktif
-                </div>
-                <div class="stat-item">
-                    <strong id="statVerifikasi">0</strong>
-                    Terverifikasi
-                </div>
+            <div class="filter-item">
+                <label>Status</label>
+                <select id="statusFilter" onchange="applyFilter()">
+                    <option value="all">Semua</option>
+                    <option value="active">Aktif</option>
+                    <option value="inactive">Tidak Aktif</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-success" onclick="openAddModal()">
+                    <i class="fas fa-plus"></i> Tambah Pendidik
+                </button>
+                <button class="btn btn-outline" onclick="refreshData()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
             </div>
         </div>
 
-        <!-- ===== STATS GRID ===== -->
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card" onclick="navigateTo('pendidik')">
-                <div class="icon green"><i class="fas fa-user-graduate"></i></div>
-                <div class="info">
-                    <div class="label">Total Pendidik</div>
-                    <div class="value" id="totalPendidik">0</div>
-                    <div class="sub-value" id="pendidikAktif">Aktif: 0</div>
-                </div>
-            </div>
-            <div class="stat-card" onclick="navigateTo('bantuan')">
-                <div class="icon gold"><i class="fas fa-hand-holding-heart"></i></div>
-                <div class="info">
-                    <div class="label">Penerima Bantuan</div>
-                    <div class="value" id="totalBantuan">0</div>
-                    <div class="sub-value" id="bantuanTahun">Tahun 2026</div>
-                </div>
-            </div>
-            <div class="stat-card kyc-card" onclick="openKYCModal()">
-                <div class="icon blue"><i class="fas fa-id-card"></i></div>
-                <div class="info">
-                    <div class="label">Verifikasi Dokumen</div>
-                    <div class="value" id="totalVerifikasi">0</div>
-                    <div class="sub-value" id="verifikasiStatus">Menunggu: 0</div>
-                    <div class="verification-progress">
-                        <div class="bar" id="verificationBar" style="width:0%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="stat-card" onclick="showToast('Mutasi bulan ini', 'info')">
-                <div class="icon orange"><i class="fas fa-exchange-alt"></i></div>
-                <div class="info">
-                    <div class="label">Mutasi Bulan Ini</div>
-                    <div class="value" id="totalMutasi">0</div>
-                    <div class="sub-value">Update terakhir</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== TREND CHART (Pendidik per Tahun) ===== -->
-        <div class="trend-chart-container">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                <div class="card-title" style="margin-bottom:0;">
-                    <i class="fas fa-chart-line" style="color:var(--primary);"></i> 
-                    Tren Jumlah Pendidik
-                    <small style="font-weight:400;color:#888;font-size:0.7rem;">5 tahun terakhir</small>
-                </div>
-                <div style="display:flex;gap:6px;font-size:0.7rem;color:#888;">
-                    <span><span style="display:inline-block;width:12px;height:3px;background:var(--primary);border-radius:2px;"></span> Total</span>
-                    <span><span style="display:inline-block;width:12px;height:3px;background:var(--gold);border-radius:2px;"></span> Aktif</span>
-                </div>
-            </div>
-            <div style="height:180px;">
-                <canvas id="trendChart"></canvas>
-            </div>
-        </div>
-
-        <!-- ===== QUICK ACTIONS ===== -->
-        <div class="quick-actions">
-            <a class="action-btn" href="operator-pendidik.html?action=add">
-                <i class="fas fa-user-plus"></i>
-                <div class="label">Tambah Pendidik</div>
-            </a>
-            <a class="action-btn" href="operator-pendidik.html">
-                <i class="fas fa-list"></i>
-                <div class="label">Daftar Pendidik</div>
-                <span class="badge-count" id="badgePendidik">0</span>
-            </a>
-            <a class="action-btn" href="operator-bantuan.html">
-                <i class="fas fa-hand-holding-heart"></i>
-                <div class="label">Kelola Bantuan</div>
-            </a>
-            <a class="action-btn" onclick="openKYCModal()">
-                <i class="fas fa-check-circle"></i>
-                <div class="label">Verifikasi Dokumen</div>
-                <span class="badge-count" id="badgeKYC">0</span>
-            </a>
-            <a class="action-btn" onclick="exportData()">
-                <i class="fas fa-file-excel"></i>
-                <div class="label">Export Data</div>
-            </a>
-            <a class="action-btn" href="operator-pengaturan.html">
-                <i class="fas fa-cog"></i>
-                <div class="label">Pengaturan</div>
-            </a>
-        </div>
-
-        <!-- ===== RECENT ACTIVITY ===== -->
+        <!-- ===== TABEL ===== -->
         <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                <div class="card-title" style="margin-bottom:0;">
-                    <i class="fas fa-clock" style="color:var(--primary);"></i> Aktivitas Terbaru
-                </div>
-                <div style="display:flex;gap:8px;">
-                    <button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
-                    <button class="btn btn-primary" onclick="navigateTo('pendidik')"><i class="fas fa-list"></i> Lihat Semua</button>
-                </div>
+                <div class="card-title" style="margin-bottom:0;"><i class="fas fa-list"></i>Daftar Pendidik <small id="totalData" style="font-weight:400;color:#888;">0 data</small></div>
             </div>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>Nama</th>
+                            <th>No</th>
                             <th>NIK</th>
+                            <th>Nama Lengkap</th>
                             <th>Status</th>
-                            <th>Verifikasi</th>
-                            <th>Update</th>
+                            <th>KYC</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="recentTableBody">
-                        <tr><td colspan="5" style="text-align:center;padding:20px;color:#999;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+                    <tbody id="pendidikTableBody">
+                        <tr><td colspan="6" style="text-align:center;padding:30px;color:#999;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
                     </tbody>
                 </table>
+            </div>
+            <div style="display:flex;justify-content:center;align-items:center;gap:16px;padding-top:12px;border-top:1px solid #f0f2f5;margin-top:12px;">
+                <button class="btn btn-outline btn-sm" onclick="changePage(-1)" id="prevPage"><i class="fas fa-chevron-left"></i></button>
+                <span id="pageInfo" style="font-size:0.8rem;color:#666;">Halaman 1</span>
+                <button class="btn btn-outline btn-sm" onclick="changePage(1)" id="nextPage"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
 
     </main>
 
-    <!-- ===== BOTTOM NAVIGATION ===== -->
-    <nav class="bottom-nav">
-        <a class="nav-item active" href="operator.html">
-            <i class="fas fa-chart-pie"></i>
-            <span>Dashboard</span>
-        </a>
-        <a class="nav-item" href="operator-pendidik.html">
-            <i class="fas fa-user-graduate"></i>
-            <span>Pendidik</span>
-            <span class="nav-badge" id="navPendidikCount">0</span>
-        </a>
-        <a class="nav-item" href="operator-bantuan.html">
-            <i class="fas fa-hand-holding-heart"></i>
-            <span>Bantuan</span>
-        </a>
-        <a class="nav-item" href="operator-pengaturan.html">
-            <i class="fas fa-cog"></i>
-            <span>Pengaturan</span>
-        </a>
-    </nav>
-
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
 
-    <!-- ===== MODAL KYC ===== -->
-    <div class="modal-overlay" id="kycModal">
+    <!-- ===== MODAL DETAIL PENDIDIK ===== -->
+    <div class="modal-overlay" id="pendidikModal">
         <div class="modal-container">
             <div class="modal-header">
-                <h2><i class="fas fa-id-card" style="color:var(--primary);margin-right:8px;"></i>Verifikasi KYC</h2>
-                <button class="close-btn" onclick="closeKYCModal()"><i class="fas fa-times"></i></button>
+                <h2 id="modalTitle">Detail Pendidik</h2>
+                <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
-                <!-- Pilih Pendidik -->
-                <div class="form-group">
-                    <label for="kycPendidik">Pilih Pendidik <span style="color:red;">*</span></label>
-                    <select id="kycPendidik">
-                        <option value="">-- Pilih Pendidik --</option>
-                    </select>
-                </div>
+                <input type="hidden" id="editId">
+                <input type="hidden" id="editLembagaId">
 
-                <!-- Status KYC -->
-                <div class="kyc-status-info" id="kycStatusInfo" style="display:none;">
-                    <div class="status-label">Status Verifikasi</div>
-                    <div class="status-value" id="kycStatusValue">Draft</div>
-                </div>
-
-                <!-- Upload Dokumen -->
-                <div class="form-group">
-                    <label for="kycDokumen">Upload Dokumen (KTP + Buku Rekening) <span style="color:red;">*</span></label>
-                    <input type="file" id="kycDokumen" accept=".jpg,.jpeg,.png,.pdf" onchange="handleFileUpload(this)">
-                    <div class="help-text">
-                        <i class="fas fa-info-circle"></i> 
-                        Gabungkan foto KTP dan Buku Rekening dalam satu file (JPG, PNG, atau PDF). Maksimal 5MB.
+                <!-- ===== IDENTITAS ===== -->
+                <div class="section-title"><i class="fas fa-id-card"></i> Identitas Pendidik</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>NIK <span style="color:red;">*</span></label>
+                        <input type="text" id="editNik" placeholder="16 digit NIK" maxlength="16">
                     </div>
-                    <div id="fileInfo" class="file-info" style="display:none;">
-                        <i class="fas fa-check-circle"></i>
-                        <span id="fileName">file.pdf</span>
-                        <span id="fileSize">(0 KB)</span>
-                        <span class="remove-file" onclick="removeFile()">× Hapus</span>
+                    <div class="form-group">
+                        <label>Nama Lengkap <span style="color:red;">*</span></label>
+                        <input type="text" id="editNama" placeholder="Nama lengkap">
                     </div>
                 </div>
-
-                <!-- Catatan -->
-                <div class="form-group">
-                    <label for="kycCatatan">Catatan (Opsional)</label>
-                    <textarea id="kycCatatan" rows="3" placeholder="Tambahkan catatan untuk verifikasi..." style="width:100%;padding:8px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.9rem;resize:vertical;min-height:60px;"></textarea>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tempat Lahir</label>
+                        <input type="text" id="editTempatLahir" placeholder="Tempat lahir">
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Lahir</label>
+                        <input type="date" id="editTanggalLahir">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Jenis Kelamin</label>
+                        <select id="editJenisKelamin">
+                            <option value="">Pilih</option>
+                            <option value="LAKI-LAKI">Laki-laki</option>
+                            <option value="PEREMPUAN">Perempuan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status Perkawinan</label>
+                        <input type="text" id="editStatusPerkawinan" placeholder="Menikah / Belum Menikah / dll">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ibu Kandung</label>
+                        <input type="text" id="editIbuKandung" placeholder="Nama ibu kandung">
+                    </div>
+                    <div class="form-group">
+                        <label>Pendidikan Terakhir</label>
+                        <input type="text" id="editPendidikan" placeholder="S1 / D3 / SMA / dll">
+                    </div>
                 </div>
 
-                <!-- Riwayat Verifikasi -->
-                <div id="kycHistory" style="display:none;margin-top:12px;padding:12px;background:#f8faf8;border-radius:8px;">
-                    <div style="font-size:0.75rem;font-weight:600;color:#555;margin-bottom:6px;">
-                        <i class="fas fa-history"></i> Riwayat Verifikasi
+                <!-- ===== ALAMAT ===== -->
+                <div class="section-title"><i class="fas fa-map-marker-alt"></i> Alamat</div>
+                <div class="form-group full-width">
+                    <label>Alamat Lengkap</label>
+                    <input type="text" id="editAlamat" placeholder="Alamat lengkap">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Desa / Kelurahan (Pengajar)</label>
+                        <select id="editDesaPengajar">
+                            <option value="">-- Pilih Desa --</option>
+                        </select>
                     </div>
-                    <div id="kycHistoryContent" style="font-size:0.8rem;color:#666;"></div>
+                    <div class="form-group">
+                        <label>Kecamatan (Pengajar)</label>
+                        <select id="editKecamatanPengajar">
+                            <option value="">-- Pilih Kecamatan --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kabupaten (Pengajar)</label>
+                        <input type="text" id="editKabupatenPengajar" placeholder="Kabupaten" value="Tegal">
+                    </div>
+                    <div class="form-group">
+                        <label>Provinsi</label>
+                        <input type="text" id="editProvinsi" placeholder="Provinsi" value="Jawa Tengah">
+                    </div>
+                </div>
+
+                <!-- ===== KONTAK ===== -->
+                <div class="section-title"><i class="fas fa-phone"></i> Kontak</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>No. HP</label>
+                        <input type="text" id="editNoHp" placeholder="Nomor telepon">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="editEmail" placeholder="Alamat email">
+                    </div>
+                </div>
+
+                <!-- ===== REKENING ===== -->
+                <div class="section-title"><i class="fas fa-university"></i> Rekening Insentif Bupati</div>
+                <div class="rekening-box">
+                    <div class="rekening-title"><i class="fas fa-landmark"></i> Rekening 1 - Insentif Bupati</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nomor Rekening</label>
+                            <input type="text" id="editNomorRekeningBupati" placeholder="Nomor rekening">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Bank</label>
+                            <input type="text" id="editNamaBankBupati" placeholder="Nama bank">
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Nama Pemilik Rekening</label>
+                        <input type="text" id="editPemilikRekeningBupati" placeholder="Nama sesuai rekening">
+                    </div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-university"></i> Rekening Insentif Gubernur</div>
+                <div class="rekening-box">
+                    <div class="rekening-title"><i class="fas fa-landmark"></i> Rekening 2 - Insentif Gubernur</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nomor Rekening</label>
+                            <input type="text" id="editNomorRekeningGubernur" placeholder="Nomor rekening">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Bank</label>
+                            <input type="text" id="editNamaBankGubernur" placeholder="Nama bank">
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Nama Pemilik Rekening</label>
+                        <input type="text" id="editPemilikRekeningGubernur" placeholder="Nama sesuai rekening">
+                    </div>
+                </div>
+
+                <!-- ===== DATA MENGAJAR ===== -->
+                <div class="section-title"><i class="fas fa-chalkboard-teacher"></i> Data Mengajar</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>TMT Mengajar</label>
+                        <input type="date" id="editTmt">
+                    </div>
+                    <div class="form-group">
+                        <label>Lama Mengabdi (otomatis)</label>
+                        <div class="lama-mengabdi-display" id="lamaMengabdiDisplay">0 Tahun</div>
+                        <input type="hidden" id="editLamaMengabdi" value="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Lembaga</label>
+                        <input type="text" id="editLembagaName" class="lembaga-readonly" readonly placeholder="Lembaga Anda">
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis Lembaga</label>
+                        <select id="editJenisLembaga" disabled>
+                            <option value="LPQ">LPQ</option>
+                            <option value="MDT">MDT</option>
+                            <option value="PONPES">PONPES</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ===== DOKUMEN KYC (3 FIELD) ===== -->
+                <div class="section-title"><i class="fas fa-file-alt"></i> Dokumen KYC</div>
+
+                <div class="form-group full-width">
+                    <label>Upload KTP <span style="color:red;">*</span></label>
+                    <input type="file" id="editDokumenKtp" accept=".pdf,.jpg,.jpeg,.png" onchange="uploadDokumen(this, 'ktp')">
+                    <div style="margin-top:6px;font-size:0.7rem;color:#888;">
+                        <i class="fas fa-info-circle"></i> Format: PDF, JPG, PNG. Maks 5MB
+                    </div>
+                    <div class="upload-preview" id="dokumenKtpPreview">
+                        <i class="fas fa-file-pdf" style="color:#d32f2f;"></i>
+                        <span class="file-name" id="dokumenKtpName"></span>
+                        <button class="btn btn-outline btn-sm" onclick="removeDokumen('ktp')" style="padding:2px 8px;font-size:0.65rem;">
+                            <i class="fas fa-times"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Upload Rekening Insentif Bupati <span style="color:red;">*</span></label>
+                    <input type="file" id="editDokumenBupati" accept=".pdf,.jpg,.jpeg,.png" onchange="uploadDokumen(this, 'bupati')">
+                    <div style="margin-top:6px;font-size:0.7rem;color:#888;">
+                        <i class="fas fa-info-circle"></i> Format: PDF, JPG, PNG. Maks 5MB
+                    </div>
+                    <div class="upload-preview" id="dokumenBupatiPreview">
+                        <i class="fas fa-file-pdf" style="color:#d32f2f;"></i>
+                        <span class="file-name" id="dokumenBupatiName"></span>
+                        <button class="btn btn-outline btn-sm" onclick="removeDokumen('bupati')" style="padding:2px 8px;font-size:0.65rem;">
+                            <i class="fas fa-times"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Upload Rekening Insentif Gubernur <span style="color:red;">*</span></label>
+                    <input type="file" id="editDokumenGubernur" accept=".pdf,.jpg,.jpeg,.png" onchange="uploadDokumen(this, 'gubernur')">
+                    <div style="margin-top:6px;font-size:0.7rem;color:#888;">
+                        <i class="fas fa-info-circle"></i> Format: PDF, JPG, PNG. Maks 5MB
+                    </div>
+                    <div class="upload-preview" id="dokumenGubernurPreview">
+                        <i class="fas fa-file-pdf" style="color:#d32f2f;"></i>
+                        <span class="file-name" id="dokumenGubernurName"></span>
+                        <button class="btn btn-outline btn-sm" onclick="removeDokumen('gubernur')" style="padding:2px 8px;font-size:0.65rem;">
+                            <i class="fas fa-times"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ===== STATUS ===== -->
+                <div class="section-title"><i class="fas fa-info-circle"></i> Status</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="editStatus">
+                            <option value="true">Aktif</option>
+                            <option value="false">Tidak Aktif</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status Verifikasi KYC</label>
+                        <select id="editVerifikasi">
+                            <option value="Draft">Draft</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Diverifikasi">Diverifikasi</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeKYCModal()">Tutup</button>
-                <button class="btn btn-success" id="kycSubmitBtn" onclick="submitKYC()">
-                    <i class="fas fa-paper-plane"></i> Ajukan Verifikasi
-                </button>
+                <button class="btn btn-outline" onclick="closeModal()">Tutup</button>
+                <button class="btn btn-success" id="btnSave" onclick="savePendidik()"><i class="fas fa-save"></i> Simpan</button>
             </div>
         </div>
     </div>
@@ -618,708 +1409,747 @@
     <script src="js/utils.js"></script>
     <script>
         // ============================================================
-        // ===== OPERATOR DASHBOARD =====
+        // ===== KONFIGURASI CLOUDINARY =====
         // ============================================================
-        let trendChart = null;
-        let userProfile = null;
-        let selectedFile = null;
-        let currentKYCData = null;
+        const CLOUDINARY_CLOUD_NAME = 'ddrbmte6';
+        const CLOUDINARY_UPLOAD_PRESET = 'simustafa_preset';
 
         // ============================================================
-        // ===== LOAD USER PROFILE =====
+        // ===== SIDEBAR FUNCTIONS =====
         // ============================================================
-        async function loadUserProfile() {
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        });
+
+        // ============================================================
+        // ===== TOAST =====
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            if (!toast) { alert(message); return; }
+            toast.textContent = message;
+            toast.className = `toast toast-${type}`;
+            void toast.offsetWidth;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // ============================================================
+        // ===== DATE =====
+        // ============================================================
+        function updateDate() {
+            const el = document.getElementById('currentDate');
+            if (!el) return;
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            el.textContent = now.toLocaleDateString('id-ID', options);
+
+            const welcomeDate = document.getElementById('welcomeDate');
+            if (welcomeDate) {
+                const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+                welcomeDate.textContent = now.toLocaleDateString('id-ID', dateOptions);
+            }
+        }
+
+        // ============================================================
+        // ===== AUTH CHECK =====
+        // ============================================================
+        async function checkAuth() {
             try {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (!session) {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error || !session) {
                     window.location.href = 'index.html';
-                    return;
+                    return false;
                 }
 
-                const { data: userData, error } = await supabaseClient
+                const { data: userData, error: userError } = await supabaseClient
                     .from('users')
-                    .select('id, name, role, lembaga_id')
+                    .select('id, name, email, role, kecamatan_id, lembaga_id, active')
                     .eq('id', session.user.id)
                     .single();
 
-                if (error || !userData || userData.role !== 'operator') {
+                if (userError || !userData || !userData.active) {
+                    console.error('User data error:', userError);
+                    await supabaseClient.auth.signOut();
+                    window.location.href = 'index.html';
+                    return false;
+                }
+
+                if (userData.role !== 'operator') {
                     window.location.href = 'dashboard.html';
-                    return;
+                    return false;
                 }
 
-                userProfile = userData;
-
-                // Set user info
-                const name = userData.name || 'Operator';
-                document.getElementById('userName').textContent = name;
-                document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
-
-                // Load lembaga info
-                if (userData.lembaga_id) {
-                    await loadLembagaInfo(userData.lembaga_id);
-                    await loadKYCPendidikOptions();
+                if (!userData.lembaga_id) {
+                    showToast('Akun operator tidak memiliki lembaga! Hubungi admin.', 'error');
+                    return false;
                 }
 
-                // Load dashboard data
-                await loadDashboard();
-                await loadTrendChart();
-                await loadRecent();
+                window.currentUser = {
+                    id: userData.id,
+                    name: userData.name || session.user.email,
+                    email: session.user.email,
+                    role: userData.role || 'operator',
+                    kecamatan_id: userData.kecamatan_id,
+                    lembaga_id: userData.lembaga_id
+                };
 
-                // Set interval refresh
-                setInterval(() => {
-                    loadDashboard();
-                    loadRecent();
-                }, 300000);
-
-            } catch (e) {
-                console.error('Error loading profile:', e);
-                showToast('Gagal memuat data', 'error');
-            }
-        }
-
-        // ============================================================
-        // ===== LOAD LEMBAGA INFO =====
-        // ============================================================
-        async function loadLembagaInfo(lembagaId) {
-            try {
-                const { data: lembaga, error } = await supabaseClient
+                const { data: lembagaData } = await supabaseClient
                     .from('lembaga')
-                    .select('nama, nslp, jenis_lembaga, alamat, kecamatan, desa')
-                    .eq('id', lembagaId)
+                    .select('nama, jenis_lembaga')
+                    .eq('id', window.currentUser.lembaga_id)
                     .single();
 
-                if (error) throw error;
+                window.lembagaInfo = lembagaData || {};
 
-                document.getElementById('lembagaNama').textContent = lembaga.nama || 'Lembaga';
-                document.getElementById('lembagaAlamat').textContent = lembaga.alamat || '-';
-                document.getElementById('lembagaJenis').textContent = lembaga.jenis_lembaga || '-';
-                document.getElementById('lembagaNslp').textContent = lembaga.nslp || '-';
-                document.getElementById('lembagaInfo').textContent = 
-                    `${lembaga.nama} (${lembaga.jenis_lembaga || 'LPQ'})`;
+                updateHeaderUI(window.currentUser);
+                updateWelcomeUI(window.currentUser);
 
-            } catch (e) {
-                console.error('Error loading lembaga info:', e);
+                return true;
+
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = 'index.html';
+                return false;
+            }
+        }
+
+        function getUser() {
+            return window.currentUser || null;
+        }
+
+        // ============================================================
+        // ===== UPDATE UI =====
+        // ============================================================
+        function updateHeaderUI(user) {
+            if (!user) return;
+
+            const avatarEl = document.getElementById('userAvatar');
+            if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
+
+            const nameEl = document.getElementById('userName');
+            if (nameEl) nameEl.textContent = user.name;
+
+            const roleEl = document.getElementById('userRole');
+            if (roleEl) roleEl.textContent = 'Operator Lembaga';
+
+            const avatarSmall = document.getElementById('userAvatarSmall');
+            if (avatarSmall) avatarSmall.textContent = user.name.charAt(0).toUpperCase();
+
+            const nameSmall = document.getElementById('userNameSmall');
+            if (nameSmall) nameSmall.textContent = user.name;
+
+            const roleBadge = document.getElementById('headerRoleBadge');
+            if (roleBadge) roleBadge.textContent = 'Operator';
+
+            const scopeEl = document.getElementById('headerScope');
+            if (scopeEl && window.lembagaInfo) {
+                scopeEl.textContent = `🏫 ${window.lembagaInfo.nama || 'Lembaga'}`;
+            }
+        }
+
+        function updateWelcomeUI(user) {
+            if (!user) return;
+
+            const welcomeName = document.getElementById('welcomeName');
+            if (welcomeName) welcomeName.textContent = user.name;
+
+            const welcomeRole = document.getElementById('welcomeRole');
+            if (welcomeRole && window.lembagaInfo) {
+                welcomeRole.textContent = `Operator ${window.lembagaInfo.nama || 'Lembaga'}`;
             }
         }
 
         // ============================================================
-        // ===== LOAD KYC PENDIDIK OPTIONS =====
+        // ===== HANDLE LOGOUT =====
         // ============================================================
-        async function loadKYCPendidikOptions() {
-            if (!userProfile?.lembaga_id) return;
-
+        async function handleLogout() {
+            if (!confirm('Apakah Anda yakin ingin keluar?')) return;
             try {
-                const { data, error } = await supabaseClient
-                    .from('pendidik')
-                    .select('id, nama_lengkap, nik, status_verifikasi')
-                    .eq('lembaga_id', userProfile.lembaga_id)
-                    .order('nama_lengkap');
-
+                const { error } = await supabaseClient.auth.signOut();
                 if (error) throw error;
-
-                const select = document.getElementById('kycPendidik');
-                select.innerHTML = '<option value="">-- Pilih Pendidik --</option>';
-                data.forEach(item => {
-                    const statusLabel = item.status_verifikasi === 'Diverifikasi' ? '✅' :
-                                      item.status_verifikasi === 'Pending' ? '⏳' :
-                                      item.status_verifikasi === 'Ditolak' ? '❌' : '📝';
-                    select.innerHTML += `<option value="${item.id}" data-status="${item.status_verifikasi}">
-                        ${statusLabel} ${item.nama_lengkap} (${item.nik})
-                    </option>`;
-                });
-
-                // Auto-load status when selected
-                select.addEventListener('change', function() {
-                    const selected = this.options[this.selectedIndex];
-                    if (selected.value) {
-                        loadKYCStatus(selected.value);
-                    } else {
-                        document.getElementById('kycStatusInfo').style.display = 'none';
-                    }
-                });
-
+                showToast('Logout berhasil!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
             } catch (e) {
-                console.error('Error loading KYC pendidik options:', e);
+                console.error('Logout error:', e);
+                showToast('Gagal logout: ' + e.message, 'error');
             }
         }
 
         // ============================================================
-        // ===== LOAD KYC STATUS =====
+        // ===== UPLOAD DOKUMEN KE CLOUDINARY (3 FIELD) =====
         // ============================================================
-        async function loadKYCStatus(pendidikId) {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('pendidik')
-                    .select('status_verifikasi, catatan_verifikasi, dokumen_kyc, updated_at')
-                    .eq('id', pendidikId)
-                    .single();
+        let dokumenUrls = {
+            ktp: '',
+            bupati: '',
+            gubernur: ''
+        };
 
-                if (error) throw error;
-
-                currentKYCData = data;
-
-                const statusDiv = document.getElementById('kycStatusInfo');
-                const statusValue = document.getElementById('kycStatusValue');
-                const submitBtn = document.getElementById('kycSubmitBtn');
-
-                statusDiv.style.display = 'block';
-
-                let statusText = data.status_verifikasi || 'Draft';
-                let statusClass = 'draft';
-                
-                if (statusText === 'Diverifikasi') {
-                    statusClass = 'verified';
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Sudah Terverifikasi';
-                } else if (statusText === 'Pending') {
-                    statusClass = 'pending';
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-clock"></i> Menunggu Verifikasi';
-                } else if (statusText === 'Ditolak') {
-                    statusClass = 'rejected';
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-redo"></i> Ajukan Ulang';
-                } else {
-                    statusClass = 'draft';
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Verifikasi';
-                }
-
-                statusValue.textContent = statusText;
-                statusValue.className = 'status-value ' + statusClass;
-
-                // Show existing document if any
-                if (data.dokumen_kyc) {
-                    document.getElementById('fileInfo').style.display = 'flex';
-                    document.getElementById('fileName').textContent = 'Dokumen sudah diupload';
-                    document.getElementById('fileSize').textContent = '';
-                }
-
-                // Show history
-                if (data.catatan_verifikasi) {
-                    document.getElementById('kycHistory').style.display = 'block';
-                    document.getElementById('kycHistoryContent').textContent = data.catatan_verifikasi;
-                } else {
-                    document.getElementById('kycHistory').style.display = 'none';
-                }
-
-            } catch (e) {
-                console.error('Error loading KYC status:', e);
-            }
-        }
-
-        // ============================================================
-        // ===== HANDLE FILE UPLOAD =====
-        // ============================================================
-        function handleFileUpload(input) {
+        async function uploadDokumen(input, type) {
             const file = input.files[0];
             if (!file) return;
 
-            // Validasi ukuran (max 5MB)
             if (file.size > 5 * 1024 * 1024) {
-                showToast('Ukuran file terlalu besar! Maksimal 5MB.', 'error');
+                showToast('Ukuran file maksimal 5MB!', 'error');
                 input.value = '';
                 return;
             }
 
-            // Validasi tipe file
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-            if (!validTypes.includes(file.type)) {
-                showToast('Format file tidak didukung! Gunakan JPG, PNG, atau PDF.', 'error');
-                input.value = '';
-                return;
-            }
-
-            selectedFile = file;
-
-            // Tampilkan info file
-            document.getElementById('fileInfo').style.display = 'flex';
-            document.getElementById('fileName').textContent = file.name;
-            document.getElementById('fileSize').textContent = `(${(file.size / 1024).toFixed(1)} KB)`;
-        }
-
-        function removeFile() {
-            selectedFile = null;
-            document.getElementById('kycDokumen').value = '';
-            document.getElementById('fileInfo').style.display = 'none';
-        }
-
-        // ============================================================
-        // ===== SUBMIT KYC =====
-        // ============================================================
-        async function submitKYC() {
-            const pendidikId = document.getElementById('kycPendidik').value;
-            const catatan = document.getElementById('kycCatatan').value.trim();
-
-            if (!pendidikId) {
-                showToast('Pilih pendidik terlebih dahulu!', 'error');
-                return;
-            }
-
-            // Cek status saat ini
-            if (currentKYCData?.status_verifikasi === 'Diverifikasi') {
-                showToast('Pendidik ini sudah terverifikasi!', 'warning');
-                return;
-            }
-
-            if (currentKYCData?.status_verifikasi === 'Pending') {
-                showToast('Pengajuan sedang diproses, tunggu verifikasi admin.', 'warning');
-                return;
-            }
-
-            // Validasi file
-            if (!selectedFile && currentKYCData?.dokumen_kyc === null) {
-                showToast('Upload dokumen KTP + Buku Rekening terlebih dahulu!', 'error');
-                return;
-            }
-
-            const submitBtn = document.getElementById('kycSubmitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+            showToast('Uploading...', 'info');
 
             try {
-                let dokumenUrl = currentKYCData?.dokumen_kyc || null;
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
-                // Upload file jika ada
-                if (selectedFile) {
-                    const fileExt = selectedFile.name.split('.').pop();
-                    const fileName = `kyc_${pendidikId}_${Date.now()}.${fileExt}`;
-                    const filePath = `kyc/${fileName}`;
+                const response = await fetch(
+                    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`,
+                    { method: 'POST', body: formData }
+                );
 
-                    const { data: uploadData, error: uploadError } = await supabaseClient
-                        .storage
-                        .from('dokumen-kyc')
-                        .upload(filePath, selectedFile, {
-                            cacheControl: '3600',
-                            upsert: true
-                        });
+                const data = await response.json();
 
-                    if (uploadError) throw uploadError;
-
-                    // Get public URL
-                    const { data: { publicUrl } } = supabaseClient
-                        .storage
-                        .from('dokumen-kyc')
-                        .getPublicUrl(filePath);
-
-                    dokumenUrl = publicUrl;
+                if (data.error) {
+                    throw new Error(data.error.message);
                 }
 
-                // Update status pendidik
-                const updateData = {
-                    status_verifikasi: 'Pending',
-                    dokumen_kyc: dokumenUrl,
-                    updated_at: new Date().toISOString()
-                };
+                dokumenUrls[type] = data.secure_url;
 
-                if (catatan) {
-                    updateData.catatan_verifikasi = catatan;
-                }
+                const previewId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Preview`;
+                const nameId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Name`;
 
-                const { error: updateError } = await supabaseClient
+                document.getElementById(previewId).classList.add('visible');
+                document.getElementById(nameId).textContent = file.name;
+
+                showToast('Dokumen berhasil diupload!', 'success');
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showToast('Gagal upload: ' + error.message, 'error');
+                input.value = '';
+            }
+        }
+
+        function removeDokumen(type) {
+            dokumenUrls[type] = '';
+
+            const previewId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Preview`;
+            const inputId = `editDokumen${type.charAt(0).toUpperCase() + type.slice(1)}`;
+
+            document.getElementById(previewId).classList.remove('visible');
+            document.getElementById(inputId).value = '';
+
+            showToast('Dokumen dihapus', 'info');
+        }
+
+        function resetDokumen() {
+            dokumenUrls = { ktp: '', bupati: '', gubernur: '' };
+
+            ['ktp', 'bupati', 'gubernur'].forEach(type => {
+                const previewId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Preview`;
+                const inputId = `editDokumen${type.charAt(0).toUpperCase() + type.slice(1)}`;
+
+                document.getElementById(previewId).classList.remove('visible');
+                document.getElementById(inputId).value = '';
+            });
+        }
+
+        // ============================================================
+        // ===== OPERATOR VARIABLES =====
+        // ============================================================
+        let currentPage = 1;
+        const pageSize = 10;
+        let totalData = 0;
+        let currentFilter = { search: '', status: 'all' };
+        let currentPendidikData = null;
+
+        // ============================================================
+        // ===== LOAD MASTER DATA =====
+        // ============================================================
+        async function loadKecamatanOptions() {
+            const { data, error } = await supabaseClient
+                .from('master_kecamatan')
+                .select('id, nama')
+                .order('nama');
+            if (error) throw error;
+            const select = document.getElementById('editKecamatanPengajar');
+            if (!select) return;
+            select.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+            data.forEach(item => {
+                select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
+            });
+        }
+
+        async function loadDesaOptions(kecamatanId, targetSelectId) {
+            let query = supabaseClient
+                .from('master_kelurahan')
+                .select('id, nama')
+                .order('nama');
+            if (kecamatanId) {
+                query = query.eq('kecamatan_id', kecamatanId);
+            }
+            const { data, error } = await query;
+            if (error) throw error;
+            const select = document.getElementById(targetSelectId);
+            if (!select) return;
+            select.innerHTML = '<option value="">-- Pilih Desa --</option>';
+            data.forEach(item => {
+                select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
+            });
+        }
+
+        // ============================================================
+        // ===== LOAD PENDIDIK =====
+        // ============================================================
+        async function loadPendidik() {
+            try {
+                const user = getUser();
+                if (!user || !user.lembaga_id) return;
+
+                let query = supabaseClient
                     .from('pendidik')
-                    .update(updateData)
-                    .eq('id', pendidikId);
+                    .select('*', { count: 'exact' })
+                    .eq('lembaga_id', user.lembaga_id);
 
-                if (updateError) throw updateError;
+                if (currentFilter.search) {
+                    const searchTerm = currentFilter.search.trim();
+                    query = query.or(
+                        `nik.ilike.%${searchTerm}%,nama_lengkap.ilike.%${searchTerm}%`
+                    );
+                }
 
-                showToast('Verifikasi berhasil diajukan! Menunggu verifikasi admin.', 'success');
-                
-                // Reset form
-                removeFile();
-                document.getElementById('kycCatatan').value = '';
-                document.getElementById('kycPendidik').value = '';
-                document.getElementById('kycStatusInfo').style.display = 'none';
-                
-                // Refresh data
-                await loadDashboard();
-                await loadRecent();
-                await loadKYCPendidikOptions();
+                if (currentFilter.status === 'active') {
+                    query = query.eq('status_aktif', true);
+                } else if (currentFilter.status === 'inactive') {
+                    query = query.eq('status_aktif', false);
+                }
 
-                closeKYCModal();
+                const from = (currentPage - 1) * pageSize;
+                const { data, count, error } = await query
+                    .order('nama_lengkap', { ascending: true })
+                    .range(from, from + pageSize - 1);
+
+                if (error) throw error;
+
+                totalData = count || 0;
+                renderTable(data || []);
+                updatePagination();
+                updateStats();
 
             } catch (e) {
-                console.error('Error submitting KYC:', e);
-                showToast('Gagal mengajukan verifikasi: ' + e.message, 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Verifikasi';
+                console.error('Error loading pendidik:', e);
+                document.getElementById('pendidikTableBody').innerHTML =
+                    `<tr><td colspan="6" style="text-align:center;padding:30px;color:#f44336;">Gagal memuat data: ${e.message}</td></tr>`;
             }
         }
 
         // ============================================================
-        // ===== KYC MODAL =====
+        // ===== RENDER TABLE =====
         // ============================================================
-        function openKYCModal() {
-            // Reset form
-            removeFile();
-            document.getElementById('kycCatatan').value = '';
-            document.getElementById('kycStatusInfo').style.display = 'none';
-            document.getElementById('kycHistory').style.display = 'none';
-            
-            // Reset submit button
-            const submitBtn = document.getElementById('kycSubmitBtn');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan Verifikasi';
+        function renderTable(data) {
+            const tbody = document.getElementById('pendidikTableBody');
+            const totalEl = document.getElementById('totalData');
+            totalEl.textContent = `${totalData} data`;
 
-            // Load pendidik options
-            loadKYCPendidikOptions();
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">
+                        <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>Belum ada pendidik di lembaga Anda</td></tr>`;
+                return;
+            }
 
-            document.getElementById('kycModal').classList.add('active');
+            const start = (currentPage - 1) * pageSize;
+            tbody.innerHTML = data.map((item, i) => {
+                const statusBadge = item.status_aktif ? 'active' : 'inactive';
+                const statusText = item.status_aktif ? 'Aktif' : 'Tidak Aktif';
+                const kycBadge = item.status_verifikasi === 'Diverifikasi' ? 'active' :
+                    item.status_verifikasi === 'Pending' ? 'pending' : 'inactive';
+                const kycText = item.status_verifikasi || 'Draft';
+
+                return `
+                    <tr onclick="viewPendidik('${item.id}')" style="cursor:pointer;">
+                        <td>${start + i + 1}</td>
+                        <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${item.nik || '-'}</code></td>
+                        <td><strong>${item.nama_lengkap || '-'}</strong></td>
+                        <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                        <td><span class="badge ${kycBadge}">${kycText}</span></td>
+                        <td>
+                            <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:0.65rem;" onclick="event.stopPropagation(); viewPendidik('${item.id}')"><i class="fas fa-eye"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        function closeKYCModal() {
-            document.getElementById('kycModal').classList.remove('active');
-            // Reset file input
-            removeFile();
-            document.getElementById('kycCatatan').value = '';
-            document.getElementById('kycPendidik').value = '';
-            document.getElementById('kycStatusInfo').style.display = 'none';
-            document.getElementById('kycHistory').style.display = 'none';
-        }
-
         // ============================================================
-        // ===== LOAD DASHBOARD =====
+        // ===== STATISTIK =====
         // ============================================================
-        async function loadDashboard() {
-            if (!userProfile?.lembaga_id) return;
-
+        async function updateStats() {
             try {
-                const lembagaId = userProfile.lembaga_id;
+                const user = getUser();
+                if (!user || !user.lembaga_id) return;
 
-                // Total pendidik
-                const { count: totalPendidik } = await supabaseClient
+                const { count: total } = await supabaseClient
                     .from('pendidik')
                     .select('*', { count: 'exact', head: true })
-                    .eq('lembaga_id', lembagaId);
+                    .eq('lembaga_id', user.lembaga_id);
 
-                const { count: aktifPendidik } = await supabaseClient
+                const { count: aktif } = await supabaseClient
                     .from('pendidik')
                     .select('*', { count: 'exact', head: true })
-                    .eq('lembaga_id', lembagaId)
+                    .eq('lembaga_id', user.lembaga_id)
                     .eq('status_aktif', true);
 
-                const { count: nonaktifPendidik } = await supabaseClient
+                const { count: nonaktif } = await supabaseClient
                     .from('pendidik')
                     .select('*', { count: 'exact', head: true })
-                    .eq('lembaga_id', lembagaId)
+                    .eq('lembaga_id', user.lembaga_id)
                     .eq('status_aktif', false);
 
-                document.getElementById('totalPendidik').textContent = totalPendidik || 0;
-                document.getElementById('pendidikAktif').textContent = `Aktif: ${aktifPendidik || 0}`;
-                document.getElementById('navPendidikCount').textContent = totalPendidik || 0;
-                document.getElementById('badgePendidik').textContent = totalPendidik || 0;
-
-                // Stat di lembaga info card
-                document.getElementById('statTotalPendidik').textContent = totalPendidik || 0;
-                document.getElementById('statAktifPendidik').textContent = aktifPendidik || 0;
-                document.getElementById('statNonaktifPendidik').textContent = nonaktifPendidik || 0;
-
-                // Total bantuan (tahun ini)
-                const year = new Date().getFullYear();
-                const { count: totalBantuan } = await supabaseClient
-                    .from('bantuan')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('lembaga_id', lembagaId)
-                    .eq('tahun_anggaran', year)
-                    .eq('status', 'cair');
-
-                document.getElementById('totalBantuan').textContent = totalBantuan || 0;
-                document.getElementById('bantuanTahun').textContent = `Tahun ${year}`;
-
-                // KYC / Verifikasi
-                const { count: totalVerifikasi } = await supabaseClient
+                const { count: kyc } = await supabaseClient
                     .from('pendidik')
                     .select('*', { count: 'exact', head: true })
-                    .eq('lembaga_id', lembagaId);
-
-                const { count: verifikasiDone } = await supabaseClient
-                    .from('pendidik')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('lembaga_id', lembagaId)
-                    .eq('status_verifikasi', 'Diverifikasi');
-
-                const { count: verifikasiPending } = await supabaseClient
-                    .from('pendidik')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('lembaga_id', lembagaId)
+                    .eq('lembaga_id', user.lembaga_id)
                     .in('status_verifikasi', ['Draft', 'Pending']);
 
-                document.getElementById('totalVerifikasi').textContent = verifikasiDone || 0;
-                document.getElementById('verifikasiStatus').textContent = `Menunggu: ${verifikasiPending || 0}`;
-                document.getElementById('statVerifikasi').textContent = verifikasiDone || 0;
-                document.getElementById('badgeKYC').textContent = verifikasiPending || 0;
+                document.getElementById('totalPendidik').textContent = total || 0;
+                document.getElementById('totalAktif').textContent = aktif || 0;
+                document.getElementById('totalNonaktif').textContent = nonaktif || 0;
+                document.getElementById('totalKyc').textContent = kyc || 0;
 
-                const progress = totalVerifikasi > 0 ? ((verifikasiDone || 0) / totalVerifikasi * 100) : 0;
-                document.getElementById('verificationBar').style.width = `${Math.min(progress, 100)}%`;
-
-                // Mutasi bulan ini
-                const startOfMonth = new Date(year, new Date().getMonth(), 1).toISOString();
-                const { count: totalMutasi } = await supabaseClient
-                    .from('mutasi')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('lembaga_id', lembagaId)
-                    .gte('created_at', startOfMonth);
-
-                document.getElementById('totalMutasi').textContent = totalMutasi || 0;
-
-            } catch (e) {
-                console.error('Error loading dashboard:', e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         // ============================================================
-        // ===== LOAD TREND CHART =====
+        // ===== PAGINATION =====
         // ============================================================
-        async function loadTrendChart() {
-            if (!userProfile?.lembaga_id) return;
+        function updatePagination() {
+            const totalPages = Math.ceil(totalData / pageSize);
+            document.getElementById('pageInfo').textContent = `Halaman ${currentPage} dari ${totalPages || 1}`;
+            document.getElementById('prevPage').disabled = currentPage <= 1;
+            document.getElementById('nextPage').disabled = currentPage >= totalPages;
+        }
 
-            try {
-                const lembagaId = userProfile.lembaga_id;
-                const currentYear = new Date().getFullYear();
-                const years = [];
-                const totalData = [];
-                const aktifData = [];
+        function changePage(delta) {
+            const totalPages = Math.ceil(totalData / pageSize);
+            const newPage = currentPage + delta;
+            if (newPage < 1 || newPage > totalPages) return;
+            currentPage = newPage;
+            loadPendidik();
+        }
 
-                for (let i = 4; i >= 0; i--) {
-                    const year = currentYear - i;
-                    years.push(year);
+        // ============================================================
+        // ===== FILTER =====
+        // ============================================================
+        function applyFilter() {
+            currentFilter.search = document.getElementById('searchInput').value.trim();
+            currentFilter.status = document.getElementById('statusFilter').value;
+            currentPage = 1;
+            loadPendidik();
+        }
 
-                    const { count: total } = await supabaseClient
-                        .from('pendidik')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('lembaga_id', lembagaId)
-                        .lte('created_at', new Date(year, 12, 31).toISOString());
-
-                    const { count: aktif } = await supabaseClient
-                        .from('pendidik')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('lembaga_id', lembagaId)
-                        .eq('status_aktif', true)
-                        .lte('created_at', new Date(year, 12, 31).toISOString());
-
-                    totalData.push(total || 0);
-                    aktifData.push(aktif || 0);
-                }
-
-                const ctx = document.getElementById('trendChart').getContext('2d');
-                if (trendChart) trendChart.destroy();
-
-                trendChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: years,
-                        datasets: [
-                            {
-                                label: 'Total Pendidik',
-                                data: totalData,
-                                borderColor: '#006400',
-                                backgroundColor: 'rgba(0,100,0,0.05)',
-                                fill: true,
-                                tension: 0.3,
-                                pointRadius: 4,
-                                pointBackgroundColor: '#006400'
-                            },
-                            {
-                                label: 'Pendidik Aktif',
-                                data: aktifData,
-                                borderColor: '#FFD700',
-                                backgroundColor: 'rgba(255,215,0,0.05)',
-                                fill: true,
-                                tension: 0.3,
-                                pointRadius: 4,
-                                pointBackgroundColor: '#FFD700',
-                                borderDash: [5, 5]
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1,
-                                    font: { size: 10 }
-                                },
-                                grid: {
-                                    color: 'rgba(0,0,0,0.05)'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                },
-                                ticks: {
-                                    font: { size: 10 }
-                                }
-                            }
-                        },
-                        interaction: {
-                            intersect: false,
-                            mode: 'index'
-                        }
+        // ============================================================
+        // ===== ENABLE INPUTS =====
+        // ============================================================
+        function enableInputs(disabled) {
+            const inputs = document.querySelectorAll('#pendidikModal .modal-body input, #pendidikModal .modal-body select');
+            inputs.forEach(el => {
+                if (!el.id.includes('LembagaName') && !el.id.includes('JenisLembaga')) {
+                    if (el.type === 'file') {
+                        el.disabled = false;
+                    } else {
+                        el.disabled = disabled;
                     }
-                });
-
-            } catch (e) {
-                console.error('Error loading trend chart:', e);
-            }
+                }
+            });
         }
 
         // ============================================================
-        // ===== LOAD RECENT ACTIVITY =====
+        // ===== OPEN ADD MODAL =====
         // ============================================================
-        async function loadRecent() {
-            if (!userProfile?.lembaga_id) return;
+        function openAddModal() {
+            const user = getUser();
+            if (!user || !user.lembaga_id) {
+                showToast('Data lembaga tidak ditemukan!', 'error');
+                return;
+            }
 
+            document.getElementById('modalTitle').textContent = 'Tambah Pendidik Baru';
+            document.getElementById('editId').value = '';
+            document.getElementById('editLembagaId').value = user.lembaga_id;
+
+            // Reset form
+            document.getElementById('editNik').value = '';
+            document.getElementById('editNama').value = '';
+            document.getElementById('editTempatLahir').value = '';
+            document.getElementById('editTanggalLahir').value = '';
+            document.getElementById('editJenisKelamin').value = '';
+            document.getElementById('editStatusPerkawinan').value = '';
+            document.getElementById('editIbuKandung').value = '';
+            document.getElementById('editPendidikan').value = '';
+            document.getElementById('editAlamat').value = '';
+            document.getElementById('editNoHp').value = '';
+            document.getElementById('editEmail').value = '';
+            document.getElementById('editKabupatenPengajar').value = 'Tegal';
+            document.getElementById('editProvinsi').value = 'Jawa Tengah';
+            document.getElementById('editTmt').value = '';
+            document.getElementById('editStatus').value = 'true';
+            document.getElementById('editVerifikasi').value = 'Draft';
+
+            document.getElementById('editNomorRekeningBupati').value = '';
+            document.getElementById('editNamaBankBupati').value = '';
+            document.getElementById('editPemilikRekeningBupati').value = '';
+            document.getElementById('editNomorRekeningGubernur').value = '';
+            document.getElementById('editNamaBankGubernur').value = '';
+            document.getElementById('editPemilikRekeningGubernur').value = '';
+
+            document.getElementById('lamaMengabdiDisplay').textContent = '0 Tahun';
+            document.getElementById('editLamaMengabdi').value = '0';
+
+            // Reset dokumen
+            resetDokumen();
+
+            // Set lembaga
+            document.getElementById('editLembagaName').value = window.lembagaInfo?.nama || 'Lembaga Anda';
+            document.getElementById('editJenisLembaga').value = window.lembagaInfo?.jenis_lembaga || 'LPQ';
+
+            enableInputs(false);
+            document.getElementById('btnSave').style.display = 'inline-flex';
+            document.getElementById('pendidikModal').classList.add('active');
+        }
+
+        // ============================================================
+        // ===== VIEW PENDIDIK =====
+        // ============================================================
+        async function viewPendidik(id) {
             try {
                 const { data, error } = await supabaseClient
                     .from('pendidik')
-                    .select('id, nama_lengkap, nik, status_aktif, status_verifikasi, updated_at')
-                    .eq('lembaga_id', userProfile.lembaga_id)
-                    .order('updated_at', { ascending: false })
-                    .limit(5);
-
-                if (error) throw error;
-
-                const tbody = document.getElementById('recentTableBody');
-                if (!data || data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">Belum ada aktivitas</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = data.map(item => {
-                    const statusBadge = item.status_aktif ? 'active' : 'inactive';
-                    const statusText = item.status_aktif ? 'Aktif' : 'Tidak Aktif';
-                    
-                    let verifBadge = 'inactive';
-                    let verifText = 'Draft';
-                    if (item.status_verifikasi === 'Diverifikasi') {
-                        verifBadge = 'active';
-                        verifText = '✓ Terverifikasi';
-                    } else if (item.status_verifikasi === 'Pending') {
-                        verifBadge = 'pending';
-                        verifText = '⏳ Pending';
-                    }
-                    
-                    return `
-                        <tr onclick="navigateTo('pendidik?view=${item.id}')" style="cursor:pointer;">
-                            <td><strong>${item.nama_lengkap || '-'}</strong></td>
-                            <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${item.nik || '-'}</code></td>
-                            <td><span class="badge ${statusBadge}">${statusText}</span></td>
-                            <td><span class="badge ${verifBadge}" style="font-size:0.6rem;">${verifText}</span></td>
-                            <td style="font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
-                        </tr>
-                    `;
-                }).join('');
-
-            } catch (e) {
-                console.error('Error loading recent:', e);
-            }
-        }
-
-        // ============================================================
-        // ===== EXPORT DATA =====
-        // ============================================================
-        async function exportData() {
-            if (!userProfile?.lembaga_id) {
-                showToast('Data lembaga tidak ditemukan', 'error');
-                return;
-            }
-
-            try {
-                showToast('Mengambil data...', 'info');
-
-                const { data: pendidikData, error } = await supabaseClient
-                    .from('pendidik')
                     .select('*')
-                    .eq('lembaga_id', userProfile.lembaga_id)
-                    .order('nama_lengkap', { ascending: true });
+                    .eq('id', id)
+                    .single();
 
                 if (error) throw error;
-
-                if (!pendidikData || pendidikData.length === 0) {
-                    showToast('Tidak ada data untuk diexport', 'warning');
+                if (!data) {
+                    showToast('Data tidak ditemukan', 'error');
                     return;
                 }
 
-                const headers = [
-                    'NIK', 'Nama Lengkap', 'Tempat Lahir', 'Tanggal Lahir',
-                    'Jenis Kelamin', 'Status Perkawinan', 'Ibu Kandung',
-                    'Pendidikan Terakhir', 'Alamat', 'No HP', 'Email',
-                    'Nomor Rekening', 'Nama Bank', 'RT/RW', 'TMT Mengajar',
-                    'Lama Mengabdi', 'Jenis Lembaga', 'Status', 'Status Verifikasi'
-                ];
+                currentPendidikData = data;
 
-                const rows = pendidikData.map(item => [
-                    item.nik || '',
-                    item.nama_lengkap || '',
-                    item.tempat_lahir || '',
-                    item.tanggal_lahir || '',
-                    item.jenis_kelamin || '',
-                    item.status_perkawinan || '',
-                    item.ibu_kandung || '',
-                    item.pendidikan_terakhir || '',
-                    item.alamat || '',
-                    item.no_hp || '',
-                    item.email || '',
-                    item.nomor_rekening || '',
-                    item.nama_bank || '',
-                    item.rt_rw_pengajar || '',
-                    item.tmt_mengajar || '',
-                    item.lama_mengabdi || '',
-                    item.jenis_lembaga || 'LPQ',
-                    item.status_aktif ? 'Aktif' : 'Tidak Aktif',
-                    item.status_verifikasi || 'Draft'
-                ]);
+                document.getElementById('modalTitle').textContent = 'Detail Pendidik';
+                document.getElementById('editId').value = data.id;
+                document.getElementById('editLembagaId').value = data.lembaga_id || '';
 
-                if (typeof XLSX === 'undefined') {
-                    const script = document.createElement('script');
-                    script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
-                    document.head.appendChild(script);
-                    await new Promise(resolve => script.onload = resolve);
+                document.getElementById('editNik').value = data.nik || '';
+                document.getElementById('editNama').value = data.nama_lengkap || '';
+                document.getElementById('editTempatLahir').value = data.tempat_lahir || '';
+                document.getElementById('editTanggalLahir').value = data.tanggal_lahir || '';
+                document.getElementById('editJenisKelamin').value = data.jenis_kelamin || '';
+                document.getElementById('editStatusPerkawinan').value = data.status_perkawinan || '';
+                document.getElementById('editIbuKandung').value = data.ibu_kandung || '';
+                document.getElementById('editPendidikan').value = data.pendidikan_terakhir || '';
+                document.getElementById('editAlamat').value = data.alamat || '';
+                document.getElementById('editNoHp').value = data.no_hp || '';
+                document.getElementById('editEmail').value = data.email || '';
+                document.getElementById('editKabupatenPengajar').value = data.kabupaten_pengajar || 'Tegal';
+                document.getElementById('editProvinsi').value = data.provinsi || 'Jawa Tengah';
+                document.getElementById('editTmt').value = data.tmt_mengajar || '';
+                document.getElementById('editStatus').value = data.status_aktif ? 'true' : 'false';
+                document.getElementById('editVerifikasi').value = data.status_verifikasi || 'Draft';
+
+                document.getElementById('editNomorRekeningBupati').value = data.nomor_rekening_bupati || '';
+                document.getElementById('editNamaBankBupati').value = data.nama_bank_bupati || '';
+                document.getElementById('editPemilikRekeningBupati').value = data.pemilik_rekening_bupati || '';
+                document.getElementById('editNomorRekeningGubernur').value = data.nomor_rekening_gubernur || '';
+                document.getElementById('editNamaBankGubernur').value = data.nama_bank_gubernur || '';
+                document.getElementById('editPemilikRekeningGubernur').value = data.pemilik_rekening_gubernur || '';
+
+                document.getElementById('editLembagaName').value = window.lembagaInfo?.nama || 'Lembaga Anda';
+                document.getElementById('editJenisLembaga').value = window.lembagaInfo?.jenis_lembaga || 'LPQ';
+
+                // Reset & load dokumen
+                resetDokumen();
+
+                if (data.dokumen_kyc) {
+                    try {
+                        const docs = typeof data.dokumen_kyc === 'string' ? JSON.parse(data.dokumen_kyc) : data.dokumen_kyc;
+
+                        if (docs.ktp) {
+                            dokumenUrls.ktp = docs.ktp;
+                            document.getElementById('dokumenKtpPreview').classList.add('visible');
+                            document.getElementById('dokumenKtpName').textContent = docs.ktp.split('/').pop() || 'KTP';
+                        }
+                        if (docs.bupati) {
+                            dokumenUrls.bupati = docs.bupati;
+                            document.getElementById('dokumenBupatiPreview').classList.add('visible');
+                            document.getElementById('dokumenBupatiName').textContent = docs.bupati.split('/').pop() || 'Rek Bupati';
+                        }
+                        if (docs.gubernur) {
+                            dokumenUrls.gubernur = docs.gubernur;
+                            document.getElementById('dokumenGubernurPreview').classList.add('visible');
+                            document.getElementById('dokumenGubernurName').textContent = docs.gubernur.split('/').pop() || 'Rek Gubernur';
+                        }
+                    } catch (e) {
+                        console.warn('Legacy dokumen format:', data.dokumen_kyc);
+                    }
                 }
 
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
-                XLSX.utils.book_append_sheet(wb, ws, 'Pendidik');
+                if (data.tmt_mengajar) {
+                    const tmt = new Date(data.tmt_mengajar);
+                    const now = new Date();
+                    let years = now.getFullYear() - tmt.getFullYear();
+                    const monthDiff = now.getMonth() - tmt.getMonth();
+                    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < tmt.getDate())) {
+                        years--;
+                    }
+                    document.getElementById('lamaMengabdiDisplay').textContent = `${Math.max(0, years)} Tahun`;
+                    document.getElementById('editLamaMengabdi').value = Math.max(0, years);
+                } else {
+                    document.getElementById('lamaMengabdiDisplay').textContent = '0 Tahun';
+                    document.getElementById('editLamaMengabdi').value = '0';
+                }
 
-                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                const blob = new Blob([wbout], { type: 'application/octet-stream' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                const date = new Date().toISOString().split('T')[0];
-                link.download = `data_pendidik_operator_${date}.xlsx`;
-                link.click();
-                URL.revokeObjectURL(link.href);
-
-                showToast(`Export berhasil! ${pendidikData.length} data`, 'success');
+                enableInputs(true);
+                document.getElementById('btnSave').style.display = 'inline-flex';
+                document.getElementById('pendidikModal').classList.add('active');
 
             } catch (e) {
                 console.error(e);
-                showToast('Gagal export: ' + e.message, 'error');
+                showToast('Gagal memuat detail: ' + e.message, 'error');
             }
         }
 
         // ============================================================
-        // ===== NAVIGATION =====
+        // ===== MODAL =====
         // ============================================================
-        function navigateTo(page) {
-            const pages = {
-                'pendidik': 'operator-pendidik.html',
-                'bantuan': 'operator-bantuan.html',
-                'pengaturan': 'operator-pengaturan.html'
+        function closeModal() {
+            document.getElementById('pendidikModal').classList.remove('active');
+            currentPendidikData = null;
+        }
+
+        // ============================================================
+        // ===== SAVE PENDIDIK =====
+        // ============================================================
+        async function savePendidik() {
+            const id = document.getElementById('editId').value;
+            const isEdit = !!id;
+            const user = getUser();
+
+            const nik = document.getElementById('editNik').value.trim();
+            const nama = document.getElementById('editNama').value.trim();
+
+            if (!nik || !nama) {
+                showToast('NIK dan Nama Lengkap wajib diisi!', 'error');
+                return;
+            }
+            if (nik.length !== 16 || !/^\d+$/.test(nik)) {
+                showToast('NIK harus 16 digit angka!', 'error');
+                return;
+            }
+
+            // Cek duplikat NIK (kecuali dirinya sendiri)
+            const { data: existing } = await supabaseClient
+                .from('pendidik')
+                .select('id')
+                .eq('nik', nik)
+                .maybeSingle();
+
+            if (existing && existing.id !== id) {
+                showToast('NIK sudah terdaftar!', 'error');
+                return;
+            }
+
+            const dokumenData = {
+                ktp: dokumenUrls.ktp || null,
+                bupati: dokumenUrls.bupati || null,
+                gubernur: dokumenUrls.gubernur || null
             };
-            const target = pages[page] || 'operator.html';
-            window.location.href = target;
+
+            const data = {
+                nik: nik,
+                nama_lengkap: nama,
+                tempat_lahir: document.getElementById('editTempatLahir').value.trim(),
+                tanggal_lahir: document.getElementById('editTanggalLahir').value || null,
+                jenis_kelamin: document.getElementById('editJenisKelamin').value,
+                status_perkawinan: document.getElementById('editStatusPerkawinan').value.trim(),
+                ibu_kandung: document.getElementById('editIbuKandung').value.trim(),
+                pendidikan_terakhir: document.getElementById('editPendidikan').value.trim(),
+                alamat: document.getElementById('editAlamat').value.trim(),
+                no_hp: document.getElementById('editNoHp').value.trim(),
+                email: document.getElementById('editEmail').value.trim(),
+                kabupaten_pengajar: document.getElementById('editKabupatenPengajar').value.trim() || 'Tegal',
+                provinsi: document.getElementById('editProvinsi').value.trim() || 'Jawa Tengah',
+                tmt_mengajar: document.getElementById('editTmt').value || null,
+                status_aktif: document.getElementById('editStatus').value === 'true',
+                status_verifikasi: document.getElementById('editVerifikasi').value,
+                jenis_lembaga: window.lembagaInfo?.jenis_lembaga || 'LPQ',
+                nomor_rekening_bupati: document.getElementById('editNomorRekeningBupati').value.trim(),
+                nama_bank_bupati: document.getElementById('editNamaBankBupati').value.trim(),
+                pemilik_rekening_bupati: document.getElementById('editPemilikRekeningBupati').value.trim(),
+                nomor_rekening_gubernur: document.getElementById('editNomorRekeningGubernur').value.trim(),
+                nama_bank_gubernur: document.getElementById('editNamaBankGubernur').value.trim(),
+                pemilik_rekening_gubernur: document.getElementById('editPemilikRekeningGubernur').value.trim(),
+                lembaga_id: user.lembaga_id,
+                dokumen_kyc: JSON.stringify(dokumenData),
+                updated_at: new Date().toISOString()
+            };
+
+            // Hitung lama mengabdi
+            if (data.tmt_mengajar) {
+                const tmt = new Date(data.tmt_mengajar);
+                const now = new Date();
+                let years = now.getFullYear() - tmt.getFullYear();
+                const monthDiff = now.getMonth() - tmt.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < tmt.getDate())) {
+                    years--;
+                }
+                data.lama_mengabdi = Math.max(0, years);
+            }
+
+            try {
+                let error;
+
+                if (isEdit) {
+                    const { error: updateError } = await supabaseClient
+                        .from('pendidik')
+                        .update(data)
+                        .eq('id', id);
+                    error = updateError;
+                } else {
+                    data.created_at = new Date().toISOString();
+                    const { error: insertError } = await supabaseClient
+                        .from('pendidik')
+                        .insert([data]);
+                    error = insertError;
+                }
+
+                if (error) throw error;
+
+                showToast(`Data pendidik berhasil ${isEdit ? 'diperbarui' : 'ditambahkan'}!`, 'success');
+                closeModal();
+                loadPendidik();
+
+            } catch (e) {
+                console.error(e);
+                showToast(`Gagal ${isEdit ? 'menyimpan' : 'menambah'}: ` + e.message, 'error');
+            }
         }
 
         // ============================================================
@@ -1327,9 +2157,7 @@
         // ============================================================
         function refreshData() {
             showToast('Memperbarui data...', 'info');
-            loadDashboard();
-            loadTrendChart();
-            loadRecent();
+            loadPendidik();
         }
 
         // ============================================================
@@ -1338,23 +2166,37 @@
         document.addEventListener('DOMContentLoaded', async function() {
             await checkAuth();
             updateDate();
-            await loadUserProfile();
+            await loadKecamatanOptions();
+            loadPendidik();
+
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') applyFilter();
+            });
+
+            document.getElementById('editKecamatanPengajar').addEventListener('change', function() {
+                loadDesaOptions(this.value, 'editDesaPengajar');
+            });
 
             setInterval(updateDate, 60000);
         });
 
         // ============================================================
-        // ===== EXPOSE =====
+        // ===== EXPOSE FUNCTIONS =====
         // ============================================================
+        window.applyFilter = applyFilter;
+        window.changePage = changePage;
         window.refreshData = refreshData;
-        window.navigateTo = navigateTo;
-        window.exportData = exportData;
-        window.openKYCModal = openKYCModal;
-        window.closeKYCModal = closeKYCModal;
-        window.submitKYC = submitKYC;
-        window.handleFileUpload = handleFileUpload;
-        window.removeFile = removeFile;
+        window.openAddModal = openAddModal;
+        window.closeModal = closeModal;
+        window.viewPendidik = viewPendidik;
+        window.savePendidik = savePendidik;
         window.showToast = showToast;
+        window.toggleSidebar = toggleSidebar;
+        window.handleLogout = handleLogout;
+        window.getUser = getUser;
+        window.uploadDokumen = uploadDokumen;
+        window.removeDokumen = removeDokumen;
+        window.resetDokumen = resetDokumen;
     </script>
 </body>
 </html>

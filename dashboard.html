@@ -7,13 +7,643 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
         /* ============================================================
-           KYC SPECIFIC STYLES
+           SI-MUSTAFA - DASHBOARD SIDEBAR KIRI + TOMBOL DI HEADER
            ============================================================ */
-        
-        /* KYC Status Badge */
+
+        /* ===== RESET & VARIABLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed: 0px;
+            --header-height: 64px;
+            --primary: #006400;
+            --primary-light: #4CAF50;
+            --primary-dark: #0a2e1a;
+            --gold: #FFD700;
+            --gold-dark: #DAA520;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #f44336;
+            --info: #2196F3;
+            --purple: #9C27B0;
+            --bg-gray: #f0f4f0;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 30px rgba(0, 100, 0, 0.15);
+        }
+
+        body {
+            background: linear-gradient(135deg, #e8f5e9 0%, #e3f2fd 50%, #f3e5f5 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(180deg, #0a2e1a 0%, #1a5a3a 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(0);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .sidebar-brand {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: var(--header-height);
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .sidebar-brand .brand-text h1 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-brand .brand-text h1 span {
+            color: var(--gold);
+        }
+
+        .sidebar-brand .brand-text small {
+            font-size: 0.55rem;
+            opacity: 0.7;
+            font-weight: 300;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 12px 0;
+            list-style: none;
+        }
+
+        .sidebar-menu .menu-label {
+            padding: 8px 20px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 600;
+        }
+
+        .sidebar-menu .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .sidebar-menu .menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .sidebar-menu .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--gold);
+            border-left-color: var(--gold);
+        }
+
+        .sidebar-menu .menu-item i {
+            width: 20px;
+            font-size: 1.1rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-menu .menu-item .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar-footer .user-info .name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-footer .user-info .role {
+            font-size: 0.6rem;
+            opacity: 0.6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-footer .logout-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 8px;
+            transition: 0.2s;
+            border-radius: 6px;
+        }
+
+        .sidebar-footer .logout-btn:hover {
+            color: #ff6b6b;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        /* ===== OVERLAY ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 12px 12px 12px 12px;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: white;
+            padding: 0 28px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e8ecf1;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-left .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .header-left .sidebar-toggle:hover {
+            background: var(--bg-gray);
+            color: var(--primary);
+        }
+
+        .header-left .page-title h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .header-left .page-title p {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-date {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .header-right .role-badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .header-right .role-scope {
+            font-size: 0.6rem;
+            color: #888;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .header-user:hover {
+            background: var(--bg-gray);
+        }
+
+        .header-user .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .header-user .user-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .logout-btn-header {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 8px;
+            transition: 0.2s;
+            border-radius: 6px;
+        }
+
+        .logout-btn-header:hover {
+            color: var(--danger);
+            background: rgba(244, 67, 54, 0.08);
+        }
+
+        /* ===== WELCOME SECTION ===== */
+        .welcome-section {
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5a3a 100%);
+            border-radius: 14px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0, 100, 0, 0.2);
+        }
+
+        .welcome-section .welcome-text h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .welcome-section .welcome-text h2 span {
+            color: var(--gold);
+        }
+
+        .welcome-section .welcome-text p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .welcome-section .welcome-text p i {
+            margin-right: 6px;
+            color: var(--gold);
+        }
+
+        .welcome-section .welcome-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 8px 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .welcome-section .welcome-badge i {
+            color: var(--gold);
+        }
+
+        /* ===== FILTER INFO ===== */
+        #filterInfo {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            box-shadow: var(--card-shadow);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 18px 20px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .stat-card .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .stat-card .icon.purple { background: #7b1fa2; }
+        .stat-card .icon.teal { background: #00897b; }
+        .stat-card .icon.gold { background: #f9a825; }
+        .stat-card .icon.green { background: #2e7d32; }
+        .stat-card .icon.blue { background: #1565c0; }
+        .stat-card .icon.orange { background: #e65100; }
+
+        .stat-card .info .label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .info .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            line-height: 1.2;
+        }
+
+        /* ===== KYC CARD ===== */
+        .kyc-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            border-left: 4px solid #1976d2;
+        }
+
+        .kyc-card .kyc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .kyc-card .kyc-header .title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .kyc-card .kyc-header .title i {
+            color: #1976d2;
+        }
+
+        .kyc-card .kyc-header .progress-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .kyc-progress {
+            background: #f0f2f5;
+            border-radius: 8px;
+            height: 6px;
+            overflow: hidden;
+            width: 120px;
+        }
+
+        .kyc-progress .bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+
+        .kyc-stats-mini {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .kyc-stats-mini .stat-item {
+            background: #f8faf8;
+            border-radius: 8px;
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        .kyc-stats-mini .stat-item .label {
+            font-size: 0.6rem;
+            color: #888;
+        }
+
+        .kyc-stats-mini .stat-item .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .kyc-stats-mini .stat-item .value.pending { color: #ff9800; }
+        .kyc-stats-mini .stat-item .value.verified { color: #4CAF50; }
+        .kyc-stats-mini .stat-item .value.rejected { color: #f44336; }
+
+        .kyc-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .kyc-table-wrapper table {
+            width: 100%;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+
+        .kyc-table-wrapper table th {
+            padding: 8px 10px;
+            text-align: left;
+            background: #f8faf8;
+            border-bottom: 2px solid #f0f2f5;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #888;
+        }
+
+        .kyc-table-wrapper table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f5f6f8;
+        }
+
+        .kyc-table-wrapper table tr:hover {
+            background: #f8faf8;
+            cursor: pointer;
+        }
+
+        .kyc-table-wrapper table tr.kyc-pending {
+            background: #fffde7;
+        }
+
+        .kyc-table-wrapper table tr.kyc-pending:hover {
+            background: #fff9c4;
+        }
+
         .kyc-status-badge {
             display: inline-flex;
             align-items: center;
@@ -28,91 +658,113 @@
         .kyc-status-badge.verified { background: #e8f5e9; color: #4CAF50; }
         .kyc-status-badge.rejected { background: #ffebee; color: #f44336; }
 
-        /* KYC Progress */
-        .kyc-progress {
-            background: #f0f2f5;
-            border-radius: 8px;
-            height: 6px;
-            overflow: hidden;
-            margin-top: 6px;
+        /* ===== CHARTS SECTION ===== */
+        .charts-section {
+            display: none;
         }
-        .kyc-progress .bar {
-            height: 100%;
-            background: var(--primary);
-            border-radius: 8px;
-            transition: width 0.5s ease;
+        .charts-section.visible {
+            display: block;
         }
 
-        /* KYC Card */
-        .kyc-card {
-            border-left: 4px solid #1976d2;
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .card {
             background: white;
             border-radius: 14px;
             padding: 20px;
             box-shadow: var(--card-shadow);
-            margin-bottom: 16px;
         }
 
-        /* KYC Stats Mini */
-        .kyc-stats-mini {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
+        .card .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
             margin-bottom: 12px;
         }
-        .kyc-stats-mini .stat-item {
-            background: #f8faf8;
+
+        .card .card-title i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 6px 14px;
+            border: none;
             border-radius: 8px;
-            padding: 8px 12px;
-            text-align: center;
-        }
-        .kyc-stats-mini .stat-item .label {
-            font-size: 0.6rem;
-            color: #888;
-        }
-        .kyc-stats-mini .stat-item .value {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #333;
-        }
-        .kyc-stats-mini .stat-item .value.pending { color: #ff9800; }
-        .kyc-stats-mini .stat-item .value.verified { color: #4CAF50; }
-        .kyc-stats-mini .stat-item .value.rejected { color: #f44336; }
-
-        /* KYC Table */
-        .kyc-table-wrapper {
-            overflow-x: auto;
-        }
-        .kyc-table-wrapper table {
-            width: 100%;
-            font-size: 0.85rem;
-            border-collapse: collapse;
-        }
-        .kyc-table-wrapper table th {
-            padding: 8px 10px;
-            text-align: left;
-            background: #f8faf8;
-            border-bottom: 2px solid #f0f2f5;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: #888;
-        }
-        .kyc-table-wrapper table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #f5f6f8;
-        }
-        .kyc-table-wrapper table tr:hover {
-            background: #f8faf8;
+            font-size: 0.75rem;
+            font-weight: 600;
             cursor: pointer;
-        }
-        .kyc-table-wrapper table tr.kyc-pending {
-            background: #fffde7;
-        }
-        .kyc-table-wrapper table tr.kyc-pending:hover {
-            background: #fff9c4;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        /* ===== MODAL KYC ===== */
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 0.7rem;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 90%;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+        .toast-info { background: var(--primary); }
+        .toast-warning { background: var(--warning); }
+
+        /* ===== SPINNER ===== */
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f0f2f5;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -129,6 +781,7 @@
         .modal-overlay.active {
             display: flex;
         }
+
         .modal-container {
             background: white;
             border-radius: 16px;
@@ -140,10 +793,12 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: fadeInModal 0.25s ease;
         }
+
         @keyframes fadeInModal {
             from { opacity: 0; transform: scale(0.95) translateY(10px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -152,11 +807,13 @@
             padding-bottom: 12px;
             border-bottom: 2px solid #f0f2f5;
         }
+
         .modal-header h2 {
             font-size: 1.2rem;
             color: var(--primary);
             font-weight: 700;
         }
+
         .modal-header .close-btn {
             background: none;
             border: none;
@@ -169,7 +826,6 @@
             color: #333;
         }
 
-        /* Status Bar */
         .kyc-status-bar {
             display: flex;
             justify-content: space-between;
@@ -181,6 +837,7 @@
             border-radius: 10px;
             margin-bottom: 16px;
         }
+
         .kyc-status-bar .item .label {
             font-size: 0.65rem;
             color: #888;
@@ -190,7 +847,6 @@
             font-size: 0.95rem;
         }
 
-        /* Tab Navigation */
         .kyc-tabs {
             display: flex;
             gap: 4px;
@@ -198,6 +854,7 @@
             border-bottom: 2px solid #f0f2f5;
             overflow-x: auto;
         }
+
         .kyc-tabs .tab-btn {
             padding: 8px 16px;
             border: none;
@@ -210,6 +867,7 @@
             font-size: 0.8rem;
             white-space: nowrap;
         }
+
         .kyc-tabs .tab-btn:hover {
             color: var(--primary);
             background: var(--primary-bg);
@@ -219,7 +877,6 @@
             border-bottom-color: var(--primary);
         }
 
-        /* Tab Content */
         .kyc-tab-content {
             display: none;
             animation: fadeIn 0.25s ease;
@@ -228,17 +885,18 @@
             display: block;
         }
 
-        /* Info Grid */
         .kyc-info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
+
         .kyc-info-grid .field {
             padding: 6px 10px;
             background: #f8faf8;
             border-radius: 6px;
         }
+
         .kyc-info-grid .field .label {
             font-size: 0.6rem;
             color: #888;
@@ -251,40 +909,42 @@
             grid-column: 1 / -1;
         }
 
-        /* Dokumen Preview */
         .dokumen-preview {
-            margin-top: 12px;
+            margin-top: 8px;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             overflow: hidden;
-            max-height: 450px;
+            max-height: 400px;
             display: none;
             background: #fafafa;
         }
+
         .dokumen-preview img {
             width: 100%;
             height: auto;
-            max-height: 450px;
+            max-height: 350px;
             object-fit: contain;
         }
+
         .dokumen-preview iframe {
             width: 100%;
-            height: 450px;
+            height: 350px;
             border: none;
         }
+
         .dokumen-preview .empty {
             text-align: center;
-            padding: 40px 20px;
+            padding: 20px;
             color: #888;
         }
+
         .dokumen-preview .empty i {
-            font-size: 2.5rem;
+            font-size: 2rem;
             display: block;
             margin-bottom: 8px;
             color: #ccc;
         }
 
-        /* Action Box */
         .kyc-action-box {
             padding: 16px;
             background: #fff8e1;
@@ -292,17 +952,20 @@
             border-left: 4px solid var(--warning);
             margin-top: 16px;
         }
+
         .kyc-action-box .action-title {
             font-size: 0.8rem;
             font-weight: 600;
             color: #856404;
             margin-bottom: 8px;
         }
+
         .kyc-action-box .action-row {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
         }
+
         .kyc-action-box .action-row input {
             flex: 1;
             min-width: 150px;
@@ -311,6 +974,7 @@
             border-radius: 8px;
             font-size: 0.85rem;
         }
+
         .kyc-action-box .action-row input:focus {
             border-color: var(--primary);
             outline: none;
@@ -325,87 +989,84 @@
             border-top: 1px solid #f0f2f5;
         }
 
-        /* Buttons */
-        .btn {
-            padding: 6px 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: 0.7rem;
-        }
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 1.5px solid var(--primary);
-        }
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-primary:hover {
-            background: var(--primary-light);
-        }
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-        .btn-success:hover {
-            background: #43a047;
-        }
-        .btn-danger {
-            background: var(--error);
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #d32f2f;
-        }
-        .btn-warning {
-            background: var(--warning);
-            color: white;
-        }
-        .btn-warning:hover {
-            background: #e65100;
-        }
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .header {
+                padding: 0 16px;
+            }
+            .header-left .page-title p {
+                display: none;
+            }
+            .header-date {
+                display: none;
+            }
+            .header-right .role-scope {
+                display: none;
+            }
         }
 
-        /* Hide charts section for non-admin */
-        .charts-section {
-            display: none;
-        }
-        .charts-section.visible {
-            display: block;
-        }
-
-        /* Responsive */
-        @media (max-width: 640px) {
-            .modal-container {
-                padding: 20px;
-                margin: 10px;
+        @media (max-width: 768px) {
+            .header {
+                height: 56px;
+                padding: 0 12px;
+            }
+            .header-left .page-title h1 {
+                font-size: 0.9rem;
+            }
+            .header-user .user-name {
+                display: none;
+            }
+            .header-right .role-badge {
+                display: none;
+            }
+            .welcome-section {
+                padding: 16px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .welcome-section .welcome-text h2 {
+                font-size: 1rem;
+            }
+            .welcome-section .welcome-text p {
+                font-size: 0.75rem;
+            }
+            .welcome-section .welcome-badge {
+                font-size: 0.65rem;
+                padding: 4px 12px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 10px;
+            }
+            .stat-card {
+                padding: 14px 16px;
+                gap: 12px;
+            }
+            .stat-card .icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            .stat-card .info .value {
+                font-size: 1.2rem;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
             }
             .kyc-info-grid {
                 grid-template-columns: 1fr;
-            }
-            .kyc-action-box .action-row {
-                flex-direction: column;
-            }
-            .kyc-action-box .action-row input {
-                min-width: auto;
             }
             .kyc-status-bar {
                 flex-direction: column;
@@ -414,41 +1075,171 @@
             .kyc-stats-mini {
                 grid-template-columns: repeat(2, 1fr);
             }
+            .dokumen-preview {
+                max-height: 300px;
+            }
+            .dokumen-preview iframe {
+                height: 250px;
+            }
+            .dokumen-preview img {
+                max-height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-left .page-title h1 {
+                font-size: 0.8rem;
+            }
+            .header-left .sidebar-toggle {
+                font-size: 1rem;
+                padding: 2px 6px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .stat-card {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            .stat-card .icon {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
+            .stat-card .info .value {
+                font-size: 1rem;
+            }
+            .stat-card .info .label {
+                font-size: 0.55rem;
+            }
+            .modal-container {
+                padding: 16px;
+                margin: 10px;
+            }
+            .kyc-card .kyc-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .dokumen-preview {
+                max-height: 200px;
+            }
+            .dokumen-preview iframe {
+                height: 180px;
+            }
+            .dokumen-preview img {
+                max-height: 180px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="header-left">
-            <div class="header-logo">
-                <img src="assets/logo-kemenag.png" alt="Logo" 
-                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
-                <div>
-                    <h1>SI-<span>MUSTAFA</span></h1>
-                    <small>Kemenag Kab. Tegal</small>
-                </div>
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="assets/logo-kemenag.png" alt="Logo" 
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+            <div class="brand-text">
+                <h1>SI-<span>MUSTAFA</span></h1>
+                <small>Kemenag Kab. Tegal</small>
             </div>
         </div>
-        <div class="header-right">
-            <span class="header-date" id="currentDate"></span>
-            <div class="header-user" onclick="showToast('Profile', 'info')">
-                <div class="avatar" id="userAvatar">A</div>
-                <span class="user-name" id="userName">Admin</span>
-            </div>
-        </div>
-    </header>
 
-    <!-- ===== FILTER INFO ===== -->
-    <div id="filterInfo" style="margin-bottom:12px;"></div>
+        <ul class="sidebar-menu">
+            <li class="menu-label">Menu Utama</li>
+            <li>
+                <a class="menu-item active" href="dashboard.html">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a class="menu-item" href="lembaga.html">
+                    <i class="fas fa-building"></i> Lembaga
+                </a>
+            </li>
+            <li>
+                <a class="menu-item" href="pendidik.html">
+                    <i class="fas fa-user-graduate"></i> Pendidik
+                    <span class="badge" id="navPendidikCount">0</span>
+                </a>
+            </li>
+            <li>
+                <a class="menu-item" href="mutasi.html">
+                    <i class="fas fa-exchange-alt"></i> Mutasi Pendidik
+                </a>
+            </li>
+            <li>
+                <a class="menu-item" href="bantuan.html">
+                    <i class="fas fa-hand-holding-heart"></i> Bantuan
+                </a>
+            </li>
+            <li>
+                <a class="menu-item" href="pengaturan.html">
+                    <i class="fas fa-cog"></i> Pengaturan
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="avatar" id="userAvatar">A</div>
+            <div class="user-info">
+                <div class="name" id="userName">Admin</div>
+                <div class="role" id="userRole">Super Admin</div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ===== OVERLAY ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- ===== MAIN CONTENT ===== -->
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
 
-        <div class="page-header">
-            <h1>Dashboard</h1>
-            <p>Data Terpadu Pendidik Keagamaan Kabupaten Tegal</p>
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="page-title">
+                    <h1>Dashboard</h1>
+                    <p>Data Terpadu Pendidik Keagamaan Kabupaten Tegal</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="header-date" id="currentDate"></span>
+                <span class="role-badge" id="headerRoleBadge">Admin</span>
+                <span class="role-scope" id="headerScope"></span>
+                <div class="header-user" onclick="showToast('Profile', 'info')">
+                    <div class="avatar" id="userAvatarSmall">A</div>
+                    <span class="user-name" id="userNameSmall">Admin</span>
+                </div>
+                <button class="logout-btn-header" onclick="handleLogout()" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ===== WELCOME SECTION ===== -->
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h2>Selamat datang, <span id="welcomeName">Admin</span> 👋</h2>
+                <p id="welcomeStatus"><i class="fas fa-user-shield"></i> <span id="welcomeRole">Super Admin SI-MUSTAFA</span></p>
+            </div>
+            <div class="welcome-badge">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="welcomeDate">Loading...</span>
+            </div>
+        </div>
+
+        <!-- ===== FILTER INFO ===== -->
+        <div id="filterInfo">
+            <i class="fas fa-info-circle"></i>
+            <span id="filterInfoText">Menampilkan semua data</span>
         </div>
 
         <!-- ===== STATS GRID ===== -->
@@ -499,24 +1290,23 @@
 
         <!-- ===== KYC SECTION ===== -->
         <div class="kyc-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <i class="fas fa-id-card" style="color:#1976d2;font-size:1.2rem;"></i>
-                    <span style="font-size:0.95rem;font-weight:600;color:var(--primary);">Verifikasi dokumen</span>
-                    <span class="badge pending" style="font-size:0.6rem;">
+            <div class="kyc-header">
+                <div class="title">
+                    <i class="fas fa-id-card"></i>
+                    Verifikasi Dokumen
+                    <span class="badge" style="background:#ff9800;color:white;font-size:0.6rem;padding:2px 10px;border-radius:12px;">
                         <i class="fas fa-clock"></i> Menunggu: <span id="kycPendingCount">0</span>
                     </span>
                 </div>
-                <div style="display:flex;align-items:center;gap:8px;font-size:0.7rem;color:#888;">
+                <div class="progress-info">
                     <span>Progress:</span>
                     <span id="kycProgressText">0%</span>
-                    <div class="kyc-progress" style="width:120px;">
+                    <div class="kyc-progress">
                         <div class="bar" id="kycProgressBar" style="width:0%"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- KYC Stats Mini -->
             <div class="kyc-stats-mini">
                 <div class="stat-item">
                     <div class="label">Total</div>
@@ -536,7 +1326,6 @@
                 </div>
             </div>
 
-            <!-- Daftar Pengajuan KYC -->
             <div class="kyc-table-wrapper">
                 <table>
                     <thead>
@@ -558,30 +1347,37 @@
             </div>
         </div>
 
-        <!-- ===== CHARTS - HANYA UNTUK ADMIN KAB / SUPER ADMIN ===== -->
+        <!-- ===== CHARTS SECTION ===== -->
         <div id="chartsSection" class="charts-section">
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:16px;">
+            <div class="charts-grid">
                 <div class="card">
-                    <div class="card-title">Sebaran Pendidik per Desa</div>
+                    <div class="card-title"><i class="fas fa-chart-bar"></i>Sebaran Pendidik per Desa</div>
                     <div style="height:200px;"><canvas id="sebaranChart"></canvas></div>
                 </div>
                 <div class="card">
-                    <div class="card-title">Statistik Bantuan</div>
+                    <div class="card-title"><i class="fas fa-chart-line"></i>Statistik Bantuan</div>
                     <div style="height:200px;"><canvas id="bantuanChart"></canvas></div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== RECENT ACTIVITY - HANYA UNTUK ADMIN KAB / SUPER ADMIN ===== -->
+        <!-- ===== RECENT ACTIVITY ===== -->
         <div id="recentSection" class="charts-section">
             <div class="card">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                    <div class="card-title" style="margin-bottom:0;">Aktivitas Terbaru</div>
-                    <button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
+                    <div class="card-title" style="margin-bottom:0;"><i class="fas fa-clock"></i>Aktivitas Terbaru</div>
+                    <button class="btn btn-outline btn-sm" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
                 </div>
-                <div class="table-responsive">
-                    <table>
-                        <thead><tr><th>Nama</th><th>Lembaga</th><th>Status</th><th>Update</th></tr></thead>
+                <div class="table-responsive" style="overflow-x:auto;">
+                    <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
+                        <thead>
+                            <tr>
+                                <th style="padding:8px 10px;text-align:left;background:#f8faf8;border-bottom:2px solid #f0f2f5;font-size:0.7rem;text-transform:uppercase;color:#888;">Nama</th>
+                                <th style="padding:8px 10px;text-align:left;background:#f8faf8;border-bottom:2px solid #f0f2f5;font-size:0.7rem;text-transform:uppercase;color:#888;">Lembaga</th>
+                                <th style="padding:8px 10px;text-align:left;background:#f8faf8;border-bottom:2px solid #f0f2f5;font-size:0.7rem;text-transform:uppercase;color:#888;">Status</th>
+                                <th style="padding:8px 10px;text-align:left;background:#f8faf8;border-bottom:2px solid #f0f2f5;font-size:0.7rem;text-transform:uppercase;color:#888;">Update</th>
+                            </tr>
+                        </thead>
                         <tbody id="recentTableBody">
                             <tr><td colspan="4" style="text-align:center;padding:20px;color:#999;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
                         </tbody>
@@ -592,31 +1388,6 @@
 
     </main>
 
-    <!-- ===== BOTTOM NAVIGATION ===== -->
-    <nav class="bottom-nav">
-        <a class="nav-item active" href="dashboard.html">
-            <i class="fas fa-chart-pie"></i>
-            <span>Dashboard</span>
-        </a>
-        <a class="nav-item" href="lembaga.html">
-            <i class="fas fa-building"></i>
-            <span>Lembaga</span>
-        </a>
-        <a class="nav-item" href="pendidik.html">
-            <i class="fas fa-user-graduate"></i>
-            <span>Pendidik</span>
-            <span class="nav-badge" id="navPendidikCount">0</span>
-        </a>
-        <a class="nav-item" href="bantuan.html">
-            <i class="fas fa-hand-holding-heart"></i>
-            <span>Bantuan</span>
-        </a>
-        <a class="nav-item" href="pengaturan.html">
-            <i class="fas fa-cog"></i>
-            <span>Pengaturan</span>
-        </a>
-    </nav>
-
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
 
@@ -624,13 +1395,12 @@
     <div class="modal-overlay" id="kycModal">
         <div class="modal-container">
             <div class="modal-header">
-                <h2><i class="fas fa-id-card" style="color:#1976d2;margin-right:8px;"></i>Detail Verifikasi KYC</h2>
+                <h2><i class="fas fa-id-card" style="color:#1976d2;margin-right:8px;"></i>Detail Verifikasi Dokumen</h2>
                 <button class="close-btn" onclick="closeKycModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="kycPendidikId">
                 
-                <!-- Status Bar -->
                 <div class="kyc-status-bar">
                     <div class="item">
                         <div class="label">Status Verifikasi</div>
@@ -646,7 +1416,6 @@
                     </div>
                 </div>
 
-                <!-- Tabs -->
                 <div class="kyc-tabs">
                     <button class="tab-btn active" data-tab="identitas" onclick="switchKycTab('identitas', this)">
                         <i class="fas fa-user"></i> Identitas
@@ -659,147 +1428,154 @@
                     </button>
                 </div>
 
-                <!-- Tab: Identitas -->
                 <div id="tab-identitas" class="kyc-tab-content active">
                     <div class="kyc-info-grid">
+                        <div class="field"><div class="label">NIK</div><div class="value" id="kycDetailNik">-</div></div>
+                        <div class="field"><div class="label">Nama Lengkap</div><div class="value" id="kycDetailNama">-</div></div>
+                        <div class="field"><div class="label">Tempat Lahir</div><div class="value" id="kycDetailTempatLahir">-</div></div>
+                        <div class="field"><div class="label">Tanggal Lahir</div><div class="value" id="kycDetailTanggalLahir">-</div></div>
+                        <div class="field"><div class="label">Jenis Kelamin</div><div class="value" id="kycDetailJenisKelamin">-</div></div>
+                        <div class="field"><div class="label">Status Perkawinan</div><div class="value" id="kycDetailStatusPerkawinan">-</div></div>
+                        <div class="field"><div class="label">Ibu Kandung</div><div class="value" id="kycDetailIbuKandung">-</div></div>
+                        <div class="field"><div class="label">Pendidikan Terakhir</div><div class="value" id="kycDetailPendidikan">-</div></div>
+                        <div class="field full"><div class="label">Alamat</div><div class="value" id="kycDetailAlamat">-</div></div>
                         <div class="field">
-                            <div class="label">NIK</div>
-                            <div class="value" id="kycDetailNik">-</div>
+    <div class="label">Desa Pengajar</div>
+    <div class="value" id="kycDetailDesaPengajar">-</div>
+</div>
+                        <div class="field">
+    <div class="label">Kecamatan Pengajar</div>
+    <div class="value" id="kycDetailKecamatanPengajar">-</div>
+</div>
+                        <div class="field"><div class="label">Kabupaten Pengajar</div><div class="value" id="kycDetailKabupatenPengajar">-</div></div>
+                        <div class="field"><div class="label">No. HP</div><div class="value" id="kycDetailNoHp">-</div></div>
+                        <div class="field"><div class="label">Email</div><div class="value" id="kycDetailEmail">-</div></div>
+                        <div class="field">
+                            <div class="label">Nomor Rekening Bupati</div>
+                            <div class="value" id="kycDetailNomorRekeningBupati">-</div>
                         </div>
                         <div class="field">
-                            <div class="label">Nama Lengkap</div>
-                            <div class="value" id="kycDetailNama">-</div>
+                            <div class="label">Nama Bank Bupati</div>
+                            <div class="value" id="kycDetailNamaBankBupati">-</div>
+                        </div>
+                        <div class="field" style="grid-column:1/-1;">
+                            <div class="label">Pemilik Rekening Bupati</div>
+                            <div class="value" id="kycDetailPemilikRekeningBupati">-</div>
                         </div>
                         <div class="field">
-                            <div class="label">Tempat Lahir</div>
-                            <div class="value" id="kycDetailTempatLahir">-</div>
+                            <div class="label">Nomor Rekening Gubernur</div>
+                            <div class="value" id="kycDetailNomorRekeningGubernur">-</div>
                         </div>
                         <div class="field">
-                            <div class="label">Tanggal Lahir</div>
-                            <div class="value" id="kycDetailTanggalLahir">-</div>
+                            <div class="label">Nama Bank Gubernur</div>
+                            <div class="value" id="kycDetailNamaBankGubernur">-</div>
                         </div>
-                        <div class="field">
-                            <div class="label">Jenis Kelamin</div>
-                            <div class="value" id="kycDetailJenisKelamin">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Status Perkawinan</div>
-                            <div class="value" id="kycDetailStatusPerkawinan">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Ibu Kandung</div>
-                            <div class="value" id="kycDetailIbuKandung">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Pendidikan Terakhir</div>
-                            <div class="value" id="kycDetailPendidikan">-</div>
-                        </div>
-                        <div class="field full">
-                            <div class="label">Alamat</div>
-                            <div class="value" id="kycDetailAlamat">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">No. HP</div>
-                            <div class="value" id="kycDetailNoHp">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Email</div>
-                            <div class="value" id="kycDetailEmail">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Nomor Rekening</div>
-                            <div class="value" id="kycDetailNomorRekening">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Nama Bank</div>
-                            <div class="value" id="kycDetailNamaBank">-</div>
+                        <div class="field" style="grid-column:1/-1;">
+                            <div class="label">Pemilik Rekening Gubernur</div>
+                            <div class="value" id="kycDetailPemilikRekeningGubernur">-</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tab: Data Mengajar -->
                 <div id="tab-mengajar" class="kyc-tab-content" style="display:none;">
                     <div class="kyc-info-grid">
-                        <div class="field full">
-                            <div class="label">Lembaga</div>
-                            <div class="value" id="kycDetailLembaga">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">NSLP Lembaga</div>
-                            <div class="value" id="kycDetailNslpLembaga">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Jenis Lembaga</div>
-                            <div class="value" id="kycDetailJenisLembaga">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Kecamatan Lembaga</div>
-                            <div class="value" id="kycDetailKecamatanLembaga">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Desa Lembaga</div>
-                            <div class="value" id="kycDetailDesaLembaga">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">RT/RW</div>
-                            <div class="value" id="kycDetailRtRw">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Kecamatan Pengajar</div>
-                            <div class="value" id="kycDetailKecamatanPengajar">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Desa Pengajar</div>
-                            <div class="value" id="kycDetailDesaPengajar">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">Kabupaten Pengajar</div>
-                            <div class="value" id="kycDetailKabupatenPengajar">-</div>
-                        </div>
-                        <div class="field">
-                            <div class="label">TMT Mengajar</div>
-                            <div class="value" id="kycDetailTmt">-</div>
-                        </div>
-                        <div class="field full">
-                            <div class="label">Lama Mengabdi</div>
-                            <div class="value" id="kycDetailLamaMengabdi">-</div>
-                        </div>
+                        <div class="field full"><div class="label">Lembaga</div><div class="value" id="kycDetailLembaga">-</div></div>
+                        <div class="field"><div class="label">NSLP Lembaga</div><div class="value" id="kycDetailNslpLembaga">-</div></div>
+                        <div class="field"><div class="label">Jenis Lembaga</div><div class="value" id="kycDetailJenisLembaga">-</div></div>
+                        <div class="field"><div class="label">Kecamatan Lembaga</div><div class="value" id="kycDetailKecamatanLembaga">-</div></div>
+                        <div class="field"><div class="label">Desa Lembaga</div><div class="value" id="kycDetailDesaLembaga">-</div></div>
+                        <div class="field"><div class="label">RT/RW</div><div class="value" id="kycDetailRtRw">-</div></div>
+                        <div class="field"><div class="label">TMT Mengajar</div><div class="value" id="kycDetailTmt">-</div></div>
+                        <div class="field full"><div class="label">Lama Mengabdi</div><div class="value" id="kycDetailLamaMengabdi">-</div></div>
                     </div>
                 </div>
 
-                <!-- Tab: Dokumen -->
-                <div id="tab-dokumen" class="kyc-tab-content" style="display:none;">
-                    <div style="margin-bottom:12px;">
-                        <div style="font-size:0.7rem;font-weight:600;color:#555;margin-bottom:4px;">
-                            <i class="fas fa-file-alt"></i> Dokumen KYC (KTP + Buku Rekening)
-                        </div>
-                        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 12px;background:#f8faf8;border-radius:8px;">
-                            <span id="kycDokumenName" style="font-size:0.85rem;font-weight:500;">Belum ada dokumen</span>
-                            <button class="btn btn-primary btn-sm" onclick="previewKycDocument()">
-                                <i class="fas fa-eye"></i> Lihat
-                            </button>
-                            <button class="btn btn-outline btn-sm" onclick="downloadKycDocument()">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </div>
-                        <div class="dokumen-preview" id="dokumenPreview">
-                            <img id="dokumenPreviewImg" src="" alt="Dokumen KYC">
-                            <iframe id="dokumenPreviewPdf" src=""></iframe>
-                            <div class="empty" id="dokumenPreviewEmpty">
-                                <i class="fas fa-file-image"></i>
-                                Klik "Lihat" untuk menampilkan dokumen
-                            </div>
-                        </div>
-                    </div>
+             <div id="tab-dokumen" class="kyc-tab-content" style="display:none;">
+    <!-- KTP -->
+    <div style="margin-bottom:16px;padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #1976d2;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div style="font-size:0.75rem;font-weight:700;color:#1976d2;">
+                <i class="fas fa-id-card"></i> Kartu Tanda Penduduk (KTP)
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+                <button class="btn btn-primary btn-sm" onclick="previewDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
+                    <i class="fas fa-eye"></i> Lihat
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+        </div>
+        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
+            <span id="kycDokumenKtpName" style="font-weight:500;">Belum ada dokumen</span>
+        </div>
+        <div class="dokumen-preview" id="dokumenKtpPreview" style="display:none;margin-top:8px;">
+            <img id="dokumenKtpImg" src="" alt="KTP" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
+            <iframe id="dokumenKtpPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
+            <div class="empty" id="dokumenKtpEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
+                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                File tidak dapat ditampilkan
+            </div>
+        </div>
+    </div>
 
-                    <!-- Catatan -->
-                    <div style="padding:12px 16px;background:#f8faf8;border-radius:10px;">
-                        <div style="font-size:0.7rem;color:#888;">Catatan Verifikasi</div>
-                        <div style="font-weight:500;" id="kycDetailCatatan">Tidak ada catatan</div>
-                    </div>
-                </div>
+    <!-- Rekening Bupati -->
+    <div style="margin-bottom:16px;padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #2e7d32;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div style="font-size:0.75rem;font-weight:700;color:#2e7d32;">
+                <i class="fas fa-university"></i> Rekening Insentif Bupati
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+                <button class="btn btn-primary btn-sm" onclick="previewDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
+                    <i class="fas fa-eye"></i> Lihat
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+        </div>
+        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
+            <span id="kycDokumenBupatiName" style="font-weight:500;">Belum ada dokumen</span>
+        </div>
+        <div class="dokumen-preview" id="dokumenBupatiPreview" style="display:none;margin-top:8px;">
+            <img id="dokumenBupatiImg" src="" alt="Rekening Bupati" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
+            <iframe id="dokumenBupatiPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
+            <div class="empty" id="dokumenBupatiEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
+                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                File tidak dapat ditampilkan
+            </div>
+        </div>
+    </div>
 
-                <!-- Action Box -->
+    <!-- Rekening Gubernur -->
+    <div style="padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #7b1fa2;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div style="font-size:0.75rem;font-weight:700;color:#7b1fa2;">
+                <i class="fas fa-university"></i> Rekening Insentif Gubernur
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+                <button class="btn btn-primary btn-sm" onclick="previewDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
+                    <i class="fas fa-eye"></i> Lihat
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+        </div>
+        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
+            <span id="kycDokumenGubernurName" style="font-weight:500;">Belum ada dokumen</span>
+        </div>
+        <div class="dokumen-preview" id="dokumenGubernurPreview" style="display:none;margin-top:8px;">
+            <img id="dokumenGubernurImg" src="" alt="Rekening Gubernur" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
+            <iframe id="dokumenGubernurPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
+            <div class="empty" id="dokumenGubernurEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
+                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                File tidak dapat ditampilkan
+            </div>
+        </div>
+    </div>
+</div>
+
                 <div class="kyc-action-box" id="kycActionBox" style="display:none;">
                     <div class="action-title">
                         <i class="fas fa-gavel"></i> Tindakan Verifikasi
@@ -826,33 +1602,276 @@
     <script src="js/utils.js"></script>
     <script>
         // ============================================================
+        // ===== SIDEBAR FUNCTIONS =====
+        // ============================================================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        });
+
+        // ============================================================
         // ===== DASHBOARD + KYC =====
         // ============================================================
         let sebaranChart = null;
         let bantuanChart = null;
         let currentKycPendidik = null;
-        let currentKycDokumenUrl = null;
         let currentKycTab = 'identitas';
 
-        // ============================================================
-        // ===== TOGGLE CHARTS BERDASARKAN ROLE =====
-        // ============================================================
-        function toggleChartsByRole() {
-            const user = getUser();
-            if (!user) return;
+        // ===== DOKUMEN VARIABLES =====
+        let kycDokumen = {
+            ktp: null,
+            bupati: null,
+            gubernur: null
+        };
 
-            const chartsSection = document.getElementById('chartsSection');
-            const recentSection = document.getElementById('recentSection');
+        // ============================================================
+        // ===== TOAST =====
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            if (!toast) { alert(message); return; }
+            toast.textContent = message;
+            toast.className = `toast toast-${type}`;
+            void toast.offsetWidth;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
 
-            // Admin Kab atau Super Admin → tampilkan chart & recent
-            if (user.role === 'admin_kab' || user.role === 'super_admin') {
-                if (chartsSection) chartsSection.classList.add('visible');
-                if (recentSection) recentSection.classList.add('visible');
-            } else {
-                // BATKO, FKDT, PONPES, Operator → sembunyikan
-                if (chartsSection) chartsSection.classList.remove('visible');
-                if (recentSection) recentSection.classList.remove('visible');
+        // ============================================================
+        // ===== DATE =====
+        // ============================================================
+        function updateDate() {
+            const el = document.getElementById('currentDate');
+            if (!el) return;
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            el.textContent = now.toLocaleDateString('id-ID', options);
+
+            const welcomeDate = document.getElementById('welcomeDate');
+            if (welcomeDate) {
+                const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+                welcomeDate.textContent = now.toLocaleDateString('id-ID', dateOptions);
             }
+        }
+
+        // ============================================================
+        // ===== AUTH CHECK =====
+        // ============================================================
+        async function checkAuth() {
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error || !session) {
+                    window.location.href = 'index.html';
+                    return false;
+                }
+                
+                const { data: userData, error: userError } = await supabaseClient
+                    .from('users')
+                    .select('id, name, email, role, kecamatan_id, lembaga_id, active')
+                    .eq('id', session.user.id)
+                    .single();
+                
+                if (userError || !userData || !userData.active) {
+                    console.error('User data error:', userError);
+                    await supabaseClient.auth.signOut();
+                    window.location.href = 'index.html';
+                    return false;
+                }
+
+                window.currentUser = {
+                    id: userData.id,
+                    name: userData.name || session.user.email,
+                    email: session.user.email,
+                    role: userData.role || 'operator',
+                    kecamatan_id: userData.kecamatan_id,
+                    lembaga_id: userData.lembaga_id
+                };
+
+                updateHeaderUI(window.currentUser);
+                updateWelcomeUI(window.currentUser);
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = 'index.html';
+                return false;
+            }
+        }
+
+        function getUser() {
+            return window.currentUser || null;
+        }
+
+        function getRoleFilter() {
+            if (!window.currentUser) return {};
+            const user = window.currentUser;
+            const role = user.role;
+            const filter = {};
+
+            if (role === 'super_admin' || role === 'admin_kab') {
+                return {};
+            }
+
+            if (!user.kecamatan_id) {
+                return { restrict: true };
+            }
+
+            filter.kecamatan_id = user.kecamatan_id;
+
+            if (role === 'batko') {
+                filter.jenis_lembaga = 'LPQ';
+            } else if (role === 'fkdt') {
+                filter.jenis_lembaga = 'MDT';
+            } else if (role === 'ponpes') {
+                filter.jenis_lembaga = 'PONPES';
+            }
+
+            return filter;
+        }
+
+        // ============================================================
+        // ===== UPDATE UI =====
+        // ============================================================
+        function updateHeaderUI(user) {
+            if (!user) return;
+            
+            const avatarEl = document.getElementById('userAvatar');
+            if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
+            
+            const nameEl = document.getElementById('userName');
+            if (nameEl) nameEl.textContent = user.name;
+            
+            const roleNames = {
+                'super_admin': 'Super Admin',
+                'admin_kab': 'Admin Kabupaten',
+                'batko': 'BATKO',
+                'fkdt': 'FKDT',
+                'ponpes': 'PONPES',
+                'operator': 'Operator'
+            };
+            const roleEl = document.getElementById('userRole');
+            if (roleEl) roleEl.textContent = roleNames[user.role] || user.role;
+
+            const avatarSmall = document.getElementById('userAvatarSmall');
+            if (avatarSmall) avatarSmall.textContent = user.name.charAt(0).toUpperCase();
+            
+            const nameSmall = document.getElementById('userNameSmall');
+            if (nameSmall) nameSmall.textContent = user.name;
+            
+            const roleBadge = document.getElementById('headerRoleBadge');
+            if (roleBadge) roleBadge.textContent = roleNames[user.role] || user.role;
+            
+            const scopeEl = document.getElementById('headerScope');
+            if (scopeEl) {
+                if (user.role === 'super_admin' || user.role === 'admin_kab') {
+                    scopeEl.textContent = '';
+                } else if (user.kecamatan_id) {
+                    supabaseClient
+                        .from('master_kecamatan')
+                        .select('nama')
+                        .eq('id', user.kecamatan_id)
+                        .single()
+                        .then(({ data }) => {
+                            const jenis = {
+                                'batko': 'LPQ',
+                                'fkdt': 'MDT',
+                                'ponpes': 'PONPES'
+                            };
+                            scopeEl.textContent = `📍 ${data?.nama || 'Kecamatan'} • ${jenis[user.role] || ''}`;
+                        });
+                } else if (user.lembaga_id) {
+                    supabaseClient
+                        .from('lembaga')
+                        .select('nama')
+                        .eq('id', user.lembaga_id)
+                        .single()
+                        .then(({ data }) => {
+                            scopeEl.textContent = `🏫 ${data?.nama || 'Lembaga'}`;
+                        });
+                }
+            }
+        }
+
+        function updateWelcomeUI(user) {
+            if (!user) return;
+            
+            const welcomeName = document.getElementById('welcomeName');
+            if (welcomeName) welcomeName.textContent = user.name;
+            
+            const roleNames = {
+                'super_admin': 'Super Admin SI-MUSTAFA',
+                'admin_kab': 'Admin Kemenag Kabupaten Tegal',
+                'batko': 'Admin BATKO',
+                'fkdt': 'Admin FKDT',
+                'ponpes': 'Admin PONPES',
+                'operator': 'Operator Lembaga'
+            };
+
+            let roleText = roleNames[user.role] || user.role;
+            
+            if (['batko', 'fkdt', 'ponpes'].includes(user.role) && user.kecamatan_id) {
+                supabaseClient
+                    .from('master_kecamatan')
+                    .select('nama')
+                    .eq('id', user.kecamatan_id)
+                    .single()
+                    .then(({ data }) => {
+                        const jenis = {
+                            'batko': 'LPQ',
+                            'fkdt': 'MDT',
+                            'ponpes': 'PONPES'
+                        };
+                        const welcomeRole = document.getElementById('welcomeRole');
+                        if (welcomeRole) {
+                            welcomeRole.textContent = `Admin ${jenis[user.role] || ''} ${data?.nama || 'Kecamatan'}`;
+                        }
+                    });
+            } else {
+                const welcomeRole = document.getElementById('welcomeRole');
+                if (welcomeRole) welcomeRole.textContent = roleText;
+            }
+        }
+
+        // ============================================================
+        // ===== HANDLE LOGOUT =====
+        // ============================================================
+        async function handleLogout() {
+            if (!confirm('Apakah Anda yakin ingin keluar?')) return;
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) throw error;
+                showToast('Logout berhasil!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } catch (e) {
+                console.error('Logout error:', e);
+                showToast('Gagal logout: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== NAVIGATE =====
+        // ============================================================
+        function navigateTo(page) {
+            window.location.href = page;
         }
 
         // ============================================================
@@ -863,7 +1882,6 @@
                 const user = getUser();
                 const filter = getRoleFilter();
 
-                // 🔴 Cek apakah user memiliki akses
                 if (filter.restrict) {
                     document.querySelector('.stats-grid').innerHTML = `
                         <div style="grid-column:1/-1;text-align:center;padding:40px;color:#f44336;">
@@ -874,13 +1892,11 @@
                     return;
                 }
 
-                // 🔴 BUILD QUERY DENGAN FILTER ROLE
                 let lembagaQuery = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true });
                 let pendidikQuery = supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true);
                 let bantuanQuery = supabaseClient.from('bantuan').select('*', { count: 'exact', head: true })
                     .eq('tahun_anggaran', new Date().getFullYear()).eq('status', 'cair');
 
-                // Filter berdasarkan role
                 if (filter.kecamatan_id) {
                     lembagaQuery = lembagaQuery.eq('kecamatan_id', filter.kecamatan_id);
                     pendidikQuery = pendidikQuery.eq('kecamatan_lembaga_id', filter.kecamatan_id);
@@ -900,18 +1916,13 @@
                     bantuanQuery
                 ]);
 
-                // Update UI dengan data yang sudah difilter...
                 document.getElementById('totalKecamatan').textContent = kecamatan.count || 0;
                 document.getElementById('totalKelurahan').textContent = kelurahan.count || 0;
                 document.getElementById('totalLembaga').textContent = lembaga.count || 0;
                 document.getElementById('totalPendidik').textContent = pendidik.count || 0;
                 document.getElementById('totalBantuan').textContent = bantuan.count || 0;
 
-                // Tampilkan informasi filter di dashboard
                 showFilterInfo(filter);
-
-                // Toggle charts berdasarkan role
-                toggleChartsByRole();
 
             } catch (e) {
                 console.error(e);
@@ -920,8 +1931,8 @@
         }
 
         function showFilterInfo(filter) {
-            const infoEl = document.getElementById('filterInfo');
-            if (!infoEl) return;
+            const infoText = document.getElementById('filterInfoText');
+            if (!infoText) return;
 
             if (filter.jenis_lembaga && filter.kecamatan_id) {
                 const jenisNames = { 'LPQ': 'LPQ (BATKO)', 'MDT': 'MDT (FKDT)', 'PONPES': 'PONPES' };
@@ -931,12 +1942,16 @@
                     .eq('id', filter.kecamatan_id)
                     .single()
                     .then(({ data }) => {
-                        infoEl.textContent = `📌 Menampilkan: ${jenisNames[filter.jenis_lembaga] || filter.jenis_lembaga} di Kecamatan ${data?.nama || ''}`;
-                        infoEl.style.cssText = 'background:#e8f5e9;padding:8px 16px;border-radius:8px;font-size:0.8rem;color:#2e7d32;margin-bottom:12px;';
+                        infoText.textContent = `Menampilkan: ${jenisNames[filter.jenis_lembaga] || filter.jenis_lembaga} di Kecamatan ${data?.nama || ''}`;
+                        document.getElementById('filterInfo').style.background = '#e8f5e9';
+                        document.getElementById('filterInfo').style.borderLeftColor = '#2e7d32';
+                        document.getElementById('filterInfo').style.color = '#2e7d32';
                     });
             } else {
-                infoEl.textContent = '📊 Menampilkan semua data';
-                infoEl.style.cssText = 'background:#f8faf8;padding:8px 16px;border-radius:8px;font-size:0.8rem;color:#888;margin-bottom:12px;';
+                infoText.textContent = 'Menampilkan semua data';
+                document.getElementById('filterInfo').style.background = 'white';
+                document.getElementById('filterInfo').style.borderLeftColor = 'var(--primary)';
+                document.getElementById('filterInfo').style.color = '#888';
             }
         }
 
@@ -945,7 +1960,6 @@
         // ============================================================
         async function loadCharts() {
             try {
-                // Sebaran Chart - per Desa
                 const { data } = await supabaseClient
                     .from('pendidik')
                     .select('desa_pengajar, kecamatan_pengajar')
@@ -983,7 +1997,6 @@
                     });
                 }
 
-                // Bantuan Chart
                 const { data: bData } = await supabaseClient
                     .from('bantuan')
                     .select('tahun_anggaran, nominal')
@@ -1017,7 +2030,24 @@
         }
 
         // ============================================================
-        // ===== LOAD RECENT ACTIVITY =====
+        // ===== TOGGLE CHARTS BY ROLE =====
+        // ============================================================
+        function toggleChartsByRole() {
+            const user = getUser();
+            const chartsSection = document.getElementById('chartsSection');
+            const recentSection = document.getElementById('recentSection');
+
+            if (user && (user.role === 'admin_kab' || user.role === 'super_admin')) {
+                if (chartsSection) chartsSection.classList.add('visible');
+                if (recentSection) recentSection.classList.add('visible');
+            } else {
+                if (chartsSection) chartsSection.classList.remove('visible');
+                if (recentSection) recentSection.classList.remove('visible');
+            }
+        }
+
+        // ============================================================
+        // ===== LOAD RECENT =====
         // ============================================================
         async function loadRecent() {
             try {
@@ -1037,10 +2067,10 @@
 
                 tbody.innerHTML = data.map(item => `
                     <tr>
-                        <td><strong>${item.nama_lengkap || '-'}</strong></td>
-                        <td>${item.nslp_lembaga || '-'}</td>
-                        <td><span class="badge ${item.status_aktif ? 'active' : 'inactive'}">${item.status_aktif ? 'Aktif' : 'Tidak Aktif'}</span></td>
-                        <td style="font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><strong>${item.nama_lengkap || '-'}</strong></td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;">${item.nslp_lembaga || '-'}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><span class="badge" style="padding:2px 12px;border-radius:12px;font-size:0.7rem;font-weight:600;background:${item.status_aktif ? '#e8f5e9' : '#ffebee'};color:${item.status_aktif ? '#2e7d32' : '#c62828'};">${item.status_aktif ? 'Aktif' : 'Tidak Aktif'}</span></td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
                     </tr>
                 `).join('');
             } catch (e) { console.error(e); }
@@ -1054,14 +2084,16 @@
                 const { data, error } = await supabaseClient
                     .from('pendidik')
                     .select(`
-                        id,
-                        nik,
-                        nama_lengkap,
-                        status_verifikasi,
-                        dokumen_kyc,
-                        lembaga_id,
-                        updated_at,
-                        lembaga!pendidik_lembaga_id_fkey(nama, nslp)
+                        *,
+                        lembaga:lembaga_id (
+                            id,
+                            nama,
+                            nslp,
+                            jenis_lembaga,
+                            alamat,
+                            kecamatan,
+                            desa
+                        )
                     `)
                     .not('dokumen_kyc', 'is', null)
                     .order('updated_at', { ascending: false });
@@ -1069,26 +2101,21 @@
                 if (error) throw error;
 
                 const kycData = data || [];
-
-                // Hitung statistik
                 const total = kycData.length;
                 const pending = kycData.filter(d => d.status_verifikasi === 'Pending').length;
                 const verified = kycData.filter(d => d.status_verifikasi === 'Diverifikasi').length;
                 const rejected = kycData.filter(d => d.status_verifikasi === 'Ditolak').length;
 
-                // Update stats
                 document.getElementById('kycTotal').textContent = total;
                 document.getElementById('kycPending').textContent = pending;
                 document.getElementById('kycVerified').textContent = verified;
                 document.getElementById('kycRejected').textContent = rejected;
                 document.getElementById('kycPendingCount').textContent = pending;
 
-                // Progress
                 const progress = total > 0 ? ((verified / total) * 100) : 0;
                 document.getElementById('kycProgressText').textContent = `${Math.round(progress)}%`;
                 document.getElementById('kycProgressBar').style.width = `${Math.min(progress, 100)}%`;
 
-                // Render tabel
                 renderKYCTable(kycData);
 
             } catch (e) {
@@ -1134,18 +2161,18 @@
 
                 return `
                     <tr onclick="openKycModal('${item.id}')" style="cursor:pointer;${isPending ? 'background:#fffde7;' : ''}">
-                        <td><strong>${item.nama_lengkap || '-'}</strong></td>
-                        <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${item.nik || '-'}</code></td>
-                        <td>${item.lembaga?.nama || item.nslp_lembaga || '-'}</td>
-                        <td><span class="kyc-status-badge ${statusClass}">${statusText}</span></td>
-                        <td style="font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
-                        <td style="text-align:center;">
+                        <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><strong>${item.nama_lengkap || '-'}</strong></td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${item.nik || '-'}</code></td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;">${item.lembaga?.nama || item.nslp_lembaga || '-'}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><span class="kyc-status-badge ${statusClass}">${statusText}</span></td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;text-align:center;">
                             ${isPending ? `
-                                <span class="badge pending" style="font-size:0.6rem;">
+                                <span class="badge" style="background:#ff9800;color:white;font-size:0.6rem;padding:2px 10px;border-radius:12px;">
                                     <i class="fas fa-clock"></i> Perlu Verifikasi
                                 </span>
                             ` : `
-                                <span class="badge ${item.status_verifikasi === 'Diverifikasi' ? 'active' : 'inactive'}" style="font-size:0.6rem;">
+                                <span class="badge" style="background:${item.status_verifikasi === 'Diverifikasi' ? '#4CAF50' : '#f44336'};color:white;font-size:0.6rem;padding:2px 10px;border-radius:12px;">
                                     ${item.status_verifikasi === 'Diverifikasi' ? '✓ Selesai' : '✗ Ditolak'}
                                 </span>
                             `}
@@ -1156,22 +2183,29 @@
         }
 
         // ============================================================
-        // ===== KYC TAB SWITCHER =====
+        // ===== KYC FUNCTIONS =====
         // ============================================================
+        // ===== HELPER FUNCTION =====
+        function setElementText(id, value) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = value || '-';
+            } else {
+                console.warn('Element not found:', id);
+            }
+        }
+
         function switchKycTab(tab, btn) {
             currentKycTab = tab;
-            
             document.querySelectorAll('.kyc-tab-content').forEach(el => {
                 el.style.display = 'none';
                 el.classList.remove('active');
             });
-            
             const target = document.getElementById(`tab-${tab}`);
             if (target) {
                 target.style.display = 'block';
                 target.classList.add('active');
             }
-            
             document.querySelectorAll('.kyc-tabs .tab-btn').forEach(b => {
                 b.classList.remove('active');
             });
@@ -1180,182 +2214,250 @@
             }
         }
 
-        // ============================================================
-        // ===== OPEN KYC MODAL =====
-        // ============================================================
-        async function openKycModal(pendidikId) {
+async function openKycModal(pendidikId) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('pendidik')
+            .select(`
+                *,
+                lembaga:lembaga_id (
+                    id,
+                    nama,
+                    nslp,
+                    jenis_lembaga,
+                    alamat,
+                    kecamatan,
+                    desa
+                )
+            `)
+            .eq('id', pendidikId)
+            .single();
+
+        if (error) throw error;
+
+        currentKycPendidik = data;
+
+        // ===== IDENTITAS (AMAN) =====
+        const fields = [
+            'kycDetailNama', 'kycDetailNik', 'kycDetailTempatLahir',
+            'kycDetailTanggalLahir', 'kycDetailJenisKelamin',
+            'kycDetailStatusPerkawinan', 'kycDetailIbuKandung',
+            'kycDetailPendidikan', 'kycDetailAlamat', 'kycDetailNoHp',
+            'kycDetailEmail'
+        ];
+        
+        const values = [
+            data.nama_lengkap, data.nik, data.tempat_lahir,
+            data.tanggal_lahir, data.jenis_kelamin,
+            data.status_perkawinan, data.ibu_kandung,
+            data.pendidikan_terakhir, data.alamat, data.no_hp,
+            data.email
+        ];
+
+        fields.forEach((id, index) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = values[index] || '-';
+        });
+
+        // ===== REKENING =====
+        const rekFields = [
+            'kycDetailNomorRekeningBupati', 'kycDetailNamaBankBupati',
+            'kycDetailPemilikRekeningBupati', 'kycDetailNomorRekeningGubernur',
+            'kycDetailNamaBankGubernur', 'kycDetailPemilikRekeningGubernur'
+        ];
+        
+        const rekValues = [
+            data.nomor_rekening_bupati, data.nama_bank_bupati,
+            data.pemilik_rekening_bupati, data.nomor_rekening_gubernur,
+            data.nama_bank_gubernur, data.pemilik_rekening_gubernur
+        ];
+
+        rekFields.forEach((id, index) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = rekValues[index] || '-';
+        });
+
+        // ===== DATA MENGAJAR =====
+        const lembaga = data.lembaga || {};
+        
+        const mengajarFields = {
+            'kycDetailLembaga': lembaga.nama || data.nslp_lembaga || '-',
+            'kycDetailNslpLembaga': lembaga.nslp || data.nslp_lembaga || '-',
+            'kycDetailJenisLembaga': lembaga.jenis_lembaga || data.jenis_lembaga || '-',
+            'kycDetailKecamatanLembaga': lembaga.kecamatan || data.kecamatan_lembaga || '-',
+            'kycDetailDesaLembaga': lembaga.desa || data.desa_lembaga || '-',
+            'kycDetailRtRw': data.rt_rw_pengajar || '-',
+            'kycDetailKecamatanPengajar': data.kecamatan_pengajar || '-',
+            'kycDetailDesaPengajar': data.desa_pengajar || '-',
+            'kycDetailKabupatenPengajar': data.kabupaten_pengajar || 'Tegal',
+            'kycDetailTmt': data.tmt_mengajar || '-',
+            'kycDetailLamaMengabdi': data.lama_mengabdi ? data.lama_mengabdi + ' tahun' : '-'
+        };
+
+        Object.keys(mengajarFields).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = mengajarFields[id];
+        });
+
+        // ===== STATUS =====
+        let statusText = data.status_verifikasi || 'Draft';
+        let statusClass = 'draft';
+        if (statusText === 'Diverifikasi') { 
+            statusClass = 'verified'; 
+            statusText = '✅ Terverifikasi'; 
+        } else if (statusText === 'Pending') { 
+            statusClass = 'pending'; 
+            statusText = '⏳ Menunggu Verifikasi'; 
+        } else if (statusText === 'Ditolak') { 
+            statusClass = 'rejected'; 
+            statusText = '❌ Ditolak'; 
+        } else { 
+            statusText = '📝 Draft'; 
+        }
+        
+        const statusEl = document.getElementById('kycDetailStatus');
+        if (statusEl) statusEl.innerHTML = `<span class="kyc-status-badge ${statusClass}" style="font-size:0.9rem;padding:4px 14px;">${statusText}</span>`;
+
+        const aktifText = data.status_aktif ? 'Aktif' : 'Tidak Aktif';
+        const aktifClass = data.status_aktif ? 'active' : 'inactive';
+        const aktifEl = document.getElementById('kycDetailAktif');
+        if (aktifEl) aktifEl.innerHTML = `<span class="badge" style="padding:2px 12px;border-radius:12px;font-size:0.8rem;font-weight:600;background:${data.status_aktif ? '#e8f5e9' : '#ffebee'};color:${data.status_aktif ? '#2e7d32' : '#c62828'};">${aktifText}</span>`;
+
+        const tanggalEl = document.getElementById('kycDetailTanggal');
+        if (tanggalEl) tanggalEl.textContent = formatDate(data.updated_at);
+        
+        const catatanEl = document.getElementById('kycDetailCatatan');
+        if (catatanEl) catatanEl.textContent = data.catatan_verifikasi || 'Tidak ada catatan';
+
+        // ===== DOKUMEN =====
+        kycDokumen = { ktp: null, bupati: null, gubernur: null };
+        document.querySelectorAll('.dokumen-preview').forEach(el => el.style.display = 'none');
+        
+        const ktpNameEl = document.getElementById('kycDokumenKtpName');
+        const bupatiNameEl = document.getElementById('kycDokumenBupatiName');
+        const gubernurNameEl = document.getElementById('kycDokumenGubernurName');
+        
+        if (ktpNameEl) ktpNameEl.textContent = 'Belum ada dokumen';
+        if (bupatiNameEl) bupatiNameEl.textContent = 'Belum ada dokumen';
+        if (gubernurNameEl) gubernurNameEl.textContent = 'Belum ada dokumen';
+
+        if (data.dokumen_kyc) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('pendidik')
-                    .select(`
-                        *,
-                        lembaga!pendidik_lembaga_id_fkey(
-                            id, nama, nslp, jenis_lembaga, alamat, kecamatan, desa
-                        )
-                    `)
-                    .eq('id', pendidikId)
-                    .single();
-
-                if (error) throw error;
-
-                currentKycPendidik = data;
-                currentKycDokumenUrl = data.dokumen_kyc || null;
-
-                // ===== IDENTITAS =====
-                document.getElementById('kycDetailNama').textContent = data.nama_lengkap || '-';
-                document.getElementById('kycDetailNik').textContent = data.nik || '-';
-                document.getElementById('kycDetailTempatLahir').textContent = data.tempat_lahir || '-';
-                document.getElementById('kycDetailTanggalLahir').textContent = data.tanggal_lahir || '-';
-                document.getElementById('kycDetailJenisKelamin').textContent = data.jenis_kelamin || '-';
-                document.getElementById('kycDetailStatusPerkawinan').textContent = data.status_perkawinan || '-';
-                document.getElementById('kycDetailIbuKandung').textContent = data.ibu_kandung || '-';
-                document.getElementById('kycDetailPendidikan').textContent = data.pendidikan_terakhir || '-';
-                document.getElementById('kycDetailAlamat').textContent = data.alamat || '-';
-                document.getElementById('kycDetailNoHp').textContent = data.no_hp || '-';
-                document.getElementById('kycDetailEmail').textContent = data.email || '-';
-                document.getElementById('kycDetailNomorRekening').textContent = data.nomor_rekening || '-';
-                document.getElementById('kycDetailNamaBank').textContent = data.nama_bank || '-';
-
-                // ===== DATA MENGAJAR =====
-                document.getElementById('kycDetailLembaga').textContent = data.lembaga?.nama || data.nslp_lembaga || '-';
-                document.getElementById('kycDetailNslpLembaga').textContent = data.lembaga?.nslp || data.nslp_lembaga || '-';
-                document.getElementById('kycDetailJenisLembaga').textContent = data.lembaga?.jenis_lembaga || data.jenis_lembaga || '-';
-                document.getElementById('kycDetailKecamatanLembaga').textContent = data.lembaga?.kecamatan || data.kecamatan_lembaga || '-';
-                document.getElementById('kycDetailDesaLembaga').textContent = data.lembaga?.desa || data.desa_lembaga || '-';
-                document.getElementById('kycDetailRtRw').textContent = data.rt_rw_pengajar || '-';
-                document.getElementById('kycDetailKecamatanPengajar').textContent = data.kecamatan_pengajar || '-';
-                document.getElementById('kycDetailDesaPengajar').textContent = data.desa_pengajar || '-';
-                document.getElementById('kycDetailKabupatenPengajar').textContent = data.kabupaten_pengajar || 'Tegal';
-                document.getElementById('kycDetailTmt').textContent = data.tmt_mengajar || '-';
-                document.getElementById('kycDetailLamaMengabdi').textContent = data.lama_mengabdi ? data.lama_mengabdi + ' tahun' : '-';
-
-                // ===== STATUS =====
-                let statusText = data.status_verifikasi || 'Draft';
-                let statusClass = 'draft';
-                if (statusText === 'Diverifikasi') { 
-                    statusClass = 'verified'; 
-                    statusText = '✅ Terverifikasi'; 
-                } else if (statusText === 'Pending') { 
-                    statusClass = 'pending'; 
-                    statusText = '⏳ Menunggu Verifikasi'; 
-                } else if (statusText === 'Ditolak') { 
-                    statusClass = 'rejected'; 
-                    statusText = '❌ Ditolak'; 
-                } else { 
-                    statusText = '📝 Draft'; 
-                }
-                document.getElementById('kycDetailStatus').innerHTML = `<span class="kyc-status-badge ${statusClass}" style="font-size:0.9rem;padding:4px 14px;">${statusText}</span>`;
-
-                // Status Aktif
-                const aktifText = data.status_aktif ? 'Aktif' : 'Tidak Aktif';
-                const aktifClass = data.status_aktif ? 'active' : 'inactive';
-                document.getElementById('kycDetailAktif').innerHTML = `<span class="badge ${aktifClass}" style="font-size:0.8rem;">${aktifText}</span>`;
-
-                // Tanggal
-                document.getElementById('kycDetailTanggal').textContent = formatDate(data.updated_at);
-
-                // Catatan
-                document.getElementById('kycDetailCatatan').textContent = data.catatan_verifikasi || 'Tidak ada catatan';
-
-                // ===== DOKUMEN =====
-                const dokumenName = document.getElementById('kycDokumenName');
-                const preview = document.getElementById('dokumenPreview');
-                const img = document.getElementById('dokumenPreviewImg');
-                const pdf = document.getElementById('dokumenPreviewPdf');
-                const empty = document.getElementById('dokumenPreviewEmpty');
-
-                preview.style.display = 'none';
-                img.style.display = 'none';
-                pdf.style.display = 'none';
-                empty.style.display = 'none';
-
-                if (data.dokumen_kyc) {
-                    const fileName = data.dokumen_kyc.split('/').pop() || 'Dokumen KYC';
-                    dokumenName.textContent = `📄 ${fileName}`;
-                } else {
-                    dokumenName.textContent = '❌ Belum ada dokumen';
-                }
-
-                // ===== ACTION BOX =====
-                const actionBox = document.getElementById('kycActionBox');
-                const isPending = data.status_verifikasi === 'Pending' || data.status_verifikasi === 'Draft';
+                const docs = typeof data.dokumen_kyc === 'string' ? JSON.parse(data.dokumen_kyc) : data.dokumen_kyc;
                 
-                if (isPending) {
-                    actionBox.style.display = 'block';
-                    document.getElementById('kycKeterangan').value = '';
-                } else {
-                    actionBox.style.display = 'none';
+                if (docs.ktp && ktpNameEl) {
+                    kycDokumen.ktp = docs.ktp;
+                    ktpNameEl.textContent = `📄 ${docs.ktp.split('/').pop() || 'KTP'}`;
                 }
-
-                document.getElementById('kycPendidikId').value = data.id;
-
-                switchKycTab('identitas', document.querySelector('.kyc-tabs .tab-btn'));
-
-                document.getElementById('kycModal').classList.add('active');
-
+                if (docs.bupati && bupatiNameEl) {
+                    kycDokumen.bupati = docs.bupati;
+                    bupatiNameEl.textContent = `📄 ${docs.bupati.split('/').pop() || 'Rek Bupati'}`;
+                }
+                if (docs.gubernur && gubernurNameEl) {
+                    kycDokumen.gubernur = docs.gubernur;
+                    gubernurNameEl.textContent = `📄 ${docs.gubernur.split('/').pop() || 'Rek Gubernur'}`;
+                }
             } catch (e) {
-                console.error('Error opening KYC modal:', e);
-                showToast('Gagal memuat detail KYC: ' + e.message, 'error');
+                if (data.dokumen_kyc && ktpNameEl) {
+                    kycDokumen.ktp = data.dokumen_kyc;
+                    ktpNameEl.textContent = `📄 ${data.dokumen_kyc.split('/').pop() || 'Dokumen'}`;
+                }
             }
         }
 
-        // ============================================================
-        // ===== CLOSE KYC MODAL =====
-        // ============================================================
+        // ===== ACTION BOX =====
+        const actionBox = document.getElementById('kycActionBox');
+        const isPending = data.status_verifikasi === 'Pending' || data.status_verifikasi === 'Draft';
+        
+        if (actionBox) {
+            if (isPending) {
+                actionBox.style.display = 'block';
+                const keteranganEl = document.getElementById('kycKeterangan');
+                if (keteranganEl) keteranganEl.value = '';
+            } else {
+                actionBox.style.display = 'none';
+            }
+        }
+
+        const pendidikIdEl = document.getElementById('kycPendidikId');
+        if (pendidikIdEl) pendidikIdEl.value = data.id;
+
+        switchKycTab('identitas', document.querySelector('.kyc-tabs .tab-btn'));
+
+        const modal = document.getElementById('kycModal');
+        if (modal) modal.classList.add('active');
+
+    } catch (e) {
+        console.error('Error opening KYC modal:', e);
+        showToast('Gagal memuat detail KYC: ' + e.message, 'error');
+    }
+}
+
         function closeKycModal() {
             document.getElementById('kycModal').classList.remove('active');
-            document.getElementById('dokumenPreview').style.display = 'none';
             currentKycPendidik = null;
-            currentKycDokumenUrl = null;
         }
 
         // ============================================================
-        // ===== PREVIEW DOKUMEN =====
+        // ===== PREVIEW DOKUMEN PER FIELD =====
         // ============================================================
-        function previewKycDocument() {
-            const preview = document.getElementById('dokumenPreview');
-            const img = document.getElementById('dokumenPreviewImg');
-            const pdf = document.getElementById('dokumenPreviewPdf');
-            const empty = document.getElementById('dokumenPreviewEmpty');
-
-            if (!currentKycDokumenUrl) {
+        function previewDokumen(type) {
+            const url = kycDokumen[type];
+            if (!url) {
                 showToast('Tidak ada dokumen untuk dilihat', 'warning');
                 return;
             }
 
+            const previewId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Preview`;
+            const imgId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Img`;
+            const pdfId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Pdf`;
+            const emptyId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Empty`;
+
+            const preview = document.getElementById(previewId);
+            const img = document.getElementById(imgId);
+            const pdf = document.getElementById(pdfId);
+            const empty = document.getElementById(emptyId);
+
+            // Reset
             img.style.display = 'none';
             pdf.style.display = 'none';
             empty.style.display = 'none';
             preview.style.display = 'block';
 
-            const url = currentKycDokumenUrl.toLowerCase();
+            const urlLower = url.toLowerCase();
             
-            if (url.endsWith('.pdf')) {
-                pdf.src = currentKycDokumenUrl;
+            if (urlLower.endsWith('.pdf')) {
+                pdf.src = url;
                 pdf.style.display = 'block';
-            } else if (url.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) {
-                img.src = currentKycDokumenUrl;
+            } else if (urlLower.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) {
+                img.src = url;
                 img.style.display = 'block';
             } else {
-                img.src = currentKycDokumenUrl;
+                img.src = url;
                 img.style.display = 'block';
                 img.onerror = function() {
                     img.style.display = 'none';
                     empty.style.display = 'block';
-                    empty.innerHTML = '<i class="fas fa-file" style="font-size:2rem;display:block;margin-bottom:8px;"></i>File tidak dapat ditampilkan. Silakan download.';
+                    empty.innerHTML = `<i class="fas fa-file" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                        File tidak dapat ditampilkan. 
+                        <br><button class="btn btn-primary btn-sm" onclick="downloadDokumen('${type}')" style="margin-top:8px;">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    `;
                 };
             }
         }
 
         // ============================================================
-        // ===== DOWNLOAD DOKUMEN =====
+        // ===== DOWNLOAD DOKUMEN PER FIELD =====
         // ============================================================
-        function downloadKycDocument() {
-            if (currentKycDokumenUrl) {
-                window.open(currentKycDokumenUrl, '_blank');
-            } else {
+        function downloadDokumen(type) {
+            const url = kycDokumen[type];
+            if (!url) {
                 showToast('Tidak ada dokumen untuk didownload', 'warning');
+                return;
             }
+            window.open(url, '_blank');
         }
 
         // ============================================================
@@ -1393,7 +2495,6 @@
 
                 showToast(`Verifikasi ${statusText} untuk ${currentKycPendidik.nama_lengkap} berhasil!`, 'success');
                 closeKycModal();
-                
                 await loadKYCData();
                 await loadDashboard();
 
@@ -1404,19 +2505,26 @@
         }
 
         // ============================================================
+        // ===== FORMAT DATE =====
+        // ============================================================
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            } catch {
+                return dateStr;
+            }
+        }
+
+        // ============================================================
         // ===== REFRESH =====
         // ============================================================
         function refreshData() {
             showToast('Memperbarui data...', 'info');
             loadKYCData();
             loadDashboard();
-        }
-
-        // ============================================================
-        // ===== NAVIGATE =====
-        // ============================================================
-        function navigateTo(page) {
-            window.location.href = page;
+            loadRecent();
         }
 
         // ============================================================
@@ -1426,13 +2534,18 @@
             await checkAuth();
             updateDate();
             
-            // Toggle charts berdasarkan role (sebelum load data)
             toggleChartsByRole();
             
             await loadKYCData();
             await loadDashboard();
             await loadCharts();
             await loadRecent();
+
+            const { count } = await supabaseClient
+                .from('pendidik')
+                .select('*', { count: 'exact', head: true })
+                .eq('status_aktif', true);
+            document.getElementById('navPendidikCount').textContent = count || 0;
             
             setInterval(updateDate, 60000);
             setInterval(() => { 
@@ -1448,11 +2561,15 @@
         window.navigateTo = navigateTo;
         window.openKycModal = openKycModal;
         window.closeKycModal = closeKycModal;
-        window.previewKycDocument = previewKycDocument;
-        window.downloadKycDocument = downloadKycDocument;
+        window.previewDokumen = previewDokumen;
+        window.downloadDokumen = downloadDokumen;
         window.verifyKyc = verifyKyc;
         window.switchKycTab = switchKycTab;
         window.showToast = showToast;
+        window.handleLogout = handleLogout;
+        window.getUser = getUser;
+        window.getRoleFilter = getRoleFilter;
+        window.toggleSidebar = toggleSidebar;
     </script>
 </body>
 </html>
