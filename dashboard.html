@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Dashboard - SI-MUSTAFA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         /* ============================================================
@@ -482,6 +481,8 @@
             align-items: center;
             gap: 16px;
             border-left: 4px solid var(--primary);
+            text-decoration: none;
+            color: inherit;
         }
 
         .stat-card:hover {
@@ -657,40 +658,6 @@
         .kyc-status-badge.pending { background: #fff3e0; color: #ff9800; }
         .kyc-status-badge.verified { background: #e8f5e9; color: #4CAF50; }
         .kyc-status-badge.rejected { background: #ffebee; color: #f44336; }
-
-        /* ===== CHARTS SECTION ===== */
-        .charts-section {
-            display: none;
-        }
-        .charts-section.visible {
-            display: block;
-        }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: var(--card-shadow);
-        }
-
-        .card .card-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-            margin-bottom: 12px;
-        }
-
-        .card .card-title i {
-            margin-right: 8px;
-            color: var(--primary);
-        }
 
         /* ===== BUTTONS ===== */
         .btn {
@@ -989,6 +956,60 @@
             border-top: 1px solid #f0f2f5;
         }
 
+        /* ===== RECENT ACTIVITY ===== */
+        .recent-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+        }
+
+        .recent-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .recent-card .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .recent-card .card-title i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table-responsive table {
+            width: 100%;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+
+        .table-responsive table th {
+            padding: 8px 10px;
+            text-align: left;
+            background: #f8faf8;
+            border-bottom: 2px solid #f0f2f5;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #888;
+        }
+
+        .table-responsive table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f5f6f8;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
             .sidebar {
@@ -1061,9 +1082,6 @@
             }
             .stat-card .info .value {
                 font-size: 1.2rem;
-            }
-            .charts-grid {
-                grid-template-columns: 1fr;
             }
             .kyc-info-grid {
                 grid-template-columns: 1fr;
@@ -1244,48 +1262,48 @@
 
         <!-- ===== STATS GRID ===== -->
         <div class="stats-grid" id="statsGrid">
-            <div class="stat-card" onclick="navigateTo('lembaga?tab=kecamatan')">
+            <a href="lembaga.html?tab=kecamatan" class="stat-card">
                 <div class="icon purple"><i class="fas fa-map-marker-alt"></i></div>
                 <div class="info">
                     <div class="label">Kecamatan</div>
                     <div class="value" id="totalKecamatan">0</div>
                 </div>
-            </div>
-            <div class="stat-card" onclick="navigateTo('lembaga?tab=kelurahan')">
+            </a>
+            <a href="lembaga.html?tab=kelurahan" class="stat-card">
                 <div class="icon teal"><i class="fas fa-city"></i></div>
                 <div class="info">
                     <div class="label">Kelurahan/Desa</div>
                     <div class="value" id="totalKelurahan">0</div>
                 </div>
-            </div>
-            <div class="stat-card" onclick="navigateTo('lembaga')">
+            </a>
+            <a href="lembaga.html" class="stat-card">
                 <div class="icon gold"><i class="fas fa-building"></i></div>
                 <div class="info">
                     <div class="label">Lembaga</div>
                     <div class="value" id="totalLembaga">0</div>
                 </div>
-            </div>
-            <div class="stat-card" onclick="navigateTo('pendidik')">
+            </a>
+            <a href="pendidik.html" class="stat-card">
                 <div class="icon green"><i class="fas fa-user-graduate"></i></div>
                 <div class="info">
                     <div class="label">Pendidik Aktif</div>
                     <div class="value" id="totalPendidik">0</div>
                 </div>
-            </div>
-            <div class="stat-card" onclick="navigateTo('bantuan')">
+            </a>
+            <a href="bantuan.html" class="stat-card">
                 <div class="icon blue"><i class="fas fa-hand-holding-heart"></i></div>
                 <div class="info">
                     <div class="label">Penerima Bantuan</div>
                     <div class="value" id="totalBantuan">0</div>
                 </div>
-            </div>
-            <div class="stat-card" onclick="navigateTo('laporan')">
+            </a>
+            <a href="laporan.html" class="stat-card">
                 <div class="icon orange"><i class="fas fa-file-alt"></i></div>
                 <div class="info">
                     <div class="label">Laporan Bulan Ini</div>
                     <div class="value" id="totalLaporan">0</div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- ===== KYC SECTION ===== -->
@@ -1347,42 +1365,26 @@
             </div>
         </div>
 
-        <!-- ===== CHARTS SECTION ===== -->
-        <div id="chartsSection" class="charts-section">
-            <div class="charts-grid">
-                <div class="card">
-                    <div class="card-title"><i class="fas fa-chart-bar"></i>Sebaran Pendidik per Desa</div>
-                    <div style="height:200px;"><canvas id="sebaranChart"></canvas></div>
-                </div>
-                <div class="card">
-                    <div class="card-title"><i class="fas fa-chart-line"></i>Statistik Bantuan</div>
-                    <div style="height:200px;"><canvas id="bantuanChart"></canvas></div>
-                </div>
-            </div>
-        </div>
-
         <!-- ===== RECENT ACTIVITY ===== -->
-        <div id="recentSection" class="charts-section">
-            <div class="card">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                    <div class="card-title" style="margin-bottom:0;"><i class="fas fa-clock"></i>Aktivitas Terbaru</div>
-                    <button class="btn btn-outline btn-sm" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
-                </div>
-                <div class="table-responsive" style="overflow-x:auto;">
-                    <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
-                        <thead>
-                            <tr>
-                                <th style="padding:8px 10px;text-align:left;background:#f8faf8;border-bottom:2px solid #f0f2f5;font-size:0.7rem;text-transform:uppercase;color:#888;">Nama</th>
-                                <th style="padding:8px 10px;text-align:left;background:#f8faf8;border-bottom:2px solid #f0f2f5;font-size:0.7rem;text-transform:uppercase;color:#888;">Lembaga</th>
-                                <th style="padding:8px 10px;text-align:left;background:#f8faf8;border-bottom:2px solid #f0f2f5;font-size:0.7rem;text-transform:uppercase;color:#888;">Status</th>
-                                <th style="padding:8px 10px;text-align:left;background:#f8faf8;border-bottom:2px solid #f0f2f5;font-size:0.7rem;text-transform:uppercase;color:#888;">Update</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentTableBody">
-                            <tr><td colspan="4" style="text-align:center;padding:20px;color:#999;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
-                        </tbody>
-                    </table>
-                </div>
+        <div class="recent-card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-clock"></i>Aktivitas Terbaru</div>
+                <button class="btn btn-outline btn-sm" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Lembaga</th>
+                            <th>Status</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentTableBody">
+                        <tr><td colspan="4" style="text-align:center;padding:20px;color:#999;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -1440,13 +1442,13 @@
                         <div class="field"><div class="label">Pendidikan Terakhir</div><div class="value" id="kycDetailPendidikan">-</div></div>
                         <div class="field full"><div class="label">Alamat</div><div class="value" id="kycDetailAlamat">-</div></div>
                         <div class="field">
-    <div class="label">Desa Pengajar</div>
-    <div class="value" id="kycDetailDesaPengajar">-</div>
-</div>
+                            <div class="label">Desa Pengajar</div>
+                            <div class="value" id="kycDetailDesaPengajar">-</div>
+                        </div>
                         <div class="field">
-    <div class="label">Kecamatan Pengajar</div>
-    <div class="value" id="kycDetailKecamatanPengajar">-</div>
-</div>
+                            <div class="label">Kecamatan Pengajar</div>
+                            <div class="value" id="kycDetailKecamatanPengajar">-</div>
+                        </div>
                         <div class="field"><div class="label">Kabupaten Pengajar</div><div class="value" id="kycDetailKabupatenPengajar">-</div></div>
                         <div class="field"><div class="label">No. HP</div><div class="value" id="kycDetailNoHp">-</div></div>
                         <div class="field"><div class="label">Email</div><div class="value" id="kycDetailEmail">-</div></div>
@@ -1490,91 +1492,91 @@
                     </div>
                 </div>
 
-             <div id="tab-dokumen" class="kyc-tab-content" style="display:none;">
-    <!-- KTP -->
-    <div style="margin-bottom:16px;padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #1976d2;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:0.75rem;font-weight:700;color:#1976d2;">
-                <i class="fas fa-id-card"></i> Kartu Tanda Penduduk (KTP)
-            </div>
-            <div style="display:flex;gap:6px;flex-shrink:0;">
-                <button class="btn btn-primary btn-sm" onclick="previewDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
-                    <i class="fas fa-eye"></i> Lihat
-                </button>
-                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
-                    <i class="fas fa-download"></i> Download
-                </button>
-            </div>
-        </div>
-        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
-            <span id="kycDokumenKtpName" style="font-weight:500;">Belum ada dokumen</span>
-        </div>
-        <div class="dokumen-preview" id="dokumenKtpPreview" style="display:none;margin-top:8px;">
-            <img id="dokumenKtpImg" src="" alt="KTP" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
-            <iframe id="dokumenKtpPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
-            <div class="empty" id="dokumenKtpEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
-                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
-                File tidak dapat ditampilkan
-            </div>
-        </div>
-    </div>
+                <div id="tab-dokumen" class="kyc-tab-content" style="display:none;">
+                    <!-- KTP -->
+                    <div style="margin-bottom:16px;padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #1976d2;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <div style="font-size:0.75rem;font-weight:700;color:#1976d2;">
+                                <i class="fas fa-id-card"></i> Kartu Tanda Penduduk (KTP)
+                            </div>
+                            <div style="display:flex;gap:6px;flex-shrink:0;">
+                                <button class="btn btn-primary btn-sm" onclick="previewDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-eye"></i> Lihat
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
+                            <span id="kycDokumenKtpName" style="font-weight:500;">Belum ada dokumen</span>
+                        </div>
+                        <div class="dokumen-preview" id="dokumenKtpPreview" style="display:none;margin-top:8px;">
+                            <img id="dokumenKtpImg" src="" alt="KTP" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
+                            <iframe id="dokumenKtpPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
+                            <div class="empty" id="dokumenKtpEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
+                                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                                File tidak dapat ditampilkan
+                            </div>
+                        </div>
+                    </div>
 
-    <!-- Rekening Bupati -->
-    <div style="margin-bottom:16px;padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #2e7d32;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:0.75rem;font-weight:700;color:#2e7d32;">
-                <i class="fas fa-university"></i> Rekening Insentif Bupati
-            </div>
-            <div style="display:flex;gap:6px;flex-shrink:0;">
-                <button class="btn btn-primary btn-sm" onclick="previewDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
-                    <i class="fas fa-eye"></i> Lihat
-                </button>
-                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
-                    <i class="fas fa-download"></i> Download
-                </button>
-            </div>
-        </div>
-        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
-            <span id="kycDokumenBupatiName" style="font-weight:500;">Belum ada dokumen</span>
-        </div>
-        <div class="dokumen-preview" id="dokumenBupatiPreview" style="display:none;margin-top:8px;">
-            <img id="dokumenBupatiImg" src="" alt="Rekening Bupati" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
-            <iframe id="dokumenBupatiPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
-            <div class="empty" id="dokumenBupatiEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
-                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
-                File tidak dapat ditampilkan
-            </div>
-        </div>
-    </div>
+                    <!-- Rekening Bupati -->
+                    <div style="margin-bottom:16px;padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #2e7d32;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <div style="font-size:0.75rem;font-weight:700;color:#2e7d32;">
+                                <i class="fas fa-university"></i> Rekening Insentif Bupati
+                            </div>
+                            <div style="display:flex;gap:6px;flex-shrink:0;">
+                                <button class="btn btn-primary btn-sm" onclick="previewDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-eye"></i> Lihat
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
+                            <span id="kycDokumenBupatiName" style="font-weight:500;">Belum ada dokumen</span>
+                        </div>
+                        <div class="dokumen-preview" id="dokumenBupatiPreview" style="display:none;margin-top:8px;">
+                            <img id="dokumenBupatiImg" src="" alt="Rekening Bupati" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
+                            <iframe id="dokumenBupatiPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
+                            <div class="empty" id="dokumenBupatiEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
+                                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                                File tidak dapat ditampilkan
+                            </div>
+                        </div>
+                    </div>
 
-    <!-- Rekening Gubernur -->
-    <div style="padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #7b1fa2;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:0.75rem;font-weight:700;color:#7b1fa2;">
-                <i class="fas fa-university"></i> Rekening Insentif Gubernur
-            </div>
-            <div style="display:flex;gap:6px;flex-shrink:0;">
-                <button class="btn btn-primary btn-sm" onclick="previewDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
-                    <i class="fas fa-eye"></i> Lihat
-                </button>
-                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
-                    <i class="fas fa-download"></i> Download
-                </button>
-            </div>
-        </div>
-        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
-            <span id="kycDokumenGubernurName" style="font-weight:500;">Belum ada dokumen</span>
-        </div>
-        <div class="dokumen-preview" id="dokumenGubernurPreview" style="display:none;margin-top:8px;">
-            <img id="dokumenGubernurImg" src="" alt="Rekening Gubernur" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
-            <iframe id="dokumenGubernurPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
-            <div class="empty" id="dokumenGubernurEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
-                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
-                File tidak dapat ditampilkan
-            </div>
-        </div>
-    </div>
-</div>
+                    <!-- Rekening Gubernur -->
+                    <div style="padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #7b1fa2;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <div style="font-size:0.75rem;font-weight:700;color:#7b1fa2;">
+                                <i class="fas fa-university"></i> Rekening Insentif Gubernur
+                            </div>
+                            <div style="display:flex;gap:6px;flex-shrink:0;">
+                                <button class="btn btn-primary btn-sm" onclick="previewDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-eye"></i> Lihat
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
+                            <span id="kycDokumenGubernurName" style="font-weight:500;">Belum ada dokumen</span>
+                        </div>
+                        <div class="dokumen-preview" id="dokumenGubernurPreview" style="display:none;margin-top:8px;">
+                            <img id="dokumenGubernurImg" src="" alt="Rekening Gubernur" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
+                            <iframe id="dokumenGubernurPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
+                            <div class="empty" id="dokumenGubernurEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
+                                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                                File tidak dapat ditampilkan
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="kyc-action-box" id="kycActionBox" style="display:none;">
                     <div class="action-title">
@@ -1625,8 +1627,6 @@
         // ============================================================
         // ===== DASHBOARD + KYC =====
         // ============================================================
-        let sebaranChart = null;
-        let bantuanChart = null;
         let currentKycPendidik = null;
         let currentKycTab = 'identitas';
 
@@ -1868,13 +1868,6 @@
         }
 
         // ============================================================
-        // ===== NAVIGATE =====
-        // ============================================================
-        function navigateTo(page) {
-            window.location.href = page;
-        }
-
-        // ============================================================
         // ===== LOAD DASHBOARD =====
         // ============================================================
         async function loadDashboard() {
@@ -1952,97 +1945,6 @@
                 document.getElementById('filterInfo').style.background = 'white';
                 document.getElementById('filterInfo').style.borderLeftColor = 'var(--primary)';
                 document.getElementById('filterInfo').style.color = '#888';
-            }
-        }
-
-        // ============================================================
-        // ===== LOAD CHARTS =====
-        // ============================================================
-        async function loadCharts() {
-            try {
-                const { data } = await supabaseClient
-                    .from('pendidik')
-                    .select('desa_pengajar, kecamatan_pengajar')
-                    .eq('status_aktif', true);
-
-                const counts = {};
-                (data || []).forEach(d => {
-                    const key = d.desa_pengajar || d.kecamatan_pengajar || 'Tidak Diketahui';
-                    counts[key] = (counts[key] || 0) + 1;
-                });
-
-                const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,15);
-                
-                const ctx1 = document.getElementById('sebaranChart')?.getContext('2d');
-                if (ctx1) {
-                    if (sebaranChart) sebaranChart.destroy();
-                    sebaranChart = new Chart(ctx1, {
-                        type: 'bar',
-                        data: {
-                            labels: sorted.map(d => d[0]),
-                            datasets: [{
-                                data: sorted.map(d => d[1]),
-                                backgroundColor: ['#006400','#008000','#2e7d32','#388e3c','#43a047','#4caf50','#66bb6a','#81c784','#a5d6a7','#c8e6c9','#a5d6a7','#81c784','#66bb6a','#4caf50','#43a047'],
-                                borderRadius: 4
-                            }]
-                        },
-                        options: { 
-                            responsive: true, 
-                            maintainAspectRatio: false, 
-                            plugins: { legend: { display: false } },
-                            scales: {
-                                x: { ticks: { font: { size: 8 } } }
-                            }
-                        }
-                    });
-                }
-
-                const { data: bData } = await supabaseClient
-                    .from('bantuan')
-                    .select('tahun_anggaran, nominal')
-                    .eq('status', 'cair');
-
-                const year = new Date().getFullYear();
-                const years = [year-4, year-3, year-2, year-1, year];
-                const totals = {};
-                (bData || []).forEach(d => { totals[d.tahun_anggaran] = (totals[d.tahun_anggaran] || 0) + (d.nominal || 0); });
-
-                const ctx2 = document.getElementById('bantuanChart')?.getContext('2d');
-                if (ctx2) {
-                    if (bantuanChart) bantuanChart.destroy();
-                    bantuanChart = new Chart(ctx2, {
-                        type: 'line',
-                        data: {
-                            labels: years,
-                            datasets: [{
-                                data: years.map(y => totals[y] || 0),
-                                borderColor: '#006400',
-                                backgroundColor: 'rgba(0,100,0,0.08)',
-                                fill: true,
-                                tension: 0.3
-                            }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                    });
-                }
-
-            } catch (e) { console.error('Chart error:', e); }
-        }
-
-        // ============================================================
-        // ===== TOGGLE CHARTS BY ROLE =====
-        // ============================================================
-        function toggleChartsByRole() {
-            const user = getUser();
-            const chartsSection = document.getElementById('chartsSection');
-            const recentSection = document.getElementById('recentSection');
-
-            if (user && (user.role === 'admin_kab' || user.role === 'super_admin')) {
-                if (chartsSection) chartsSection.classList.add('visible');
-                if (recentSection) recentSection.classList.add('visible');
-            } else {
-                if (chartsSection) chartsSection.classList.remove('visible');
-                if (recentSection) recentSection.classList.remove('visible');
             }
         }
 
@@ -2214,184 +2116,184 @@
             }
         }
 
-async function openKycModal(pendidikId) {
-    try {
-        const { data, error } = await supabaseClient
-            .from('pendidik')
-            .select(`
-                *,
-                lembaga:lembaga_id (
-                    id,
-                    nama,
-                    nslp,
-                    jenis_lembaga,
-                    alamat,
-                    kecamatan,
-                    desa
-                )
-            `)
-            .eq('id', pendidikId)
-            .single();
-
-        if (error) throw error;
-
-        currentKycPendidik = data;
-
-        // ===== IDENTITAS (AMAN) =====
-        const fields = [
-            'kycDetailNama', 'kycDetailNik', 'kycDetailTempatLahir',
-            'kycDetailTanggalLahir', 'kycDetailJenisKelamin',
-            'kycDetailStatusPerkawinan', 'kycDetailIbuKandung',
-            'kycDetailPendidikan', 'kycDetailAlamat', 'kycDetailNoHp',
-            'kycDetailEmail'
-        ];
-        
-        const values = [
-            data.nama_lengkap, data.nik, data.tempat_lahir,
-            data.tanggal_lahir, data.jenis_kelamin,
-            data.status_perkawinan, data.ibu_kandung,
-            data.pendidikan_terakhir, data.alamat, data.no_hp,
-            data.email
-        ];
-
-        fields.forEach((id, index) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = values[index] || '-';
-        });
-
-        // ===== REKENING =====
-        const rekFields = [
-            'kycDetailNomorRekeningBupati', 'kycDetailNamaBankBupati',
-            'kycDetailPemilikRekeningBupati', 'kycDetailNomorRekeningGubernur',
-            'kycDetailNamaBankGubernur', 'kycDetailPemilikRekeningGubernur'
-        ];
-        
-        const rekValues = [
-            data.nomor_rekening_bupati, data.nama_bank_bupati,
-            data.pemilik_rekening_bupati, data.nomor_rekening_gubernur,
-            data.nama_bank_gubernur, data.pemilik_rekening_gubernur
-        ];
-
-        rekFields.forEach((id, index) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = rekValues[index] || '-';
-        });
-
-        // ===== DATA MENGAJAR =====
-        const lembaga = data.lembaga || {};
-        
-        const mengajarFields = {
-            'kycDetailLembaga': lembaga.nama || data.nslp_lembaga || '-',
-            'kycDetailNslpLembaga': lembaga.nslp || data.nslp_lembaga || '-',
-            'kycDetailJenisLembaga': lembaga.jenis_lembaga || data.jenis_lembaga || '-',
-            'kycDetailKecamatanLembaga': lembaga.kecamatan || data.kecamatan_lembaga || '-',
-            'kycDetailDesaLembaga': lembaga.desa || data.desa_lembaga || '-',
-            'kycDetailRtRw': data.rt_rw_pengajar || '-',
-            'kycDetailKecamatanPengajar': data.kecamatan_pengajar || '-',
-            'kycDetailDesaPengajar': data.desa_pengajar || '-',
-            'kycDetailKabupatenPengajar': data.kabupaten_pengajar || 'Tegal',
-            'kycDetailTmt': data.tmt_mengajar || '-',
-            'kycDetailLamaMengabdi': data.lama_mengabdi ? data.lama_mengabdi + ' tahun' : '-'
-        };
-
-        Object.keys(mengajarFields).forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = mengajarFields[id];
-        });
-
-        // ===== STATUS =====
-        let statusText = data.status_verifikasi || 'Draft';
-        let statusClass = 'draft';
-        if (statusText === 'Diverifikasi') { 
-            statusClass = 'verified'; 
-            statusText = '✅ Terverifikasi'; 
-        } else if (statusText === 'Pending') { 
-            statusClass = 'pending'; 
-            statusText = '⏳ Menunggu Verifikasi'; 
-        } else if (statusText === 'Ditolak') { 
-            statusClass = 'rejected'; 
-            statusText = '❌ Ditolak'; 
-        } else { 
-            statusText = '📝 Draft'; 
-        }
-        
-        const statusEl = document.getElementById('kycDetailStatus');
-        if (statusEl) statusEl.innerHTML = `<span class="kyc-status-badge ${statusClass}" style="font-size:0.9rem;padding:4px 14px;">${statusText}</span>`;
-
-        const aktifText = data.status_aktif ? 'Aktif' : 'Tidak Aktif';
-        const aktifClass = data.status_aktif ? 'active' : 'inactive';
-        const aktifEl = document.getElementById('kycDetailAktif');
-        if (aktifEl) aktifEl.innerHTML = `<span class="badge" style="padding:2px 12px;border-radius:12px;font-size:0.8rem;font-weight:600;background:${data.status_aktif ? '#e8f5e9' : '#ffebee'};color:${data.status_aktif ? '#2e7d32' : '#c62828'};">${aktifText}</span>`;
-
-        const tanggalEl = document.getElementById('kycDetailTanggal');
-        if (tanggalEl) tanggalEl.textContent = formatDate(data.updated_at);
-        
-        const catatanEl = document.getElementById('kycDetailCatatan');
-        if (catatanEl) catatanEl.textContent = data.catatan_verifikasi || 'Tidak ada catatan';
-
-        // ===== DOKUMEN =====
-        kycDokumen = { ktp: null, bupati: null, gubernur: null };
-        document.querySelectorAll('.dokumen-preview').forEach(el => el.style.display = 'none');
-        
-        const ktpNameEl = document.getElementById('kycDokumenKtpName');
-        const bupatiNameEl = document.getElementById('kycDokumenBupatiName');
-        const gubernurNameEl = document.getElementById('kycDokumenGubernurName');
-        
-        if (ktpNameEl) ktpNameEl.textContent = 'Belum ada dokumen';
-        if (bupatiNameEl) bupatiNameEl.textContent = 'Belum ada dokumen';
-        if (gubernurNameEl) gubernurNameEl.textContent = 'Belum ada dokumen';
-
-        if (data.dokumen_kyc) {
+        async function openKycModal(pendidikId) {
             try {
-                const docs = typeof data.dokumen_kyc === 'string' ? JSON.parse(data.dokumen_kyc) : data.dokumen_kyc;
+                const { data, error } = await supabaseClient
+                    .from('pendidik')
+                    .select(`
+                        *,
+                        lembaga:lembaga_id (
+                            id,
+                            nama,
+                            nslp,
+                            jenis_lembaga,
+                            alamat,
+                            kecamatan,
+                            desa
+                        )
+                    `)
+                    .eq('id', pendidikId)
+                    .single();
+
+                if (error) throw error;
+
+                currentKycPendidik = data;
+
+                // ===== IDENTITAS (AMAN) =====
+                const fields = [
+                    'kycDetailNama', 'kycDetailNik', 'kycDetailTempatLahir',
+                    'kycDetailTanggalLahir', 'kycDetailJenisKelamin',
+                    'kycDetailStatusPerkawinan', 'kycDetailIbuKandung',
+                    'kycDetailPendidikan', 'kycDetailAlamat', 'kycDetailNoHp',
+                    'kycDetailEmail'
+                ];
                 
-                if (docs.ktp && ktpNameEl) {
-                    kycDokumen.ktp = docs.ktp;
-                    ktpNameEl.textContent = `📄 ${docs.ktp.split('/').pop() || 'KTP'}`;
+                const values = [
+                    data.nama_lengkap, data.nik, data.tempat_lahir,
+                    data.tanggal_lahir, data.jenis_kelamin,
+                    data.status_perkawinan, data.ibu_kandung,
+                    data.pendidikan_terakhir, data.alamat, data.no_hp,
+                    data.email
+                ];
+
+                fields.forEach((id, index) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = values[index] || '-';
+                });
+
+                // ===== REKENING =====
+                const rekFields = [
+                    'kycDetailNomorRekeningBupati', 'kycDetailNamaBankBupati',
+                    'kycDetailPemilikRekeningBupati', 'kycDetailNomorRekeningGubernur',
+                    'kycDetailNamaBankGubernur', 'kycDetailPemilikRekeningGubernur'
+                ];
+                
+                const rekValues = [
+                    data.nomor_rekening_bupati, data.nama_bank_bupati,
+                    data.pemilik_rekening_bupati, data.nomor_rekening_gubernur,
+                    data.nama_bank_gubernur, data.pemilik_rekening_gubernur
+                ];
+
+                rekFields.forEach((id, index) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = rekValues[index] || '-';
+                });
+
+                // ===== DATA MENGAJAR =====
+                const lembaga = data.lembaga || {};
+                
+                const mengajarFields = {
+                    'kycDetailLembaga': lembaga.nama || data.nslp_lembaga || '-',
+                    'kycDetailNslpLembaga': lembaga.nslp || data.nslp_lembaga || '-',
+                    'kycDetailJenisLembaga': lembaga.jenis_lembaga || data.jenis_lembaga || '-',
+                    'kycDetailKecamatanLembaga': lembaga.kecamatan || data.kecamatan_lembaga || '-',
+                    'kycDetailDesaLembaga': lembaga.desa || data.desa_lembaga || '-',
+                    'kycDetailRtRw': data.rt_rw_pengajar || '-',
+                    'kycDetailKecamatanPengajar': data.kecamatan_pengajar || '-',
+                    'kycDetailDesaPengajar': data.desa_pengajar || '-',
+                    'kycDetailKabupatenPengajar': data.kabupaten_pengajar || 'Tegal',
+                    'kycDetailTmt': data.tmt_mengajar || '-',
+                    'kycDetailLamaMengabdi': data.lama_mengabdi ? data.lama_mengabdi + ' tahun' : '-'
+                };
+
+                Object.keys(mengajarFields).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = mengajarFields[id];
+                });
+
+                // ===== STATUS =====
+                let statusText = data.status_verifikasi || 'Draft';
+                let statusClass = 'draft';
+                if (statusText === 'Diverifikasi') { 
+                    statusClass = 'verified'; 
+                    statusText = '✅ Terverifikasi'; 
+                } else if (statusText === 'Pending') { 
+                    statusClass = 'pending'; 
+                    statusText = '⏳ Menunggu Verifikasi'; 
+                } else if (statusText === 'Ditolak') { 
+                    statusClass = 'rejected'; 
+                    statusText = '❌ Ditolak'; 
+                } else { 
+                    statusText = '📝 Draft'; 
                 }
-                if (docs.bupati && bupatiNameEl) {
-                    kycDokumen.bupati = docs.bupati;
-                    bupatiNameEl.textContent = `📄 ${docs.bupati.split('/').pop() || 'Rek Bupati'}`;
+                
+                const statusEl = document.getElementById('kycDetailStatus');
+                if (statusEl) statusEl.innerHTML = `<span class="kyc-status-badge ${statusClass}" style="font-size:0.9rem;padding:4px 14px;">${statusText}</span>`;
+
+                const aktifText = data.status_aktif ? 'Aktif' : 'Tidak Aktif';
+                const aktifClass = data.status_aktif ? 'active' : 'inactive';
+                const aktifEl = document.getElementById('kycDetailAktif');
+                if (aktifEl) aktifEl.innerHTML = `<span class="badge" style="padding:2px 12px;border-radius:12px;font-size:0.8rem;font-weight:600;background:${data.status_aktif ? '#e8f5e9' : '#ffebee'};color:${data.status_aktif ? '#2e7d32' : '#c62828'};">${aktifText}</span>`;
+
+                const tanggalEl = document.getElementById('kycDetailTanggal');
+                if (tanggalEl) tanggalEl.textContent = formatDate(data.updated_at);
+                
+                const catatanEl = document.getElementById('kycDetailCatatan');
+                if (catatanEl) catatanEl.textContent = data.catatan_verifikasi || 'Tidak ada catatan';
+
+                // ===== DOKUMEN =====
+                kycDokumen = { ktp: null, bupati: null, gubernur: null };
+                document.querySelectorAll('.dokumen-preview').forEach(el => el.style.display = 'none');
+                
+                const ktpNameEl = document.getElementById('kycDokumenKtpName');
+                const bupatiNameEl = document.getElementById('kycDokumenBupatiName');
+                const gubernurNameEl = document.getElementById('kycDokumenGubernurName');
+                
+                if (ktpNameEl) ktpNameEl.textContent = 'Belum ada dokumen';
+                if (bupatiNameEl) bupatiNameEl.textContent = 'Belum ada dokumen';
+                if (gubernurNameEl) gubernurNameEl.textContent = 'Belum ada dokumen';
+
+                if (data.dokumen_kyc) {
+                    try {
+                        const docs = typeof data.dokumen_kyc === 'string' ? JSON.parse(data.dokumen_kyc) : data.dokumen_kyc;
+                        
+                        if (docs.ktp && ktpNameEl) {
+                            kycDokumen.ktp = docs.ktp;
+                            ktpNameEl.textContent = `📄 ${docs.ktp.split('/').pop() || 'KTP'}`;
+                        }
+                        if (docs.bupati && bupatiNameEl) {
+                            kycDokumen.bupati = docs.bupati;
+                            bupatiNameEl.textContent = `📄 ${docs.bupati.split('/').pop() || 'Rek Bupati'}`;
+                        }
+                        if (docs.gubernur && gubernurNameEl) {
+                            kycDokumen.gubernur = docs.gubernur;
+                            gubernurNameEl.textContent = `📄 ${docs.gubernur.split('/').pop() || 'Rek Gubernur'}`;
+                        }
+                    } catch (e) {
+                        if (data.dokumen_kyc && ktpNameEl) {
+                            kycDokumen.ktp = data.dokumen_kyc;
+                            ktpNameEl.textContent = `📄 ${data.dokumen_kyc.split('/').pop() || 'Dokumen'}`;
+                        }
+                    }
                 }
-                if (docs.gubernur && gubernurNameEl) {
-                    kycDokumen.gubernur = docs.gubernur;
-                    gubernurNameEl.textContent = `📄 ${docs.gubernur.split('/').pop() || 'Rek Gubernur'}`;
+
+                // ===== ACTION BOX =====
+                const actionBox = document.getElementById('kycActionBox');
+                const isPending = data.status_verifikasi === 'Pending' || data.status_verifikasi === 'Draft';
+                
+                if (actionBox) {
+                    if (isPending) {
+                        actionBox.style.display = 'block';
+                        const keteranganEl = document.getElementById('kycKeterangan');
+                        if (keteranganEl) keteranganEl.value = '';
+                    } else {
+                        actionBox.style.display = 'none';
+                    }
                 }
+
+                const pendidikIdEl = document.getElementById('kycPendidikId');
+                if (pendidikIdEl) pendidikIdEl.value = data.id;
+
+                switchKycTab('identitas', document.querySelector('.kyc-tabs .tab-btn'));
+
+                const modal = document.getElementById('kycModal');
+                if (modal) modal.classList.add('active');
+
             } catch (e) {
-                if (data.dokumen_kyc && ktpNameEl) {
-                    kycDokumen.ktp = data.dokumen_kyc;
-                    ktpNameEl.textContent = `📄 ${data.dokumen_kyc.split('/').pop() || 'Dokumen'}`;
-                }
+                console.error('Error opening KYC modal:', e);
+                showToast('Gagal memuat detail KYC: ' + e.message, 'error');
             }
         }
-
-        // ===== ACTION BOX =====
-        const actionBox = document.getElementById('kycActionBox');
-        const isPending = data.status_verifikasi === 'Pending' || data.status_verifikasi === 'Draft';
-        
-        if (actionBox) {
-            if (isPending) {
-                actionBox.style.display = 'block';
-                const keteranganEl = document.getElementById('kycKeterangan');
-                if (keteranganEl) keteranganEl.value = '';
-            } else {
-                actionBox.style.display = 'none';
-            }
-        }
-
-        const pendidikIdEl = document.getElementById('kycPendidikId');
-        if (pendidikIdEl) pendidikIdEl.value = data.id;
-
-        switchKycTab('identitas', document.querySelector('.kyc-tabs .tab-btn'));
-
-        const modal = document.getElementById('kycModal');
-        if (modal) modal.classList.add('active');
-
-    } catch (e) {
-        console.error('Error opening KYC modal:', e);
-        showToast('Gagal memuat detail KYC: ' + e.message, 'error');
-    }
-}
 
         function closeKycModal() {
             document.getElementById('kycModal').classList.remove('active');
@@ -2534,11 +2436,8 @@ async function openKycModal(pendidikId) {
             await checkAuth();
             updateDate();
             
-            toggleChartsByRole();
-            
             await loadKYCData();
             await loadDashboard();
-            await loadCharts();
             await loadRecent();
 
             const { count } = await supabaseClient
@@ -2558,7 +2457,6 @@ async function openKycModal(pendidikId) {
         // ===== EXPOSE =====
         // ============================================================
         window.refreshData = refreshData;
-        window.navigateTo = navigateTo;
         window.openKycModal = openKycModal;
         window.closeKycModal = closeKycModal;
         window.previewDokumen = previewDokumen;
