@@ -11,9 +11,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ============================================================
-           SI-MUSTAFA - SEBARAN LEMBAGA PER DESA (ELEGANT)
-           ============================================================ */
         :root {
             --primary: #006400;
             --primary-light: #4CAF50;
@@ -912,17 +909,15 @@
     <main class="main-content">
         <div class="main-container">
 
-            <!-- HEADER -->
             <div class="container-header">
                 <h1><i class="fas fa-building"></i> Sebaran Lembaga per Desa</h1>
                 <div class="header-actions">
                     <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
-                    <span class="updated"><i class="fas fa-clock"></i> <span id="updatedAt"></span></span>
+                    <span class="updated"><i class="fas fa-clock"></i> <span id="updatedAt">-</span></span>
                     <button class="refresh-btn" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
                 </div>
             </div>
 
-            <!-- STICKY FILTER BAR -->
             <div class="sticky-filter-bar" id="stickyFilterBar">
                 <div class="filter-left">
                     <span class="filter-label"><i class="fas fa-map-marker-alt"></i> Kecamatan:</span>
@@ -938,10 +933,8 @@
                 </div>
             </div>
 
-            <!-- CONTENT: CHART + DETAIL -->
             <div class="content-wrapper">
 
-                <!-- CHART PANEL -->
                 <div class="chart-panel">
                     <div class="chart-title"><i class="fas fa-circle" style="color:var(--primary);font-size:0.6rem;"></i> Distribusi Lembaga</div>
                     <div class="chart-sub" id="chartSub">Total seluruh desa</div>
@@ -961,7 +954,6 @@
                     </div>
                 </div>
 
-                <!-- DETAIL PANEL -->
                 <div class="detail-panel">
                     <div class="detail-title"><i class="fas fa-list-ul"></i> Detail per Desa</div>
                     <div class="detail-sub" id="detailSub">Diurutkan dari jumlah lembaga terbanyak</div>
@@ -980,11 +972,32 @@
 
     <script>
         // ============================================================
-        // ===== TOAST =====
+        // ===== UTILITY FUNCTIONS =====
         // ============================================================
+        function safeSetText(id, value) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = value;
+                return true;
+            }
+            return false;
+        }
+
+        function safeSetInnerHTML(id, value) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.innerHTML = value;
+                return true;
+            }
+            return false;
+        }
+
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
-            if (!toast) { alert(message); return; }
+            if (!toast) {
+                console.log('Toast:', message);
+                return;
+            }
             toast.textContent = message;
             toast.className = `toast toast-${type}`;
             void toast.offsetWidth;
@@ -995,20 +1008,15 @@
             }, 4000);
         }
 
-        // ============================================================
-        // ===== UPDATE TIMESTAMP =====
-        // ============================================================
         function updateTimestamp() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            const el = document.getElementById('updatedAt');
-            if (el) el.textContent = timeStr;
-            const small = document.getElementById('updatedSmall');
-            if (small) small.textContent = '🔄 ' + timeStr;
+            safeSetText('updatedAt', timeStr);
+            safeSetText('updatedSmall', '🔄 ' + timeStr);
         }
 
         // ============================================================
-        // ===== AUTH CHECK =====
+        // ===== AUTH =====
         // ============================================================
         async function checkAuth() {
             try {
@@ -1081,7 +1089,7 @@
         }
 
         // ============================================================
-        // ===== FETCH ALL LEMBAGA (dengan pagination) =====
+        // ===== FETCH DATA =====
         // ============================================================
         async function fetchAllLembaga(filter) {
             const CHUNK = 1000;
@@ -1091,7 +1099,7 @@
             while (true) {
                 let q = supabaseClient
                     .from('lembaga')
-                    .select('kecamatan_id, desa_id, desa, jenis_lembaga, nama')
+                    .select('id, nama, jenis_lembaga, desa_id, desa, kecamatan_id, kecamatan, alamat, status_aktif')
                     .order('created_at', { ascending: true });
 
                 if (filter.kecamatan_id) {
@@ -1112,46 +1120,10 @@
                 from += CHUNK;
             }
 
+            console.log('✅ Total lembaga diambil:', allRows.length);
             return allRows;
         }
 
-        // ============================================================
-        // ===== LOAD KECAMATAN FILTER =====
-        // ============================================================
-        async function loadKecamatanFilter() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('master_kecamatan')
-                    .select('id, nama')
-                    .order('nama');
-
-                if (error) throw error;
-
-                const select = document.getElementById('kecamatanFilter');
-                const currentVal = select.value;
-
-                select.innerHTML = '<option value="">Semua Kecamatan</option>';
-                (data || []).forEach(k => {
-                    select.innerHTML += `<option value="${k.id}">${k.nama}</option>`;
-                });
-
-                if (currentVal && data.some(k => k.id === currentVal)) {
-                    select.value = currentVal;
-                }
-
-                if (window.currentUser && window.currentUser.kecamatan_id) {
-                    select.value = window.currentUser.kecamatan_id;
-                    select.disabled = true;
-                }
-
-            } catch (e) {
-                console.error('Error loading kecamatan filter:', e);
-            }
-        }
-
-        // ============================================================
-        // ===== GET KECAMATAN NAME =====
-        // ============================================================
         async function getKecamatanName(id) {
             if (!id) return '';
             try {
@@ -1168,12 +1140,16 @@
         }
 
         // ============================================================
-        // ===== DONUT CHART =====
+        // ===== RENDER FUNCTIONS =====
         // ============================================================
         let donutChartInstance = null;
 
         function renderDonut(desaArray) {
-            const ctx = document.getElementById('donutChart').getContext('2d');
+            const ctx = document.getElementById('donutChart');
+            if (!ctx) {
+                console.error('❌ Canvas donutChart tidak ditemukan');
+                return;
+            }
 
             const top10 = desaArray.slice(0, 10);
             const others = desaArray.slice(10);
@@ -1198,60 +1174,67 @@
 
             if (donutChartInstance) donutChartInstance.destroy();
 
-            donutChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: grand === 0 ? [1] : values,
-                        backgroundColor: grand === 0 ? ['#e8ecf1'] : colors.slice(0, labels.length),
-                        borderColor: '#ffffff',
-                        borderWidth: 3,
-                        hoverOffset: 10,
-                        spacing: 2,
-                        hoverBorderColor: 'rgba(255,255,255,0.8)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '70%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            enabled: grand > 0,
-                            backgroundColor: 'rgba(255,255,255,0.95)',
-                            titleColor: '#0a2e1a',
-                            bodyColor: '#333',
-                            borderColor: 'rgba(0,100,0,0.1)',
-                            borderWidth: 1,
-                            padding: 12,
-                            cornerRadius: 12,
-                            callbacks: {
-                                label: function(ctx) {
-                                    const val = ctx.raw;
-                                    const pct = grand ? ((val / grand) * 100).toFixed(1) : 0;
-                                    return ctx.label + ': ' + val + ' (' + pct + '%)';
+            try {
+                donutChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: grand === 0 ? [1] : values,
+                            backgroundColor: grand === 0 ? ['#e8ecf1'] : colors.slice(0, labels.length),
+                            borderColor: '#ffffff',
+                            borderWidth: 3,
+                            hoverOffset: 10,
+                            spacing: 2,
+                            hoverBorderColor: 'rgba(255,255,255,0.8)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                enabled: grand > 0,
+                                backgroundColor: 'rgba(255,255,255,0.95)',
+                                titleColor: '#0a2e1a',
+                                bodyColor: '#333',
+                                borderColor: 'rgba(0,100,0,0.1)',
+                                borderWidth: 1,
+                                padding: 12,
+                                cornerRadius: 12,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        const val = ctx.raw;
+                                        const pct = grand ? ((val / grand) * 100).toFixed(1) : 0;
+                                        return ctx.label + ': ' + val + ' (' + pct + '%)';
+                                    }
                                 }
                             }
+                        },
+                        animation: {
+                            animateRotate: true,
+                            duration: 1000,
+                            easing: 'easeOutQuart'
                         }
-                    },
-                    animation: {
-                        animateRotate: true,
-                        duration: 1000,
-                        easing: 'easeOutQuart'
                     }
-                }
-            });
+                });
 
-            document.getElementById('donutTotal').textContent = grand;
+                safeSetText('donutTotal', grand);
+
+            } catch (e) {
+                console.error('❌ Error rendering chart:', e);
+            }
         }
 
-        // ============================================================
-        // ===== RENDER DESA LIST =====
-        // ============================================================
         function renderDesaList(desaArray) {
             const list = document.getElementById('desaList');
+            if (!list) {
+                console.error('❌ Elemen desaList tidak ditemukan');
+                return;
+            }
+
             if (!desaArray || desaArray.length === 0) {
                 list.innerHTML = `<div class="empty-note"><i class="fas fa-inbox"></i>Belum ada data desa</div>`;
                 return;
@@ -1291,12 +1274,53 @@
         }
 
         // ============================================================
-        // ===== LOAD DATA UTAMA (PERBAIKAN) =====
+        // ===== LOAD KECAMATAN FILTER =====
+        // ============================================================
+        async function loadKecamatanFilter() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('master_kecamatan')
+                    .select('id, nama')
+                    .order('nama');
+
+                if (error) throw error;
+
+                const select = document.getElementById('kecamatanFilter');
+                if (!select) return;
+
+                const currentVal = select.value;
+
+                select.innerHTML = '<option value="">Semua Kecamatan</option>';
+                (data || []).forEach(k => {
+                    select.innerHTML += `<option value="${k.id}">${k.nama}</option>`;
+                });
+
+                if (currentVal && data.some(k => k.id === currentVal)) {
+                    select.value = currentVal;
+                }
+
+                if (window.currentUser && window.currentUser.kecamatan_id) {
+                    select.value = window.currentUser.kecamatan_id;
+                    select.disabled = true;
+                }
+
+            } catch (e) {
+                console.error('Error loading kecamatan filter:', e);
+            }
+        }
+
+        // ============================================================
+        // ===== LOAD DATA UTAMA =====
         // ============================================================
         let currentKecamatanId = '';
 
         async function loadDesaData(kecamatanId = '') {
             const list = document.getElementById('desaList');
+            if (!list) {
+                console.error('❌ Elemen desaList tidak ditemukan');
+                return;
+            }
+
             list.innerHTML = '<div class="spinner"></div>';
 
             try {
@@ -1314,7 +1338,7 @@
 
                 console.log('🔍 Filter yang digunakan:', filter);
 
-                // 1. Ambil daftar desa dari master_kelurahan
+                // 1. Ambil daftar desa
                 let desaQuery = supabaseClient
                     .from('master_kelurahan')
                     .select('id, nama, kecamatan_id')
@@ -1337,12 +1361,14 @@
 
                 console.log('📊 Total Lembaga:', lembagaRows?.length || 0);
                 if (lembagaRows && lembagaRows.length > 0) {
-                    console.log('📊 Sample Lembaga (3 data):', lembagaRows.slice(0, 3));
+                    console.log('📊 Sample Lembaga (5 data):', lembagaRows.slice(0, 5));
                 }
 
                 // 3. Buat mapping desa
                 const desaMap = {};
                 const desaNamaMap = {};
+                const desaNamaVariasi = {};
+
                 if (desaList && desaList.length > 0) {
                     desaList.forEach(d => {
                         const normalized = d.nama.toLowerCase().trim();
@@ -1355,14 +1381,37 @@
                             PONPES: 0,
                             total: 0
                         };
+
                         desaNamaMap[normalized] = d.id;
+
+                        // Variasi tanpa "desa"
+                        const tanpaDesa = normalized.replace(/^desa\s+/, '').trim();
+                        if (tanpaDesa !== normalized) {
+                            desaNamaVariasi[tanpaDesa] = d.id;
+                        }
+
+                        // Variasi dengan "desa"
+                        const denganDesa = 'desa ' + normalized;
+                        desaNamaVariasi[denganDesa] = d.id;
+
+                        // Variasi capitalize
+                        const capitalize = normalized.split(' ').map(word =>
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        ).join(' ');
+                        desaNamaVariasi[capitalize] = d.id;
                     });
                 }
 
                 // 4. Proses setiap lembaga
                 let unlinkedCount = 0;
                 let processedCount = 0;
-                const linkedData = {};
+                const linkedByMethod = {
+                    desa_id: 0,
+                    exact_match: 0,
+                    partial_match: 0,
+                    variasi_match: 0,
+                    alamat_match: 0
+                };
 
                 if (lembagaRows && lembagaRows.length > 0) {
                     lembagaRows.forEach(row => {
@@ -1373,35 +1422,64 @@
                         let targetDesa = null;
                         let matchMethod = 'none';
 
-                        // Method 1: Gunakan desa_id
+                        // Method 1: desa_id
                         if (row.desa_id && desaMap[row.desa_id]) {
                             targetDesa = desaMap[row.desa_id];
                             matchMethod = 'desa_id';
+                            linkedByMethod.desa_id++;
                         }
-                        // Method 2: Gunakan field desa (teks)
+                        // Method 2: field desa (teks)
                         else if (row.desa) {
                             const desaName = row.desa.toLowerCase().trim();
 
-                            // Exact match
                             if (desaNamaMap[desaName]) {
                                 targetDesa = desaMap[desaNamaMap[desaName]];
                                 matchMethod = 'exact_match';
+                                linkedByMethod.exact_match++;
+                            } else if (desaNamaVariasi[desaName]) {
+                                targetDesa = desaMap[desaNamaVariasi[desaName]];
+                                matchMethod = 'variasi_match';
+                                linkedByMethod.variasi_match++;
                             } else {
                                 // Partial match
+                                let bestMatch = null;
+                                let bestScore = 0;
+
                                 for (const [nama, id] of Object.entries(desaNamaMap)) {
                                     if (nama.includes(desaName) || desaName.includes(nama)) {
-                                        targetDesa = desaMap[id];
-                                        matchMethod = 'partial_match';
-                                        break;
+                                        const score = Math.min(nama.length, desaName.length) / Math.max(nama.length,
+                                            desaName.length);
+                                        if (score > bestScore) {
+                                            bestScore = score;
+                                            bestMatch = id;
+                                        }
                                     }
+                                }
+
+                                if (bestMatch && bestScore > 0.5) {
+                                    targetDesa = desaMap[bestMatch];
+                                    matchMethod = 'partial_match';
+                                    linkedByMethod.partial_match++;
+                                }
+                            }
+                        }
+
+                        // Method 3: dari alamat
+                        if (!targetDesa && row.alamat) {
+                            const alamatLower = row.alamat.toLowerCase();
+                            for (const [nama, id] of Object.entries(desaNamaMap)) {
+                                if (alamatLower.includes(nama) || nama.includes(alamatLower.substring(0, 10))) {
+                                    targetDesa = desaMap[id];
+                                    matchMethod = 'alamat_match';
+                                    linkedByMethod.alamat_match++;
+                                    break;
                                 }
                             }
                         }
 
                         if (!targetDesa) {
                             unlinkedCount++;
-                            // Log untuk debugging (hanya 5 pertama)
-                            if (unlinkedCount <= 5) {
+                            if (unlinkedCount <= 10) {
                                 console.warn('⚠️ Lembaga tidak terhubung:', {
                                     nama: row.nama || 'Tanpa nama',
                                     desa: row.desa || 'NULL',
@@ -1412,37 +1490,35 @@
                             return;
                         }
 
-                        // Tambahkan ke counter
                         targetDesa[jenis]++;
                         targetDesa.total++;
                     });
                 }
 
                 console.log(`✅ ${processedCount} lembaga diproses`);
-                console.log(`✅ ${processedCount - unlinkedCount} lembaga terhubung ke desa`);
+                console.log(`✅ ${processedCount - unlinkedCount} lembaga terhubung`);
                 console.log(`❌ ${unlinkedCount} lembaga tidak terhubung`);
+                console.log('📊 Metode koneksi:', linkedByMethod);
 
-                // 5. Konversi ke array dan sorting
+                // 5. Konversi ke array
                 const desaArray = Object.values(desaMap).sort((a, b) => b.total - a.total || a.nama.localeCompare(b.nama));
 
-                // 6. Cek spesifik desa Pesarean
+                // 6. Debug Pesarean
                 const pesarean = desaArray.find(d => d.nama.toLowerCase().includes('pesarean'));
                 if (pesarean) {
                     console.log('📍 DESA PESAREAN:', pesarean);
-                } else {
-                    console.log('📍 Desa Pesarean tidak ditemukan di daftar');
                 }
 
-                // 7. Update subtitle dengan nama kecamatan
+                // 7. Update subtitle
                 const sub = document.getElementById('chartSub');
                 const detailSub = document.getElementById('detailSub');
                 if (filter.kecamatan_id) {
                     const kecNama = await getKecamatanName(filter.kecamatan_id);
-                    sub.textContent = `Total desa di Kecamatan ${kecNama}`;
-                    detailSub.textContent = `Diurutkan dari jumlah lembaga terbanyak di Kecamatan ${kecNama}`;
+                    if (sub) sub.textContent = `Total desa di Kecamatan ${kecNama}`;
+                    if (detailSub) detailSub.textContent = `Diurutkan dari jumlah lembaga terbanyak di Kecamatan ${kecNama}`;
                 } else {
-                    sub.textContent = 'Total seluruh desa';
-                    detailSub.textContent = 'Diurutkan dari jumlah lembaga terbanyak';
+                    if (sub) sub.textContent = 'Total seluruh desa';
+                    if (detailSub) detailSub.textContent = 'Diurutkan dari jumlah lembaga terbanyak';
                 }
 
                 // 8. Render data
@@ -1451,24 +1527,24 @@
 
                 // 9. Update stats
                 const grand = desaArray.reduce((sum, d) => sum + d.total, 0);
-                document.getElementById('totalDesa').textContent = desaArray.length;
-                document.getElementById('avgLembaga').textContent = desaArray.length ? (grand / desaArray.length).toFixed(1) :
-                    '0';
-                document.getElementById('topDesa').textContent = desaArray.length && desaArray[0].total > 0 ? desaArray[0]
-                    .nama : '-';
-                document.getElementById('totalDesaStat').textContent = desaArray.length;
-                document.getElementById('totalLembagaStat').textContent = grand;
-                document.getElementById('topDesaStat').textContent = desaArray.length && desaArray[0].total > 0 ? desaArray[0]
-                    .nama : '-';
+                const totalDesaWithData = desaArray.filter(d => d.total > 0).length;
+
+                safeSetText('totalDesa', desaArray.length);
+                safeSetText('avgLembaga', desaArray.length ? (grand / totalDesaWithData || grand / desaArray.length).toFixed(
+                    1) : '0');
+                safeSetText('topDesa', desaArray.length && desaArray[0].total > 0 ? desaArray[0].nama : '-');
+                safeSetText('totalDesaStat', desaArray.length);
+                safeSetText('totalLembagaStat', grand);
+                safeSetText('topDesaStat', desaArray.length && desaArray[0].total > 0 ? desaArray[0].nama : '-');
 
                 updateTimestamp();
                 updateStats();
 
-                // Tampilkan notifikasi jika ada data tidak terhubung
+                // Tampilkan notifikasi
                 if (unlinkedCount > 0) {
                     showToast(`${unlinkedCount} lembaga tidak terhubung ke desa. Cek console untuk detail.`, 'warning');
                 } else {
-                    showToast(`Data berhasil dimuat: ${grand} lembaga di ${desaArray.length} desa`, 'success');
+                    showToast(`✅ Data berhasil dimuat: ${grand} lembaga di ${totalDesaWithData} desa`, 'success');
                 }
 
             } catch (e) {
@@ -1488,6 +1564,10 @@
         // ============================================================
         function filterByKecamatan() {
             const select = document.getElementById('kecamatanFilter');
+            if (!select) {
+                console.error('❌ Elemen kecamatanFilter tidak ditemukan');
+                return;
+            }
             const val = select.value;
             currentKecamatanId = val;
             loadDesaData(val);
@@ -1499,11 +1579,10 @@
         }
 
         // ============================================================
-        // ===== STATISTIK =====
+        // ===== UPDATE STATS =====
         // ============================================================
         async function updateStats() {
             try {
-                const user = getUser();
                 const filter = getRoleFilter();
 
                 let query = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true });
@@ -1531,10 +1610,11 @@
                     queryPonpes
                 ]);
 
-                // Update di sidebar jika ada
-                document.getElementById('totalLembagaStat').textContent = total.count || 0;
+                safeSetText('totalLembagaStat', total.count || 0);
 
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error('Error update stats:', e);
+            }
         }
 
         // ============================================================
@@ -1544,7 +1624,6 @@
             try {
                 console.log('🔍 === DEBUG DESA PESAREAN ===');
 
-                // 1. Cek di master_kelurahan
                 const { data: desaMaster, error: err1 } = await supabaseClient
                     .from('master_kelurahan')
                     .select('*')
@@ -1553,7 +1632,6 @@
                 if (err1) console.error('Error master:', err1);
                 console.log('🏘️ DESA DI MASTER:', desaMaster);
 
-                // 2. Cek lembaga dengan desa_id
                 if (desaMaster && desaMaster.length > 0) {
                     const desaId = desaMaster[0].id;
                     const { data: lembagaByDesaId, error: err2 } = await supabaseClient
@@ -1568,7 +1646,6 @@
                     }
                 }
 
-                // 3. Cek lembaga dengan field desa (teks)
                 const { data: lembagaByDesa, error: err3 } = await supabaseClient
                     .from('lembaga')
                     .select('*')
@@ -1580,7 +1657,6 @@
                     console.table(lembagaByDesa);
                 }
 
-                // 4. Tampilkan ringkasan
                 const msg = `🔍 Hasil Debug Pesarean:
         - Desa di master: ${desaMaster?.length || 0}
         - Lembaga dengan desa_id: ${lembagaByDesaId?.length || 0}
@@ -1600,18 +1676,22 @@
         // ===== INIT =====
         // ============================================================
         document.addEventListener('DOMContentLoaded', async function() {
-            await checkAuth();
-            await loadKecamatanFilter();
-            await loadDesaData('');
-
-            // Update pendidik count di sidebar
             try {
-                const { count } = await supabaseClient
-                    .from('pendidik')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status_aktif', true);
-                document.getElementById('navPendidikCount').textContent = count || 0;
-            } catch (e) { console.error(e); }
+                await checkAuth();
+                await loadKecamatanFilter();
+                await loadDesaData('');
+
+                const navCount = document.getElementById('navPendidikCount');
+                if (navCount) {
+                    const { count } = await supabaseClient
+                        .from('pendidik')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('status_aktif', true);
+                    navCount.textContent = count || 0;
+                }
+            } catch (e) {
+                console.error('Error init:', e);
+            }
         });
 
         // ============================================================
