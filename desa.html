@@ -36,7 +36,8 @@
             box-sizing: border-box;
         }
 
-        html, body {
+        html,
+        body {
             height: 100%;
         }
 
@@ -49,7 +50,6 @@
             overflow-y: auto;
         }
 
-        /* ===== MAIN CONTENT ===== */
         .main-content {
             flex: 1;
             max-width: 1200px;
@@ -59,7 +59,6 @@
             padding: 0;
         }
 
-        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -126,7 +125,6 @@
             opacity: 0.4;
         }
 
-        /* ===== MAIN CONTAINER ===== */
         .main-container {
             background: white;
             border-radius: 16px;
@@ -138,7 +136,6 @@
             flex-direction: column;
         }
 
-        /* ===== HEADER CONTAINER ===== */
         .container-header {
             display: flex;
             align-items: center;
@@ -251,7 +248,6 @@
             transform: rotate(180deg);
         }
 
-        /* ===== BACK BUTTON ===== */
         .back-btn {
             padding: 7px 16px;
             border: 1.5px solid rgba(0, 100, 0, 0.2);
@@ -275,7 +271,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
         }
 
-        /* ===== STICKY FILTER BAR ===== */
         .sticky-filter-bar {
             position: sticky;
             top: 0;
@@ -367,7 +362,6 @@
             color: #aaa;
         }
 
-        /* ===== CONTENT WRAPPER ===== */
         .content-wrapper {
             display: flex;
             gap: 32px;
@@ -375,7 +369,6 @@
             min-height: 0;
         }
 
-        /* ===== CHART PANEL ===== */
         .chart-panel {
             flex: 0 0 38%;
             min-width: 260px;
@@ -512,7 +505,6 @@
             -webkit-text-fill-color: var(--gold-dark);
         }
 
-        /* ===== DETAIL PANEL ===== */
         .detail-panel {
             flex: 1;
             min-width: 0;
@@ -792,7 +784,6 @@
             background: transparent;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
             body {
                 padding: 12px;
@@ -916,13 +907,9 @@
 </head>
 <body>
 
-    <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
 
-    <!-- ===== MAIN CONTENT ===== -->
     <main class="main-content">
-
-        <!-- ===== MAIN CONTAINER ===== -->
         <div class="main-container">
 
             <!-- HEADER -->
@@ -985,7 +972,6 @@
 
             </div>
         </div>
-
     </main>
 
     <script src="js/supabase-client.js"></script>
@@ -1095,7 +1081,7 @@
         }
 
         // ============================================================
-        // ===== FETCH ALL LEMBAGA (bypass limit 1000) =====
+        // ===== FETCH ALL LEMBAGA (dengan pagination) =====
         // ============================================================
         async function fetchAllLembaga(filter) {
             const CHUNK = 1000;
@@ -1105,13 +1091,21 @@
             while (true) {
                 let q = supabaseClient
                     .from('lembaga')
-                    .select('kecamatan_id, desa_id, jenis_lembaga');
+                    .select('kecamatan_id, desa_id, desa, jenis_lembaga, nama')
+                    .order('created_at', { ascending: true });
 
-                if (filter.kecamatan_id) q = q.eq('kecamatan_id', filter.kecamatan_id);
-                if (filter.jenis_lembaga) q = q.eq('jenis_lembaga', filter.jenis_lembaga);
+                if (filter.kecamatan_id) {
+                    q = q.eq('kecamatan_id', filter.kecamatan_id);
+                }
+                if (filter.jenis_lembaga) {
+                    q = q.eq('jenis_lembaga', filter.jenis_lembaga);
+                }
 
                 const { data, error } = await q.range(from, from + CHUNK - 1);
-                if (error) throw error;
+                if (error) {
+                    console.error('Error fetching lembaga:', error);
+                    throw error;
+                }
 
                 allRows = allRows.concat(data || []);
                 if (!data || data.length < CHUNK) break;
@@ -1174,7 +1168,7 @@
         }
 
         // ============================================================
-        // ===== DONUT CHART (sebaran per desa) =====
+        // ===== DONUT CHART =====
         // ============================================================
         let donutChartInstance = null;
 
@@ -1254,106 +1248,8 @@
         }
 
         // ============================================================
-        // ===== LOAD DATA =====
+        // ===== RENDER DESA LIST =====
         // ============================================================
-        let currentKecamatanId = '';
-
-        async function loadDesaData(kecamatanId = '') {
-            const list = document.getElementById('desaList');
-            list.innerHTML = '<div class="spinner"></div>';
-
-            try {
-                const filter = getRoleFilter();
-
-                if (filter.restrict) {
-                    list.innerHTML =
-                        `<div class="empty-note"><i class="fas fa-lock"></i>Anda tidak memiliki akses ke data ini</div>`;
-                    return;
-                }
-
-                if (kecamatanId) {
-                    filter.kecamatan_id = kecamatanId;
-                }
-
-                // Ambil daftar desa dari tabel master_kelurahan
-                let desaQuery = supabaseClient
-                    .from('master_kelurahan')
-                    .select('id, nama, kecamatan_id')
-                    .order('nama');
-
-                if (filter.kecamatan_id) {
-                    desaQuery = desaQuery.eq('kecamatan_id', filter.kecamatan_id);
-                }
-
-                const { data: desaList, error: desaErr } = await desaQuery;
-                if (desaErr) throw desaErr;
-
-                // Ambil semua lembaga
-                const lembagaRows = await fetchAllLembaga(filter);
-
-                // Aggregate per desa
-                const counts = {};
-                (desaList || []).forEach(d => {
-                    counts[d.id] = {
-                        nama: d.nama,
-                        kecamatan_id: d.kecamatan_id,
-                        LPQ: 0,
-                        MDT: 0,
-                        PONPES: 0,
-                        total: 0
-                    };
-                });
-
-                (lembagaRows || []).forEach(row => {
-                    const jenis = row.jenis_lembaga;
-                    if (row.desa_id && counts[row.desa_id]) {
-                        if (jenis === 'LPQ' || jenis === 'MDT' || jenis === 'PONPES') {
-                            counts[row.desa_id][jenis]++;
-                            counts[row.desa_id].total++;
-                        }
-                    }
-                });
-
-                const desaArray = Object.values(counts).sort((a, b) => b.total - a.total || a.nama.localeCompare(b.nama));
-
-                // Update subtitle
-                const sub = document.getElementById('chartSub');
-                const detailSub = document.getElementById('detailSub');
-                if (filter.kecamatan_id) {
-                    const kecNama = await getKecamatanName(filter.kecamatan_id);
-                    sub.textContent = `Total desa di Kecamatan ${kecNama}`;
-                    detailSub.textContent = `Diurutkan dari jumlah lembaga terbanyak di Kecamatan ${kecNama}`;
-                } else {
-                    sub.textContent = 'Total seluruh desa';
-                    detailSub.textContent = 'Diurutkan dari jumlah lembaga terbanyak';
-                }
-
-                renderDonut(desaArray);
-                renderDesaList(desaArray);
-
-                const grand = desaArray.reduce((sum, d) => sum + d.total, 0);
-                document.getElementById('totalDesa').textContent = desaArray.length;
-                document.getElementById('avgLembaga').textContent = desaArray.length ? (grand / desaArray.length).toFixed(1) :
-                    '0';
-                document.getElementById('topDesa').textContent = desaArray.length && desaArray[0].total > 0 ? desaArray[0]
-                    .nama : '-';
-
-                // Update sticky stats
-                document.getElementById('totalDesaStat').textContent = desaArray.length;
-                document.getElementById('totalLembagaStat').textContent = grand;
-                document.getElementById('topDesaStat').textContent = desaArray.length && desaArray[0].total > 0 ? desaArray[0]
-                    .nama : '-';
-
-                updateTimestamp();
-                updateStats();
-
-            } catch (e) {
-                console.error('Error:', e);
-                list.innerHTML =
-                    `<div class="empty-note" style="color:#f44336;"><i class="fas fa-triangle-exclamation"></i>Gagal memuat data: ${e.message}</div>`;
-            }
-        }
-
         function renderDesaList(desaArray) {
             const list = document.getElementById('desaList');
             if (!desaArray || desaArray.length === 0) {
@@ -1394,6 +1290,202 @@
             }).join('');
         }
 
+        // ============================================================
+        // ===== LOAD DATA UTAMA (PERBAIKAN) =====
+        // ============================================================
+        let currentKecamatanId = '';
+
+        async function loadDesaData(kecamatanId = '') {
+            const list = document.getElementById('desaList');
+            list.innerHTML = '<div class="spinner"></div>';
+
+            try {
+                const filter = getRoleFilter();
+
+                if (filter.restrict) {
+                    list.innerHTML =
+                        `<div class="empty-note"><i class="fas fa-lock"></i>Anda tidak memiliki akses ke data ini</div>`;
+                    return;
+                }
+
+                if (kecamatanId) {
+                    filter.kecamatan_id = kecamatanId;
+                }
+
+                console.log('🔍 Filter yang digunakan:', filter);
+
+                // 1. Ambil daftar desa dari master_kelurahan
+                let desaQuery = supabaseClient
+                    .from('master_kelurahan')
+                    .select('id, nama, kecamatan_id')
+                    .order('nama');
+
+                if (filter.kecamatan_id) {
+                    desaQuery = desaQuery.eq('kecamatan_id', filter.kecamatan_id);
+                }
+
+                const { data: desaList, error: desaErr } = await desaQuery;
+                if (desaErr) {
+                    console.error('Error desa:', desaErr);
+                    throw desaErr;
+                }
+
+                console.log('📋 Total Desa:', desaList?.length || 0);
+
+                // 2. Ambil semua lembaga
+                const lembagaRows = await fetchAllLembaga(filter);
+
+                console.log('📊 Total Lembaga:', lembagaRows?.length || 0);
+                if (lembagaRows && lembagaRows.length > 0) {
+                    console.log('📊 Sample Lembaga (3 data):', lembagaRows.slice(0, 3));
+                }
+
+                // 3. Buat mapping desa
+                const desaMap = {};
+                const desaNamaMap = {};
+                if (desaList && desaList.length > 0) {
+                    desaList.forEach(d => {
+                        const normalized = d.nama.toLowerCase().trim();
+                        desaMap[d.id] = {
+                            id: d.id,
+                            nama: d.nama,
+                            kecamatan_id: d.kecamatan_id,
+                            LPQ: 0,
+                            MDT: 0,
+                            PONPES: 0,
+                            total: 0
+                        };
+                        desaNamaMap[normalized] = d.id;
+                    });
+                }
+
+                // 4. Proses setiap lembaga
+                let unlinkedCount = 0;
+                let processedCount = 0;
+                const linkedData = {};
+
+                if (lembagaRows && lembagaRows.length > 0) {
+                    lembagaRows.forEach(row => {
+                        const jenis = row.jenis_lembaga;
+                        if (!['LPQ', 'MDT', 'PONPES'].includes(jenis)) return;
+
+                        processedCount++;
+                        let targetDesa = null;
+                        let matchMethod = 'none';
+
+                        // Method 1: Gunakan desa_id
+                        if (row.desa_id && desaMap[row.desa_id]) {
+                            targetDesa = desaMap[row.desa_id];
+                            matchMethod = 'desa_id';
+                        }
+                        // Method 2: Gunakan field desa (teks)
+                        else if (row.desa) {
+                            const desaName = row.desa.toLowerCase().trim();
+
+                            // Exact match
+                            if (desaNamaMap[desaName]) {
+                                targetDesa = desaMap[desaNamaMap[desaName]];
+                                matchMethod = 'exact_match';
+                            } else {
+                                // Partial match
+                                for (const [nama, id] of Object.entries(desaNamaMap)) {
+                                    if (nama.includes(desaName) || desaName.includes(nama)) {
+                                        targetDesa = desaMap[id];
+                                        matchMethod = 'partial_match';
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!targetDesa) {
+                            unlinkedCount++;
+                            // Log untuk debugging (hanya 5 pertama)
+                            if (unlinkedCount <= 5) {
+                                console.warn('⚠️ Lembaga tidak terhubung:', {
+                                    nama: row.nama || 'Tanpa nama',
+                                    desa: row.desa || 'NULL',
+                                    desa_id: row.desa_id || 'NULL',
+                                    jenis: row.jenis_lembaga
+                                });
+                            }
+                            return;
+                        }
+
+                        // Tambahkan ke counter
+                        targetDesa[jenis]++;
+                        targetDesa.total++;
+                    });
+                }
+
+                console.log(`✅ ${processedCount} lembaga diproses`);
+                console.log(`✅ ${processedCount - unlinkedCount} lembaga terhubung ke desa`);
+                console.log(`❌ ${unlinkedCount} lembaga tidak terhubung`);
+
+                // 5. Konversi ke array dan sorting
+                const desaArray = Object.values(desaMap).sort((a, b) => b.total - a.total || a.nama.localeCompare(b.nama));
+
+                // 6. Cek spesifik desa Pesarean
+                const pesarean = desaArray.find(d => d.nama.toLowerCase().includes('pesarean'));
+                if (pesarean) {
+                    console.log('📍 DESA PESAREAN:', pesarean);
+                } else {
+                    console.log('📍 Desa Pesarean tidak ditemukan di daftar');
+                }
+
+                // 7. Update subtitle dengan nama kecamatan
+                const sub = document.getElementById('chartSub');
+                const detailSub = document.getElementById('detailSub');
+                if (filter.kecamatan_id) {
+                    const kecNama = await getKecamatanName(filter.kecamatan_id);
+                    sub.textContent = `Total desa di Kecamatan ${kecNama}`;
+                    detailSub.textContent = `Diurutkan dari jumlah lembaga terbanyak di Kecamatan ${kecNama}`;
+                } else {
+                    sub.textContent = 'Total seluruh desa';
+                    detailSub.textContent = 'Diurutkan dari jumlah lembaga terbanyak';
+                }
+
+                // 8. Render data
+                renderDonut(desaArray);
+                renderDesaList(desaArray);
+
+                // 9. Update stats
+                const grand = desaArray.reduce((sum, d) => sum + d.total, 0);
+                document.getElementById('totalDesa').textContent = desaArray.length;
+                document.getElementById('avgLembaga').textContent = desaArray.length ? (grand / desaArray.length).toFixed(1) :
+                    '0';
+                document.getElementById('topDesa').textContent = desaArray.length && desaArray[0].total > 0 ? desaArray[0]
+                    .nama : '-';
+                document.getElementById('totalDesaStat').textContent = desaArray.length;
+                document.getElementById('totalLembagaStat').textContent = grand;
+                document.getElementById('topDesaStat').textContent = desaArray.length && desaArray[0].total > 0 ? desaArray[0]
+                    .nama : '-';
+
+                updateTimestamp();
+                updateStats();
+
+                // Tampilkan notifikasi jika ada data tidak terhubung
+                if (unlinkedCount > 0) {
+                    showToast(`${unlinkedCount} lembaga tidak terhubung ke desa. Cek console untuk detail.`, 'warning');
+                } else {
+                    showToast(`Data berhasil dimuat: ${grand} lembaga di ${desaArray.length} desa`, 'success');
+                }
+
+            } catch (e) {
+                console.error('❌ Error di loadDesaData:', e);
+                list.innerHTML =
+                    `<div class="empty-note" style="color:#f44336;">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        Gagal memuat data: ${e.message}
+                        <br><small style="color:#999;">Cek console untuk detail error</small>
+                    </div>`;
+                showToast('Gagal memuat data: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== FILTER & REFRESH =====
+        // ============================================================
         function filterByKecamatan() {
             const select = document.getElementById('kecamatanFilter');
             const val = select.value;
@@ -1439,12 +1531,69 @@
                     queryPonpes
                 ]);
 
+                // Update di sidebar jika ada
                 document.getElementById('totalLembagaStat').textContent = total.count || 0;
-                document.getElementById('totalLPQ').textContent = lpq.count || 0;
-                document.getElementById('totalMDT').textContent = mdt.count || 0;
-                document.getElementById('totalPONPES').textContent = ponpes.count || 0;
 
             } catch (e) { console.error(e); }
+        }
+
+        // ============================================================
+        // ===== DEBUG FUNCTION =====
+        // ============================================================
+        async function debugDesaPesarean() {
+            try {
+                console.log('🔍 === DEBUG DESA PESAREAN ===');
+
+                // 1. Cek di master_kelurahan
+                const { data: desaMaster, error: err1 } = await supabaseClient
+                    .from('master_kelurahan')
+                    .select('*')
+                    .ilike('nama', '%pesarean%');
+
+                if (err1) console.error('Error master:', err1);
+                console.log('🏘️ DESA DI MASTER:', desaMaster);
+
+                // 2. Cek lembaga dengan desa_id
+                if (desaMaster && desaMaster.length > 0) {
+                    const desaId = desaMaster[0].id;
+                    const { data: lembagaByDesaId, error: err2 } = await supabaseClient
+                        .from('lembaga')
+                        .select('*')
+                        .eq('desa_id', desaId);
+
+                    if (err2) console.error('Error by desa_id:', err2);
+                    console.log('📚 LEMBAGA DENGAN DESA_ID:', lembagaByDesaId?.length || 0);
+                    if (lembagaByDesaId && lembagaByDesaId.length > 0) {
+                        console.table(lembagaByDesaId);
+                    }
+                }
+
+                // 3. Cek lembaga dengan field desa (teks)
+                const { data: lembagaByDesa, error: err3 } = await supabaseClient
+                    .from('lembaga')
+                    .select('*')
+                    .ilike('desa', '%pesarean%');
+
+                if (err3) console.error('Error by desa text:', err3);
+                console.log('📚 LEMBAGA DENGAN DESA TEXT:', lembagaByDesa?.length || 0);
+                if (lembagaByDesa && lembagaByDesa.length > 0) {
+                    console.table(lembagaByDesa);
+                }
+
+                // 4. Tampilkan ringkasan
+                const msg = `🔍 Hasil Debug Pesarean:
+        - Desa di master: ${desaMaster?.length || 0}
+        - Lembaga dengan desa_id: ${lembagaByDesaId?.length || 0}
+        - Lembaga dengan desa (text): ${lembagaByDesa?.length || 0}
+
+        Cek console untuk detail lengkap.`;
+
+                alert(msg);
+
+            } catch (e) {
+                console.error('Debug error:', e);
+                alert('Error: ' + e.message);
+            }
         }
 
         // ============================================================
@@ -1456,11 +1605,13 @@
             await loadDesaData('');
 
             // Update pendidik count di sidebar
-            const { count } = await supabaseClient
-                .from('pendidik')
-                .select('*', { count: 'exact', head: true })
-                .eq('status_aktif', true);
-            document.getElementById('navPendidikCount').textContent = count || 0;
+            try {
+                const { count } = await supabaseClient
+                    .from('pendidik')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status_aktif', true);
+                document.getElementById('navPendidikCount').textContent = count || 0;
+            } catch (e) { console.error(e); }
         });
 
         // ============================================================
@@ -1471,6 +1622,8 @@
         window.filterByKecamatan = filterByKecamatan;
         window.getUser = getUser;
         window.getRoleFilter = getRoleFilter;
+        window.debugDesaPesarean = debugDesaPesarean;
+        window.loadDesaData = loadDesaData;
     </script>
 
 </body>
