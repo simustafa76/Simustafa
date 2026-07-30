@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login — SI-MUSTAFA</title>
+    <title>Login / Daftar — SI-MUSTAFA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -38,6 +38,8 @@
             --white: #ffffff;
             --red-500: #ef4444;
             --red-100: #fef2f2;
+            --blue-500: #3b82f6;
+            --blue-100: #eff6ff;
             --radius-sm: 8px;
             --radius: 12px;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
@@ -323,8 +325,40 @@
             max-width: 400px;
         }
 
-        .login-box .login-header {
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--gray-100);
+            border-radius: var(--radius);
+            padding: 4px;
             margin-bottom: 28px;
+        }
+
+        .tabs .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.88rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--gray-500);
+        }
+
+        .tabs .tab-btn.active {
+            background: var(--white);
+            color: var(--green-800);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .tabs .tab-btn:hover:not(.active) {
+            color: var(--gray-700);
+        }
+
+        .login-box .login-header {
             text-align: center;
         }
 
@@ -357,7 +391,28 @@
             margin-top: 5px;
         }
 
-        .login-box .login-hint {
+        /* ===== FORMS ===== */
+        .auth-form {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-hint {
             background: var(--green-50);
             border-radius: var(--radius);
             padding: 11px 15px;
@@ -370,7 +425,7 @@
             gap: 8px;
         }
 
-        .login-box .login-hint i {
+        .login-hint i {
             margin-top: 1px;
             flex-shrink: 0;
         }
@@ -385,6 +440,11 @@
             font-size: 0.84rem;
             color: var(--gray-700);
             margin-bottom: 5px;
+        }
+
+        .form-group label .required {
+            color: var(--red-500);
+            margin-left: 2px;
         }
 
         .form-group .input-wrapper {
@@ -424,12 +484,30 @@
             background: var(--red-100);
         }
 
+        .form-group input.success {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .form-group input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .input-hint {
             font-size: 0.7rem;
             color: var(--gray-500);
             margin-top: 5px;
             transition: color var(--transition);
             min-height: 18px;
+        }
+
+        .input-hint.success {
+            color: #16a34a;
+        }
+
+        .input-hint.error {
+            color: var(--red-500);
         }
 
         .input-hint strong {
@@ -507,8 +585,18 @@
             cursor: not-allowed;
         }
 
+        .btn-login.btn-secondary {
+            background: var(--blue-500);
+        }
+
+        .btn-login.btn-secondary:hover:not(:disabled) {
+            background: #2563eb;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
         .error-message,
-        .success-message {
+        .success-message,
+        .info-message {
             padding: 11px 15px;
             border-radius: var(--radius);
             margin-bottom: 16px;
@@ -543,8 +631,15 @@
             border-color: #22c55e;
         }
 
+        .info-message {
+            background: #eff6ff;
+            color: #2563eb;
+            border-color: #3b82f6;
+        }
+
         .error-message i,
-        .success-message i {
+        .success-message i,
+        .info-message i {
             flex-shrink: 0;
             margin-top: 1px;
         }
@@ -571,6 +666,66 @@
             font-size: 0.73rem;
             color: var(--gray-300);
             letter-spacing: 0.3px;
+        }
+
+        /* ===== NSLP AUTO-COMPLETE ===== */
+        .nslp-result {
+            background: var(--green-50);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            margin-top: 6px;
+            font-size: 0.82rem;
+            border: 1px solid var(--green-200);
+            display: none;
+        }
+
+        .nslp-result.show {
+            display: block;
+        }
+
+        .nslp-result .label {
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .nslp-result .value {
+            color: var(--green-800);
+            font-weight: 600;
+        }
+
+        .nslp-result .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--green-100);
+            color: var(--green-800);
+            margin-left: 6px;
+        }
+
+        .password-strength {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .password-strength .bar {
+            flex: 1;
+            height: 3px;
+            border-radius: 4px;
+            background: var(--gray-200);
+            transition: background var(--transition);
+        }
+
+        .password-strength .bar.active.weak {
+            background: #ef4444;
+        }
+        .password-strength .bar.active.medium {
+            background: #f59e0b;
+        }
+        .password-strength .bar.active.strong {
+            background: #22c55e;
         }
 
         /* ========== RESPONSIVE ========== */
@@ -686,9 +841,6 @@
             .login-box {
                 max-width: 100%;
             }
-            .login-box .login-header {
-                margin-bottom: 20px;
-            }
             .login-box .login-header .icon-lock {
                 width: 40px;
                 height: 40px;
@@ -698,7 +850,7 @@
             .login-box .login-header h2 {
                 font-size: 1.2rem;
             }
-            .login-box .login-hint {
+            .login-hint {
                 font-size: 0.74rem;
                 padding: 9px 12px;
                 margin-bottom: 16px;
@@ -714,6 +866,10 @@
             .btn-login {
                 padding: 12px;
                 font-size: 0.9rem;
+            }
+            .tabs .tab-btn {
+                font-size: 0.8rem;
+                padding: 8px 12px;
             }
         }
 
@@ -843,61 +999,161 @@
         </div>
     </div>
 
-    <!-- ========== PANEL KANAN: LOGIN FORM ========== -->
+    <!-- ========== PANEL KANAN: LOGIN + SIGNUP ========== -->
     <div class="right-panel">
         <div class="login-box">
-            <div class="login-header">
-                <div class="icon-lock">
-                    <i class="fas fa-lock"></i>
-                </div>
-                <h2>Selamat Datang</h2>
-                <p>Masuk ke <span>SI-MUSTAFA</span> untuk melanjutkan</p>
-            </div>
-
-            <div class="login-hint">
-                <i class="fas fa-info-circle"></i>
-                <span>Masuk dengan <strong>Email</strong> yang telah didaftarkan.</span>
-            </div>
-
-            <form id="loginForm" novalidate>
-                <div class="form-group">
-                    <label for="email">Alamat Email</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" id="email" placeholder="Masukkan email Anda" required autocomplete="email">
-                    </div>
-                    <div class="input-hint" id="inputHint">💡 Contoh: admin@simustafa.com</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Kata Sandi</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-key"></i>
-                        <input type="password" id="password" placeholder="Masukkan kata sandi" required autocomplete="current-password">
-                    </div>
-                </div>
-
-                <div class="form-options">
-                    <label>
-                        <input type="checkbox" id="rememberMe"> Ingat saya
-                    </label>
-                    <a href="#" onclick="alert('Hubungi admin untuk reset password')">Lupa password?</a>
-                </div>
-
-                <div id="errorMessage" class="error-message">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span id="errorText"></span>
-                </div>
-                <div id="successMessage" class="success-message">
-                    <i class="fas fa-check-circle"></i>
-                    <span id="successText"></span>
-                </div>
-
-                <button type="submit" class="btn-login" id="loginBtn">
-                    <span id="btnText"><i class="fas fa-sign-in-alt"></i> Masuk</span>
-                    <span id="btnLoader" class="loader" style="display:none;"></span>
+            <!-- TABS -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="login" onclick="switchTab('login')">
+                    <i class="fas fa-sign-in-alt"></i> Masuk
                 </button>
-            </form>
+                <button class="tab-btn" data-tab="signup" onclick="switchTab('signup')">
+                    <i class="fas fa-user-plus"></i> Daftar
+                </button>
+            </div>
+
+            <!-- ===== LOGIN FORM ===== -->
+            <div id="loginFormContainer" class="auth-form active">
+                <div class="login-header">
+                    <div class="icon-lock">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h2>Selamat Datang</h2>
+                    <p>Masuk ke <span>SI-MUSTAFA</span> untuk melanjutkan</p>
+                </div>
+
+                <div class="login-hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Masuk dengan <strong>Email</strong> yang telah didaftarkan.</span>
+                </div>
+
+                <form id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="loginEmail">Alamat Email</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="loginEmail" placeholder="Masukkan email Anda" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">Kata Sandi</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-key"></i>
+                            <input type="password" id="loginPassword" placeholder="Masukkan kata sandi" required autocomplete="current-password">
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label>
+                            <input type="checkbox" id="rememberMe"> Ingat saya
+                        </label>
+                        <a href="#" onclick="alert('Hubungi admin untuk reset password')">Lupa password?</a>
+                    </div>
+
+                    <div id="loginErrorMessage" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="loginErrorText"></span>
+                    </div>
+                    <div id="loginSuccessMessage" class="success-message">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="loginSuccessText"></span>
+                    </div>
+
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <span id="loginBtnText"><i class="fas fa-sign-in-alt"></i> Masuk</span>
+                        <span id="loginBtnLoader" class="loader" style="display:none;"></span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- ===== SIGNUP FORM ===== -->
+            <div id="signupFormContainer" class="auth-form">
+                <div class="login-header">
+                    <div class="icon-lock" style="background:var(--blue-100);color:var(--blue-500);">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h2>Daftar Akun</h2>
+                    <p>Daftar sebagai <span>Operator Lembaga</span></p>
+                </div>
+
+                <div class="login-hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Daftar menggunakan <strong>NSLP</strong> lembaga Anda.</span>
+                </div>
+
+                <form id="signupForm" novalidate>
+                    <div class="form-group">
+                        <label for="signupEmail">Alamat Email <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="signupEmail" placeholder="Masukkan email Anda" required autocomplete="email">
+                        </div>
+                        <div class="input-hint" id="emailHint">Email akan digunakan untuk login</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupName">Nama Lengkap <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="signupName" placeholder="Masukkan nama lengkap" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupNslp">NSLP Lembaga <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-building"></i>
+                            <input type="text" id="signupNslp" placeholder="Masukkan NSLP lembaga" required>
+                        </div>
+                        <div class="nslp-result" id="nslpResult">
+                            <div><span class="label">Lembaga:</span> <span class="value" id="nslpLembagaName">-</span></div>
+                            <div style="margin-top:4px;font-size:0.75rem;">
+                                <span class="label">Jenis:</span> <span id="nslpJenis">-</span>
+                                <span class="badge" id="nslpStatus">Aktif</span>
+                            </div>
+                        </div>
+                        <div class="input-hint" id="nslpHint">Masukkan NSLP yang terdaftar di database</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupPassword">Kata Sandi <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-key"></i>
+                            <input type="password" id="signupPassword" placeholder="Minimal 6 karakter" required minlength="6">
+                        </div>
+                        <div class="password-strength" id="passwordStrength">
+                            <div class="bar" data-index="0"></div>
+                            <div class="bar" data-index="1"></div>
+                            <div class="bar" data-index="2"></div>
+                        </div>
+                        <div class="input-hint" id="passwordHint">Minimal 6 karakter</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupPasswordConfirm">Konfirmasi Kata Sandi <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-check-circle"></i>
+                            <input type="password" id="signupPasswordConfirm" placeholder="Ulangi kata sandi" required>
+                        </div>
+                        <div class="input-hint" id="passwordConfirmHint">Ketik ulang kata sandi</div>
+                    </div>
+
+                    <div id="signupErrorMessage" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="signupErrorText"></span>
+                    </div>
+                    <div id="signupSuccessMessage" class="success-message">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="signupSuccessText"></span>
+                    </div>
+
+                    <button type="submit" class="btn-login btn-secondary" id="signupBtn">
+                        <span id="signupBtnText"><i class="fas fa-user-plus"></i> Daftar</span>
+                        <span id="signupBtnLoader" class="loader" style="display:none;"></span>
+                    </button>
+                </form>
+            </div>
 
             <div class="login-footer">
                 © 2026 SI-MUSTAFA — Kemenag Kab. Tegal
@@ -910,70 +1166,145 @@
         // ============================================================
         // KONFIGURASI
         // ============================================================
-        var form = document.getElementById('loginForm');
-        var emailInput = document.getElementById('email');
-        var passwordInput = document.getElementById('password');
-        var btn = document.getElementById('loginBtn');
-        var btnText = document.getElementById('btnText');
-        var btnLoader = document.getElementById('btnLoader');
-        var errorMsg = document.getElementById('errorMessage');
-        var errorText = document.getElementById('errorText');
-        var successMsg = document.getElementById('successMessage');
-        var successText = document.getElementById('successText');
-        var rememberMe = document.getElementById('rememberMe');
-        var inputHint = document.getElementById('inputHint');
-
-        // ============================================================
-        // SUPABASE CLIENT
-        // ============================================================
         var SUPABASE_URL = 'https://hhiypidstbzqmdmxfqns.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoaXlwaWRzdGJ6cW1kbXhmcW5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTExMzUsImV4cCI6MjEwMDIyNzEzNX0.0OHp0pMBiONMci88qLMkNCquaQeJfTICSBYQQrfPmwU';
 
         var client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ============================================================
+        // DOM REFS
+        // ============================================================
+        // Login
+        var loginForm = document.getElementById('loginForm');
+        var loginEmail = document.getElementById('loginEmail');
+        var loginPassword = document.getElementById('loginPassword');
+        var loginBtn = document.getElementById('loginBtn');
+        var loginBtnText = document.getElementById('loginBtnText');
+        var loginBtnLoader = document.getElementById('loginBtnLoader');
+        var loginErrorMsg = document.getElementById('loginErrorMessage');
+        var loginErrorText = document.getElementById('loginErrorText');
+        var loginSuccessMsg = document.getElementById('loginSuccessMessage');
+        var loginSuccessText = document.getElementById('loginSuccessText');
+        var rememberMe = document.getElementById('rememberMe');
+
+        // Signup
+        var signupForm = document.getElementById('signupForm');
+        var signupEmail = document.getElementById('signupEmail');
+        var signupName = document.getElementById('signupName');
+        var signupNslp = document.getElementById('signupNslp');
+        var signupPassword = document.getElementById('signupPassword');
+        var signupPasswordConfirm = document.getElementById('signupPasswordConfirm');
+        var signupBtn = document.getElementById('signupBtn');
+        var signupBtnText = document.getElementById('signupBtnText');
+        var signupBtnLoader = document.getElementById('signupBtnLoader');
+        var signupErrorMsg = document.getElementById('signupErrorMessage');
+        var signupErrorText = document.getElementById('signupErrorText');
+        var signupSuccessMsg = document.getElementById('signupSuccessMessage');
+        var signupSuccessText = document.getElementById('signupSuccessText');
+        var nslpResult = document.getElementById('nslpResult');
+        var nslpLembagaName = document.getElementById('nslpLembagaName');
+        var nslpJenis = document.getElementById('nslpJenis');
+        var nslpStatus = document.getElementById('nslpStatus');
+        var nslpHint = document.getElementById('nslpHint');
+        var emailHint = document.getElementById('emailHint');
+        var passwordHint = document.getElementById('passwordHint');
+        var passwordConfirmHint = document.getElementById('passwordConfirmHint');
+
+        // State untuk NSLP
+        var nslpData = null;
+        var isNslpValid = false;
+        var nslpCheckTimeout = null;
+
+        // ============================================================
         // UTILITY
         // ============================================================
-        function showError(msg) {
-            errorText.textContent = msg;
-            errorMsg.style.display = 'flex';
-            successMsg.style.display = 'none';
+        function showLoginError(msg) {
+            loginErrorText.textContent = msg;
+            loginErrorMsg.style.display = 'flex';
+            loginSuccessMsg.style.display = 'none';
         }
 
-        function showSuccess(msg) {
-            successText.textContent = msg;
-            successMsg.style.display = 'flex';
-            errorMsg.style.display = 'none';
+        function showLoginSuccess(msg) {
+            loginSuccessText.textContent = msg;
+            loginSuccessMsg.style.display = 'flex';
+            loginErrorMsg.style.display = 'none';
         }
 
-        function setLoading(loading) {
-            btn.disabled = loading;
-            btnText.style.display = loading ? 'none' : 'inline';
-            btnLoader.style.display = loading ? 'inline-block' : 'none';
+        function showSignupError(msg) {
+            signupErrorText.textContent = msg;
+            signupErrorMsg.style.display = 'flex';
+            signupSuccessMsg.style.display = 'none';
         }
 
-        function clearAlerts() {
-            errorMsg.style.display = 'none';
-            successMsg.style.display = 'none';
-            emailInput.classList.remove('error');
-            passwordInput.classList.remove('error');
+        function showSignupSuccess(msg) {
+            signupSuccessText.textContent = msg;
+            signupSuccessMsg.style.display = 'flex';
+            signupErrorMsg.style.display = 'none';
+        }
+
+        function setLoginLoading(loading) {
+            loginBtn.disabled = loading;
+            loginBtnText.style.display = loading ? 'none' : 'inline';
+            loginBtnLoader.style.display = loading ? 'inline-block' : 'none';
+        }
+
+        function setSignupLoading(loading) {
+            signupBtn.disabled = loading;
+            signupBtnText.style.display = loading ? 'none' : 'inline';
+            signupBtnLoader.style.display = loading ? 'inline-block' : 'none';
+        }
+
+        function clearLoginAlerts() {
+            loginErrorMsg.style.display = 'none';
+            loginSuccessMsg.style.display = 'none';
+            loginEmail.classList.remove('error');
+            loginPassword.classList.remove('error');
+        }
+
+        function clearSignupAlerts() {
+            signupErrorMsg.style.display = 'none';
+            signupSuccessMsg.style.display = 'none';
+            signupEmail.classList.remove('error');
+            signupName.classList.remove('error');
+            signupNslp.classList.remove('error');
+            signupPassword.classList.remove('error');
+            signupPasswordConfirm.classList.remove('error');
         }
 
         // ============================================================
-        // GET REDIRECT URL BERDASARKAN ROLE
+        // TAB SWITCH
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+
+            document.getElementById('loginFormContainer').classList.remove('active');
+            document.getElementById('signupFormContainer').classList.remove('active');
+
+            if (tab === 'login') {
+                document.getElementById('loginFormContainer').classList.add('active');
+            } else {
+                document.getElementById('signupFormContainer').classList.add('active');
+                // Reset NSLP state saat switch ke signup
+                resetNslpState();
+            }
+
+            clearLoginAlerts();
+            clearSignupAlerts();
+        }
+
+        // ============================================================
+        // GET REDIRECT URL
         // ============================================================
         function getRedirectUrl(role) {
             var validRoles = ['super_admin', 'admin_kab', 'batko', 'fkdt', 'ponpes', 'operator'];
-            
             if (!validRoles.includes(role)) {
                 console.warn('Role tidak dikenali:', role, '-> redirect ke dashboard');
                 return 'dashboard.html';
             }
-
             if (role === 'operator') {
                 return 'operator.html';
             }
-
             return 'dashboard.html';
         }
 
@@ -982,46 +1313,40 @@
         // ============================================================
         async function handleLogin(e) {
             e.preventDefault();
-            clearAlerts();
+            clearLoginAlerts();
 
-            var email = emailInput.value.trim();
-            var pass = passwordInput.value.trim();
+            var email = loginEmail.value.trim();
+            var pass = loginPassword.value.trim();
 
             if (!email || !pass) {
-                showError('Email dan kata sandi harus diisi!');
-                if (!email) emailInput.classList.add('error');
-                if (!pass) passwordInput.classList.add('error');
+                showLoginError('Email dan kata sandi harus diisi!');
+                if (!email) loginEmail.classList.add('error');
+                if (!pass) loginPassword.classList.add('error');
                 return;
             }
 
-            // Validasi email sederhana
             if (!email.includes('@')) {
-                showError('Masukkan alamat email yang valid!');
-                emailInput.classList.add('error');
+                showLoginError('Masukkan alamat email yang valid!');
+                loginEmail.classList.add('error');
                 return;
             }
 
-            setLoading(true);
+            setLoginLoading(true);
 
             try {
-                // ===== LOGIN =====
                 var result = await client.auth.signInWithPassword({
                     email: email,
                     password: pass
                 });
 
-                if (result.error) {
-                    throw result.error;
-                }
+                if (result.error) throw result.error;
 
-                // ===== SIMPAN REMEMBER ME =====
                 if (rememberMe.checked) {
                     localStorage.setItem('rememberEmail', email);
                 } else {
                     localStorage.removeItem('rememberEmail');
                 }
 
-                // ===== AMBIL ROLE USER =====
                 var userId = result.data.user.id;
                 var userResult = await client
                     .from('users')
@@ -1034,9 +1359,7 @@
                 if (userResult.error) {
                     console.warn('Error fetching user role:', userResult.error);
                 } else if (!userResult.data) {
-                    // User tidak ditemukan di tabel users -> buat default
-                    console.warn('User not found in users table, creating default entry...');
-                    
+                    // Buat default user
                     var defaultUser = {
                         id: userId,
                         email: email,
@@ -1046,50 +1369,41 @@
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString()
                     };
-
                     var { error: insertError } = await client
                         .from('users')
                         .insert([defaultUser]);
-
                     if (insertError) {
                         console.error('Failed to create default user:', insertError);
-                        showError('Gagal membuat data pengguna. Hubungi admin.');
-                        setLoading(false);
+                        showLoginError('Gagal membuat data pengguna. Hubungi admin.');
+                        setLoginLoading(false);
                         return;
                     }
-
                     role = 'operator';
-                    showSuccess('Login berhasil! Akun default telah dibuat.');
+                    showLoginSuccess('Login berhasil! Akun default telah dibuat.');
                 } else {
                     role = userResult.data.role || 'operator';
-                    
                     if (userResult.data.active === false) {
-                        showError('Akun Anda dinonaktifkan. Hubungi admin.');
-                        setLoading(false);
+                        showLoginError('Akun Anda dinonaktifkan. Hubungi admin.');
+                        setLoginLoading(false);
                         return;
                     }
-                    
-                    // Update last_login
                     await client
                         .from('users')
                         .update({ last_login: new Date().toISOString() })
                         .eq('id', userId);
                 }
 
-                // ===== REDIRECT =====
                 var redirectUrl = getRedirectUrl(role);
                 console.log('Login berhasil! Role:', role, 'Redirect ke:', redirectUrl);
 
-                showSuccess('Login berhasil! Mengalihkan...');
+                showLoginSuccess('Login berhasil! Mengalihkan...');
                 setTimeout(function() {
                     window.location.href = redirectUrl;
                 }, 1000);
 
             } catch (err) {
                 console.error('Login error:', err);
-                
                 var errorMessage = err.message || 'Login gagal. Periksa email dan password.';
-                
                 if (errorMessage.includes('Invalid login credentials')) {
                     errorMessage = 'Email atau password salah. Silakan coba lagi.';
                 } else if (errorMessage.includes('Email not confirmed')) {
@@ -1097,12 +1411,268 @@
                 } else if (errorMessage.includes('rate limit')) {
                     errorMessage = 'Terlalu banyak percobaan. Tunggu beberapa menit.';
                 }
-                
-                showError(errorMessage);
-                emailInput.classList.add('error');
-                passwordInput.classList.add('error');
+                showLoginError(errorMessage);
+                loginEmail.classList.add('error');
+                loginPassword.classList.add('error');
             } finally {
-                setLoading(false);
+                setLoginLoading(false);
+            }
+        }
+
+        // ============================================================
+        // NSLP VALIDATION (Real-time)
+        // ============================================================
+        function resetNslpState() {
+            nslpData = null;
+            isNslpValid = false;
+            nslpResult.classList.remove('show');
+            signupNslp.classList.remove('error', 'success');
+            nslpHint.textContent = 'Masukkan NSLP yang terdaftar di database';
+            nslpHint.className = 'input-hint';
+        }
+
+        async function checkNslp(nslp) {
+            if (!nslp || nslp.length < 3) {
+                resetNslpState();
+                return;
+            }
+
+            try {
+                var { data, error } = await client
+                    .from('lembaga')
+                    .select('id, nama, jenis_lembaga, status_aktif, operator_id')
+                    .eq('nslp', nslp)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error('NSLP check error:', error);
+                    resetNslpState();
+                    nslpHint.textContent = 'Terjadi kesalahan cek NSLP';
+                    nslpHint.className = 'input-hint error';
+                    return;
+                }
+
+                if (!data) {
+                    resetNslpState();
+                    nslpHint.textContent = '❌ NSLP tidak ditemukan. Periksa kembali.';
+                    nslpHint.className = 'input-hint error';
+                    signupNslp.classList.add('error');
+                    isNslpValid = false;
+                    return;
+                }
+
+                // NSLP ditemukan
+                nslpData = data;
+                isNslpValid = true;
+
+                // Tampilkan hasil
+                nslpLembagaName.textContent = data.nama;
+                nslpJenis.textContent = data.jenis_lembaga || '-';
+                nslpStatus.textContent = data.status_aktif ? 'Aktif' : 'Nonaktif';
+                nslpStatus.style.background = data.status_aktif ? '#dcfce7' : '#fef2f2';
+                nslpStatus.style.color = data.status_aktif ? '#16a34a' : '#dc2626';
+                nslpResult.classList.add('show');
+
+                signupNslp.classList.remove('error');
+                signupNslp.classList.add('success');
+
+                // Cek apakah sudah punya operator
+                if (data.operator_id) {
+                    nslpHint.textContent = '⚠️ Lembaga ini sudah memiliki operator. Tidak bisa mendaftar.';
+                    nslpHint.className = 'input-hint error';
+                    isNslpValid = false;
+                    signupNslp.classList.remove('success');
+                    signupNslp.classList.add('error');
+                } else if (!data.status_aktif) {
+                    nslpHint.textContent = '⚠️ Lembaga ini tidak aktif. Hubungi admin.';
+                    nslpHint.className = 'input-hint error';
+                    isNslpValid = false;
+                    signupNslp.classList.remove('success');
+                    signupNslp.classList.add('error');
+                } else {
+                    nslpHint.textContent = '✅ NSLP valid. Lembaga siap didaftarkan.';
+                    nslpHint.className = 'input-hint success';
+                }
+
+            } catch (err) {
+                console.error('NSLP check error:', err);
+                resetNslpState();
+                nslpHint.textContent = 'Terjadi kesalahan cek NSLP';
+                nslpHint.className = 'input-hint error';
+            }
+        }
+
+        // ============================================================
+        // PASSWORD STRENGTH
+        // ============================================================
+        function checkPasswordStrength(password) {
+            var bars = document.querySelectorAll('#passwordStrength .bar');
+            var score = 0;
+            
+            if (password.length >= 6) score++;
+            if (password.length >= 10) score++;
+            if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+
+            var strength = score <= 2 ? 'weak' : score <= 4 ? 'medium' : 'strong';
+            var activeBars = Math.min(Math.ceil(score / 2), 3);
+
+            bars.forEach((bar, index) => {
+                bar.className = 'bar';
+                if (index < activeBars) {
+                    bar.classList.add('active', strength);
+                }
+            });
+
+            return strength;
+        }
+
+        // ============================================================
+        // SIGNUP
+        // ============================================================
+        async function handleSignup(e) {
+            e.preventDefault();
+            clearSignupAlerts();
+
+            var email = signupEmail.value.trim();
+            var name = signupName.value.trim();
+            var nslp = signupNslp.value.trim().toUpperCase();
+            var password = signupPassword.value;
+            var passwordConfirm = signupPasswordConfirm.value;
+
+            // Validasi
+            var hasError = false;
+
+            if (!email) {
+                showSignupError('Email harus diisi!');
+                signupEmail.classList.add('error');
+                hasError = true;
+            } else if (!email.includes('@')) {
+                showSignupError('Masukkan email yang valid!');
+                signupEmail.classList.add('error');
+                hasError = true;
+            }
+
+            if (!name) {
+                if (!hasError) showSignupError('Nama lengkap harus diisi!');
+                signupName.classList.add('error');
+                hasError = true;
+            }
+
+            if (!nslp) {
+                if (!hasError) showSignupError('NSLP harus diisi!');
+                signupNslp.classList.add('error');
+                hasError = true;
+            }
+
+            if (!isNslpValid || !nslpData) {
+                if (!hasError) showSignupError('NSLP tidak valid atau sudah memiliki operator!');
+                signupNslp.classList.add('error');
+                hasError = true;
+            }
+
+            if (password.length < 6) {
+                if (!hasError) showSignupError('Password minimal 6 karakter!');
+                signupPassword.classList.add('error');
+                hasError = true;
+            }
+
+            if (password !== passwordConfirm) {
+                if (!hasError) showSignupError('Konfirmasi password tidak cocok!');
+                signupPasswordConfirm.classList.add('error');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            setSignupLoading(true);
+
+            try {
+                // 1. Buat user di Supabase Auth
+                var { data: authData, error: authError } = await client.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: name,
+                            role: 'operator'
+                        }
+                    }
+                });
+
+                if (authError) throw authError;
+
+                if (!authData.user) {
+                    throw new Error('Gagal membuat akun');
+                }
+
+                var userId = authData.user.id;
+
+                // 2. Buat record di tabel users
+                var userRecord = {
+                    id: userId,
+                    email: email,
+                    name: name,
+                    role: 'operator',
+                    active: true,
+                    lembaga_id: nslpData.id,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+
+                var { error: userError } = await client
+                    .from('users')
+                    .insert([userRecord]);
+
+                if (userError) {
+                    // Rollback: hapus user di auth
+                    console.error('Error creating user record:', userError);
+                    // Note: Supabase tidak punya API delete user dari client
+                    // Tapi kita bisa tandai sebagai error dan minta admin
+                    throw new Error('Gagal menyimpan data user. Akun mungkin sudah terdaftar.');
+                }
+
+                // 3. Update lembaga dengan operator_id
+                var { error: lembagaError } = await client
+                    .from('lembaga')
+                    .update({ 
+                        operator_id: userId,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', nslpData.id);
+
+                if (lembagaError) {
+                    console.error('Error updating lembaga:', lembagaError);
+                    // Tidak throw, tapi log error
+                }
+
+                showSignupSuccess('🎉 Pendaftaran berhasil! Silakan login dengan email Anda.');
+                
+                // Reset form
+                signupForm.reset();
+                resetNslpState();
+                document.querySelectorAll('#passwordStrength .bar').forEach(b => b.className = 'bar');
+
+                // Switch ke login setelah 2 detik
+                setTimeout(function() {
+                    switchTab('login');
+                    loginEmail.value = email;
+                }, 2000);
+
+            } catch (err) {
+                console.error('Signup error:', err);
+                var errorMessage = err.message || 'Pendaftaran gagal. Silakan coba lagi.';
+                
+                if (errorMessage.includes('User already registered')) {
+                    errorMessage = 'Email sudah terdaftar. Silakan login.';
+                } else if (errorMessage.includes('Password')) {
+                    errorMessage = 'Password harus minimal 6 karakter.';
+                }
+                
+                showSignupError(errorMessage);
+            } finally {
+                setSignupLoading(false);
             }
         }
 
@@ -1129,10 +1699,9 @@
                     return;
                 }
                 
-                // Restore remember me
                 var saved = localStorage.getItem('rememberEmail');
                 if (saved) {
-                    emailInput.value = saved;
+                    loginEmail.value = saved;
                     rememberMe.checked = true;
                 }
             } catch (e) {
@@ -1141,20 +1710,99 @@
         }
 
         // ============================================================
-        // INIT
+        // EVENT LISTENERS
         // ============================================================
-        form.addEventListener('submit', handleLogin);
-        document.addEventListener('DOMContentLoaded', checkSession);
+        // Login
+        loginForm.addEventListener('submit', handleLogin);
 
-        passwordInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') form.dispatchEvent(new Event('submit'));
+        // Signup
+        signupForm.addEventListener('submit', handleSignup);
+
+        // NSLP real-time check dengan debounce
+        signupNslp.addEventListener('input', function() {
+            var nslp = this.value.trim().toUpperCase();
+            this.value = nslp; // Force uppercase
+            
+            clearTimeout(nslpCheckTimeout);
+            nslpCheckTimeout = setTimeout(function() {
+                checkNslp(nslp);
+            }, 500);
         });
-        emailInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                passwordInput.focus();
+
+        // NSLP blur - final check
+        signupNslp.addEventListener('blur', function() {
+            var nslp = this.value.trim().toUpperCase();
+            if (nslp) {
+                checkNslp(nslp);
             }
         });
+
+        // Password strength
+        signupPassword.addEventListener('input', function() {
+            var strength = checkPasswordStrength(this.value);
+            passwordHint.textContent = strength === 'weak' ? '🔴 Password lemah' :
+                                       strength === 'medium' ? '🟡 Password sedang' :
+                                       '🟢 Password kuat';
+            passwordHint.className = 'input-hint';
+            
+            // Cek konfirmasi
+            if (signupPasswordConfirm.value) {
+                if (this.value === signupPasswordConfirm.value) {
+                    passwordConfirmHint.textContent = '✅ Password cocok';
+                    passwordConfirmHint.className = 'input-hint success';
+                    signupPasswordConfirm.classList.remove('error');
+                    signupPasswordConfirm.classList.add('success');
+                } else {
+                    passwordConfirmHint.textContent = '❌ Password tidak cocok';
+                    passwordConfirmHint.className = 'input-hint error';
+                    signupPasswordConfirm.classList.remove('success');
+                    signupPasswordConfirm.classList.add('error');
+                }
+            }
+        });
+
+        // Password confirm
+        signupPasswordConfirm.addEventListener('input', function() {
+            if (this.value === signupPassword.value) {
+                passwordConfirmHint.textContent = '✅ Password cocok';
+                passwordConfirmHint.className = 'input-hint success';
+                this.classList.remove('error');
+                this.classList.add('success');
+            } else {
+                passwordConfirmHint.textContent = '❌ Password tidak cocok';
+                passwordConfirmHint.className = 'input-hint error';
+                this.classList.remove('success');
+                this.classList.add('error');
+            }
+        });
+
+        // Email validation
+        signupEmail.addEventListener('blur', function() {
+            var email = this.value.trim();
+            if (email && !email.includes('@')) {
+                emailHint.textContent = '❌ Masukkan email yang valid';
+                emailHint.className = 'input-hint error';
+                this.classList.add('error');
+            } else if (email) {
+                emailHint.textContent = '✅ Email valid';
+                emailHint.className = 'input-hint success';
+                this.classList.remove('error');
+                this.classList.add('success');
+            }
+        });
+
+        // Enter key support
+        loginPassword.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') loginForm.dispatchEvent(new Event('submit'));
+        });
+        signupPasswordConfirm.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') signupForm.dispatchEvent(new Event('submit'));
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', checkSession);
     </script>
 </body>
 </html>
