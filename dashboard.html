@@ -7,10 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ============================================================
-           SI-MUSTAFA - DASHBOARD SIDEBAR KIRI + TOMBOL DI HEADER
-           ============================================================ */
-
         /* ===== RESET & VARIABLES ===== */
         * {
             margin: 0;
@@ -659,6 +655,57 @@
         .kyc-status-badge.verified { background: #e8f5e9; color: #4CAF50; }
         .kyc-status-badge.rejected { background: #ffebee; color: #f44336; }
 
+        /* ===== PAGINATION ===== */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f2f5;
+        }
+
+        .pagination-container .info {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .pagination-container .pagination-buttons {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-container .pagination-buttons button {
+            padding: 4px 12px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+            color: #555;
+        }
+
+        .pagination-container .pagination-buttons button:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-container .pagination-buttons button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-container .pagination-buttons button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* ===== BUTTONS ===== */
         .btn {
             padding: 6px 14px;
@@ -1102,6 +1149,10 @@
             .dokumen-preview img {
                 max-height: 250px;
             }
+            .pagination-container {
+                flex-direction: column;
+                align-items: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1363,6 +1414,20 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- ===== PAGINATION ===== -->
+            <div class="pagination-container" id="paginationContainer">
+                <div class="info" id="paginationInfo">Menampilkan 0 dari 0 data</div>
+                <div class="pagination-buttons" id="paginationButtons">
+                    <button onclick="changePage('prev')" id="prevPageBtn" disabled>
+                        <i class="fas fa-chevron-left"></i> Sebelumnya
+                    </button>
+                    <span id="pageNumbers"></span>
+                    <button onclick="changePage('next')" id="nextPageBtn" disabled>
+                        Selanjutnya <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- ===== RECENT ACTIVITY ===== -->
@@ -1604,6 +1669,61 @@
     <script src="js/utils.js"></script>
     <script>
         // ============================================================
+        // ===== CACHE MANAGER =====
+        // ============================================================
+        const CacheManager = {
+            CACHE_DURATION: 5 * 60 * 1000, // 5 menit
+            
+            get(key) {
+                try {
+                    const cached = localStorage.getItem(`cache_${key}`);
+                    if (!cached) return null;
+                    const { data, timestamp } = JSON.parse(cached);
+                    if (Date.now() - timestamp > this.CACHE_DURATION) {
+                        localStorage.removeItem(`cache_${key}`);
+                        return null;
+                    }
+                    return data;
+                } catch {
+                    return null;
+                }
+            },
+            
+            set(key, data) {
+                try {
+                    localStorage.setItem(`cache_${key}`, JSON.stringify({
+                        data,
+                        timestamp: Date.now()
+                    }));
+                } catch (e) {
+                    console.warn('Cache set error:', e);
+                }
+            },
+            
+            clear(key) {
+                if (key) {
+                    localStorage.removeItem(`cache_${key}`);
+                } else {
+                    // Clear all cache
+                    Object.keys(localStorage)
+                        .filter(k => k.startsWith('cache_'))
+                        .forEach(k => localStorage.removeItem(k));
+                }
+            },
+            
+            isExpired(key) {
+                const cached = localStorage.getItem(`cache_${key}`);
+                if (!cached) return true;
+                try {
+                    const { timestamp } = JSON.parse(cached);
+                    return Date.now() - timestamp > this.CACHE_DURATION;
+                } catch {
+                    return true;
+                }
+            }
+        };
+
+        // ============================================================
         // ===== SIDEBAR FUNCTIONS =====
         // ============================================================
         function toggleSidebar() {
@@ -1629,6 +1749,9 @@
         // ============================================================
         let currentKycPendidik = null;
         let currentKycTab = 'identitas';
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 20;
+        let totalKycData = 0;
 
         // ===== DOKUMEN VARIABLES =====
         let kycDokumen = {
@@ -1857,6 +1980,8 @@
             try {
                 const { error } = await supabaseClient.auth.signOut();
                 if (error) throw error;
+                // Clear all cache on logout
+                CacheManager.clear();
                 showToast('Logout berhasil!', 'success');
                 setTimeout(() => {
                     window.location.href = 'index.html';
@@ -1868,12 +1993,13 @@
         }
 
         // ============================================================
-        // ===== LOAD DASHBOARD =====
+        // ===== LOAD DASHBOARD (DENGAN CACHE) =====
         // ============================================================
-        async function loadDashboard() {
+        async function loadDashboard(forceRefresh = false) {
             try {
                 const user = getUser();
                 const filter = getRoleFilter();
+                const cacheKey = `dashboard_${JSON.stringify(filter)}`;
 
                 if (filter.restrict) {
                     document.querySelector('.stats-grid').innerHTML = `
@@ -1883,6 +2009,16 @@
                         </div>
                     `;
                     return;
+                }
+
+                // Cek cache
+                if (!forceRefresh) {
+                    const cachedData = CacheManager.get(cacheKey);
+                    if (cachedData) {
+                        updateDashboardStats(cachedData);
+                        showFilterInfo(filter);
+                        return;
+                    }
                 }
 
                 let lembagaQuery = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true });
@@ -1901,26 +2037,59 @@
                     bantuanQuery = bantuanQuery.eq('jenis_lembaga', filter.jenis_lembaga);
                 }
 
-                const [kecamatan, kelurahan, lembaga, pendidik, bantuan] = await Promise.all([
-                    supabaseClient.from('master_kecamatan').select('*', { count: 'exact', head: true }),
-                    supabaseClient.from('master_kelurahan').select('*', { count: 'exact', head: true }),
+                // Data statis bisa di-cache lebih lama
+                const kecamatanCache = CacheManager.get('master_kecamatan');
+                const kelurahanCache = CacheManager.get('master_kelurahan');
+                
+                let kecamatanCount, kelurahanCount;
+                
+                if (kecamatanCache && !forceRefresh) {
+                    kecamatanCount = kecamatanCache;
+                } else {
+                    const { count } = await supabaseClient.from('master_kecamatan').select('*', { count: 'exact', head: true });
+                    kecamatanCount = count || 0;
+                    CacheManager.set('master_kecamatan', kecamatanCount);
+                }
+                
+                if (kelurahanCache && !forceRefresh) {
+                    kelurahanCount = kelurahanCache;
+                } else {
+                    const { count } = await supabaseClient.from('master_kelurahan').select('*', { count: 'exact', head: true });
+                    kelurahanCount = count || 0;
+                    CacheManager.set('master_kelurahan', kelurahanCount);
+                }
+
+                const [lembaga, pendidik, bantuan] = await Promise.all([
                     lembagaQuery,
                     pendidikQuery,
                     bantuanQuery
                 ]);
 
-                document.getElementById('totalKecamatan').textContent = kecamatan.count || 0;
-                document.getElementById('totalKelurahan').textContent = kelurahan.count || 0;
-                document.getElementById('totalLembaga').textContent = lembaga.count || 0;
-                document.getElementById('totalPendidik').textContent = pendidik.count || 0;
-                document.getElementById('totalBantuan').textContent = bantuan.count || 0;
+                const statsData = {
+                    kecamatan: kecamatanCount,
+                    kelurahan: kelurahanCount,
+                    lembaga: lembaga.count || 0,
+                    pendidik: pendidik.count || 0,
+                    bantuan: bantuan.count || 0
+                };
 
+                // Simpan ke cache
+                CacheManager.set(cacheKey, statsData);
+                updateDashboardStats(statsData);
                 showFilterInfo(filter);
 
             } catch (e) {
                 console.error(e);
                 showToast('Gagal memuat data', 'error');
             }
+        }
+
+        function updateDashboardStats(data) {
+            document.getElementById('totalKecamatan').textContent = data.kecamatan || 0;
+            document.getElementById('totalKelurahan').textContent = data.kelurahan || 0;
+            document.getElementById('totalLembaga').textContent = data.lembaga || 0;
+            document.getElementById('totalPendidik').textContent = data.pendidik || 0;
+            document.getElementById('totalBantuan').textContent = data.bantuan || 0;
         }
 
         function showFilterInfo(filter) {
@@ -1979,46 +2148,89 @@
         }
 
         // ============================================================
-        // ===== LOAD KYC DATA =====
+        // ===== LOAD KYC DATA (DENGAN PAGINASI) =====
         // ============================================================
-        async function loadKYCData() {
+        async function loadKYCData(page = 1, forceRefresh = false) {
             try {
+                const cacheKey = `kyc_stats`;
+                let statsData = null;
+
+                // Cek cache untuk stats
+                if (!forceRefresh) {
+                    statsData = CacheManager.get(cacheKey);
+                }
+
+                if (!statsData || forceRefresh) {
+                    // Ambil count total untuk paginasi
+                    const { count, error: countError } = await supabaseClient
+                        .from('pendidik')
+                        .select('*', { count: 'exact', head: true })
+                        .not('dokumen_kyc', 'is', null);
+
+                    if (countError) throw countError;
+
+                    // Ambil status counts
+                    const { data: statusData, error: statusError } = await supabaseClient
+                        .from('pendidik')
+                        .select('status_verifikasi')
+                        .not('dokumen_kyc', 'is', null);
+
+                    if (statusError) throw statusError;
+
+                    const pending = statusData.filter(d => d.status_verifikasi === 'Pending' || d.status_verifikasi === 'Draft').length;
+                    const verified = statusData.filter(d => d.status_verifikasi === 'Diverifikasi').length;
+                    const rejected = statusData.filter(d => d.status_verifikasi === 'Ditolak').length;
+
+                    statsData = {
+                        total: count || 0,
+                        pending,
+                        verified,
+                        rejected
+                    };
+
+                    CacheManager.set(cacheKey, statsData);
+                }
+
+                // Update stats
+                document.getElementById('kycTotal').textContent = statsData.total;
+                document.getElementById('kycPending').textContent = statsData.pending;
+                document.getElementById('kycVerified').textContent = statsData.verified;
+                document.getElementById('kycRejected').textContent = statsData.rejected;
+                document.getElementById('kycPendingCount').textContent = statsData.pending;
+
+                const progress = statsData.total > 0 ? ((statsData.verified / statsData.total) * 100) : 0;
+                document.getElementById('kycProgressText').textContent = `${Math.round(progress)}%`;
+                document.getElementById('kycProgressBar').style.width = `${Math.min(progress, 100)}%`;
+
+                totalKycData = statsData.total;
+
+                // Ambil data dengan paginasi
+                const offset = (page - 1) * ITEMS_PER_PAGE;
+                
                 const { data, error } = await supabaseClient
                     .from('pendidik')
                     .select(`
-                        *,
+                        id,
+                        nama_lengkap,
+                        nik,
+                        nslp_lembaga,
+                        status_verifikasi,
+                        updated_at,
                         lembaga:lembaga_id (
                             id,
                             nama,
                             nslp,
-                            jenis_lembaga,
-                            alamat,
-                            kecamatan,
-                            desa
+                            jenis_lembaga
                         )
                     `)
                     .not('dokumen_kyc', 'is', null)
-                    .order('updated_at', { ascending: false });
+                    .order('updated_at', { ascending: false })
+                    .range(offset, offset + ITEMS_PER_PAGE - 1);
 
                 if (error) throw error;
 
-                const kycData = data || [];
-                const total = kycData.length;
-                const pending = kycData.filter(d => d.status_verifikasi === 'Pending').length;
-                const verified = kycData.filter(d => d.status_verifikasi === 'Diverifikasi').length;
-                const rejected = kycData.filter(d => d.status_verifikasi === 'Ditolak').length;
-
-                document.getElementById('kycTotal').textContent = total;
-                document.getElementById('kycPending').textContent = pending;
-                document.getElementById('kycVerified').textContent = verified;
-                document.getElementById('kycRejected').textContent = rejected;
-                document.getElementById('kycPendingCount').textContent = pending;
-
-                const progress = total > 0 ? ((verified / total) * 100) : 0;
-                document.getElementById('kycProgressText').textContent = `${Math.round(progress)}%`;
-                document.getElementById('kycProgressBar').style.width = `${Math.min(progress, 100)}%`;
-
-                renderKYCTable(kycData);
+                renderKYCTable(data || []);
+                renderPagination(page, statsData.total);
 
             } catch (e) {
                 console.error('Error loading KYC data:', e);
@@ -2039,7 +2251,7 @@
                 tbody.innerHTML = `
                     <tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">
                         <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                        Belum ada pengajuan KYC
+                        Tidak ada data KYC
                     </td></tr>
                 `;
                 return;
@@ -2085,9 +2297,73 @@
         }
 
         // ============================================================
+        // ===== PAGINATION =====
+        // ============================================================
+        function renderPagination(currentPage, total) {
+            const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+            const info = document.getElementById('paginationInfo');
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            const pageNumbers = document.getElementById('pageNumbers');
+
+            if (!info) return;
+
+            if (total === 0) {
+                info.textContent = 'Tidak ada data';
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                pageNumbers.innerHTML = '';
+                return;
+            }
+
+            const start = ((currentPage - 1) * ITEMS_PER_PAGE) + 1;
+            const end = Math.min(currentPage * ITEMS_PER_PAGE, total);
+            info.textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+
+            let pagesHtml = '';
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+            if (endPage - startPage < maxVisible - 1) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            if (startPage > 1) {
+                pagesHtml += `<button onclick="changePage(1)">1</button>`;
+                if (startPage > 2) pagesHtml += `<span style="padding:0 4px;color:#888;">...</span>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                pagesHtml += `<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) pagesHtml += `<span style="padding:0 4px;color:#888;">...</span>`;
+                pagesHtml += `<button onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            pageNumbers.innerHTML = pagesHtml;
+        }
+
+        function changePage(direction) {
+            if (direction === 'prev') {
+                if (currentPage > 1) currentPage--;
+            } else if (direction === 'next') {
+                const totalPages = Math.ceil(totalKycData / ITEMS_PER_PAGE);
+                if (currentPage < totalPages) currentPage++;
+            } else if (typeof direction === 'number') {
+                currentPage = direction;
+            }
+            loadKYCData(currentPage);
+        }
+
+        // ============================================================
         // ===== KYC FUNCTIONS =====
         // ============================================================
-        // ===== HELPER FUNCTION =====
         function setElementText(id, value) {
             const el = document.getElementById(id);
             if (el) {
@@ -2139,7 +2415,7 @@
 
                 currentKycPendidik = data;
 
-                // ===== IDENTITAS (AMAN) =====
+                // ===== IDENTITAS =====
                 const fields = [
                     'kycDetailNama', 'kycDetailNik', 'kycDetailTempatLahir',
                     'kycDetailTanggalLahir', 'kycDetailJenisKelamin',
@@ -2227,9 +2503,6 @@
 
                 const tanggalEl = document.getElementById('kycDetailTanggal');
                 if (tanggalEl) tanggalEl.textContent = formatDate(data.updated_at);
-                
-                const catatanEl = document.getElementById('kycDetailCatatan');
-                if (catatanEl) catatanEl.textContent = data.catatan_verifikasi || 'Tidak ada catatan';
 
                 // ===== DOKUMEN =====
                 kycDokumen = { ktp: null, bupati: null, gubernur: null };
@@ -2301,7 +2574,7 @@
         }
 
         // ============================================================
-        // ===== PREVIEW DOKUMEN PER FIELD =====
+        // ===== PREVIEW DOKUMEN =====
         // ============================================================
         function previewDokumen(type) {
             const url = kycDokumen[type];
@@ -2351,7 +2624,7 @@
         }
 
         // ============================================================
-        // ===== DOWNLOAD DOKUMEN PER FIELD =====
+        // ===== DOWNLOAD DOKUMEN =====
         // ============================================================
         function downloadDokumen(type) {
             const url = kycDokumen[type];
@@ -2395,10 +2668,13 @@
 
                 if (error) throw error;
 
+                // Clear cache setelah update
+                CacheManager.clear('kyc_stats');
+                
                 showToast(`Verifikasi ${statusText} untuk ${currentKycPendidik.nama_lengkap} berhasil!`, 'success');
                 closeKycModal();
-                await loadKYCData();
-                await loadDashboard();
+                await loadKYCData(currentPage, true);
+                await loadDashboard(true);
 
             } catch (e) {
                 console.error('Error verifying KYC:', e);
@@ -2420,13 +2696,19 @@
         }
 
         // ============================================================
-        // ===== REFRESH =====
+        // ===== REFRESH (DENGAN DEBOUNCE) =====
         // ============================================================
+        let refreshTimeout;
+
         function refreshData() {
-            showToast('Memperbarui data...', 'info');
-            loadKYCData();
-            loadDashboard();
-            loadRecent();
+            clearTimeout(refreshTimeout);
+            refreshTimeout = setTimeout(() => {
+                showToast('Memperbarui data...', 'info');
+                CacheManager.clear(); // Clear all cache
+                loadKYCData(1, true);
+                loadDashboard(true);
+                loadRecent();
+            }, 500);
         }
 
         // ============================================================
@@ -2436,7 +2718,7 @@
             await checkAuth();
             updateDate();
             
-            await loadKYCData();
+            await loadKYCData(1);
             await loadDashboard();
             await loadRecent();
 
@@ -2447,10 +2729,11 @@
             document.getElementById('navPendidikCount').textContent = count || 0;
             
             setInterval(updateDate, 60000);
+            // Auto refresh lebih jarang (10 menit)
             setInterval(() => { 
-                loadKYCData();
-                loadDashboard(); 
-            }, 300000);
+                loadKYCData(currentPage, true);
+                loadDashboard(true); 
+            }, 600000);
         });
 
         // ============================================================
@@ -2468,6 +2751,7 @@
         window.getUser = getUser;
         window.getRoleFilter = getRoleFilter;
         window.toggleSidebar = toggleSidebar;
+        window.changePage = changePage;
     </script>
 </body>
 </html>

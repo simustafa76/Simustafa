@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Data Lembaga - SI-MUSTAFA</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* ============================================================
-           SI-MUSTAFA - LEMBAGA (FULL VERSION)
+           SI-MUSTAFA - LEMBAGA (FULL VERSION - FIXED)
            ============================================================ */
 
         /* ===== RESET & VARIABLES ===== */
@@ -70,9 +69,11 @@
         .sidebar::-webkit-scrollbar {
             width: 4px;
         }
+
         .sidebar::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .sidebar::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 4px;
@@ -470,9 +471,17 @@
             font-size: 1.1rem;
         }
 
-        .stat-mini .stat-item:nth-child(2) { border-left-color: #7b1fa2; }
-        .stat-mini .stat-item:nth-child(3) { border-left-color: #00897b; }
-        .stat-mini .stat-item:nth-child(4) { border-left-color: #f9a825; }
+        .stat-mini .stat-item:nth-child(2) {
+            border-left-color: #7b1fa2;
+        }
+
+        .stat-mini .stat-item:nth-child(3) {
+            border-left-color: #00897b;
+        }
+
+        .stat-mini .stat-item:nth-child(4) {
+            border-left-color: #f9a825;
+        }
 
         /* ===== FILTER ===== */
         .filter-section {
@@ -534,8 +543,13 @@
         }
 
         @keyframes pulse-dot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
         }
 
         .btn-filter-active {
@@ -658,11 +672,17 @@
             gap: 6px;
         }
 
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .btn-outline {
             background: transparent;
             color: var(--primary);
             border: 1.5px solid var(--primary);
         }
+
         .btn-outline:hover {
             background: var(--primary);
             color: white;
@@ -672,6 +692,7 @@
             background: var(--primary);
             color: white;
         }
+
         .btn-primary:hover {
             background: var(--primary-light);
         }
@@ -680,6 +701,7 @@
             background: var(--success);
             color: white;
         }
+
         .btn-success:hover {
             background: #43a047;
         }
@@ -688,6 +710,7 @@
             background: var(--danger);
             color: white;
         }
+
         .btn-danger:hover {
             background: #d32f2f;
         }
@@ -708,7 +731,7 @@
             color: white;
             font-weight: 500;
             font-size: 0.85rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
             z-index: 9999;
             opacity: 0;
             transition: all 0.3s ease;
@@ -720,10 +743,21 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        .toast-success { background: var(--success); }
-        .toast-error { background: var(--danger); }
-        .toast-info { background: var(--primary); }
-        .toast-warning { background: var(--warning); }
+        .toast-success {
+            background: var(--success);
+        }
+
+        .toast-error {
+            background: var(--danger);
+        }
+
+        .toast-info {
+            background: var(--primary);
+        }
+
+        .toast-warning {
+            background: var(--warning);
+        }
 
         /* ===== SPINNER ===== */
         .spinner {
@@ -737,7 +771,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* ===== MODAL ===== */
@@ -754,6 +790,7 @@
             align-items: center;
             padding: 20px;
         }
+
         .modal-overlay.active {
             display: flex;
         }
@@ -771,8 +808,14 @@
         }
 
         @keyframes fadeInModal {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         .modal-header {
@@ -798,6 +841,7 @@
             cursor: pointer;
             padding: 0 8px;
         }
+
         .modal-header .close-btn:hover {
             color: #333;
         }
@@ -885,69 +929,88 @@
             .sidebar {
                 transform: translateX(-100%);
             }
+
             .sidebar.open {
                 transform: translateX(0);
             }
+
             .sidebar-overlay.active {
                 display: block;
             }
+
             .main-content {
                 margin-left: 0;
                 padding: 16px 20px 30px 20px;
             }
+
             .header {
                 padding: 0 20px;
             }
+
             .header-left .page-title p {
                 display: none;
             }
+
             .header-date {
                 display: none;
             }
+
             .header-right .role-scope {
                 display: none;
             }
+
             .filter-section .filter-item {
                 min-width: 100%;
             }
+
             .filter-actions {
                 width: 100%;
                 justify-content: stretch;
             }
+
             .filter-actions .btn {
                 flex: 1;
                 justify-content: center;
                 font-size: 0.7rem;
                 padding: 6px 10px;
             }
+
             .stat-mini {
                 gap: 10px;
             }
+
             .stat-mini .stat-item {
                 font-size: 0.75rem;
                 padding: 6px 14px;
             }
+
             .stat-mini .stat-item strong {
                 font-size: 0.95rem;
             }
+
             .welcome-section {
                 padding: 16px 20px;
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .welcome-section .welcome-text h2 {
                 font-size: 1rem;
             }
+
             .welcome-section .welcome-text p {
                 font-size: 0.75rem;
             }
+
             .welcome-section .welcome-badge {
                 font-size: 0.65rem;
                 padding: 4px 12px;
             }
+
             .table-responsive table {
                 font-size: 0.75rem;
             }
+
             .table-responsive table th,
             .table-responsive table td {
                 padding: 6px 8px;
@@ -959,48 +1022,62 @@
                 padding: 0 12px;
                 height: 56px;
             }
+
             .header-left .page-title h1 {
                 font-size: 0.85rem;
             }
+
             .header-left .sidebar-toggle {
                 font-size: 1rem;
                 padding: 2px 6px;
             }
+
             .header-user .user-name {
                 display: none;
             }
+
             .header-right .role-badge {
                 display: none;
             }
+
             .main-content {
                 padding: 12px 12px 20px 12px;
             }
+
             .stat-mini .stat-item {
                 font-size: 0.7rem;
                 padding: 4px 10px;
             }
+
             .stat-mini .stat-item strong {
                 font-size: 0.85rem;
             }
+
             .card {
                 padding: 16px;
             }
+
             .filter-section {
                 padding: 12px 16px;
             }
+
             .modal-container {
                 padding: 16px;
                 margin: 10px;
             }
+
             .welcome-section {
                 padding: 14px 16px;
             }
+
             .welcome-section .welcome-text h2 {
                 font-size: 0.9rem;
             }
+
             .table-responsive table {
                 font-size: 0.7rem;
             }
+
             .table-responsive table th,
             .table-responsive table td {
                 padding: 4px 6px;
@@ -1013,8 +1090,7 @@
     <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <img src="assets/logo-kemenag.png" alt="Logo" 
-                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+            <img src="assets/logo-kemenag.png" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
             <div class="brand-text">
                 <h1>SI-<span>MUSTAFA</span></h1>
                 <small>Kemenag Kab. Tegal</small>
@@ -1123,7 +1199,7 @@
         <div class="filter-section">
             <div class="filter-item" style="flex:2;">
                 <label><i class="fas fa-search"></i> Cari Lembaga</label>
-                <input type="text" id="searchInput" placeholder="Cari nama lembaga..." oninput="applyFilter()">
+                <input type="text" id="searchInput" placeholder="Cari nama lembaga...">
             </div>
             <div class="filter-actions">
                 <button class="btn btn-outline" onclick="openFilterModal()" id="btnFilter">
@@ -1203,7 +1279,7 @@
                 </div>
                 <div class="form-group">
                     <label>Kecamatan</label>
-                    <select id="filterKecamatan" onchange="loadDesaFilter(this.value)">
+                    <select id="filterKecamatan">
                         <option value="">Semua Kecamatan</option>
                     </select>
                 </div>
@@ -1343,7 +1419,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeImportModal()">Batal</button>
-                <button class="btn btn-success" onclick="importLembaga()"><i class="fas fa-upload"></i> Upload</button>
+                <button class="btn btn-success" id="btnImportSubmit" onclick="importLembaga()"><i class="fas fa-upload"></i> Upload</button>
             </div>
         </div>
     </div>
@@ -1351,10 +1427,38 @@
     <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
+        // ============================================================
+        // ===== CACHE MANAGER =====
+        // ============================================================
+        const dataCache = {
+            _store: {},
+
+            get(key, ttlMs = 30 * 60 * 1000) {
+                const entry = this._store[key];
+                if (!entry) return null;
+                if (Date.now() - entry.timestamp > ttlMs) {
+                    delete this._store[key];
+                    return null;
+                }
+                return entry.data;
+            },
+
+            set(key, data) {
+                this._store[key] = { data, timestamp: Date.now() };
+            },
+
+            clear(key) {
+                if (key) {
+                    delete this._store[key];
+                } else {
+                    this._store = {};
+                }
+            }
+        };
+
         // ============================================================
         // ===== SIDEBAR FUNCTIONS =====
         // ============================================================
@@ -1417,13 +1521,13 @@
                     window.location.href = 'index.html';
                     return false;
                 }
-                
+
                 const { data: userData, error: userError } = await supabaseClient
                     .from('users')
                     .select('id, name, email, role, kecamatan_id, lembaga_id, active')
                     .eq('id', session.user.id)
                     .single();
-                
+
                 if (userError || !userData || !userData.active) {
                     console.error('User data error:', userError);
                     await supabaseClient.auth.signOut();
@@ -1442,9 +1546,9 @@
 
                 updateHeaderUI(window.currentUser);
                 updateWelcomeUI(window.currentUser);
-                
+
                 return true;
-                
+
             } catch (error) {
                 console.error('Auth check error:', error);
                 window.location.href = 'index.html';
@@ -1488,13 +1592,13 @@
         // ============================================================
         function updateHeaderUI(user) {
             if (!user) return;
-            
+
             const avatarEl = document.getElementById('userAvatar');
             if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
-            
+
             const nameEl = document.getElementById('userName');
             if (nameEl) nameEl.textContent = user.name;
-            
+
             const roleNames = {
                 'super_admin': 'Super Admin',
                 'admin_kab': 'Admin Kabupaten',
@@ -1508,13 +1612,13 @@
 
             const avatarSmall = document.getElementById('userAvatarSmall');
             if (avatarSmall) avatarSmall.textContent = user.name.charAt(0).toUpperCase();
-            
+
             const nameSmall = document.getElementById('userNameSmall');
             if (nameSmall) nameSmall.textContent = user.name;
-            
+
             const roleBadge = document.getElementById('headerRoleBadge');
             if (roleBadge) roleBadge.textContent = roleNames[user.role] || user.role;
-            
+
             const scopeEl = document.getElementById('headerScope');
             if (scopeEl) {
                 if (user.role === 'super_admin' || user.role === 'admin_kab') {
@@ -1531,7 +1635,8 @@
                                 'fkdt': 'MDT',
                                 'ponpes': 'PONPES'
                             };
-                            scopeEl.textContent = `📍 ${data?.nama || 'Kecamatan'} • ${jenis[user.role] || ''}`;
+                            scopeEl.textContent =
+                                `📍 ${data?.nama || 'Kecamatan'} • ${jenis[user.role] || ''}`;
                         });
                 } else if (user.lembaga_id) {
                     supabaseClient
@@ -1548,10 +1653,10 @@
 
         function updateWelcomeUI(user) {
             if (!user) return;
-            
+
             const welcomeName = document.getElementById('welcomeName');
             if (welcomeName) welcomeName.textContent = user.name;
-            
+
             const roleNames = {
                 'super_admin': 'Super Admin SI-MUSTAFA',
                 'admin_kab': 'Admin Kemenag Kabupaten Tegal',
@@ -1562,7 +1667,7 @@
             };
 
             let roleText = roleNames[user.role] || user.role;
-            
+
             if (['batko', 'fkdt', 'ponpes'].includes(user.role) && user.kecamatan_id) {
                 supabaseClient
                     .from('master_kecamatan')
@@ -1577,7 +1682,8 @@
                         };
                         const welcomeRole = document.getElementById('welcomeRole');
                         if (welcomeRole) {
-                            welcomeRole.textContent = `Admin ${jenis[user.role] || ''} ${data?.nama || 'Kecamatan'}`;
+                            welcomeRole.textContent =
+                                `Admin ${jenis[user.role] || ''} ${data?.nama || 'Kecamatan'}`;
                         }
                     });
             } else {
@@ -1594,6 +1700,7 @@
             try {
                 const { error } = await supabaseClient.auth.signOut();
                 if (error) throw error;
+                dataCache.clear();
                 showToast('Logout berhasil!', 'success');
                 setTimeout(() => {
                     window.location.href = 'index.html';
@@ -1608,11 +1715,12 @@
         // ===== LEMBAGA VARIABLES =====
         // ============================================================
         let currentPage = 1;
-        const pageSize = 50;
+        let pageSize = 50;
         let totalData = 0;
         let currentFilters = { search: '', jenis: 'all', status: 'all', kecamatan: '', desa: '' };
         let modalMode = 'view';
         let isNewRecord = false;
+        let searchTimeout;
 
         // ============================================================
         // ===== FILTER MODAL =====
@@ -1620,16 +1728,17 @@
         function openFilterModal() {
             document.getElementById('filterJenis').value = currentFilters.jenis || 'all';
             document.getElementById('filterStatus').value = currentFilters.status || 'all';
-            
-            loadKecamatanFilterOptions();
-            
-            const kecSelect = document.getElementById('filterKecamatan');
-            if (currentFilters.kecamatan) {
-                kecSelect.value = currentFilters.kecamatan;
-                loadDesaFilter(currentFilters.kecamatan);
-                document.getElementById('filterDesa').value = currentFilters.desa || '';
-            }
-            
+
+            loadKecamatanFilterOptions().then(() => {
+                const kecSelect = document.getElementById('filterKecamatan');
+                if (currentFilters.kecamatan) {
+                    kecSelect.value = currentFilters.kecamatan;
+                    loadDesaFilter(currentFilters.kecamatan).then(() => {
+                        document.getElementById('filterDesa').value = currentFilters.desa || '';
+                    });
+                }
+            });
+
             document.getElementById('filterModal').classList.add('active');
         }
 
@@ -1638,38 +1747,58 @@
         }
 
         async function loadKecamatanFilterOptions() {
+            const cached = dataCache.get('kecamatan_filter', 60 * 60 * 1000);
+            if (cached) {
+                populateSelect('filterKecamatan', cached, 'Semua Kecamatan');
+                return;
+            }
+
             const { data, error } = await supabaseClient
                 .from('master_kecamatan')
                 .select('id, nama')
                 .order('nama');
-            
+
             if (error) throw error;
-            
-            const select = document.getElementById('filterKecamatan');
-            select.innerHTML = '<option value="">Semua Kecamatan</option>';
+
+            dataCache.set('kecamatan_filter', data);
+            populateSelect('filterKecamatan', data, 'Semua Kecamatan');
+        }
+
+        function populateSelect(selectId, data, placeholder) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            const currentValue = select.value;
+            select.innerHTML = placeholder ? `<option value="">${placeholder}</option>` : '';
             data.forEach(item => {
                 select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
             });
+            if (currentValue && data.some(d => d.id === currentValue)) {
+                select.value = currentValue;
+            }
         }
 
         async function loadDesaFilter(kecamatanId) {
+            const cacheKey = `desa_filter_${kecamatanId}`;
+            const cached = dataCache.get(cacheKey, 60 * 60 * 1000);
+            if (cached) {
+                populateSelect('filterDesa', cached, 'Semua Desa');
+                return;
+            }
+
             let query = supabaseClient
                 .from('master_kelurahan')
                 .select('id, nama')
                 .order('nama');
-            
+
             if (kecamatanId) {
                 query = query.eq('kecamatan_id', kecamatanId);
             }
-            
+
             const { data, error } = await query;
             if (error) throw error;
-            
-            const select = document.getElementById('filterDesa');
-            select.innerHTML = '<option value="">Semua Desa</option>';
-            data.forEach(item => {
-                select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
-            });
+
+            dataCache.set(cacheKey, data);
+            populateSelect('filterDesa', data, 'Semua Desa');
         }
 
         function applyFilterFromModal() {
@@ -1677,7 +1806,7 @@
             currentFilters.kecamatan = document.getElementById('filterKecamatan').value;
             currentFilters.desa = document.getElementById('filterDesa').value;
             currentFilters.status = document.getElementById('filterStatus').value;
-            
+
             currentPage = 1;
             closeFilterModal();
             updateFilterBadge();
@@ -1712,14 +1841,14 @@
         function updateFilterBadge() {
             const badge = document.getElementById('filterActiveBadge');
             const btnFilter = document.getElementById('btnFilter');
-            
-            const hasFilter = 
+
+            const hasFilter =
                 currentFilters.jenis !== 'all' ||
                 currentFilters.kecamatan !== '' ||
                 currentFilters.desa !== '' ||
                 currentFilters.status !== 'all' ||
                 currentFilters.search !== '';
-            
+
             if (hasFilter) {
                 badge.style.display = 'inline';
                 btnFilter.classList.add('btn-filter-active');
@@ -1733,20 +1862,20 @@
         // ===== MASTER DATA =====
         // ============================================================
         async function loadKecamatanOptions() {
+            const cached = dataCache.get('kecamatan_options', 60 * 60 * 1000);
+            if (cached) {
+                populateSelect('editKecamatan', cached, '-- Pilih Kecamatan --');
+                return;
+            }
+
             const { data, error } = await supabaseClient
                 .from('master_kecamatan')
                 .select('id, nama')
                 .order('nama');
             if (error) throw error;
 
-            ['editKecamatan', 'kecamatanFilter'].forEach(id => {
-                const select = document.getElementById(id);
-                if (!select) return;
-                select.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
-                data.forEach(item => {
-                    select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
-                });
-            });
+            dataCache.set('kecamatan_options', data);
+            populateSelect('editKecamatan', data, '-- Pilih Kecamatan --');
         }
 
         async function loadDesaOptions(kecamatanId, targetId = 'editDesa') {
@@ -1758,14 +1887,23 @@
                 return;
             }
 
+            const cacheKey = `desa_options_${kecamatanId}`;
+            const cached = dataCache.get(cacheKey, 60 * 60 * 1000);
+            if (cached) {
+                populateSelect(targetId, cached, '-- Pilih Desa --');
+                return;
+            }
+
             try {
                 const { data, error } = await supabaseClient
                     .from('master_kelurahan')
                     .select('id, nama')
                     .eq('kecamatan_id', kecamatanId)
                     .order('nama');
-                
+
                 if (error) throw error;
+
+                dataCache.set(cacheKey, data);
 
                 const currentValue = select.value;
                 select.innerHTML = '<option value="">-- Pilih Desa --</option>';
@@ -1773,13 +1911,13 @@
                     const selected = item.id === currentValue ? 'selected' : '';
                     select.innerHTML += `<option value="${item.id}" ${selected}>${item.nama}</option>`;
                 });
-                
+
                 if (currentValue && data.some(d => d.id === currentValue)) {
                     select.value = currentValue;
                 }
-                
+
                 console.log(`✅ Load ${data.length} desa untuk kecamatan ${kecamatanId}`);
-                
+
             } catch (e) {
                 console.error('Error loading desa:', e);
                 select.innerHTML = '<option value="">-- Error loading desa --</option>';
@@ -1787,25 +1925,42 @@
         }
 
         async function loadJenjangOptions() {
+            const cached = dataCache.get('jenjang_options', 60 * 60 * 1000);
+            if (cached) {
+                populateSelect('editJenjangId', cached, '-- Pilih Jenjang --');
+                return;
+            }
+
             const { data, error } = await supabaseClient
                 .from('master_jenjang')
                 .select('id, nama')
                 .order('nama');
             if (error) throw error;
-            const select = document.getElementById('editJenjangId');
-            select.innerHTML = '<option value="">-- Pilih Jenjang --</option>';
-            data.forEach(item => {
-                select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
-            });
+
+            dataCache.set('jenjang_options', data);
+            populateSelect('editJenjangId', data, '-- Pilih Jenjang --');
         }
 
         // ============================================================
-        // ===== EVENT LISTENER KECAMATAN =====
+        // ===== EVENT LISTENER =====
         // ============================================================
         document.getElementById('editKecamatan').addEventListener('change', function() {
             const kecamatanId = this.value;
             console.log('🔄 Kecamatan berubah:', kecamatanId);
             loadDesaOptions(kecamatanId, 'editDesa');
+        });
+
+        // Filter kecamatan change listener
+        document.getElementById('filterKecamatan').addEventListener('change', function() {
+            loadDesaFilter(this.value);
+        });
+
+        // Search debounce
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                applyFilter();
+            }, 500);
         });
 
         // ============================================================
@@ -1817,7 +1972,7 @@
                 'MDT': '📗 FKDT - MDT',
                 'PONPES': '📕 PONPES'
             };
-            
+
             const oldBadge = document.querySelector('.role-badge-filter');
             if (oldBadge) oldBadge.remove();
 
@@ -1841,14 +1996,16 @@
 
                 let query = supabaseClient
                     .from('lembaga')
-                    .select(`
+                    .select(
+                        `
                         *,
                         master_kecamatan!lembaga_kecamatan_id_fkey(nama),
                         master_kelurahan!lembaga_desa_id_fkey(nama)
-                    `, { count: 'exact' });
+                    `, { count: 'exact' }
+                    );
 
                 if (filter.restrict) {
-                    document.getElementById('lembagaTableBody').innerHTML = 
+                    document.getElementById('lembagaTableBody').innerHTML =
                         `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">
                             <i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px;"></i>
                             Anda tidak memiliki akses ke data ini
@@ -1864,7 +2021,9 @@
                 }
 
                 if (currentFilters.search) {
-                    query = query.or(`nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`);
+                    query = query.or(
+                        `nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`
+                        );
                 }
 
                 if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') {
@@ -1895,35 +2054,21 @@
                 updateStats();
 
                 if (filter.jenis_lembaga) {
-                    const jenisContainer = document.getElementById('jenisFilterContainer');
-                    if (jenisContainer) jenisContainer.style.display = 'none';
                     showRoleBadge(filter.jenis_lembaga);
                 } else {
-                    const jenisContainer = document.getElementById('jenisFilterContainer');
-                    if (jenisContainer) jenisContainer.style.display = 'block';
                     const badge = document.querySelector('.role-badge-filter');
                     if (badge) badge.remove();
                 }
 
-                if (filter.kecamatan_id) {
-                    const kecContainer = document.getElementById('kecamatanFilterContainer');
-                    if (kecContainer) kecContainer.style.display = 'none';
-                    const desaContainer = document.getElementById('desaFilterContainer');
-                    if (desaContainer) desaContainer.style.display = 'none';
-                } else {
-                    const kecContainer = document.getElementById('kecamatanFilterContainer');
-                    if (kecContainer) kecContainer.style.display = 'block';
-                    const desaContainer = document.getElementById('desaFilterContainer');
-                    if (desaContainer) desaContainer.style.display = 'block';
-                }
-
                 const userRole = user?.role || '';
+                const btnTambah = document.getElementById('btnTambah');
+                const btnImport = document.getElementById('btnImport');
                 if (userRole === 'operator') {
-                    document.getElementById('btnTambah').style.display = 'none';
-                    document.getElementById('btnImport').style.display = 'none';
+                    if (btnTambah) btnTambah.style.display = 'none';
+                    if (btnImport) btnImport.style.display = 'none';
                 } else {
-                    document.getElementById('btnTambah').style.display = 'inline-flex';
-                    document.getElementById('btnImport').style.display = 'inline-flex';
+                    if (btnTambah) btnTambah.style.display = 'inline-flex';
+                    if (btnImport) btnImport.style.display = 'inline-flex';
                 }
 
             } catch (e) {
@@ -1939,7 +2084,8 @@
         function renderTable(data) {
             const tbody = document.getElementById('lembagaTableBody');
             if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">
+                tbody.innerHTML =
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">
                         <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>Belum ada data</td></tr>`;
                 return;
             }
@@ -1962,54 +2108,41 @@
         }
 
         // ============================================================
-        // ===== STATISTIK =====
+        // ===== STATISTIK (FIXED) =====
         // ============================================================
         async function updateStats() {
             try {
                 const user = getUser();
                 const filter = getRoleFilter();
 
-                let query = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true });
-                let queryLpq = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'LPQ');
-                let queryMdt = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'MDT');
-                let queryPonpes = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'PONPES');
+                // Build base query
+                let query = supabaseClient.from('lembaga').select('jenis_lembaga');
 
                 if (filter.kecamatan_id) {
                     query = query.eq('kecamatan_id', filter.kecamatan_id);
-                    queryLpq = queryLpq.eq('kecamatan_id', filter.kecamatan_id);
-                    queryMdt = queryMdt.eq('kecamatan_id', filter.kecamatan_id);
-                    queryPonpes = queryPonpes.eq('kecamatan_id', filter.kecamatan_id);
                 }
                 if (filter.jenis_lembaga) {
                     query = query.eq('jenis_lembaga', filter.jenis_lembaga);
-                    if (filter.jenis_lembaga === 'LPQ') {
-                        queryLpq = queryLpq.eq('jenis_lembaga', 'LPQ');
-                        queryMdt = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'MDT').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
-                        queryPonpes = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'PONPES').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
-                    } else if (filter.jenis_lembaga === 'MDT') {
-                        queryMdt = queryMdt.eq('jenis_lembaga', 'MDT');
-                        queryLpq = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'LPQ').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
-                        queryPonpes = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'PONPES').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
-                    } else if (filter.jenis_lembaga === 'PONPES') {
-                        queryPonpes = queryPonpes.eq('jenis_lembaga', 'PONPES');
-                        queryLpq = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'LPQ').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
-                        queryMdt = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'MDT').eq('kecamatan_id', '00000000-0000-0000-0000-000000000000');
-                    }
                 }
 
-                const [total, lpq, mdt, ponpes] = await Promise.all([
-                    query,
-                    queryLpq,
-                    queryMdt,
-                    queryPonpes
-                ]);
+                const { data, error } = await query;
 
-                document.getElementById('totalLembagaStat').textContent = total.count || 0;
-                document.getElementById('totalLPQ').textContent = lpq.count || 0;
-                document.getElementById('totalMDT').textContent = mdt.count || 0;
-                document.getElementById('totalPONPES').textContent = ponpes.count || 0;
+                if (error) throw error;
 
-            } catch (e) { console.error(e); }
+                // Hitung statistik dari data yang sama (konsisten)
+                const total = data.length;
+                const lpq = data.filter(d => d.jenis_lembaga === 'LPQ').length;
+                const mdt = data.filter(d => d.jenis_lembaga === 'MDT').length;
+                const ponpes = data.filter(d => d.jenis_lembaga === 'PONPES').length;
+
+                document.getElementById('totalLembagaStat').textContent = total;
+                document.getElementById('totalLPQ').textContent = lpq;
+                document.getElementById('totalMDT').textContent = mdt;
+                document.getElementById('totalPONPES').textContent = ponpes;
+
+            } catch (e) {
+                console.error('Error updating stats:', e);
+            }
         }
 
         // ============================================================
@@ -2017,7 +2150,8 @@
         // ============================================================
         function updatePagination() {
             const totalPages = Math.ceil(totalData / pageSize);
-            document.getElementById('pageInfo').textContent = `Halaman ${currentPage} dari ${totalPages || 1}`;
+            document.getElementById('pageInfo').textContent =
+                `Halaman ${currentPage} dari ${totalPages || 1}`;
             document.getElementById('prevPage').disabled = currentPage <= 1;
             document.getElementById('nextPage').disabled = currentPage >= totalPages;
         }
@@ -2062,7 +2196,8 @@
         }
 
         function enableInputs(disabled) {
-            const inputs = document.querySelectorAll('#lembagaModal .modal-body input, #lembagaModal .modal-body select');
+            const inputs = document.querySelectorAll(
+                '#lembagaModal .modal-body input, #lembagaModal .modal-body select');
             inputs.forEach(el => el.disabled = disabled);
         }
 
@@ -2106,7 +2241,7 @@
         }
 
         // ============================================================
-        // ===== VIEW LEMBAGA (PERBAIKAN) =====
+        // ===== VIEW LEMBAGA =====
         // ============================================================
         async function viewLembaga(id) {
             modalMode = 'view';
@@ -2118,11 +2253,13 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('lembaga')
-                    .select(`
+                    .select(
+                        `
                         *,
                         master_kecamatan!lembaga_kecamatan_id_fkey(id, nama),
                         master_kelurahan!lembaga_desa_id_fkey(id, nama)
-                    `)
+                    `
+                        )
                     .eq('id', id)
                     .single();
 
@@ -2149,11 +2286,10 @@
                 document.getElementById('editKabupaten').value = data.kabupaten || 'Tegal';
                 document.getElementById('editProvinsi').value = data.provinsi || 'Jawa Tengah';
 
-                // 🔥 PERBAIKAN: Set kecamatan
+                // Set kecamatan
                 const kecamatanSelect = document.getElementById('editKecamatan');
                 const desaSelect = document.getElementById('editDesa');
 
-                // Set kecamatan
                 if (data.kecamatan_id) {
                     kecamatanSelect.value = data.kecamatan_id;
                 } else if (data.kecamatan) {
@@ -2172,16 +2308,15 @@
                     }
                 }
 
-                // 🔥 PERBAIKAN: Load desa berdasarkan kecamatan
+                // Load desa berdasarkan kecamatan
                 const kecamatanId = kecamatanSelect.value;
                 if (kecamatanId) {
                     await loadDesaOptions(kecamatanId, 'editDesa');
-                    
+
                     // Set desa
                     if (data.desa_id) {
                         desaSelect.value = data.desa_id;
                     } else if (data.desa) {
-                        // Cari desa berdasarkan nama
                         const { data: desaData } = await supabaseClient
                             .from('master_kelurahan')
                             .select('id')
@@ -2199,20 +2334,20 @@
                     }
                 }
 
-                // 🔥 PERBAIKAN: Jika desa masih kosong, coba dari field desa (varchar)
-                if (!desaSelect.value && data.desa) {
+                // Jika desa masih kosong, coba dari field desa (varchar)
+                if (!desaSelect.value && data.desa && kecamatanId) {
                     const { data: allDesa } = await supabaseClient
                         .from('master_kelurahan')
                         .select('id, nama')
-                        .eq('kecamatan_id', kecamatanId || '');
-                    
+                        .eq('kecamatan_id', kecamatanId);
+
                     const desaName = data.desa.toLowerCase().trim();
-                    const match = allDesa?.find(d => 
+                    const match = allDesa?.find(d =>
                         d.nama.toLowerCase().trim() === desaName ||
                         d.nama.toLowerCase().trim().includes(desaName) ||
                         desaName.includes(d.nama.toLowerCase().trim())
                     );
-                    
+
                     if (match) {
                         desaSelect.value = match.id;
                         await supabaseClient
@@ -2236,7 +2371,7 @@
             await viewLembaga(id);
             setTimeout(() => {
                 enableEditMode();
-            }, 100);
+            }, 300);
         }
 
         // ============================================================
@@ -2251,6 +2386,11 @@
                 showToast('Nama lembaga wajib diisi', 'error');
                 return;
             }
+
+            // Disable button saat proses
+            const saveBtn = document.getElementById('btnSave');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
             const data = {
                 nama: nama,
@@ -2273,7 +2413,7 @@
             // Update field desa dan kecamatan (varchar) juga
             const kecamatanSelect = document.getElementById('editKecamatan');
             const desaSelect = document.getElementById('editDesa');
-            
+
             if (kecamatanSelect.value) {
                 const { data: kecData } = await supabaseClient
                     .from('master_kecamatan')
@@ -2282,7 +2422,7 @@
                     .single();
                 if (kecData) data.kecamatan = kecData.nama;
             }
-            
+
             if (desaSelect.value) {
                 const { data: desaData } = await supabaseClient
                     .from('master_kelurahan')
@@ -2311,12 +2451,18 @@
 
                 if (error) throw error;
 
+                // Clear cache yang terkait
+                dataCache.clear();
+
                 showToast(`Data lembaga berhasil ${isEdit ? 'diperbarui' : 'ditambahkan'}!`, 'success');
                 closeModal();
                 loadLembaga();
             } catch (e) {
                 console.error(e);
                 showToast(`Gagal ${isEdit ? 'menyimpan' : 'menambah'}: ` + e.message, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = isEdit ? '<i class="fas fa-save"></i> Simpan' : '<i class="fas fa-plus"></i> Tambah';
             }
         }
 
@@ -2324,13 +2470,16 @@
         // ===== DELETE LEMBAGA =====
         // ============================================================
         async function deleteLembaga(id) {
-            if (!confirm('Yakin ingin menghapus lembaga ini?')) return;
+            if (!confirm('Yakin ingin menghapus lembaga ini? Semua data pendidik terkait juga akan terpengaruh.'))
+                return;
             try {
                 const { error } = await supabaseClient
                     .from('lembaga')
                     .delete()
                     .eq('id', id);
                 if (error) throw error;
+
+                dataCache.clear();
                 showToast('Lembaga berhasil dihapus', 'success');
                 loadLembaga();
             } catch (e) {
@@ -2345,22 +2494,21 @@
             try {
                 showToast('🔍 Memeriksa data lembaga...', 'info');
                 console.log('🔍 Memeriksa data lembaga...');
-                
-                // Ambil semua lembaga
+
                 const { data: lembaga, error } = await supabaseClient
                     .from('lembaga')
                     .select('id, nama, desa, desa_id, kecamatan, kecamatan_id');
-                    
+
                 if (error) throw error;
-                
+
                 let fixed = 0;
                 let noMatch = 0;
                 let updated = [];
-                
+
                 for (const l of lembaga) {
                     let perluUpdate = false;
                     const updates = {};
-                    
+
                     // Cek kecamatan
                     if (!l.kecamatan_id && l.kecamatan) {
                         const { data: kecData } = await supabaseClient
@@ -2368,40 +2516,38 @@
                             .select('id')
                             .eq('nama', l.kecamatan)
                             .maybeSingle();
-                            
+
                         if (kecData) {
                             updates.kecamatan_id = kecData.id;
                             perluUpdate = true;
                             console.log(`✅ Fix kecamatan: ${l.nama} -> ${l.kecamatan}`);
                         }
                     }
-                    
+
                     // Cek desa
                     if (!l.desa_id && l.desa) {
                         let desaId = null;
-                        
-                        // Cari berdasarkan nama desa
+
                         const { data: desaData } = await supabaseClient
                             .from('master_kelurahan')
                             .select('id')
                             .eq('nama', l.desa)
                             .maybeSingle();
-                            
+
                         if (desaData) {
                             desaId = desaData.id;
                         } else {
-                            // Coba partial match
                             const { data: desaDataPartial } = await supabaseClient
                                 .from('master_kelurahan')
                                 .select('id, nama')
                                 .ilike('nama', `%${l.desa}%`)
                                 .limit(1);
-                                
+
                             if (desaDataPartial && desaDataPartial.length > 0) {
                                 desaId = desaDataPartial[0].id;
                             }
                         }
-                        
+
                         if (desaId) {
                             updates.desa_id = desaId;
                             perluUpdate = true;
@@ -2411,14 +2557,13 @@
                             console.warn(`⚠️ Desa tidak ditemukan: ${l.desa} untuk ${l.nama}`);
                         }
                     }
-                    
-                    // Update jika perlu
+
                     if (perluUpdate) {
                         const { error: updateError } = await supabaseClient
                             .from('lembaga')
                             .update(updates)
                             .eq('id', l.id);
-                            
+
                         if (updateError) {
                             console.error(`❌ Gagal update ${l.nama}:`, updateError);
                         } else {
@@ -2427,24 +2572,22 @@
                         }
                     }
                 }
-                
+
                 console.log(`📊 Hasil perbaikan:`);
                 console.log(`✅ Berhasil diperbaiki: ${fixed} lembaga`);
                 console.log(`❌ Desa tidak ditemukan: ${noMatch} lembaga`);
-                
+
                 if (fixed > 0) {
+                    dataCache.clear();
                     showToast(`✅ Berhasil memperbaiki ${fixed} lembaga`, 'success');
                 } else if (noMatch > 0) {
                     showToast(`⚠️ ${noMatch} lembaga tidak ditemukan desanya. Cek manual.`, 'warning');
                 } else {
                     showToast('✅ Semua data sudah benar!', 'success');
                 }
-                
-                // Refresh data
+
                 loadLembaga();
-                
-                return { fixed, noMatch, updated };
-                
+
             } catch (e) {
                 console.error('Error:', e);
                 showToast('Error: ' + e.message, 'error');
@@ -2463,11 +2606,13 @@
 
                 let query = supabaseClient
                     .from('lembaga')
-                    .select(`
+                    .select(
+                        `
                         *,
                         master_kecamatan!lembaga_kecamatan_id_fkey(nama),
                         master_kelurahan!lembaga_desa_id_fkey(nama)
-                    `);
+                    `
+                        );
 
                 if (filter.kecamatan_id) {
                     query = query.eq('kecamatan_id', filter.kecamatan_id);
@@ -2477,7 +2622,9 @@
                 }
 
                 if (currentFilters.search) {
-                    query = query.or(`nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`);
+                    query = query.or(
+                        `nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`
+                        );
                 }
                 if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') {
                     query = query.eq('jenis_lembaga', currentFilters.jenis);
@@ -2497,13 +2644,12 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    showToast('Tidak ada data, mendownload template...', 'warning');
-                    downloadTemplate();
+                    showToast('Tidak ada data untuk diexport', 'warning');
                     return;
                 }
 
                 const headers = [
-                    'NAMA LEMBAGA', 'JENIS LEMBAGA', 'JENJANG', 'NSLP/NSPP',
+                    'NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP',
                     'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
                     'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI',
                     'NO. HP', 'EMAIL', 'STATUS'
@@ -2512,7 +2658,6 @@
                 const rows = data.map(item => [
                     item.nama || '',
                     item.jenis_lembaga || '',
-                    item.jenjang_id || '',
                     item.nslp || '',
                     item.tahun_berdiri || '',
                     item.pimpinan || '',
@@ -2553,14 +2698,14 @@
         // ============================================================
         function downloadTemplate() {
             const headers = [
-                'NAMA LEMBAGA', 'JENIS LEMBAGA', 'JENJANG', 'NSLP/NSPP',
+                'NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP',
                 'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
                 'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI',
                 'NO. HP', 'EMAIL', 'STATUS'
             ];
 
             const exampleRow = [
-                'MDTU Lafutuhiyah', 'MDT', 'SD', '1234567890',
+                'MDTU Lafutuhiyah', 'MDT', '1234567890',
                 '1998', 'H. Ahmad', 'Jl. Karangdawa No. 1',
                 'Margasari', 'Karangdawa', 'Tegal', 'Jawa Tengah',
                 '08123456789', 'lafutuhiyah@example.com', 'Aktif'
@@ -2587,6 +2732,10 @@
         // ============================================================
         function openImportModal() {
             document.getElementById('importModal').classList.add('active');
+            document.getElementById('fileInputLembaga').value = '';
+            const btn = document.getElementById('btnImportSubmit');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-upload"></i> Upload';
         }
 
         function closeImportModal() {
@@ -2602,6 +2751,10 @@
                 return;
             }
 
+            const btn = document.getElementById('btnImportSubmit');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
             showToast('Memproses import...', 'info');
             closeImportModal();
 
@@ -2615,14 +2768,24 @@
 
                     if (json.length === 0) {
                         showToast('File kosong!', 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-upload"></i> Upload';
                         return;
                     }
 
-                    let success = 0, failed = 0;
-                    for (const row of json) {
+                    let success = 0,
+                        failed = 0;
+                    const errors = [];
+
+                    for (let i = 0; i < json.length; i++) {
+                        const row = json[i];
                         try {
                             const nama = row['NAMA LEMBAGA'] || row['Nama Lembaga'] || '';
-                            if (!nama) { failed++; continue; }
+                            if (!nama) {
+                                errors.push(`Baris ${i + 2}: Nama lembaga kosong`);
+                                failed++;
+                                continue;
+                            }
 
                             const jenis = row['JENIS LEMBAGA'] || row['Jenis Lembaga'] || '';
                             const mappedJenis = mapJenjang(jenis) || 'LPQ';
@@ -2636,6 +2799,8 @@
                                     .eq('nama', kecamatanNama)
                                     .maybeSingle();
                                 if (kecData) kecamatanId = kecData.id;
+                                else errors.push(
+                                    `Baris ${i + 2}: Kecamatan "${kecamatanNama}" tidak ditemukan`);
                             }
 
                             let desaId = null;
@@ -2648,17 +2813,9 @@
                                     .eq('kecamatan_id', kecamatanId)
                                     .maybeSingle();
                                 if (desaData) desaId = desaData.id;
-                            }
-
-                            let jenjangId = null;
-                            const jenjangNama = row['JENJANG'] || '';
-                            if (jenjangNama) {
-                                const { data: jenjangData } = await supabaseClient
-                                    .from('master_jenjang')
-                                    .select('id')
-                                    .eq('nama', jenjangNama)
-                                    .maybeSingle();
-                                if (jenjangData) jenjangId = jenjangData.id;
+                                else errors.push(
+                                    `Baris ${i + 2}: Desa "${desaNama}" tidak ditemukan di kecamatan tersebut`
+                                    );
                             }
 
                             const status = row['STATUS'] || row['Status'] || 'Aktif';
@@ -2666,7 +2823,6 @@
                             const dataLembaga = {
                                 nama: nama,
                                 jenis_lembaga: mappedJenis,
-                                jenjang_id: jenjangId,
                                 nslp: row['NSLP/NSPP'] || row['NSLP'] || '',
                                 tahun_berdiri: parseInt(row['TAHUN BERDIRI']) || null,
                                 pimpinan: row['PIMPINAN'] || '',
@@ -2687,19 +2843,34 @@
                             const { error } = await supabaseClient
                                 .from('lembaga')
                                 .insert([dataLembaga]);
-                            if (error) throw error;
+                            if (error) {
+                                errors.push(`Baris ${i + 2}: ${error.message}`);
+                                throw error;
+                            }
                             success++;
                         } catch (err) {
                             failed++;
-                            console.error(err);
+                            console.error(`❌ Row ${i + 2}:`, row, err);
                         }
                     }
 
-                    showToast(`Import selesai: ${success} berhasil, ${failed} gagal`, success > 0 ? 'success' : 'error');
+                    // Tampilkan detail error jika ada
+                    if (errors.length > 0) {
+                        console.warn('⚠️ Import errors:', errors);
+                    }
+
+                    dataCache.clear();
+                    showToast(
+                        `Import selesai: ${success} berhasil, ${failed} gagal${errors.length > 0 ? '. Cek console untuk detail.' : ''}`,
+                        success > 0 ? 'success' : 'error'
+                        );
                     loadLembaga();
 
                 } catch (error) {
                     showToast('Gagal membaca file: ' + error.message, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-upload"></i> Upload';
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -2707,10 +2878,23 @@
 
         function mapJenjang(value) {
             const mapping = {
-                'LPQ': 'LPQ', 'MDT': 'MDT', 'PONPES': 'PONPES',
-                'PAUDQU': 'LPQ', 'TKQ': 'LPQ', 'TPQ': 'LPQ', 'RTQ': 'LPQ', 'TQA': 'LPQ',
-                'MDTU': 'MDT', 'MDTW': 'MDT', 'MDT_ULA': 'MDT', 'MDT_WUSTHA': 'MDT', 'MDT_ULYA': 'MDT',
-                'SALAF': 'PONPES', 'PDF': 'PONPES', 'SPM': 'PONPES', 'PKPPS': 'PONPES'
+                'LPQ': 'LPQ',
+                'MDT': 'MDT',
+                'PONPES': 'PONPES',
+                'PAUDQU': 'LPQ',
+                'TKQ': 'LPQ',
+                'TPQ': 'LPQ',
+                'RTQ': 'LPQ',
+                'TQA': 'LPQ',
+                'MDTU': 'MDT',
+                'MDTW': 'MDT',
+                'MDT_ULA': 'MDT',
+                'MDT_WUSTHA': 'MDT',
+                'MDT_ULYA': 'MDT',
+                'SALAF': 'PONPES',
+                'PDF': 'PONPES',
+                'SPM': 'PONPES',
+                'PKPPS': 'PONPES'
             };
             return mapping[value] || 'LPQ';
         }
@@ -2720,8 +2904,10 @@
         // ============================================================
         function refreshData() {
             showToast('Memperbarui data...', 'info');
+            dataCache.clear();
             loadLembaga();
-            supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true)
+            supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif',
+                    true)
                 .then(({ count }) => { document.getElementById('navPendidikCount').textContent = count || 0; });
         }
 
@@ -2729,12 +2915,17 @@
         // ===== INIT =====
         // ============================================================
         document.addEventListener('DOMContentLoaded', async function() {
-            await checkAuth();
+            // Set page size berdasarkan device
+            pageSize = window.innerWidth < 768 ? 20 : 50;
+
+            const authOk = await checkAuth();
+            if (!authOk) return;
+
             updateDate();
             await loadKecamatanOptions();
             await loadDesaOptions('', 'editDesa');
-            await loadDesaOptions('', 'desaFilter');
             await loadJenjangOptions();
+            await loadKecamatanFilterOptions();
             loadLembaga();
 
             updateFilterBadge();
