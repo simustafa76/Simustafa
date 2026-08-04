@@ -2110,40 +2110,35 @@
         // ============================================================
         // ===== STATISTIK (FIXED) =====
         // ============================================================
-        async function updateStats() {
-            try {
-                const user = getUser();
-                const filter = getRoleFilter();
+async function updateStats() {
+    try {
+        const user = getUser();
+        const filter = getRoleFilter();
 
-                // Build base query
-                let query = supabaseClient.from('lembaga').select('jenis_lembaga');
+        let qTotal = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true });
+        let qLpq = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'LPQ');
+        let qMdt = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'MDT');
+        let qPonpes = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'PONPES');
 
-                if (filter.kecamatan_id) {
-                    query = query.eq('kecamatan_id', filter.kecamatan_id);
-                }
-                if (filter.jenis_lembaga) {
-                    query = query.eq('jenis_lembaga', filter.jenis_lembaga);
-                }
-
-                const { data, error } = await query;
-
-                if (error) throw error;
-
-                // Hitung statistik dari data yang sama (konsisten)
-                const total = data.length;
-                const lpq = data.filter(d => d.jenis_lembaga === 'LPQ').length;
-                const mdt = data.filter(d => d.jenis_lembaga === 'MDT').length;
-                const ponpes = data.filter(d => d.jenis_lembaga === 'PONPES').length;
-
-                document.getElementById('totalLembagaStat').textContent = total;
-                document.getElementById('totalLPQ').textContent = lpq;
-                document.getElementById('totalMDT').textContent = mdt;
-                document.getElementById('totalPONPES').textContent = ponpes;
-
-            } catch (e) {
-                console.error('Error updating stats:', e);
-            }
+        if (filter.kecamatan_id) {
+            qTotal = qTotal.eq('kecamatan_id', filter.kecamatan_id);
+            qLpq = qLpq.eq('kecamatan_id', filter.kecamatan_id);
+            qMdt = qMdt.eq('kecamatan_id', filter.kecamatan_id);
+            qPonpes = qPonpes.eq('kecamatan_id', filter.kecamatan_id);
         }
+        if (filter.jenis_lembaga) {
+            qTotal = qTotal.eq('jenis_lembaga', filter.jenis_lembaga);
+        }
+
+        const [total, lpq, mdt, ponpes] = await Promise.all([qTotal, qLpq, qMdt, qPonpes]);
+
+        document.getElementById('totalLembagaStat').textContent = total.count || 0;
+        document.getElementById('totalLPQ').textContent = lpq.count || 0;
+        document.getElementById('totalMDT').textContent = mdt.count || 0;
+        document.getElementById('totalPONPES').textContent = ponpes.count || 0;
+
+    } catch (e) { console.error('Error updating stats:', e); }
+}
 
         // ============================================================
         // ===== PAGINATION =====

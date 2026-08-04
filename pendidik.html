@@ -1099,28 +1099,39 @@
     // ============================================================
     // ===== STATISTIK =====
     // ============================================================
-    async function updateStats() {
-        try {
-            const user = getUser();
-            const filter = getRoleFilter();
-            let query = supabaseClient.from('pendidik').select('status_aktif, status_verifikasi');
-            if (filter.kecamatan_id) query = query.eq('kecamatan_lembaga_id', filter.kecamatan_id);
-            if (filter.jenis_lembaga) query = query.eq('jenis_lembaga', filter.jenis_lembaga);
-            const { data, error } = await query;
-            if (error) throw error;
+// ✅ Hanya 4 request HEAD (masing-masing ~100 byte)
+async function updateStats() {
+    try {
+        const user = getUser();
+        const filter = getRoleFilter();
 
-            const total = data.length;
-            const aktif = data.filter(d => d.status_aktif === true).length;
-            const nonaktif = data.filter(d => d.status_aktif === false).length;
-            const proses = data.filter(d => d.status_verifikasi === 'Draft' || d.status_verifikasi === 'Pending').length;
+        let qTotal = supabaseClient.from('pendidik').select('*', { count: 'exact', head: true });
+        let qAktif = supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true);
+        let qNonaktif = supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', false);
+        let qProses = supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).in('status_verifikasi', ['Draft', 'Pending']);
 
-            document.getElementById('totalPendidikStat').textContent = total;
-            document.getElementById('totalAktif').textContent = aktif;
-            document.getElementById('totalNonaktif').textContent = nonaktif;
-            document.getElementById('totalProses').textContent = proses;
-            document.getElementById('navPendidikCount').textContent = total;
-        } catch (e) { console.error(e); }
-    }
+        if (filter.kecamatan_id) {
+            qTotal = qTotal.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+            qAktif = qAktif.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+            qNonaktif = qNonaktif.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+            qProses = qProses.eq('kecamatan_lembaga_id', filter.kecamatan_id);
+        }
+        if (filter.jenis_lembaga) {
+            qTotal = qTotal.eq('jenis_lembaga', filter.jenis_lembaga);
+            qAktif = qAktif.eq('jenis_lembaga', filter.jenis_lembaga);
+            qNonaktif = qNonaktif.eq('jenis_lembaga', filter.jenis_lembaga);
+            qProses = qProses.eq('jenis_lembaga', filter.jenis_lembaga);
+        }
+
+        const [total, aktif, nonaktif, proses] = await Promise.all([qTotal, qAktif, qNonaktif, qProses]);
+
+        document.getElementById('totalPendidikStat').textContent = total.count || 0;
+        document.getElementById('totalAktif').textContent = aktif.count || 0;
+        document.getElementById('totalNonaktif').textContent = nonaktif.count || 0;
+        document.getElementById('totalProses').textContent = proses.count || 0;
+        document.getElementById('navPendidikCount').textContent = total.count || 0;
+    } catch (e) { console.error(e); }
+}
 
     // ============================================================
     // ===== PAGINATION =====
