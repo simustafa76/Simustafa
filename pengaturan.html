@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Pengaturan - SI-MUSTAFA</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         /* ============================================================
-           SI-MUSTAFA - PENGATURAN (FULL VERSION)
+           SI-MUSTAFA - PENGATURAN (FIXED - NO DUPLICATE currentUser)
            ============================================================ */
-
         * {
             margin: 0;
             padding: 0;
@@ -43,7 +41,6 @@
             display: flex;
         }
 
-        /* ===== SIDEBAR ===== */
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
@@ -61,910 +58,210 @@
             transform: translateX(0);
         }
 
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
+        .sidebar.collapsed { transform: translateX(-100%); }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 
         .sidebar-brand {
             padding: 16px 20px;
             display: flex;
             align-items: center;
             gap: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
             min-height: var(--header-height);
             flex-shrink: 0;
         }
 
-        .sidebar-brand img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: contain;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 4px;
-            flex-shrink: 0;
-        }
+        .sidebar-brand img { width: 36px; height: 36px; border-radius: 50%; object-fit: contain; background: rgba(255,255,255,0.1); padding: 4px; flex-shrink: 0; }
+        .sidebar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+        .sidebar-brand .brand-text h1 { font-size: 1rem; font-weight: 700; color: white; letter-spacing: 0.5px; }
+        .sidebar-brand .brand-text h1 span { color: var(--gold); }
+        .sidebar-brand .brand-text small { font-size: 0.55rem; opacity: 0.7; font-weight: 300; }
 
-        .sidebar-brand .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
-
-        .sidebar-brand .brand-text h1 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: white;
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar-brand .brand-text h1 span {
-            color: var(--gold);
-        }
-
-        .sidebar-brand .brand-text small {
-            font-size: 0.55rem;
-            opacity: 0.7;
-            font-weight: 300;
-        }
-
-        .sidebar-menu {
-            flex: 1;
-            padding: 12px 0;
-            list-style: none;
-        }
-
-        .sidebar-menu .menu-label {
-            padding: 8px 20px;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255, 255, 255, 0.35);
-            font-weight: 600;
-        }
-
+        .sidebar-menu { flex: 1; padding: 12px 0; list-style: none; }
+        .sidebar-menu .menu-label { padding: 8px 20px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.35); font-weight: 600; }
         .sidebar-menu .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 10px 20px;
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.25s ease;
-            border-left: 3px solid transparent;
-            cursor: pointer;
+            display: flex; align-items: center; gap: 14px; padding: 10px 20px;
+            color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.85rem;
+            font-weight: 500; transition: all 0.25s ease; border-left: 3px solid transparent; cursor: pointer;
         }
+        .sidebar-menu .menu-item:hover { background: rgba(255,255,255,0.08); color: white; }
+        .sidebar-menu .menu-item.active { background: rgba(255,255,255,0.1); color: var(--gold); border-left-color: var(--gold); }
+        .sidebar-menu .menu-item i { width: 20px; font-size: 1.1rem; text-align: center; flex-shrink: 0; }
+        .sidebar-menu .menu-item .badge { margin-left: auto; background: var(--danger); color: white; font-size: 0.55rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; min-width: 18px; text-align: center; }
 
-        .sidebar-menu .menu-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: white;
-        }
+        .sidebar-footer { padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .sidebar-footer .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--gold); color: var(--primary-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+        .sidebar-footer .user-info { flex: 1; min-width: 0; }
+        .sidebar-footer .user-info .name { font-size: 0.8rem; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-footer .user-info .role { font-size: 0.6rem; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-footer .logout-btn { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 1rem; padding: 4px 8px; transition: 0.2s; border-radius: 6px; }
+        .sidebar-footer .logout-btn:hover { color: #ff6b6b; background: rgba(255,0,0,0.1); }
 
-        .sidebar-menu .menu-item.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--gold);
-            border-left-color: var(--gold);
-        }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .sidebar-overlay.active { display: block; }
 
-        .sidebar-menu .menu-item i {
-            width: 20px;
-            font-size: 1.1rem;
-            text-align: center;
-            flex-shrink: 0;
-        }
+        .main-content { margin-left: var(--sidebar-width); flex: 1; min-height: 100vh; transition: margin-left 0.3s ease; display: flex; flex-direction: column; padding: 20px 40px 40px 40px; }
+        .main-content.expanded { margin-left: 0; }
 
-        .sidebar-menu .menu-item .badge {
-            margin-left: auto;
-            background: var(--danger);
-            color: white;
-            font-size: 0.55rem;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 10px;
-            min-width: 18px;
-            text-align: center;
-        }
+        .header { background: white; padding: 0 40px; height: var(--header-height); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e8ecf1; position: sticky; top: 0; z-index: 100; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .header-left .sidebar-toggle { background: none; border: none; font-size: 1.3rem; color: var(--primary-dark); cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; }
+        .header-left .sidebar-toggle:hover { background: var(--bg-gray); color: var(--primary); }
+        .header-left .page-title h1 { font-size: 1.1rem; font-weight: 700; color: var(--primary-dark); }
+        .header-left .page-title p { font-size: 0.7rem; color: #888; }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .header-date { font-size: 0.75rem; color: #888; }
+        .header-right .role-badge { background: var(--primary); color: white; padding: 4px 14px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
+        .header-right .role-scope { font-size: 0.6rem; color: #888; }
+        .header-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 10px; border-radius: 8px; transition: 0.2s; }
+        .header-user:hover { background: var(--bg-gray); }
+        .header-user .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; }
+        .header-user .user-name { font-size: 0.8rem; font-weight: 600; color: var(--primary-dark); }
+        .logout-btn-header { background: none; border: none; color: #999; cursor: pointer; font-size: 1rem; padding: 4px 8px; transition: 0.2s; border-radius: 6px; }
+        .logout-btn-header:hover { color: var(--danger); background: rgba(244,67,54,0.08); }
 
-        .sidebar-footer {
-            padding: 12px 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
+        .welcome-section { background: linear-gradient(135deg, #0a2e1a 0%, #1a5a3a 50%, #2e7d32 100%); border-radius: 14px; padding: 24px 36px; margin-bottom: 24px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 8px 32px rgba(0,100,0,0.3); }
+        .welcome-section .welcome-text h2 { font-size: 1.3rem; font-weight: 700; }
+        .welcome-section .welcome-text h2 span { color: var(--gold); }
+        .welcome-section .welcome-text p { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
+        .welcome-section .welcome-text p i { margin-right: 6px; color: var(--gold); }
+        .welcome-section .welcome-badge { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px 20px; font-size: 0.75rem; font-weight: 500; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .welcome-section .welcome-badge i { color: var(--gold); }
 
-        .sidebar-footer .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--gold);
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
-
-        .sidebar-footer .user-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .sidebar-footer .user-info .name {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sidebar-footer .user-info .role {
-            font-size: 0.6rem;
-            opacity: 0.6;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sidebar-footer .logout-btn {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 4px 8px;
-            transition: 0.2s;
-            border-radius: 6px;
-        }
-
-        .sidebar-footer .logout-btn:hover {
-            color: #ff6b6b;
-            background: rgba(255, 0, 0, 0.1);
-        }
-
-        /* ===== OVERLAY ===== */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 40px 40px 40px;
-        }
-
-        .main-content.expanded {
-            margin-left: 0;
-        }
-
-        /* ===== HEADER ===== */
-        .header {
-            background: white;
-            padding: 0 40px;
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #e8ecf1;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .header-left .sidebar-toggle {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            color: var(--primary-dark);
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 6px;
-            transition: 0.2s;
-        }
-
-        .header-left .sidebar-toggle:hover {
-            background: var(--bg-gray);
-            color: var(--primary);
-        }
-
-        .header-left .page-title h1 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
-        .header-left .page-title p {
-            font-size: 0.7rem;
-            color: #888;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .header-date {
-            font-size: 0.75rem;
-            color: #888;
-        }
-
-        .header-right .role-badge {
-            background: var(--primary);
-            color: white;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            font-weight: 600;
-        }
-
-        .header-right .role-scope {
-            font-size: 0.6rem;
-            color: #888;
-        }
-
-        .header-user {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 8px;
-            transition: 0.2s;
-        }
-
-        .header-user:hover {
-            background: var(--bg-gray);
-        }
-
-        .header-user .avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
-
-        .header-user .user-name {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-        }
-
-        /* ===== WELCOME SECTION ===== */
-        .welcome-section {
-            background: linear-gradient(135deg, #0a2e1a 0%, #1a5a3a 50%, #2e7d32 100%);
-            border-radius: 14px;
-            padding: 24px 36px;
-            margin-bottom: 24px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            box-shadow: 0 8px 32px rgba(0, 100, 0, 0.3);
-        }
-
-        .welcome-section .welcome-text h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-
-        .welcome-section .welcome-text h2 span {
-            color: var(--gold);
-        }
-
-        .welcome-section .welcome-text p {
-            font-size: 0.85rem;
-            opacity: 0.85;
-            margin-top: 2px;
-        }
-
-        .welcome-section .welcome-text p i {
-            margin-right: 6px;
-            color: var(--gold);
-        }
-
-        .welcome-section .welcome-badge {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            padding: 8px 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-        }
-
-        .welcome-section .welcome-badge i {
-            color: var(--gold);
-        }
-
-        /* ===== TABS ===== */
-        .tabs {
-            display: flex;
-            gap: 4px;
-            background: white;
-            border-radius: 12px;
-            padding: 4px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            padding: 8px 18px;
-            border: none;
-            background: transparent;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tab-btn:hover {
-            background: var(--bg-gray);
-            color: var(--primary);
-        }
-
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 100, 0, 0.25);
-        }
-
-        .tab-btn .badge {
-            background: rgba(255,255,255,0.2);
-            color: inherit;
-            padding: 0 8px;
-            font-size: 0.6rem;
-            border-radius: 10px;
-        }
-
-        .tab-btn.active .badge {
-            background: rgba(255,255,255,0.2);
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.25s ease;
-        }
-
+        .tabs { display: flex; gap: 4px; background: white; border-radius: 12px; padding: 4px; box-shadow: var(--card-shadow); margin-bottom: 16px; flex-wrap: wrap; }
+        .tab-btn { padding: 8px 18px; border: none; background: transparent; border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: #666; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; }
+        .tab-btn:hover { background: var(--bg-gray); color: var(--primary); }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(0,100,0,0.25); }
+        .tab-content { display: none; animation: fadeIn 0.25s ease; }
         .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .setting-section { background: white; border-radius: 14px; padding: 20px 24px; box-shadow: var(--card-shadow); margin-bottom: 16px; }
+        .setting-section .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f0f2f5; }
+        .setting-section .section-title { font-size: 0.95rem; font-weight: 600; color: var(--primary); }
+        .setting-section .section-title i { margin-right: 10px; color: var(--primary-light); }
+        .setting-section .section-desc { font-size: 0.8rem; color: #888; margin-top: 2px; }
 
-        /* ===== SETTINGS SECTION ===== */
-        .setting-section {
-            background: white;
-            border-radius: 14px;
-            padding: 20px 24px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 16px;
-        }
+        .form-inline { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+        .form-inline select, .form-inline input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.85rem; background: white; flex: 1; min-width: 150px; transition: 0.2s; }
+        .form-inline select:focus, .form-inline input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,100,0,0.08); }
+        .form-inline input[readonly] { background: #f5f5f5; color: #666; cursor: not-allowed; }
 
-        .setting-section .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f0f2f5;
-        }
-
-        .setting-section .section-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .setting-section .section-title i {
-            margin-right: 10px;
-            color: var(--primary-light);
-        }
-
-        .setting-section .section-desc {
-            font-size: 0.8rem;
-            color: #888;
-            margin-top: 2px;
-        }
-
-        /* ===== FORM INLINE ===== */
-        .form-inline {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-        }
-
-        .form-inline select,
-        .form-inline input {
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            background: white;
-            flex: 1;
-            min-width: 150px;
-            transition: 0.2s;
-        }
-
-        .form-inline select:focus,
-        .form-inline input:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.08);
-        }
-
-        .form-inline select:disabled,
-        .form-inline input:disabled {
-            background: #f5f5f5;
-            color: #999;
-            cursor: not-allowed;
-        }
-
-        .form-inline input[readonly] {
-            background: #f5f5f5;
-            color: #666;
-            cursor: not-allowed;
-        }
-
-        /* ===== USER LIST ===== */
-        .user-list-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            background: #f8faf8;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            transition: 0.2s;
-        }
-
-        .user-list-item:hover {
-            background: var(--bg-gray);
-        }
-
-        .user-list-item .user-avatar-sm {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.8rem;
-            flex-shrink: 0;
-        }
-
-        .user-list-item .user-info {
-            flex: 1;
-        }
-
-        .user-list-item .user-info .name {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #333;
-        }
-
-        .user-list-item .user-info .email {
-            font-size: 0.75rem;
-            color: #888;
-        }
-
-        .user-list-item .user-role {
-            padding: 2px 12px;
-            border-radius: 12px;
-            font-size: 0.65rem;
-            font-weight: 600;
-        }
-
+        .user-list-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #f8faf8; border-radius: 10px; margin-bottom: 8px; transition: 0.2s; }
+        .user-list-item:hover { background: var(--bg-gray); }
+        .user-list-item .user-avatar-sm { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
+        .user-list-item .user-avatar-sm.inactive-avatar { background: #ccc; }
+        .user-list-item .user-info { flex: 1; }
+        .user-list-item .user-info .name { font-weight: 600; font-size: 0.85rem; color: #333; }
+        .user-list-item .user-info .name.inactive-name { color: #999; text-decoration: line-through; }
+        .user-list-item .user-info .email { font-size: 0.75rem; color: #888; }
+        .user-list-item .user-role { padding: 2px 12px; border-radius: 12px; font-size: 0.65rem; font-weight: 600; }
         .user-list-item .user-role.super_admin { background: #ffebee; color: #c62828; }
         .user-list-item .user-role.admin_kab { background: #fff3e0; color: #e65100; }
         .user-list-item .user-role.batko { background: #e3f2fd; color: #0d47a1; }
         .user-list-item .user-role.fkdt { background: #e8f5e9; color: #1b5e20; }
         .user-list-item .user-role.ponpes { background: #f3e5f5; color: #4a148c; }
         .user-list-item .user-role.operator { background: #e3f2fd; color: #1976d2; }
-
-        .user-list-item .user-status {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
+        .user-list-item .user-status { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .user-list-item .user-status.active { background: var(--success); }
         .user-list-item .user-status.inactive { background: #ccc; }
 
-        /* ===== BUTTONS ===== */
-        .btn {
-            padding: 6px 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .btn { padding: 6px 14px; border: none; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-light); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #43a047; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #d32f2f; }
+        .btn-sm { padding: 4px 10px; font-size: 0.7rem; }
+        .btn-icon { padding: 4px 8px; border: none; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; background: transparent; color: #888; }
+        .btn-icon:hover { background: #f0f2f5; color: var(--primary); }
+        .btn-icon.danger:hover { background: #ffebee; color: var(--danger); }
 
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 1.5px solid var(--primary);
-        }
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-        }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f5f6f8; }
+        .setting-item:last-child { border-bottom: none; }
+        .setting-item .item-label { font-size: 0.85rem; color: #333; }
+        .setting-item .item-label small { display: block; font-size: 0.7rem; color: #888; font-weight: 400; }
+        .setting-item .item-control { display: flex; align-items: center; gap: 10px; }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-primary:hover {
-            background: var(--primary-light);
-        }
+        .toggle { position: relative; width: 44px; height: 24px; background: #ccc; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; flex-shrink: 0; }
+        .toggle.active { background: var(--primary); }
+        .toggle .toggle-slider { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .toggle.active .toggle-slider { left: 22px; }
 
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-        .btn-success:hover {
-            background: #43a047;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #d32f2f;
-        }
-
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: 0.7rem;
-        }
-
-        .btn-icon {
-            padding: 4px 8px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.2s;
-            background: transparent;
-            color: #888;
-        }
-
-        .btn-icon:hover {
-            background: #f0f2f5;
-            color: var(--primary);
-        }
-
-        .btn-icon.danger:hover {
-            background: #ffebee;
-            color: var(--danger);
-        }
-
-        /* ===== SETTING ITEM ===== */
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f5f6f8;
-        }
-
-        .setting-item:last-child {
-            border-bottom: none;
-        }
-
-        .setting-item .item-label {
-            font-size: 0.85rem;
-            color: #333;
-        }
-
-        .setting-item .item-label small {
-            display: block;
-            font-size: 0.7rem;
-            color: #888;
-            font-weight: 400;
-        }
-
-        .setting-item .item-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* ===== TOGGLE ===== */
-        .toggle {
-            position: relative;
-            width: 44px;
-            height: 24px;
-            background: #ccc;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .toggle.active {
-            background: var(--primary);
-        }
-
-        .toggle .toggle-slider {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-        }
-
-        .toggle.active .toggle-slider {
-            left: 22px;
-        }
-
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            padding: 12px 24px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            font-size: 0.85rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-            z-index: 9999;
-            opacity: 0;
-            transition: all 0.3s ease;
-            max-width: 90%;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); padding: 12px 24px; border-radius: 12px; color: white; font-weight: 500; font-size: 0.85rem; box-shadow: 0 8px 30px rgba(0,0,0,0.2); z-index: 9999; opacity: 0; transition: all 0.3s ease; max-width: 90%; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast-success { background: var(--success); }
         .toast-error { background: var(--danger); }
         .toast-info { background: var(--primary); }
         .toast-warning { background: var(--warning); }
 
-        /* ===== SPINNER ===== */
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid #f0f2f5;
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto;
+        .spinner { width: 32px; height: 32px; border: 3px solid #f0f2f5; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .access-denied { text-align: center; padding: 60px 20px; }
+        .access-denied i { font-size: 48px; color: #f44336; display: block; margin-bottom: 16px; }
+        .access-denied h2 { color: #f44336; }
+        .access-denied p { color: #888; }
+
+        .info-box { margin-top: 4px; padding: 6px 12px; background: #e8f5e9; border-radius: 6px; font-size: 0.8rem; color: #2e7d32; }
+        .info-box i { margin-right: 6px; }
+
+        .progress-bar { width: 100%; height: 6px; background: #f0f2f5; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .progress-bar .fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s ease; width: 0%; }
+
+        /* Style khusus untuk BADKO TPQ */
+        .badge-badko {
+            background: #e3f2fd !important;
+            color: #0d47a1 !important;
+            padding: 2px 12px !important;
+            border-radius: 12px !important;
+            font-size: 0.65rem !important;
+            font-weight: 600 !important;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ===== ACCESS DENIED ===== */
-        .access-denied {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        .access-denied i {
-            font-size: 48px;
-            color: #f44336;
-            display: block;
-            margin-bottom: 16px;
-        }
-        .access-denied h2 {
-            color: #f44336;
-        }
-        .access-denied p {
-            color: #888;
-        }
-
-        /* ===== INFO BOX ===== */
-        .info-box {
-            margin-top: 4px;
-            padding: 6px 12px;
-            background: #e8f5e9;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            color: #2e7d32;
-        }
-
-        .info-box i {
-            margin-right: 6px;
-        }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .sidebar-overlay.active {
-                display: block;
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 16px 20px 30px 20px;
-            }
-            .header {
-                padding: 0 20px;
-            }
-            .header-left .page-title p {
-                display: none;
-            }
-            .header-date {
-                display: none;
-            }
-            .header-right .role-scope {
-                display: none;
-            }
-            .tabs {
-                flex-wrap: wrap;
-            }
-            .tab-btn {
-                flex: 1;
-                justify-content: center;
-                padding: 6px 10px;
-                font-size: 0.7rem;
-            }
-            .setting-item {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 8px;
-            }
-            .form-inline {
-                flex-direction: column;
-            }
-            .form-inline select,
-            .form-inline input {
-                min-width: auto;
-            }
-            .user-list-item {
-                flex-wrap: wrap;
-            }
-            .welcome-section {
-                padding: 16px 20px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .welcome-section .welcome-text h2 {
-                font-size: 1rem;
-            }
-            .welcome-section .welcome-text p {
-                font-size: 0.75rem;
-            }
-            .welcome-section .welcome-badge {
-                font-size: 0.65rem;
-                padding: 4px 12px;
-            }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+            .main-content { margin-left: 0; padding: 16px 20px 30px 20px; }
+            .header { padding: 0 20px; }
+            .header-left .page-title p { display: none; }
+            .header-date { display: none; }
+            .header-right .role-scope { display: none; }
+            .tabs { flex-wrap: wrap; }
+            .tab-btn { flex: 1; justify-content: center; padding: 6px 10px; font-size: 0.7rem; }
+            .setting-item { flex-direction: column; align-items: stretch; gap: 8px; }
+            .form-inline { flex-direction: column; }
+            .user-list-item { flex-wrap: wrap; }
+            .welcome-section { padding: 16px 20px; flex-direction: column; align-items: flex-start; }
+            .welcome-section .welcome-text h2 { font-size: 1rem; }
         }
 
         @media (max-width: 480px) {
-            .header {
-                padding: 0 12px;
-                height: 56px;
-            }
-            .header-left .page-title h1 {
-                font-size: 0.85rem;
-            }
-            .header-left .sidebar-toggle {
-                font-size: 1rem;
-                padding: 2px 6px;
-            }
-            .header-user .user-name {
-                display: none;
-            }
-            .header-right .role-badge {
-                display: none;
-            }
-            .main-content {
-                padding: 12px 12px 20px 12px;
-            }
-            .setting-section {
-                padding: 16px;
-            }
-            .tab-btn {
-                font-size: 0.65rem;
-                padding: 4px 8px;
-            }
-            .welcome-section {
-                padding: 14px 16px;
-            }
-            .welcome-section .welcome-text h2 {
-                font-size: 0.9rem;
-            }
+            .header { padding: 0 12px; height: 56px; }
+            .header-left .page-title h1 { font-size: 0.85rem; }
+            .header-user .user-name { display: none; }
+            .header-right .role-badge { display: none; }
+            .main-content { padding: 12px 12px 20px 12px; }
+            .setting-section { padding: 16px; }
+            .tab-btn { font-size: 0.65rem; padding: 4px 8px; }
+            .welcome-section { padding: 14px 16px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <img src="assets/logo-kemenag.png" alt="Logo" 
-                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
-            <div class="brand-text">
-                <h1>SI-<span>MUSTAFA</span></h1>
-                <small>Kemenag Kab. Tegal</small>
-            </div>
+            <img src="assets/logo-kemenag.png" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+            <div class="brand-text"><h1>SI-<span>MUSTAFA</span></h1><small>Kemenag Kab. Tegal</small></div>
         </div>
-
         <ul class="sidebar-menu">
             <li class="menu-label">Menu Utama</li>
             <li><a class="menu-item" href="dashboard.html"><i class="fas fa-chart-pie"></i>Dashboard</a></li>
@@ -974,313 +271,229 @@
             <li><a class="menu-item" href="bantuan.html"><i class="fas fa-hand-holding-heart"></i>Bantuan</a></li>
             <li><a class="menu-item active" href="pengaturan.html"><i class="fas fa-cog"></i>Pengaturan</a></li>
         </ul>
-
         <div class="sidebar-footer">
             <div class="avatar" id="userAvatar">A</div>
-            <div class="user-info">
-                <div class="name" id="userName">Admin</div>
-                <div class="role" id="userRole">Super Admin</div>
-            </div>
-            <button class="logout-btn" onclick="handleLogout()" title="Logout">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
+            <div class="user-info"><div class="name" id="userName">Admin</div><div class="role" id="userRole">Super Admin</div></div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
         </div>
     </aside>
-
-    <!-- ===== OVERLAY ===== -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-    <!-- ===== MAIN CONTENT ===== -->
     <main class="main-content" id="mainContent">
-
-        <!-- ===== HEADER ===== -->
         <header class="header">
             <div class="header-left">
-                <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="page-title">
-                    <h1>Pengaturan</h1>
-                    <p>Kelola pengguna, konfigurasi sistem, dan preferensi aplikasi</p>
-                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="page-title"><h1>Pengaturan</h1><p>Kelola pengguna, konfigurasi sistem, dan preferensi aplikasi</p></div>
             </div>
             <div class="header-right">
                 <span class="header-date" id="currentDate"></span>
                 <span class="role-badge" id="headerRoleBadge">Admin</span>
                 <span class="role-scope" id="headerScope"></span>
-                <div class="header-user" onclick="showToast('Profile', 'info')">
-                    <div class="avatar" id="userAvatarSmall">A</div>
-                    <span class="user-name" id="userNameSmall">Admin</span>
-                </div>
+                <div class="header-user"><div class="avatar" id="userAvatarSmall">A</div><span class="user-name" id="userNameSmall">Admin</span></div>
+                <button class="logout-btn-header" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </header>
 
-        <!-- ===== WELCOME SECTION ===== -->
         <div class="welcome-section">
-            <div class="welcome-text">
-                <h2>Selamat datang, <span id="welcomeName">Admin</span> 👋</h2>
-                <p id="welcomeStatus"><i class="fas fa-cog"></i> <span id="welcomeRole">Super Admin SI-MUSTAFA</span></p>
-            </div>
-            <div class="welcome-badge">
-                <i class="fas fa-calendar-alt"></i>
-                <span id="welcomeDate">Loading...</span>
-            </div>
+            <div class="welcome-text"><h2>Selamat datang, <span id="welcomeName">Admin</span> 👋</h2><p><i class="fas fa-cog"></i> <span id="welcomeRole">Super Admin SI-MUSTAFA</span></p></div>
+            <div class="welcome-badge"><i class="fas fa-calendar-alt"></i><span id="welcomeDate">Loading...</span></div>
         </div>
 
-        <!-- ===== TABS ===== -->
         <div class="tabs">
-            <button class="tab-btn active" data-tab="users" onclick="switchTab('users')">
-                <i class="fas fa-users"></i> Pengguna
-            </button>
-            <button class="tab-btn" data-tab="system" onclick="switchTab('system')">
-                <i class="fas fa-sliders-h"></i> Sistem
-            </button>
-            <button class="tab-btn" data-tab="backup" onclick="switchTab('backup')">
-                <i class="fas fa-database"></i> Backup
-            </button>
-            <button class="tab-btn" data-tab="about" onclick="switchTab('about')">
-                <i class="fas fa-info-circle"></i> Tentang
-            </button>
+            <button class="tab-btn active" data-tab="users" onclick="switchTab('users')"><i class="fas fa-users"></i> Pengguna</button>
+            <button class="tab-btn" data-tab="system" onclick="switchTab('system')"><i class="fas fa-sliders-h"></i> Sistem</button>
+            <button class="tab-btn" data-tab="backup" onclick="switchTab('backup')"><i class="fas fa-database"></i> Backup</button>
+            <button class="tab-btn" data-tab="about" onclick="switchTab('about')"><i class="fas fa-info-circle"></i> Tentang</button>
         </div>
 
-        <!-- ===== TAB: USERS ===== -->
         <div id="tab-users" class="tab-content active">
-
             <div class="setting-section" id="addUserSection">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title" id="addUserTitle"><i class="fas fa-user-plus"></i>Tambah Pengguna</div>
-                        <div class="section-desc" id="addUserDesc">Pilih wilayah → lembaga → auto-fill data</div>
-                    </div>
-                </div>
-                
-                <!-- ===== FORM DINAMIS ===== -->
-                <div id="formContainer">
-                    <!-- Akan diisi oleh JavaScript -->
-                </div>
-
-                <!-- Auto-fill fields -->
-                <div class="form-inline" style="margin-top:8px;" id="autoFillContainer">
+                <div class="section-header"><div><div class="section-title" id="addUserTitle"><i class="fas fa-user-plus"></i>Tambah Pengguna</div><div class="section-desc" id="addUserDesc">Pilih wilayah → lembaga → auto-fill data</div></div></div>
+                <div id="formContainer"></div>
+                <div class="form-inline" style="margin-top:8px;">
                     <input type="text" id="inputName" placeholder="Nama lengkap" readonly>
                     <input type="email" id="inputEmail" placeholder="Email" readonly>
                     <input type="text" id="inputPassword" placeholder="Password" readonly>
                 </div>
-
-                <div style="margin-top:8px; display:flex; justify-content:flex-end; gap:8px;">
+                <div style="margin-top:8px;display:flex;justify-content:flex-end;gap:8px;">
                     <button class="btn btn-outline" onclick="resetForm()"><i class="fas fa-undo"></i> Reset</button>
-                    <button class="btn btn-success" onclick="addUser()"><i class="fas fa-plus"></i> Tambah</button>
+                    <button class="btn btn-success" id="btnAddUser" onclick="addUser()"><i class="fas fa-plus"></i> Tambah</button>
                 </div>
             </div>
-
             <div class="setting-section">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title"><i class="fas fa-list"></i>Daftar Pengguna</div>
-                        <div class="section-desc" id="userListDesc">Kelola akun pengguna yang terdaftar di sistem</div>
-                    </div>
-                    <button class="btn btn-outline btn-sm" onclick="loadUsers()"><i class="fas fa-sync"></i> Refresh</button>
-                </div>
-                <div id="userList">
-                    <div style="text-align:center;padding:20px;color:#999;">
-                        <div class="spinner"></div>
-                        <span style="display:block;margin-top:8px;">Memuat data...</span>
-                    </div>
-                </div>
+                <div class="section-header"><div><div class="section-title"><i class="fas fa-list"></i>Daftar Pengguna</div><div class="section-desc" id="userListDesc">Kelola akun pengguna</div></div><button class="btn btn-outline btn-sm" onclick="loadUsers()"><i class="fas fa-sync"></i> Refresh</button></div>
+                <div id="userList"><div style="text-align:center;padding:20px;color:#999;"><div class="spinner"></div></div></div>
             </div>
         </div>
 
-        <!-- ===== TAB: SYSTEM ===== -->
         <div id="tab-system" class="tab-content">
             <div class="setting-section">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title"><i class="fas fa-sliders-h"></i>Konfigurasi Sistem</div>
-                        <div class="section-desc">Atur preferensi dan konfigurasi aplikasi</div>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="item-label">
-                        Maintenance Mode
-                        <small>Nonaktifkan akses sementara untuk pemeliharaan</small>
-                    </div>
-                    <div class="item-control">
-                        <div class="toggle" id="toggleMaintenance" onclick="toggleSwitch('maintenance')">
-                            <div class="toggle-slider"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="item-label">
-                        Notifikasi Email
-                        <small>Kirim notifikasi via email untuk aktivitas penting</small>
-                    </div>
-                    <div class="item-control">
-                        <div class="toggle active" id="toggleEmail" onclick="toggleSwitch('email')">
-                            <div class="toggle-slider"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="item-label">
-                        Auto Backup
-                        <small>Backup data secara otomatis setiap hari</small>
-                    </div>
-                    <div class="item-control">
-                        <div class="toggle active" id="toggleBackup" onclick="toggleSwitch('backup')">
-                            <div class="toggle-slider"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <div class="item-label">
-                        Log Aktivitas
-                        <small>Catat semua aktivitas pengguna untuk audit</small>
-                    </div>
-                    <div class="item-control">
-                        <div class="toggle active" id="toggleLog" onclick="toggleSwitch('log')">
-                            <div class="toggle-slider"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top:16px;padding-top:16px;border-top:2px solid #f0f2f5;display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="btn btn-primary" onclick="showToast('Pengaturan disimpan!', 'success')">
-                        <i class="fas fa-save"></i> Simpan Pengaturan
-                    </button>
-                    <button class="btn btn-outline" onclick="showToast('Pengaturan direset ke default', 'info')">
-                        <i class="fas fa-undo"></i> Reset Default
-                    </button>
+                <div class="section-header"><div><div class="section-title"><i class="fas fa-sliders-h"></i>Konfigurasi Sistem</div></div></div>
+                <div class="setting-item"><div class="item-label">Maintenance Mode<small>Nonaktifkan akses sementara</small></div><div class="item-control"><div class="toggle" id="toggleMaintenance" onclick="toggleSwitch('maintenance')"><div class="toggle-slider"></div></div></div></div>
+                <div class="setting-item"><div class="item-label">Notifikasi Email<small>Kirim notifikasi via email</small></div><div class="item-control"><div class="toggle active" id="toggleEmail" onclick="toggleSwitch('email')"><div class="toggle-slider"></div></div></div></div>
+                <div class="setting-item"><div class="item-label">Auto Backup<small>Backup otomatis harian</small></div><div class="item-control"><div class="toggle active" id="toggleBackup" onclick="toggleSwitch('backup')"><div class="toggle-slider"></div></div></div></div>
+                <div class="setting-item"><div class="item-label">Log Aktivitas<small>Catat aktivitas untuk audit</small></div><div class="item-control"><div class="toggle active" id="toggleLog" onclick="toggleSwitch('log')"><div class="toggle-slider"></div></div></div></div>
+                <div style="margin-top:16px;padding-top:16px;border-top:2px solid #f0f2f5;display:flex;gap:10px;">
+                    <button class="btn btn-primary" onclick="saveSystemSettings()"><i class="fas fa-save"></i> Simpan</button>
+                    <button class="btn btn-outline" onclick="resetSystemSettings()"><i class="fas fa-undo"></i> Reset Default</button>
                 </div>
             </div>
         </div>
 
-        <!-- ===== TAB: BACKUP ===== -->
         <div id="tab-backup" class="tab-content">
             <div class="setting-section">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title"><i class="fas fa-database"></i>Backup & Restore</div>
-                        <div class="section-desc">Kelola backup data untuk keamanan dan pemulihan</div>
-                    </div>
-                </div>
-
+                <div class="section-header"><div><div class="section-title"><i class="fas fa-database"></i>Backup & Restore</div></div></div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
                     <div style="background:#f8faf8;border-radius:10px;padding:16px;text-align:center;">
                         <i class="fas fa-download" style="font-size:2rem;color:var(--primary);margin-bottom:8px;display:block;"></i>
                         <div style="font-weight:600;font-size:0.9rem;">Backup Database</div>
-                        <div style="font-size:0.7rem;color:#888;margin:4px 0 12px;">Export semua data ke JSON</div>
-                        <button class="btn btn-primary" onclick="backupDatabase()"><i class="fas fa-download"></i> Download</button>
+                        <button class="btn btn-primary" id="btnBackup" onclick="backupDatabase()"><i class="fas fa-download"></i> Download</button>
+                        <div class="progress-bar" id="backupProgress" style="display:none;"><div class="fill"></div></div>
                     </div>
                     <div style="background:#f8faf8;border-radius:10px;padding:16px;text-align:center;">
                         <i class="fas fa-upload" style="font-size:2rem;color:var(--warning);margin-bottom:8px;display:block;"></i>
                         <div style="font-weight:600;font-size:0.9rem;">Restore Database</div>
-                        <div style="font-size:0.7rem;color:#888;margin:4px 0 12px;">Pulihkan data dari file backup</div>
-                        <button class="btn btn-outline" onclick="document.getElementById('restoreFile').click()">
-                            <i class="fas fa-upload"></i> Pilih File
-                        </button>
+                        <button class="btn btn-outline" onclick="document.getElementById('restoreFile').click()"><i class="fas fa-upload"></i> Pilih File</button>
                         <input type="file" id="restoreFile" accept=".json" style="display:none;" onchange="restoreDatabase(this)">
                     </div>
                     <div style="background:#f8faf8;border-radius:10px;padding:16px;text-align:center;">
                         <i class="fas fa-history" style="font-size:2rem;color:var(--primary-light);margin-bottom:8px;display:block;"></i>
                         <div style="font-weight:600;font-size:0.9rem;">Riwayat Backup</div>
-                        <div style="font-size:0.7rem;color:#888;margin:4px 0 12px;">Lihat riwayat backup sebelumnya</div>
-                        <button class="btn btn-outline" onclick="showToast('Riwayat backup akan ditampilkan', 'info')">
-                            <i class="fas fa-list"></i> Lihat Riwayat
-                        </button>
+                        <button class="btn btn-outline" onclick="showToast('Fitur akan datang', 'info')"><i class="fas fa-list"></i> Lihat</button>
                     </div>
                 </div>
-
                 <div style="margin-top:16px;padding:12px 16px;background:#fff8e1;border-radius:10px;font-size:0.8rem;color:#856404;">
-                    <i class="fas fa-info-circle"></i> 
-                    Backup terakhir: <strong id="lastBackup">Belum pernah backup</strong>
+                    <i class="fas fa-info-circle"></i> Backup terakhir: <strong id="lastBackup">Belum pernah</strong>
                 </div>
             </div>
         </div>
 
-        <!-- ===== TAB: ABOUT ===== -->
         <div id="tab-about" class="tab-content">
             <div class="setting-section">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title"><i class="fas fa-info-circle"></i>Tentang SI-MUSTAFA</div>
-                        <div class="section-desc">Informasi tentang aplikasi dan tim pengembang</div>
-                    </div>
-                </div>
-
+                <div class="section-header"><div><div class="section-title"><i class="fas fa-info-circle"></i>Tentang SI-MUSTAFA</div></div></div>
                 <div style="text-align:center;padding:20px 0;">
-                    <div style="width:80px;height:80px;background:var(--bg-gray);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
-                        <i class="fas fa-mosque" style="font-size:2.5rem;color:var(--primary);"></i>
-                    </div>
-                    <h2 style="color:var(--primary);font-size:1.5rem;">SI-MUSTAFA</h2>
-                    <p style="color:#888;font-size:0.9rem;">Sistem Informasi Manajemen Ustadz–Ustadzah</p>
-                    <p style="color:#aaa;font-size:0.8rem;margin-top:4px;">Kantor Kementerian Agama Kabupaten Tegal</p>
+                    <div style="width:80px;height:80px;background:var(--bg-gray);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;"><i class="fas fa-mosque" style="font-size:2.5rem;color:var(--primary);"></i></div>
+                    <h2 style="color:var(--primary);">SI-MUSTAFA</h2>
+                    <p style="color:#888;">Sistem Informasi Manajemen Ustadz–Ustadzah</p>
+                    <p style="color:#aaa;font-size:0.8rem;">Kantor Kementerian Agama Kabupaten Tegal</p>
                 </div>
-
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px;">
-                    <div style="background:#f8faf8;border-radius:10px;padding:12px 16px;">
-                        <div style="font-size:0.7rem;color:#888;">Versi</div>
-                        <div style="font-weight:600;font-size:1rem;">v2.0.0</div>
-                    </div>
-                    <div style="background:#f8faf8;border-radius:10px;padding:12px 16px;">
-                        <div style="font-size:0.7rem;color:#888;">Framework</div>
-                        <div style="font-weight:600;font-size:1rem;">HTML + Supabase</div>
-                    </div>
-                    <div style="background:#f8faf8;border-radius:10px;padding:12px 16px;">
-                        <div style="font-size:0.7rem;color:#888;">Database</div>
-                        <div style="font-weight:600;font-size:1rem;">PostgreSQL</div>
-                    </div>
-                    <div style="background:#f8faf8;border-radius:10px;padding:12px 16px;">
-                        <div style="font-size:0.7rem;color:#888;">Total Data</div>
-                        <div style="font-weight:600;font-size:1rem;" id="totalDataStats">0</div>
-                    </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;">
+                    <div style="background:#f8faf8;border-radius:10px;padding:12px 16px;"><div style="font-size:0.7rem;color:#888;">Versi</div><div style="font-weight:600;">v2.0.0</div></div>
+                    <div style="background:#f8faf8;border-radius:10px;padding:12px 16px;"><div style="font-size:0.7rem;color:#888;">Framework</div><div style="font-weight:600;">HTML + Supabase</div></div>
+                    <div style="background:#f8faf8;border-radius:10px;padding:12px 16px;"><div style="font-size:0.7rem;color:#888;">Database</div><div style="font-weight:600;">PostgreSQL</div></div>
+                    <div style="background:#f8faf8;border-radius:10px;padding:12px 16px;"><div style="font-size:0.7rem;color:#888;">Total Data</div><div style="font-weight:600;" id="totalDataStats">0</div></div>
                 </div>
-
-                <div style="margin-top:16px;padding:12px 16px;background:#f8faf8;border-radius:10px;font-size:0.8rem;color:#888;text-align:center;">
-                    <i class="fas fa-copyright"></i> 2026 SI-MUSTAFA. All rights reserved.
-                </div>
+                <div style="margin-top:16px;padding:12px;background:#f8faf8;border-radius:10px;font-size:0.8rem;color:#888;text-align:center;">© 2026 SI-MUSTAFA. All rights reserved.</div>
             </div>
         </div>
-
     </main>
 
-    <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
+
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
 
     <script>
         // ============================================================
-        // ===== SUPABASE CONFIG =====
+        // ===== FUNGSI UTAMA - MENGUBAH TAMPILAN BATKO MENJADI BADKO TPQ =====
         // ============================================================
-        const supabaseUrl = 'https://hhiypidstbzqmdmxfqns.supabase.co'; // GANTI DENGAN URL ANDA
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoaXlwaWRzdGJ6cW1kbXhmcW5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTExMzUsImV4cCI6MjEwMDIyNzEzNX0.0OHp0pMBiONMci88qLMkNCquaQeJfTICSBYQQrfPmwU'; // GANTI DENGAN ANON KEY ANDA
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        /**
+         * Fungsi untuk mengubah role dari database menjadi tampilan yang diinginkan
+         * Ini adalah pendekatan SAFE - hanya mengubah tampilan, tidak menyentuh database
+         */
+        function formatRoleDisplay(role) {
+            // Mapping role database -> tampilan frontend
+            const roleDisplayMap = {
+                'super_admin': '🛡️ Super Admin',
+                'admin_kab': '🏛️ Admin Kabupaten',
+                'batko': '📘 BADKO TPQ',  // ← INI YANG DIUBAH
+                'fkdt': '📗 FKDT',
+                'ponpes': '📕 PONPES',
+                'operator': '📋 Operator'
+            };
+            
+            // Jika role tidak ada di map, kembalikan role asli dengan huruf kapital
+            return roleDisplayMap[role] || role.charAt(0).toUpperCase() + role.slice(1);
+        }
+
+        /**
+         * Fungsi untuk mendapatkan jenis lembaga dari role
+         * Tetap menggunakan 'batko' untuk filter karena database masih menggunakan 'batko'
+         */
+        function getJenisLembagaFromRole(role) {
+            const jenisMap = {
+                'batko': 'LPQ',
+                'fkdt': 'MDT',
+                'ponpes': 'PONPES'
+            };
+            return jenisMap[role] || null;
+        }
+
+        /**
+         * Fungsi untuk mengecek apakah user adalah BADKO TPQ (termasuk batko dari database)
+         */
+        function isBadkoTpq(role) {
+            return role === 'batko' || role === 'badko_tpq';
+        }
+
+        /**
+         * Fungsi untuk mendapatkan role display yang aman
+         */
+        function getSafeRoleDisplay(role) {
+            if (!role) return 'Unknown';
+            
+            // Jika role adalah 'batko', tampilkan 'BADKO TPQ'
+            if (role === 'batko') {
+                return '📘 BADKO TPQ';
+            }
+            
+            // Mapping role lainnya
+            const displayMap = {
+                'super_admin': '🛡️ Super Admin',
+                'admin_kab': '🏛️ Admin Kabupaten',
+                'badko_tpq': '📘 BADKO TPQ',
+                'fkdt': '📗 FKDT',
+                'ponpes': '📕 PONPES',
+                'operator': '📋 Operator'
+            };
+            
+            return displayMap[role] || role.charAt(0).toUpperCase() + role.slice(1);
+        }
+
+        // ============================================================
+        // ===== CACHE MANAGER =====
+        // ============================================================
+        const dataCache = {
+            _store: {},
+            get(key, ttlMs = 30 * 60 * 1000) {
+                const entry = this._store[key];
+                if (!entry) return null;
+                if (Date.now() - entry.timestamp > ttlMs) { delete this._store[key]; return null; }
+                return entry.data;
+            },
+            set(key, data) { this._store[key] = { data, timestamp: Date.now() }; },
+            clear(key) { if (key) delete this._store[key]; else this._store = {}; }
+        };
 
         // ============================================================
         // ===== GLOBAL STATE =====
         // ============================================================
-        let currentUser = null;
-        let currentUserRole = 'operator';
         let allLembaga = [];
+        let isProcessing = false;
 
         // ============================================================
-        // ===== SIDEBAR FUNCTIONS =====
+        // ===== SIDEBAR =====
         // ============================================================
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
         }
-
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', () => {
             if (window.innerWidth > 992) {
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.getElementById('sidebarOverlay');
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
             }
         });
 
@@ -1289,18 +502,13 @@
         // ============================================================
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
-            if (!toast) { 
-                console.log(message); 
-                return; 
-            }
+            if (!toast) { console.log(message); return; }
             toast.textContent = message;
             toast.className = `toast toast-${type}`;
             void toast.offsetWidth;
             toast.classList.add('show');
             clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 4000);
         }
 
         // ============================================================
@@ -1310,1096 +518,449 @@
             const el = document.getElementById('currentDate');
             if (!el) return;
             const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            el.textContent = now.toLocaleDateString('id-ID', options);
-
-            const welcomeDate = document.getElementById('welcomeDate');
-            if (welcomeDate) {
-                const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-                welcomeDate.textContent = now.toLocaleDateString('id-ID', dateOptions);
-            }
+            el.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const wd = document.getElementById('welcomeDate');
+            if (wd) wd.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
         }
 
         // ============================================================
-        // ===== AUTH CHECK =====
+        // ===== AUTH =====
         // ============================================================
         async function checkAuth() {
             try {
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
-                if (error || !session) {
-                    window.location.href = 'index.html';
-                    return false;
-                }
-                
-                const { data: userData, error: userError } = await supabaseClient
-                    .from('users')
-                    .select('id, name, email, role, kecamatan_id, lembaga_id, active')
-                    .eq('id', session.user.id)
-                    .single();
-                
-                if (userError || !userData || !userData.active) {
-                    console.error('User data error:', userError);
-                    await supabaseClient.auth.signOut();
-                    window.location.href = 'index.html';
-                    return false;
-                }
-
-                currentUser = {
-                    id: userData.id,
-                    name: userData.name || session.user.email,
-                    email: session.user.email,
-                    role: userData.role || 'operator',
-                    kecamatan_id: userData.kecamatan_id,
-                    lembaga_id: userData.lembaga_id
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) { window.location.href = 'index.html'; return false; }
+                const { data: userData, error } = await supabaseClient.from('users')
+                    .select('id, name, email, role, kecamatan_id, lembaga_id, active').eq('id', session.user.id).single();
+                if (error || !userData?.active) { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; return false; }
+                window.currentUser = { 
+                    id: userData.id, 
+                    name: userData.name || session.user.email, 
+                    email: session.user.email, 
+                    role: userData.role || 'operator', 
+                    kecamatan_id: userData.kecamatan_id, 
+                    lembaga_id: userData.lembaga_id 
                 };
-                currentUserRole = currentUser.role;
-
-                updateHeaderUI(currentUser);
-                updateWelcomeUI(currentUser);
-                
+                updateHeaderUI(window.currentUser);
+                updateWelcomeUI(window.currentUser);
                 return true;
-                
-            } catch (error) {
-                console.error('Auth check error:', error);
-                window.location.href = 'index.html';
-                return false;
-            }
+            } catch (e) { window.location.href = 'index.html'; return false; }
         }
 
-        function getUser() {
-            return currentUser;
-        }
+        function getUser() { return window.currentUser || null; }
 
         function getRoleFilter() {
-            if (!currentUser) return {};
-            const user = currentUser;
-            const role = user.role;
-            const filter = {};
-
-            if (role === 'super_admin' || role === 'admin_kab') {
-                return {};
-            }
-
-            if (!user.kecamatan_id) {
-                return { restrict: true };
-            }
-
-            filter.kecamatan_id = user.kecamatan_id;
-
-            if (role === 'batko') {
-                filter.jenis_lembaga = 'LPQ';
-            } else if (role === 'fkdt') {
-                filter.jenis_lembaga = 'MDT';
-            } else if (role === 'ponpes') {
-                filter.jenis_lembaga = 'PONPES';
-            }
-
-            return filter;
+            const user = getUser();
+            if (!user) return {};
+            if (user.role === 'super_admin' || user.role === 'admin_kab') return {};
+            if (!user.kecamatan_id) return { restrict: true };
+            const f = { kecamatan_id: user.kecamatan_id };
+            
+            // Gunakan 'batko' untuk filter karena database masih menggunakan 'batko'
+            if (user.role === 'batko') f.jenis_lembaga = 'LPQ';
+            else if (user.role === 'fkdt') f.jenis_lembaga = 'MDT';
+            else if (user.role === 'ponpes') f.jenis_lembaga = 'PONPES';
+            return f;
         }
 
-        // ============================================================
-        // ===== UPDATE UI =====
-        // ============================================================
         function updateHeaderUI(user) {
             if (!user) return;
+            // Gunakan fungsi getSafeRoleDisplay untuk tampilan yang aman
+            const displayRole = getSafeRoleDisplay(user.role);
             
-            const avatarEl = document.getElementById('userAvatar');
-            if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
-            
-            const nameEl = document.getElementById('userName');
-            if (nameEl) nameEl.textContent = user.name;
-            
-            const roleNames = {
-                'super_admin': 'Super Admin',
-                'admin_kab': 'Admin Kabupaten',
-                'batko': 'BATKO',
-                'fkdt': 'FKDT',
-                'ponpes': 'PONPES',
-                'operator': 'Operator'
-            };
-            const roleEl = document.getElementById('userRole');
-            if (roleEl) roleEl.textContent = roleNames[user.role] || user.role;
-
-            const avatarSmall = document.getElementById('userAvatarSmall');
-            if (avatarSmall) avatarSmall.textContent = user.name.charAt(0).toUpperCase();
-            
-            const nameSmall = document.getElementById('userNameSmall');
-            if (nameSmall) nameSmall.textContent = user.name;
-            
-            const roleBadge = document.getElementById('headerRoleBadge');
-            if (roleBadge) roleBadge.textContent = roleNames[user.role] || user.role;
-            
-            const scopeEl = document.getElementById('headerScope');
-            if (scopeEl) {
-                if (user.role === 'super_admin' || user.role === 'admin_kab') {
-                    scopeEl.textContent = '';
-                } else if (user.kecamatan_id) {
-                    supabaseClient
-                        .from('master_kecamatan')
-                        .select('nama')
-                        .eq('id', user.kecamatan_id)
-                        .single()
-                        .then(({ data }) => {
-                            const jenis = {
-                                'batko': 'LPQ',
-                                'fkdt': 'MDT',
-                                'ponpes': 'PONPES'
-                            };
-                            scopeEl.textContent = `📍 ${data?.nama || 'Kecamatan'} • ${jenis[user.role] || ''}`;
-                        })
-                        .catch(() => {});
-                } else if (user.lembaga_id) {
-                    supabaseClient
-                        .from('lembaga')
-                        .select('nama')
-                        .eq('id', user.lembaga_id)
-                        .single()
-                        .then(({ data }) => {
-                            scopeEl.textContent = `🏫 ${data?.nama || 'Lembaga'}`;
-                        })
-                        .catch(() => {});
-                }
-            }
+            document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('userRole').textContent = displayRole;
+            document.getElementById('userAvatarSmall').textContent = user.name.charAt(0).toUpperCase();
+            document.getElementById('userNameSmall').textContent = user.name;
+            document.getElementById('headerRoleBadge').textContent = displayRole;
         }
 
         function updateWelcomeUI(user) {
             if (!user) return;
+            document.getElementById('welcomeName').textContent = user.name;
             
-            const welcomeName = document.getElementById('welcomeName');
-            if (welcomeName) welcomeName.textContent = user.name;
-            
-            const roleNames = {
+            // Mapping role ke deskripsi
+            const roleDescMap = {
                 'super_admin': 'Super Admin SI-MUSTAFA',
                 'admin_kab': 'Admin Kemenag Kabupaten Tegal',
-                'batko': 'Admin BATKO',
+                'batko': 'Admin BADKO TPQ',  // ← DIUBAH
                 'fkdt': 'Admin FKDT',
                 'ponpes': 'Admin PONPES',
                 'operator': 'Operator Lembaga'
             };
-
-            let roleText = roleNames[user.role] || user.role;
-            
-            if (['batko', 'fkdt', 'ponpes'].includes(user.role) && user.kecamatan_id) {
-                supabaseClient
-                    .from('master_kecamatan')
-                    .select('nama')
-                    .eq('id', user.kecamatan_id)
-                    .single()
-                    .then(({ data }) => {
-                        const jenis = {
-                            'batko': 'LPQ',
-                            'fkdt': 'MDT',
-                            'ponpes': 'PONPES'
-                        };
-                        const welcomeRole = document.getElementById('welcomeRole');
-                        if (welcomeRole) {
-                            welcomeRole.textContent = `Admin ${jenis[user.role] || ''} ${data?.nama || 'Kecamatan'}`;
-                        }
-                    })
-                    .catch(() => {
-                        const welcomeRole = document.getElementById('welcomeRole');
-                        if (welcomeRole) welcomeRole.textContent = roleText;
-                    });
-            } else {
-                const welcomeRole = document.getElementById('welcomeRole');
-                if (welcomeRole) welcomeRole.textContent = roleText;
-            }
+            document.getElementById('welcomeRole').textContent = roleDescMap[user.role] || user.role;
         }
 
-        // ============================================================
-        // ===== HANDLE LOGOUT =====
-        // ============================================================
         async function handleLogout() {
-            if (!confirm('Apakah Anda yakin ingin keluar?')) return;
-            try {
-                const { error } = await supabaseClient.auth.signOut();
-                if (error) throw error;
-                showToast('Logout berhasil!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-            } catch (e) {
-                console.error('Logout error:', e);
-                showToast('Gagal logout: ' + e.message, 'error');
-            }
+            if (!confirm('Yakin ingin keluar?')) return;
+            await supabaseClient.auth.signOut();
+            dataCache.clear();
+            showToast('Logout berhasil!', 'success');
+            setTimeout(() => window.location.href = 'index.html', 1000);
         }
 
         // ============================================================
         // ===== TAB =====
         // ============================================================
         function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.tab === tab);
-            });
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.toggle('active', content.id === `tab-${tab}`);
-            });
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${tab}`));
         }
 
         // ============================================================
-        // ===== BUILD FORM DINAMIS =====
+        // ===== BUILD FORM =====
         // ============================================================
         function buildForm() {
             const container = document.getElementById('formContainer');
-            if (!container) return;
-            
-            // PASTIKAN currentUser TERSEDIA
-            if (!currentUser) {
-                container.innerHTML = '<div style="color:#999;padding:10px;">Memuat form...</div>';
-                return;
-            }
-
-            const role = currentUser.role;
-            
+            const user = getUser();
+            if (!container || !user) { if (container) container.innerHTML = '<div style="color:#999;">Memuat...</div>'; return; }
+            const role = user.role;
             let html = '';
-
             if (role === 'super_admin' || role === 'admin_kab') {
-                html = `
-                    <div class="form-inline">
-                        <select id="inputKecamatan" style="flex:1;" onchange="loadLembagaByKecamatan()">
-                            <option value="">-- Pilih Kecamatan --</option>
-                        </select>
-                        <select id="inputJenisLembaga" style="flex:1;" onchange="loadLembagaByKecamatan()">
-                            <option value="">-- Jenis Lembaga --</option>
-                            <option value="LPQ">LPQ</option>
-                            <option value="MDT">MDT</option>
-                            <option value="PONPES">PONPES</option>
-                        </select>
-                    </div>
-                    <div class="form-inline" style="margin-top:8px;">
-                        <select id="inputLembaga" style="flex:2;" onchange="autoFillFromLembaga()">
-                            <option value="">-- Pilih Lembaga --</option>
-                        </select>
-                    </div>
-                    <div class="form-inline" style="margin-top:8px;">
-                        <select id="inputRole" style="flex:1;">
-                            <option value="">-- Pilih Role --</option>
-                            <option value="batko">BADKO LPQ (LPQ Kecamatan)</option>
-                            <option value="fkdt">FKDT (MDT Kecamatan)</option>
-                            <option value="ponpes">PONPES (Kecamatan)</option>
-                            <option value="operator">Operator Lembaga</option>
-                        </select>
-                    </div>
-                `;
-            } else if (role === 'batko' || role === 'fkdt' || role === 'ponpes') {
-                const roleLabel = {
-                    'batko': 'LPQ',
-                    'fkdt': 'MDT',
-                    'ponpes': 'PONPES'
-                };
-                html = `
-                    <div class="form-inline">
-                        <select id="inputDesa" style="flex:1;" onchange="loadLembagaByDesa()">
-                            <option value="">-- Pilih Desa --</option>
-                        </select>
-                        <select id="inputLembaga" style="flex:2;" onchange="autoFillFromLembaga()">
-                            <option value="">-- Pilih Lembaga ${roleLabel[role] || ''} --</option>
-                        </select>
-                    </div>
-                    <input type="hidden" id="inputKecamatan" value="${currentUser.kecamatan_id || ''}">
-                    <input type="hidden" id="inputRole" value="operator">
-                    <div class="info-box">
-                        <i class="fas fa-info-circle"></i> Membuat akun Operator untuk lembaga ${roleLabel[role] || ''} di kecamatan Anda
-                    </div>
-                `;
+                html = `<div class="form-inline"><select id="inputKecamatan" onchange="loadLembagaByKecamatan()"><option value="">-- Kecamatan --</option></select><select id="inputJenisLembaga" onchange="loadLembagaByKecamatan()"><option value="">-- Jenis --</option><option value="LPQ">LPQ</option><option value="MDT">MDT</option><option value="PONPES">PONPES</option></select></div>
+                <div class="form-inline" style="margin-top:8px;"><select id="inputLembaga" onchange="autoFillFromLembaga()"><option value="">-- Lembaga --</option></select></div>
+                <div class="form-inline" style="margin-top:8px;"><select id="inputRole"><option value="">-- Role --</option><option value="batko">BADKO TPQ</option><option value="fkdt">FKDT MDT</option><option value="ponpes">PONPES</option><option value="operator">Operator</option></select></div>`;
+            } else if (['batko', 'fkdt', 'ponpes'].includes(role)) {
+                const rl = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
+                const displayName = role === 'batko' ? 'BADKO TPQ' : role.toUpperCase();
+                html = `<div class="form-inline"><select id="inputDesa" onchange="loadLembagaByDesa()"><option value="">-- Desa --</option></select><select id="inputLembaga" onchange="autoFillFromLembaga()"><option value="">-- Lembaga ${rl[role]} --</option></select></div>
+                <input type="hidden" id="inputKecamatan" value="${user.kecamatan_id || ''}"><input type="hidden" id="inputRole" value="operator">
+                <div class="info-box"><i class="fas fa-info-circle"></i> Membuat akun Operator ${rl[role]} di kecamatan Anda</div>`;
             }
-
             container.innerHTML = html;
-
-            // Set readonly/editable pada input fields
-            const nameInput = document.getElementById('inputName');
-            const emailInput = document.getElementById('inputEmail');
-            const passInput = document.getElementById('inputPassword');
-
+            const nm = document.getElementById('inputName'), em = document.getElementById('inputEmail'), pw = document.getElementById('inputPassword');
             if (role === 'super_admin' || role === 'admin_kab') {
-                nameInput.removeAttribute('readonly');
-                emailInput.removeAttribute('readonly');
-                passInput.removeAttribute('readonly');
-                nameInput.placeholder = 'Nama lengkap';
-                emailInput.placeholder = 'Email';
-                passInput.placeholder = 'Password (min 6 karakter)';
-                nameInput.value = '';
-                emailInput.value = '';
-                passInput.value = '';
+                nm.removeAttribute('readonly'); em.removeAttribute('readonly'); pw.removeAttribute('readonly');
+                nm.placeholder = 'Nama lengkap'; em.placeholder = 'Email (harus valid)'; pw.placeholder = 'Password (min 6)';
+                nm.value = ''; em.value = ''; pw.value = '';
             } else {
-                nameInput.setAttribute('readonly', true);
-                emailInput.setAttribute('readonly', true);
-                passInput.setAttribute('readonly', true);
-                nameInput.placeholder = 'Nama lengkap (auto-fill)';
-                emailInput.placeholder = 'Email (auto-fill)';
-                passInput.placeholder = 'Password (auto-fill)';
-                nameInput.value = '';
-                emailInput.value = '';
-                passInput.value = '';
+                nm.setAttribute('readonly', true); em.setAttribute('readonly', true); pw.setAttribute('readonly', true);
+                nm.value = ''; em.value = ''; pw.value = '';
             }
-
-            // Load data setelah form dibuat
-            if (role === 'super_admin' || role === 'admin_kab') {
-                loadKecamatanOptionsAdmin();
-            } else if (['batko', 'fkdt', 'ponpes'].includes(role) && currentUser.kecamatan_id) {
-                loadDesaOptionsKecamatan();
-            }
+            if (role === 'super_admin' || role === 'admin_kab') loadKecamatanOptionsAdmin();
+            else if (['batko', 'fkdt', 'ponpes'].includes(role) && user.kecamatan_id) loadDesaOptionsKecamatan();
         }
 
-        // ============================================================
-        // ===== LOAD DATA UNTUK ADMIN KAB =====
-        // ============================================================
         async function loadKecamatanOptionsAdmin() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('master_kecamatan')
-                    .select('id, nama')
-                    .order('nama');
-                
-                if (error) throw error;
-                const select = document.getElementById('inputKecamatan');
-                if (!select) return;
-                select.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
-                data.forEach(item => {
-                    select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
-                });
-            } catch (e) {
-                console.error('Load kecamatan error:', e);
-            }
+            const cached = dataCache.get('kecamatan_options', 3600000);
+            if (cached) { populateSelect('inputKecamatan', cached, '-- Kecamatan --'); return; }
+            const { data } = await supabaseClient.from('master_kecamatan').select('id, nama').order('nama');
+            dataCache.set('kecamatan_options', data || []);
+            populateSelect('inputKecamatan', data || [], '-- Kecamatan --');
+        }
+
+        function populateSelect(id, data, placeholder) {
+            const sel = document.getElementById(id);
+            if (!sel) return;
+            const cv = sel.value;
+            sel.innerHTML = placeholder ? `<option value="">${placeholder}</option>` : '';
+            data.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.nama}</option>`);
+            if (cv && data.some(d => d.id === cv)) sel.value = cv;
         }
 
         async function loadLembagaByKecamatan() {
-            const kecamatanId = document.getElementById('inputKecamatan')?.value || '';
+            const kid = document.getElementById('inputKecamatan')?.value || '';
             const jenis = document.getElementById('inputJenisLembaga')?.value || '';
-
-            try {
-                let query = supabaseClient
-                    .from('lembaga')
-                    .select('id, nama, nslp, jenis_lembaga')
-                    .order('nama');
-                
-                if (kecamatanId) {
-                    query = query.eq('kecamatan_id', kecamatanId);
-                }
-                if (jenis) {
-                    query = query.eq('jenis_lembaga', jenis);
-                }
-
-                const { data, error } = await query;
-                if (error) throw error;
-                
-                allLembaga = data || [];
-                const select = document.getElementById('inputLembaga');
-                if (!select) return;
-                select.innerHTML = '<option value="">-- Pilih Lembaga --</option>';
-                data.forEach(item => {
-                    const label = { 'LPQ': '📘', 'MDT': '📗', 'PONPES': '📕' };
-                    select.innerHTML += `<option value="${item.id}" data-nslp="${item.nslp || ''}" data-jenis="${item.jenis_lembaga}">
-                        ${label[item.jenis_lembaga] || ''} ${item.nama} (${item.jenis_lembaga || 'LPQ'})
-                    </option>`;
-                });
-            } catch (e) {
-                console.error('Load lembaga error:', e);
-            }
+            let q = supabaseClient.from('lembaga').select('id, nama, nslp, jenis_lembaga').order('nama');
+            if (kid) q = q.eq('kecamatan_id', kid);
+            if (jenis) q = q.eq('jenis_lembaga', jenis);
+            const { data } = await q;
+            allLembaga = data || [];
+            const sel = document.getElementById('inputLembaga');
+            if (!sel) return;
+            const lb = { 'LPQ': '📘', 'MDT': '📗', 'PONPES': '📕' };
+            sel.innerHTML = '<option value="">-- Lembaga --</option>';
+            allLembaga.forEach(l => sel.innerHTML += `<option value="${l.id}" data-nslp="${l.nslp||''}" data-jenis="${l.jenis_lembaga}">${lb[l.jenis_lembaga]||''} ${l.nama} (${l.jenis_lembaga||'LPQ'})</option>`);
         }
 
-        // ============================================================
-        // ===== LOAD DATA UNTUK BATKO/FKDT/PONPES =====
-        // ============================================================
         async function loadDesaOptionsKecamatan() {
-            if (!currentUser || !currentUser.kecamatan_id) return;
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('master_kelurahan')
-                    .select('id, nama')
-                    .eq('kecamatan_id', currentUser.kecamatan_id)
-                    .order('nama');
-                
-                if (error) throw error;
-                const select = document.getElementById('inputDesa');
-                if (!select) return;
-                select.innerHTML = '<option value="">-- Pilih Desa --</option>';
-                data.forEach(item => {
-                    select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
-                });
-            } catch (e) {
-                console.error('Load desa error:', e);
-            }
+            const user = getUser();
+            if (!user?.kecamatan_id) return;
+            const cached = dataCache.get(`desa_${user.kecamatan_id}`, 3600000);
+            if (cached) { populateSelect('inputDesa', cached, '-- Desa --'); return; }
+            const { data } = await supabaseClient.from('master_kelurahan').select('id, nama').eq('kecamatan_id', user.kecamatan_id).order('nama');
+            dataCache.set(`desa_${user.kecamatan_id}`, data || []);
+            populateSelect('inputDesa', data || [], '-- Desa --');
         }
 
         async function loadLembagaByDesa() {
-            if (!currentUser) return;
-            
-            const role = currentUser.role;
-            let jenisLembaga = '';
-            if (role === 'batko') jenisLembaga = 'LPQ';
-            else if (role === 'fkdt') jenisLembaga = 'MDT';
-            else if (role === 'ponpes') jenisLembaga = 'PONPES';
-
-            const desaId = document.getElementById('inputDesa')?.value || '';
-
-            try {
-                let query = supabaseClient
-                    .from('lembaga')
-                    .select('id, nama, nslp, jenis_lembaga')
-                    .eq('jenis_lembaga', jenisLembaga)
-                    .eq('kecamatan_id', currentUser.kecamatan_id)
-                    .order('nama');
-                
-                if (desaId) {
-                    query = query.eq('desa_id', desaId);
-                }
-
-                const { data, error } = await query;
-                if (error) throw error;
-                
-                allLembaga = data || [];
-                const select = document.getElementById('inputLembaga');
-                if (!select) return;
-                select.innerHTML = '<option value="">-- Pilih Lembaga --</option>';
-                data.forEach(item => {
-                    const label = { 'LPQ': '📘', 'MDT': '📗', 'PONPES': '📕' };
-                    select.innerHTML += `<option value="${item.id}" data-nslp="${item.nslp || ''}" data-jenis="${item.jenis_lembaga}">
-                        ${label[item.jenis_lembaga] || ''} ${item.nama}
-                    </option>`;
-                });
-            } catch (e) {
-                console.error('Load lembaga by desa error:', e);
-            }
+            const user = getUser();
+            if (!user) return;
+            const jm = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
+            const jenis = jm[user.role] || '';
+            const did = document.getElementById('inputDesa')?.value || '';
+            let q = supabaseClient.from('lembaga').select('id, nama, nslp, jenis_lembaga').eq('jenis_lembaga', jenis).eq('kecamatan_id', user.kecamatan_id).order('nama');
+            if (did) q = q.eq('desa_id', did);
+            const { data } = await q;
+            allLembaga = data || [];
+            const sel = document.getElementById('inputLembaga');
+            if (!sel) return;
+            const lb = { 'LPQ': '📘', 'MDT': '📗', 'PONPES': '📕' };
+            sel.innerHTML = '<option value="">-- Lembaga --</option>';
+            allLembaga.forEach(l => sel.innerHTML += `<option value="${l.id}" data-nslp="${l.nslp||''}" data-jenis="${l.jenis_lembaga}">${lb[l.jenis_lembaga]||''} ${l.nama}</option>`);
         }
 
-        // ============================================================
-        // ===== AUTO FILL DARI LEMBAGA =====
-        // ============================================================
         function autoFillFromLembaga() {
-            const lembagaId = document.getElementById('inputLembaga')?.value || '';
-            
-            if (!lembagaId) {
-                document.getElementById('inputName').value = '';
-                document.getElementById('inputEmail').value = '';
-                document.getElementById('inputPassword').value = '';
-                return;
-            }
-
-            const lembaga = allLembaga.find(l => l.id === lembagaId);
-            if (!lembaga) return;
-
-            // Cari pendidik di lembaga ini
-            supabaseClient
-                .from('pendidik')
-                .select('id, nama_lengkap, email, nik')
-                .eq('lembaga_id', lembagaId)
-                .limit(1)
+            const lid = document.getElementById('inputLembaga')?.value || '';
+            if (!lid) { document.getElementById('inputName').value = ''; document.getElementById('inputEmail').value = ''; document.getElementById('inputPassword').value = ''; return; }
+            const lem = allLembaga.find(l => l.id === lid);
+            if (!lem) return;
+            supabaseClient.from('pendidik').select('nama_lengkap, email, nik').eq('lembaga_id', lid).limit(1)
                 .then(({ data }) => {
-                    if (data && data.length > 0) {
-                        const pendidik = data[0];
-                        document.getElementById('inputName').value = pendidik.nama_lengkap || '';
-                        document.getElementById('inputEmail').value = pendidik.email || '';
-                        document.getElementById('inputPassword').value = pendidik.nik || 'password123';
+                    if (data?.length) {
+                        document.getElementById('inputName').value = data[0].nama_lengkap || '';
+                        document.getElementById('inputEmail').value = data[0].email || '';
+                        document.getElementById('inputPassword').value = data[0].nik || 'password123';
                     } else {
-                        document.getElementById('inputName').value = lembaga.nama || '';
+                        document.getElementById('inputName').value = lem.nama || '';
                         document.getElementById('inputEmail').value = '';
                         document.getElementById('inputPassword').value = 'password123';
                     }
-                })
-                .catch(err => console.error('Error auto-fill:', err));
+                }).catch(() => {});
         }
 
-        // ============================================================
-        // ===== RESET FORM =====
-        // ============================================================
         function resetForm() {
-            document.getElementById('inputName').value = '';
-            document.getElementById('inputEmail').value = '';
-            document.getElementById('inputPassword').value = '';
-            
-            const kecamatan = document.getElementById('inputKecamatan');
-            if (kecamatan) kecamatan.value = '';
-            
-            const desa = document.getElementById('inputDesa');
-            if (desa) desa.value = '';
-            
-            const lembaga = document.getElementById('inputLembaga');
-            if (lembaga) lembaga.innerHTML = '<option value="">-- Pilih Lembaga --</option>';
-            
-            const jenis = document.getElementById('inputJenisLembaga');
-            if (jenis) jenis.value = '';
-            
-            const role = document.getElementById('inputRole');
-            if (role) role.value = '';
-            
-            showToast('Form telah direset', 'info');
+            ['inputName', 'inputEmail', 'inputPassword'].forEach(id => document.getElementById(id).value = '');
+            ['inputKecamatan', 'inputDesa', 'inputLembaga', 'inputJenisLembaga', 'inputRole'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            const ls = document.getElementById('inputLembaga'); if (ls) ls.innerHTML = '<option value="">-- Lembaga --</option>';
+            showToast('Form direset', 'info');
         }
 
         // ============================================================
-        // ===== GET FORM VALUES =====
+        // ===== VALIDASI =====
         // ============================================================
+        function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
         function getFormValues() {
-            if (!currentUser) return null;
-            
-            const role = currentUser.role;
-            let result = {
+            const user = getUser();
+            if (!user) return null;
+            return {
                 name: document.getElementById('inputName').value.trim(),
                 email: document.getElementById('inputEmail').value.trim(),
                 password: document.getElementById('inputPassword').value.trim(),
                 role: document.getElementById('inputRole')?.value || 'operator',
                 lembagaId: document.getElementById('inputLembaga')?.value || null,
-                kecamatanId: document.getElementById('inputKecamatan')?.value || currentUser.kecamatan_id || null,
+                kecamatanId: document.getElementById('inputKecamatan')?.value || user.kecamatan_id || null,
                 desaId: document.getElementById('inputDesa')?.value || null
             };
-
-            // Untuk BATKO/FKDT/PONPES, role sudah di-hidden = operator
-            if (['batko', 'fkdt', 'ponpes'].includes(role)) {
-                result.role = 'operator';
-            }
-
-            return result;
         }
 
         // ============================================================
         // ===== ADD USER =====
         // ============================================================
         async function addUser() {
-            if (!currentUser) {
-                showToast('Silakan login terlebih dahulu', 'error');
-                return;
+            const user = getUser();
+            if (!user) { showToast('Silakan login', 'error'); return; }
+            if (isProcessing) { showToast('Sedang memproses...', 'warning'); return; }
+            const v = getFormValues();
+            if (!v) return;
+            if (!v.name || !v.email || !v.password) { showToast('Nama, Email, Password wajib diisi!', 'error'); return; }
+            if (!isValidEmail(v.email)) { showToast('Format email tidak valid!', 'error'); return; }
+            if (v.password.length < 6) { showToast('Password minimal 6 karakter!', 'error'); return; }
+            if ((user.role === 'super_admin' || user.role === 'admin_kab')) {
+                if (['batko', 'fkdt', 'ponpes'].includes(v.role) && !v.kecamatanId) { showToast('Role ' + v.role.toUpperCase() + ' harus pilih kecamatan!', 'error'); return; }
+                if (v.role === 'operator' && !v.lembagaId) { showToast('Operator harus pilih lembaga!', 'error'); return; }
             }
+            if (['batko', 'fkdt', 'ponpes'].includes(user.role) && !v.lembagaId) { showToast('Pilih lembaga!', 'error'); return; }
 
-            const values = getFormValues();
-            if (!values) return;
+            const { data: exist } = await supabaseClient.from('users').select('email').eq('email', v.email).maybeSingle();
+            if (exist) { showToast('Email sudah terdaftar!', 'error'); return; }
 
-            const role = currentUser.role;
-
-            // ===== VALIDASI DASAR =====
-            if (!values.name || !values.email || !values.password) {
-                showToast('Nama, Email, dan Password harus diisi!', 'error');
-                return;
-            }
-            if (values.password.length < 6) {
-                showToast('Password minimal 6 karakter!', 'error');
-                return;
-            }
-
-            // ===== VALIDASI UNTUK ADMIN KAB =====
-            if (role === 'super_admin' || role === 'admin_kab') {
-                if (['batko', 'fkdt', 'ponpes'].includes(values.role) && !values.kecamatanId) {
-                    showToast('Role ' + values.role.toUpperCase() + ' harus dipilih kecamatan!', 'error');
-                    return;
-                }
-                if (values.role === 'operator' && !values.lembagaId) {
-                    showToast('Operator harus dipilih lembaga!', 'error');
-                    return;
-                }
-                if (['super_admin', 'admin_kab'].includes(values.role)) {
-                    if (values.kecamatanId || values.lembagaId) {
-                        showToast('Super Admin dan Admin Kab tidak boleh memiliki kecamatan atau lembaga!', 'error');
-                        return;
-                    }
-                }
-            }
-
-            // ===== VALIDASI UNTUK BATKO/FKDT/PONPES =====
-            if (['batko', 'fkdt', 'ponpes'].includes(role)) {
-                if (!values.lembagaId) {
-                    showToast('Pilih lembaga terlebih dahulu!', 'error');
-                    return;
-                }
-            }
-
-            // ===== CEK EMAIL DUPLIKAT =====
+            isProcessing = true;
+            const btn = document.getElementById('btnAddUser');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuat...';
             try {
-                const { data: existingUser } = await supabaseClient
-                    .from('users')
-                    .select('email')
-                    .eq('email', values.email)
-                    .maybeSingle();
-
-                if (existingUser) {
-                    showToast('Email sudah terdaftar! Gunakan email lain.', 'error');
-                    return;
-                }
-            } catch (e) {
-                console.error('Error checking email:', e);
-            }
-
-            showToast('Membuat akun...', 'info');
-
-            try {
-                // 1. Buat user di auth
-                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                    email: values.email,
-                    password: values.password,
-                    options: {
-                        data: { full_name: values.name, role: values.role }
-                    }
-                });
-
-                if (authError) {
-                    if (authError.message.includes('already registered')) {
-                        showToast('Email sudah terdaftar di sistem! Gunakan email lain.', 'error');
-                    } else {
-                        throw authError;
-                    }
-                    return;
-                }
-
-                if (!authData.user) {
-                    showToast('Gagal membuat akun. Silakan coba lagi.', 'error');
-                    return;
-                }
-
-                // 2. Insert ke tabel users
-                const userData = {
-                    id: authData.user.id,
-                    email: values.email,
-                    name: values.name,
-                    role: values.role,
-                    active: true,
-                    lembaga_id: values.lembagaId || null,
-                    kecamatan_id: values.kecamatanId || null,
-                    desa_id: values.desaId || null
-                };
-
-                const { error: userError } = await supabaseClient
-                    .from('users')
-                    .insert([userData]);
-
-                if (userError) {
-                    try {
-                        await supabaseClient.auth.admin.deleteUser(authData.user.id);
-                    } catch (cleanupError) {
-                        console.error('Cleanup error:', cleanupError);
-                    }
-                    throw userError;
-                }
-
-                // 3. Jika operator, update operator_id di lembaga
-                if (values.role === 'operator' && values.lembagaId) {
-                    const { error: updateError } = await supabaseClient
-                        .from('lembaga')
-                        .update({ operator_id: authData.user.id })
-                        .eq('id', values.lembagaId);
-
-                    if (updateError) {
-                        console.warn('Gagal update operator_id:', updateError);
-                        showToast('User berhasil, tapi gagal mengaitkan lembaga.', 'warning');
-                    }
-                }
-
+                const { data: ad, error: ae } = await supabaseClient.auth.signUp({ email: v.email, password: v.password, options: { data: { full_name: v.name, role: v.role } } });
+                if (ae) throw ae;
+                if (!ad.user) throw new Error('Gagal buat akun');
+                const { error: ue } = await supabaseClient.from('users').insert([{ id: ad.user.id, email: v.email, name: v.name, role: v.role, active: true, lembaga_id: v.lembagaId || null, kecamatan_id: v.kecamatanId || null, desa_id: v.desaId || null }]);
+                if (ue) throw ue;
+                if (v.role === 'operator' && v.lembagaId) await supabaseClient.from('lembaga').update({ operator_id: ad.user.id }).eq('id', v.lembagaId);
                 resetForm();
-                showToast(`Pengguna ${values.name} berhasil ditambahkan!`, 'success');
+                showToast(`Pengguna ${v.name} berhasil ditambahkan!`, 'success');
                 loadUsers();
-
-            } catch (e) {
-                console.error('Add user error:', e);
-                showToast('Gagal tambah pengguna: ' + e.message, 'error');
-            }
+            } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
+            finally { isProcessing = false;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus"></i> Tambah'; }
         }
 
         // ============================================================
-        // ===== DELETE USER =====
+        // ===== DELETE USER (nonaktifkan) =====
         // ============================================================
         async function deleteUser(userId) {
-            if (!confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) return;
-
+            if (!confirm('Nonaktifkan pengguna ini?\nMereka tidak akan bisa login lagi.')) return;
             try {
-                // CEK APAKAH USER ADALAH OPERATOR DI LEMBAGA
-                const { data: lembagaData, error: lembagaError } = await supabaseClient
-                    .from('lembaga')
-                    .select('id, nama')
-                    .eq('operator_id', userId);
-
-                if (lembagaError) throw lembagaError;
-
-                if (lembagaData && lembagaData.length > 0) {
-                    const lembagaNames = lembagaData.map(l => l.nama).join(', ');
-                    const confirmMsg = `User ini adalah operator dari lembaga:\n${lembagaNames}\n\nHapus akan menghapus keterkaitan ini. Lanjutkan?`;
-                    
-                    if (!confirm(confirmMsg)) return;
-                    
-                    for (const lembaga of lembagaData) {
-                        const { error: updateError } = await supabaseClient
-                            .from('lembaga')
-                            .update({ operator_id: null })
-                            .eq('id', lembaga.id);
-                        
-                        if (updateError) throw updateError;
-                    }
-                    
-                    showToast('Keterkaitan lembaga telah dihapus.', 'info');
-                }
-
-                // Hapus user dari tabel users
-                const { error: deleteError } = await supabaseClient
-                    .from('users')
-                    .delete()
-                    .eq('id', userId);
-
-                if (deleteError) {
-                    if (deleteError.code === '23503') {
-                        showToast('Tidak bisa menghapus user: masih terhubung dengan data lain. Hubungi administrator.', 'error');
-                    } else {
-                        throw deleteError;
-                    }
-                    return;
-                }
-
-                showToast('Pengguna berhasil dihapus!', 'success');
+                const { data: ld } = await supabaseClient.from('lembaga').select('id, nama').eq('operator_id', userId);
+                if (ld?.length && !confirm(`Operator dari: ${ld.map(l=>l.nama).join(', ')}\nHapus keterkaitan?`)) return;
+                for (const l of (ld || [])) await supabaseClient.from('lembaga').update({ operator_id: null }).eq('id', l.id);
+                const { error } = await supabaseClient.from('users').update({ active: false, updated_at: new Date().toISOString() }).eq('id', userId);
+                if (error) throw error;
+                showToast('Pengguna dinonaktifkan!', 'success');
                 loadUsers();
-
-            } catch (e) {
-                console.error('Delete user error:', e);
-                showToast('Gagal hapus pengguna: ' + e.message, 'error');
-            }
+            } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
         }
 
         // ============================================================
         // ===== LOAD USERS =====
         // ============================================================
         async function loadUsers() {
+            const user = getUser();
+            if (!user) return;
             try {
-                if (!currentUser) {
-                    document.getElementById('userList').innerHTML = `
-                        <div style="text-align:center;padding:20px;color:#999;">
-                            <i class="fas fa-spinner fa-spin"></i> Memuat...
-                        </div>
-                    `;
-                    return;
+                let q = supabaseClient.from('users').select('*').order('created_at', { ascending: false });
+                if (['batko', 'fkdt', 'ponpes'].includes(user.role)) {
+                    q = q.eq('role', 'operator').eq('kecamatan_id', user.kecamatan_id);
+                    const jm = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
+                    const { data: lids } = await supabaseClient.from('lembaga').select('id').eq('jenis_lembaga', jm[user.role]).eq('kecamatan_id', user.kecamatan_id);
+                    const ids = lids?.map(l => l.id) || [];
+                    q = ids.length ? q.in('lembaga_id', ids) : q.eq('lembaga_id', '00000000-0000-0000-0000-000000000000');
                 }
-
-                const user = currentUser;
-                let query = supabaseClient
-                    .from('users')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                // FILTER BERDASARKAN ROLE YANG LOGIN
-                if (user.role === 'batko') {
-                    query = query
-                        .eq('role', 'operator')
-                        .eq('kecamatan_id', user.kecamatan_id);
-                    
-                    const { data: lpqLembaga } = await supabaseClient
-                        .from('lembaga')
-                        .select('id')
-                        .eq('jenis_lembaga', 'LPQ')
-                        .eq('kecamatan_id', user.kecamatan_id);
-                    const lpqIds = lpqLembaga?.map(l => l.id) || [];
-                    if (lpqIds.length > 0) {
-                        query = query.in('lembaga_id', lpqIds);
-                    } else {
-                        query = query.eq('lembaga_id', '00000000-0000-0000-0000-000000000000');
-                    }
-                    
-                } else if (user.role === 'fkdt') {
-                    query = query
-                        .eq('role', 'operator')
-                        .eq('kecamatan_id', user.kecamatan_id);
-                    
-                    const { data: mdtLembaga } = await supabaseClient
-                        .from('lembaga')
-                        .select('id')
-                        .eq('jenis_lembaga', 'MDT')
-                        .eq('kecamatan_id', user.kecamatan_id);
-                    const mdtIds = mdtLembaga?.map(l => l.id) || [];
-                    if (mdtIds.length > 0) {
-                        query = query.in('lembaga_id', mdtIds);
-                    } else {
-                        query = query.eq('lembaga_id', '00000000-0000-0000-0000-000000000000');
-                    }
-                    
-                } else if (user.role === 'ponpes') {
-                    query = query
-                        .eq('role', 'operator')
-                        .eq('kecamatan_id', user.kecamatan_id);
-                    
-                    const { data: ponpesLembaga } = await supabaseClient
-                        .from('lembaga')
-                        .select('id')
-                        .eq('jenis_lembaga', 'PONPES')
-                        .eq('kecamatan_id', user.kecamatan_id);
-                    const ponpesIds = ponpesLembaga?.map(l => l.id) || [];
-                    if (ponpesIds.length > 0) {
-                        query = query.in('lembaga_id', ponpesIds);
-                    } else {
-                        query = query.eq('lembaga_id', '00000000-0000-0000-0000-000000000000');
-                    }
-                }
-
-                const { data, error } = await query;
-                if (error) throw error;
-
+                const { data } = await q;
                 const container = document.getElementById('userList');
-                if (!data || data.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align:center;padding:30px;color:#999;">
-                            <i class="fas fa-users" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                            Belum ada pengguna terdaftar${['batko', 'fkdt', 'ponpes'].includes(user.role) ? ' di wilayah Anda' : ''}
-                        </div>
-                    `;
-                    return;
-                }
+                if (!data?.length) { container.innerHTML = '<div style="text-align:center;padding:30px;color:#999;">Belum ada pengguna</div>'; return; }
 
-                // Ambil nama kecamatan dan lembaga untuk setiap user
-                const usersWithDetail = await Promise.all(data.map(async (u) => {
-                    let kecamatanName = '';
-                    let lembagaName = '';
+                const kids = [...new Set(data.map(u => u.kecamatan_id).filter(Boolean))];
+                const lids = [...new Set(data.map(u => u.lembaga_id).filter(Boolean))];
+                const [kecData, lemData] = await Promise.all([
+                    kids.length ? supabaseClient.from('master_kecamatan').select('id, nama').in('id', kids) : Promise.resolve({ data: [] }),
+                    lids.length ? supabaseClient.from('lembaga').select('id, nama').in('id', lids) : Promise.resolve({ data: [] })
+                ]);
+                const km = {}, lm = {};
+                (kecData.data || []).forEach(k => km[k.id] = k.nama);
+                (lemData.data || []).forEach(l => lm[l.id] = l.nama);
 
-                    if (u.kecamatan_id) {
-                        const { data: kecData } = await supabaseClient
-                            .from('master_kecamatan')
-                            .select('nama')
-                            .eq('id', u.kecamatan_id)
-                            .maybeSingle();
-                        kecamatanName = kecData?.nama || '';
-                    }
-
-                    if (u.lembaga_id) {
-                        const { data: lemData } = await supabaseClient
-                            .from('lembaga')
-                            .select('nama')
-                            .eq('id', u.lembaga_id)
-                            .maybeSingle();
-                        lembagaName = lemData?.nama || '';
-                    }
-
-                    return { ...u, kecamatan_name: kecamatanName, lembaga_name: lembagaName };
-                }));
-
-                container.innerHTML = usersWithDetail.map(u => {
-                    const roleLabels = {
-                        'super_admin': '🛡️ Super Admin',
-                        'admin_kab': '🏛️ Admin Kab',
-                        'batko': '📘 BATKO',
-                        'fkdt': '📗 FKDT',
-                        'ponpes': '📕 PONPES',
-                        'operator': '📋 Operator'
-                    };
-                    
-                    const roleClass = u.role || 'viewer';
-                    const lembagaName = u.lembaga_name || '-';
-                    const kecamatanName = u.kecamatan_name || '-';
-                    
-                    return `
-                        <div class="user-list-item">
-                            <div class="user-avatar-sm">${(u.name || 'U').charAt(0).toUpperCase()}</div>
-                            <div class="user-info">
-                                <div class="name">${u.name || '-'}</div>
-                                <div class="email">${u.email || '-'}</div>
-                                ${u.role === 'operator' ? `<div class="email" style="color:var(--primary);">🏫 ${lembagaName}</div>` : ''}
-                                ${['batko', 'fkdt', 'ponpes'].includes(u.role) ? `<div class="email" style="color:#888;">📍 ${kecamatanName}</div>` : ''}
-                            </div>
-                            <span class="user-role ${roleClass}">${roleLabels[u.role] || u.role}</span>
-                            <span class="user-status ${u.active !== false ? 'active' : 'inactive'}"></span>
-                            <div style="display:flex;gap:4px;">
-                                <button class="btn-icon" onclick="showToast('Edit user: ${u.name}', 'info')" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-icon danger" onclick="deleteUser('${u.id}')" title="Hapus">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-            } catch (e) {
-                console.error(e);
-                document.getElementById('userList').innerHTML = `
-                    <div style="text-align:center;padding:30px;color:#f44336;">
-                        <i class="fas fa-exclamation-circle" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                        Gagal memuat data: ${e.message}
-                    </div>
-                `;
-            }
-        }
-
-        // ============================================================
-        // ===== APPLY UI RESTRICTIONS =====
-        // ============================================================
-        function applyUIRestrictions() {
-            if (!currentUser) return;
-            
-            const role = currentUser.role;
-            const isOperator = role === 'operator';
-
-            // OPERATOR TIDAK BOLEH AKSES
-            if (isOperator) {
-                document.getElementById('mainContent').innerHTML = `
-                    <div class="access-denied">
-                        <i class="fas fa-lock"></i>
-                        <h2>Akses Ditolak</h2>
-                        <p>Anda tidak memiliki izin untuk mengakses halaman Pengaturan.</p>
-                        <a href="dashboard.html" class="btn btn-primary" style="margin-top:16px;display:inline-block;">
-                            <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
-                        </a>
-                    </div>
-                `;
-                return;
-            }
-
-            // Update judul
-            const titleEl = document.getElementById('addUserTitle');
-            const descEl = document.getElementById('addUserDesc');
-            
-            if (role === 'super_admin' || role === 'admin_kab') {
-                titleEl.innerHTML = '<i class="fas fa-user-plus"></i>Tambah Pengguna (Admin Kabupaten)';
-                descEl.textContent = 'Pilih kecamatan → jenis lembaga → lembaga → auto-fill data';
-            } else if (role === 'batko') {
-                titleEl.innerHTML = '<i class="fas fa-user-plus"></i>Tambah Operator LPQ';
-                descEl.textContent = 'Pilih desa → lembaga LPQ → auto-fill data';
-            } else if (role === 'fkdt') {
-                titleEl.innerHTML = '<i class="fas fa-user-plus"></i>Tambah Operator MDT';
-                descEl.textContent = 'Pilih desa → lembaga MDT → auto-fill data';
-            } else if (role === 'ponpes') {
-                titleEl.innerHTML = '<i class="fas fa-user-plus"></i>Tambah Operator PONPES';
-                descEl.textContent = 'Pilih desa → lembaga PONPES → auto-fill data';
-            }
-
-            // Update deskripsi daftar user
-            const listDesc = document.getElementById('userListDesc');
-            if (role === 'super_admin' || role === 'admin_kab') {
-                listDesc.textContent = 'Kelola semua akun pengguna yang terdaftar di sistem';
-            } else if (['batko', 'fkdt', 'ponpes'].includes(role)) {
-                const roleName = {
-                    'batko': 'LPQ',
-                    'fkdt': 'MDT',
-                    'ponpes': 'PONPES'
+                // Gunakan getSafeRoleDisplay untuk tampilan yang aman
+                const rl = { 
+                    'super_admin': '🛡️ Super Admin', 
+                    'admin_kab': '🏛️ Admin Kab', 
+                    'batko': '📘 BADKO TPQ',  // ← DIUBAH
+                    'fkdt': '📗 FKDT', 
+                    'ponpes': '📕 PONPES', 
+                    'operator': '📋 Operator' 
                 };
-                listDesc.textContent = `Kelola akun Operator ${roleName[role]} di Kecamatan Anda`;
+                
+                container.innerHTML = data.map(u => {
+                    const act = u.active !== false;
+                    const displayRole = rl[u.role] || u.role;
+                    return `<div class="user-list-item">
+                        <div class="user-avatar-sm${act?'':' inactive-avatar'}">${(u.name||'U').charAt(0).toUpperCase()}</div>
+                        <div class="user-info"><div class="name${act?'':' inactive-name'}">${u.name||'-'}${act?'':' (Nonaktif)'}</div><div class="email">${u.email||'-'}</div>${u.role==='operator'?`<div class="email" style="color:var(--primary);">🏫 ${lm[u.lembaga_id]||'-'}</div>`:''}</div>
+                        <span class="user-role ${u.role||'viewer'}">${displayRole}</span>
+                        <span class="user-status ${act?'active':'inactive'}"></span>
+                        ${act?`<button class="btn-icon danger" onclick="deleteUser('${u.id}')" title="Nonaktifkan"><i class="fas fa-ban"></i></button>`:''}
+                    </div>`;
+                }).join('');
+            } catch (e) { document.getElementById('userList').innerHTML = `<div style="text-align:center;padding:30px;color:#f44336;">Gagal: ${e.message}</div>`; }
+        }
+
+        function applyUIRestrictions() {
+            const user = getUser();
+            if (!user) return;
+            if (user.role === 'operator') { document.getElementById('mainContent').innerHTML = '<div class="access-denied"><i class="fas fa-lock"></i><h2>Akses Ditolak</h2><p>Anda tidak memiliki izin.</p><a href="dashboard.html" class="btn btn-primary" style="margin-top:16px;"><i class="fas fa-arrow-left"></i> Kembali</a></div>'; return; }
+            if (['batko', 'fkdt', 'ponpes'].includes(user.role)) {
+                const rn = { 'batko': 'BADKO TPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
+                document.getElementById('addUserTitle').innerHTML = `<i class="fas fa-user-plus"></i>Tambah Operator ${rn[user.role]}`;
+                document.getElementById('addUserDesc').textContent = `Pilih desa → lembaga ${user.role === 'batko' ? 'LPQ' : user.role === 'fkdt' ? 'MDT' : 'PONPES'} → auto-fill`;
+                document.getElementById('userListDesc').textContent = `Kelola akun Operator ${rn[user.role]} di Kecamatan Anda`;
             }
         }
 
         // ============================================================
-        // ===== TOGGLE SWITCH =====
+        // ===== SYSTEM =====
         // ============================================================
-        function toggleSwitch(id) {
-            const el = document.getElementById(`toggle${id.charAt(0).toUpperCase() + id.slice(1)}`);
-            if (!el) return;
-            el.classList.toggle('active');
-            const status = el.classList.contains('active') ? 'diaktifkan' : 'dinonaktifkan';
-            showToast(`Setting ${id} ${status}`, 'info');
+        function toggleSwitch(id) { document.getElementById(`toggle${id.charAt(0).toUpperCase()+id.slice(1)}`)?.classList.toggle('active'); }
+        function saveSystemSettings() {
+            const s = { maintenance: document.getElementById('toggleMaintenance')?.classList.contains('active'), email: document.getElementById('toggleEmail')?.classList.contains('active'), backup: document.getElementById('toggleBackup')?.classList.contains('active'), log: document.getElementById('toggleLog')?.classList.contains('active') };
+            localStorage.setItem('simustafa_settings', JSON.stringify(s));
+            showToast('Pengaturan disimpan!', 'success');
+        }
+        function resetSystemSettings() {
+            ['toggleEmail', 'toggleBackup', 'toggleLog'].forEach(id => document.getElementById(id)?.classList.add('active'));
+            document.getElementById('toggleMaintenance')?.classList.remove('active');
+            localStorage.removeItem('simustafa_settings');
+            showToast('Direset ke default', 'info');
         }
 
         // ============================================================
         // ===== BACKUP =====
         // ============================================================
         async function backupDatabase() {
-            showToast('Mengambil backup database...', 'info');
+            if (isProcessing) return;
+            const btn = document.getElementById('btnBackup'), prog = document.getElementById('backupProgress'), fill = prog?.querySelector('.fill');
+            isProcessing = true;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            if (prog) prog.style.display = 'block';
+            if (fill) fill.style.width = '0%';
             try {
                 const tables = ['master_kecamatan', 'master_kelurahan', 'master_jenjang', 'lembaga', 'pendidik', 'bantuan', 'mutasi'];
-                const backupData = {};
-
-                for (const table of tables) {
-                    const { data, error } = await supabaseClient
-                        .from(table)
-                        .select('*');
-
-                    if (error) throw error;
-                    backupData[table] = data || [];
-                }
-
-                const json = JSON.stringify(backupData, null, 2);
-                const blob = new Blob([json], { type: 'application/json' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `backup_simustafa_${new Date().toISOString().split('T')[0]}.json`;
-                link.click();
-                URL.revokeObjectURL(link.href);
-
-                document.getElementById('lastBackup').textContent = new Date().toLocaleString('id-ID');
-                showToast('Backup berhasil diunduh!', 'success');
-
-            } catch (e) {
-                console.error(e);
-                showToast('Gagal backup: ' + e.message, 'error');
-            }
+                const bd = {};
+                for (let i = 0; i < tables.length; i++) { const { data } = await supabaseClient.from(tables[i]).select('*');
+                    bd[tables[i]] = data || []; if (fill) fill.style.width = `${Math.round((i+1)/tables.length*100)}%`; }
+                const blob = new Blob([JSON.stringify(bd, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                const now = new Date().toLocaleString('id-ID');
+                document.getElementById('lastBackup').textContent = now;
+                localStorage.setItem('lastBackup', now);
+                showToast('Backup berhasil!', 'success');
+            } catch (e) { showToast('Gagal: ' + e.message, 'error'); } finally { isProcessing = false;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-download"></i> Download'; if (prog) prog.style.display = 'none'; }
         }
 
         async function restoreDatabase(input) {
             const file = input.files[0];
             if (!file) return;
-
-            if (!confirm('Restore akan mengganti semua data yang ada. Lanjutkan?')) return;
-
+            if (!confirm('⚠️ Restore akan MENAMBAH data. Lanjutkan?')) { input.value = ''; return; }
+            showToast('Memproses...', 'info');
             try {
-                const text = await file.text();
-                const data = JSON.parse(text);
-
-                showToast('Memulai restore data...', 'info');
-
+                const data = JSON.parse(await file.text());
                 const tables = ['master_kecamatan', 'master_kelurahan', 'master_jenjang', 'lembaga', 'pendidik', 'bantuan', 'mutasi'];
-                
-                for (const table of tables) {
-                    if (data[table] && data[table].length > 0) {
-                        await supabaseClient.from(table).delete().neq('id', '00000000-0000-0000-0000-000000000000');
-                        const { error } = await supabaseClient.from(table).insert(data[table]);
-                        if (error) throw error;
-                    }
-                }
-
-                showToast('Restore data berhasil!', 'success');
+                let restored = 0;
+                for (const t of tables) { if (data[t]?.length) { await supabaseClient.from(t).upsert(data[t], { onConflict: 'id' });
+                        restored += data[t].length; } }
+                dataCache.clear();
+                showToast(`Restore berhasil! ${restored} data.`, 'success');
                 input.value = '';
                 loadUsers();
-
-            } catch (e) {
-                console.error(e);
-                showToast('Gagal restore: ' + e.message, 'error');
-            }
+            } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
         }
 
-        // ============================================================
-        // ===== LOAD TOTAL DATA =====
-        // ============================================================
         async function loadTotalDataStats() {
             try {
                 const tables = ['master_kecamatan', 'master_kelurahan', 'master_jenjang', 'lembaga', 'pendidik', 'bantuan', 'mutasi'];
                 let total = 0;
-                
-                for (const table of tables) {
-                    const { count } = await supabaseClient
-                        .from(table)
-                        .select('*', { count: 'exact', head: true });
-                    total += count || 0;
-                }
-
+                for (const t of tables) { const { count } = await supabaseClient.from(t).select('*', { count: 'exact', head: true });
+                    total += count || 0; }
                 document.getElementById('totalDataStats').textContent = total.toLocaleString();
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
 
         // ============================================================
         // ===== INIT =====
         // ============================================================
-        document.addEventListener('DOMContentLoaded', async function() {
-            // 1. CHECK AUTH
-            const isLoggedIn = await checkAuth();
-            if (!isLoggedIn) return;
-
-            // 2. UPDATE DATE
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!await checkAuth()) return;
             updateDate();
-
-            // 3. TERAPKAN RESTRIKSI UI
             applyUIRestrictions();
-
-            // 4. BUILD FORM (setelah currentUser tersedia)
             buildForm();
-
-            // 5. LOAD DATA
             await loadUsers();
             await loadTotalDataStats();
-
-            // 6. UPDATE BADGE
-            try {
-                const { count } = await supabaseClient
-                    .from('pendidik')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status_aktif', true);
-                document.getElementById('navPendidikCount').textContent = count || 0;
-            } catch (e) {
-                console.error('Error loading pendidik count:', e);
-            }
-
+            const lb = localStorage.getItem('lastBackup');
+            if (lb) document.getElementById('lastBackup').textContent = lb;
+            try { const { count } = await supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true);
+                document.getElementById('navPendidikCount').textContent = count || 0; } catch (e) {}
             setInterval(updateDate, 60000);
         });
 
         // ============================================================
-        // ===== EXPOSE FUNCTIONS =====
+        // ===== EXPOSE FUNCTIONS KE GLOBAL =====
         // ============================================================
         window.switchTab = switchTab;
         window.loadUsers = loadUsers;
@@ -2417,6 +978,14 @@
         window.loadLembagaByKecamatan = loadLembagaByKecamatan;
         window.loadLembagaByDesa = loadLembagaByDesa;
         window.autoFillFromLembaga = autoFillFromLembaga;
+        window.saveSystemSettings = saveSystemSettings;
+        window.resetSystemSettings = resetSystemSettings;
+        
+        // Ekspos fungsi-fungsi baru
+        window.formatRoleDisplay = formatRoleDisplay;
+        window.getSafeRoleDisplay = getSafeRoleDisplay;
+        window.isBadkoTpq = isBadkoTpq;
+        window.getJenisLembagaFromRole = getJenisLembagaFromRole;
     </script>
 </body>
 </html>
