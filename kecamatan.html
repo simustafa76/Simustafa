@@ -3,893 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Sebaran Lembaga per Kecamatan - SI-MUSTAFA</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js">
-    </script>
+    <title>Sebaran Lembaga - SI-MUSTAFA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ============================================================
-           SI-MUSTAFA - SEBARAN LEMBAGA PER KECAMATAN (ELEGANT)
-           ============================================================ */
-        :root {
-            --primary: #006400;
-            --primary-light: #4CAF50;
-            --primary-dark: #0a2e1a;
-            --gold: #FFD700;
-            --gold-dark: #DAA520;
-            --bg-gray: #f0f4f0;
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --lpq-a: #0a2e1a;
-            --lpq-b: #4CAF50;
-            --mdt-a: #b8860b;
-            --mdt-b: #FFD700;
-            --ponpes-a: #5e1073;
-            --ponpes-b: #ce7be0;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            height: 100%;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f0f4f0;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            flex: 1;
-            max-width: 1200px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-        }
-
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            padding: 14px 28px;
-            border-radius: 16px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.85rem;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-            z-index: 9999;
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            max-width: 90%;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .toast-success {
-            background: linear-gradient(135deg, #43a047, #2e7d32);
-        }
-        .toast-error {
-            background: linear-gradient(135deg, #ef5350, #c62828);
-        }
-        .toast-info {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        }
-        .toast-warning {
-            background: linear-gradient(135deg, #ffa726, #f57c00);
-        }
-
-        .spinner {
-            width: 36px;
-            height: 36px;
-            border: 3px solid #f0f2f5;
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 30px auto;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .empty-note {
-            text-align: center;
-            padding: 30px;
-            color: #999;
-        }
-        .empty-note i {
-            font-size: 28px;
-            display: block;
-            margin-bottom: 10px;
-            color: var(--primary-light);
-            opacity: 0.4;
-        }
-
-        /* ===== MAIN CONTAINER ===== */
-        .main-container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--card-shadow);
-            overflow: hidden;
-            padding: 28px 32px 32px 32px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* ===== HEADER CONTAINER ===== */
-        .container-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid rgba(0, 100, 0, 0.08);
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .container-header::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 80px;
-            height: 2px;
-            background: linear-gradient(90deg, var(--primary), var(--gold-dark));
-            border-radius: 2px;
-        }
-
-        .container-header h1 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .container-header h1 i {
-            background: linear-gradient(135deg, var(--primary), var(--gold-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 1.4rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-
-        .header-actions .updated {
-            font-size: 0.7rem;
-            color: #999;
-            background: rgba(0, 100, 0, 0.05);
-            padding: 4px 12px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .refresh-btn {
-            padding: 7px 18px;
-            border: none;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 100, 0, 0.25);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .refresh-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .refresh-btn:hover::before {
-            left: 100%;
-        }
-
-        .refresh-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(0, 100, 0, 0.35);
-        }
-
-        .refresh-btn:active {
-            transform: scale(0.96);
-        }
-
-        .refresh-btn i {
-            transition: transform 0.5s ease;
-        }
-
-        .refresh-btn:hover i {
-            transform: rotate(180deg);
-        }
-
-        /* ===== BACK BUTTON ===== */
-        .back-btn {
-            padding: 7px 16px;
-            border: 1.5px solid rgba(0, 100, 0, 0.2);
-            background: rgba(255, 255, 255, 0.6);
-            color: var(--primary-dark);
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .back-btn:hover {
-            background: white;
-            border-color: var(--primary);
-            transform: translateX(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-        }
-
-        /* ===== STICKY FILTER BAR ===== */
-        .sticky-filter-bar {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background: white;
-            padding: 8px 0 12px 0;
-            margin: -4px 0 16px 0;
-            border-bottom: 2px solid rgba(0, 100, 0, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .sticky-filter-bar .filter-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .sticky-filter-bar .filter-left .filter-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .sticky-filter-bar .filter-left .filter-label i {
-            color: var(--primary);
-        }
-
-        .sticky-filter-bar .filter-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .sticky-filter-bar .filter-right .stat-chip {
-            font-size: 0.7rem;
-            color: #666;
-            background: rgba(0, 100, 0, 0.04);
-            padding: 4px 14px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .sticky-filter-bar .filter-right .stat-chip strong {
-            color: var(--primary-dark);
-        }
-
-        .sticky-filter-bar .filter-right .updated-small {
-            font-size: 0.6rem;
-            color: #aaa;
-        }
-
-        /* ===== CONTENT WRAPPER ===== */
-        .content-wrapper {
-            display: flex;
-            gap: 32px;
-            flex: 1;
-            min-height: 0;
-        }
-
-        /* ===== CHART PANEL ===== */
-        .chart-panel {
-            flex: 0 0 38%;
-            min-width: 260px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            background: linear-gradient(160deg, rgba(255, 255, 255, 0.5), rgba(240, 248, 240, 0.5));
-            border-radius: 20px;
-            padding: 20px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            position: relative;
-            overflow: hidden;
-            align-self: flex-start;
-        }
-
-        .chart-panel::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 30% 40%, rgba(76, 175, 80, 0.03), transparent 60%);
-            animation: chartGlow 8s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        @keyframes chartGlow {
-            0%,
-            100% {
-                transform: translate(0, 0);
-            }
-            50% {
-                transform: translate(10%, 5%);
-            }
-        }
-
-        .chart-panel .chart-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            margin-bottom: 2px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .chart-panel .chart-sub {
-            font-size: 0.7rem;
-            color: #999;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .donut-wrap {
-            position: relative;
-            width: 100%;
-            max-width: 240px;
-            margin: 0 auto;
-            z-index: 1;
-        }
-
-        .donut-wrap canvas {
-            filter: drop-shadow(0 8px 25px rgba(0, 100, 0, 0.08));
-            transition: filter 0.3s ease;
-        }
-
-        .donut-wrap:hover canvas {
-            filter: drop-shadow(0 12px 35px rgba(0, 100, 0, 0.15));
-        }
-
-        .donut-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            pointer-events: none;
-        }
-
-        .donut-center .num {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-dark), var(--gold-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1;
-        }
-
-        .donut-center .lbl {
-            font-size: 0.55rem;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 2px;
-            font-weight: 600;
-        }
-
-        .chart-stats {
-            display: flex;
-            gap: 14px;
-            justify-content: center;
-            margin-top: 12px;
-            flex-wrap: wrap;
-            font-size: 0.65rem;
-            color: #666;
-            position: relative;
-            z-index: 1;
-            padding: 8px 14px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
-
-        .chart-stats span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .chart-stats strong {
-            color: var(--primary-dark);
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--gold-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .chart-stats strong::before {
-            content: '✦ ';
-            -webkit-text-fill-color: var(--gold-dark);
-        }
-
-        /* ===== DETAIL PANEL ===== */
-        .detail-panel {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .detail-panel .detail-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .detail-panel .detail-title i {
-            color: var(--primary);
-            animation: iconPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes iconPulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.6;
-            }
-        }
-
-        .detail-panel .detail-sub {
-            font-size: 0.7rem;
-            color: #999;
-            margin-bottom: 12px;
-            flex-shrink: 0;
-        }
-
-        .kec-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding-right: 6px;
-            min-height: 200px;
-            max-height: 600px;
-        }
-
-        .kec-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        .kec-list::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.02);
-            border-radius: 10px;
-        }
-        .kec-list::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, var(--primary-light), var(--gold-dark));
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-        .kec-list::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, var(--primary), var(--gold));
-        }
-
-        .kec-item {
-            background: linear-gradient(160deg, #ffffff 0%, #f8fbf8 100%);
-            border: 1px solid rgba(0, 100, 0, 0.06);
-            border-radius: 14px;
-            padding: 12px 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
-            animation: itemIn 0.5s ease-out backwards;
-            cursor: default;
-        }
-
-        .kec-item:nth-child(1) {
-            animation-delay: 0.03s;
-        }
-        .kec-item:nth-child(2) {
-            animation-delay: 0.06s;
-        }
-        .kec-item:nth-child(3) {
-            animation-delay: 0.09s;
-        }
-        .kec-item:nth-child(4) {
-            animation-delay: 0.12s;
-        }
-        .kec-item:nth-child(5) {
-            animation-delay: 0.15s;
-        }
-        .kec-item:nth-child(6) {
-            animation-delay: 0.18s;
-        }
-        .kec-item:nth-child(7) {
-            animation-delay: 0.21s;
-        }
-        .kec-item:nth-child(8) {
-            animation-delay: 0.24s;
-        }
-        .kec-item:nth-child(9) {
-            animation-delay: 0.27s;
-        }
-        .kec-item:nth-child(10) {
-            animation-delay: 0.30s;
-        }
-
-        @keyframes itemIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px) scale(0.97);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-
-        .kec-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(180deg, var(--primary-light), var(--gold-dark));
-            border-radius: 4px 0 0 4px;
-        }
-
-        .kec-item::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), transparent);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .kec-item:hover::after {
-            opacity: 1;
-        }
-
-        .kec-item:hover {
-            transform: translateX(4px) scale(1.005);
-            box-shadow: 0 8px 30px rgba(0, 100, 0, 0.10);
-            border-color: rgba(0, 100, 0, 0.12);
-        }
-
-        .kec-item.empty {
-            opacity: 0.55;
-        }
-
-        .kec-item.empty::before {
-            background: #ccc;
-        }
-
-        .kec-row-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 6px;
-            gap: 8px;
-        }
-
-        .kec-row-name {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 0;
-        }
-
-        .kec-row-rank {
-            font-size: 0.6rem;
-            font-weight: 700;
-            color: #bbb;
-            flex-shrink: 0;
-            width: 20px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.03);
-            padding: 2px 0;
-            border-radius: 8px;
-        }
-
-        .kec-total-badge {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-            color: white;
-            font-size: 0.66rem;
-            font-weight: 700;
-            padding: 4px 14px;
-            border-radius: 20px;
-            white-space: nowrap;
-            flex-shrink: 0;
-            box-shadow: 0 2px 10px rgba(0, 100, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .kec-item:hover .kec-total-badge {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0, 100, 0, 0.3);
-        }
-
-        .kec-pills {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-        }
-
-        .pill {
-            font-size: 0.64rem;
-            font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 20px;
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .pill:hover {
-            transform: scale(1.04);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .pill.lpq {
-            background: linear-gradient(135deg, var(--lpq-a), var(--lpq-b));
-        }
-        .pill.mdt {
-            background: linear-gradient(135deg, var(--mdt-a), var(--mdt-b));
-            color: #3a2a00;
-        }
-        .pill.ponpes {
-            background: linear-gradient(135deg, var(--ponpes-a), var(--ponpes-b));
-        }
-
-        .pill i {
-            font-size: 0.55rem;
-        }
-
-        .kec-bar {
-            height: 6px;
-            border-radius: 6px;
-            overflow: hidden;
-            display: flex;
-            background: #eef2ee;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
-        }
-
-        .kec-bar-seg {
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .kec-bar-seg.lpq {
-            background: linear-gradient(90deg, var(--lpq-a), var(--lpq-b));
-        }
-        .kec-bar-seg.mdt {
-            background: linear-gradient(90deg, var(--mdt-a), var(--mdt-b));
-        }
-        .kec-bar-seg.ponpes {
-            background: linear-gradient(90deg, var(--ponpes-a), var(--ponpes-b));
-        }
-        .kec-bar-seg.empty {
-            background: transparent;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 900px) {
-            body {
-                padding: 12px;
-            }
-            .main-container {
-                padding: 16px;
-                border-radius: 20px;
-            }
-            .content-wrapper {
-                flex-direction: column;
-                gap: 20px;
-            }
-            .chart-panel {
-                flex: 1;
-                padding: 16px;
-                align-self: stretch;
-            }
-            .chart-panel .donut-wrap {
-                max-width: 200px;
-            }
-            .donut-center .num {
-                font-size: 1.6rem;
-            }
-            .kec-list {
-                max-height: 400px;
-                min-height: 150px;
-            }
-            .container-header h1 {
-                font-size: 1rem;
-            }
-            .container-header::after {
-                width: 50px;
-            }
-
-            .sticky-filter-bar {
-                padding: 6px 0 10px 0;
-                flex-direction: column;
-                align-items: stretch;
-                gap: 6px;
-            }
-            .sticky-filter-bar .filter-left {
-                justify-content: center;
-            }
-            .sticky-filter-bar .filter-right {
-                justify-content: center;
-                gap: 8px;
-            }
-            .sticky-filter-bar .filter-right .stat-chip {
-                font-size: 0.6rem;
-                padding: 3px 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 8px;
-            }
-            .main-container {
-                padding: 12px;
-                border-radius: 16px;
-            }
-            .kec-item {
-                padding: 10px 12px;
-            }
-            .kec-row-name {
-                font-size: 0.75rem;
-            }
-            .kec-total-badge {
-                font-size: 0.55rem;
-                padding: 2px 10px;
-            }
-            .pill {
-                font-size: 0.55rem;
-                padding: 2px 7px;
-            }
-            .header-actions .updated {
-                display: none;
-            }
-            .chart-stats {
-                gap: 8px;
-                font-size: 0.55rem;
-                padding: 6px 10px;
-            }
-            .refresh-btn {
-                padding: 5px 12px;
-                font-size: 0.6rem;
-            }
-            .back-btn {
-                padding: 5px 10px;
-                font-size: 0.6rem;
-            }
-            .sticky-filter-bar .filter-right .stat-chip {
-                font-size: 0.55rem;
-                padding: 2px 8px;
-            }
-            .sticky-filter-bar .filter-right .updated-small {
-                display: none;
-            }
-            .kec-list {
-                max-height: 300px;
-                min-height: 120px;
-            }
-            .container-header {
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-            .container-header h1 {
-                font-size: 0.9rem;
-            }
-        }
+        :root{--p:#006400;--pl:#4CAF50;--pd:#0a2e1a;--g:#FFD700;--gd:#DAA520;--bg:#f0f4f0;--cs:0 4px 20px rgba(0,0,0,0.08);--lpqa:#0a2e1a;--lpqb:#4CAF50;--mdta:#b8860b;--mdtb:#FFD700;--ppsa:#5e1073;--ppsb:#ce7be0}
+        *{margin:0;padding:0;box-sizing:border-box}
+        html,body{height:100%}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f4f0;display:flex;justify-content:center;padding:20px;overflow-y:auto}
+        .main-content{flex:1;max-width:1200px;min-height:100vh;display:flex;flex-direction:column;padding:0}
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);padding:14px 28px;border-radius:16px;color:white;font-weight:600;font-size:.85rem;box-shadow:0 12px 40px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:all .5s cubic-bezier(.4,0,.2,1);max-width:90%}
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+        .toast-success{background:linear-gradient(135deg,#43a047,#2e7d32)}.toast-error{background:linear-gradient(135deg,#ef5350,#c62828)}.toast-info{background:linear-gradient(135deg,var(--p),var(--pd))}
+        .spinner{width:36px;height:36px;border:3px solid #f0f2f5;border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite;margin:30px auto}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .empty-note{text-align:center;padding:30px;color:#999}.empty-note i{font-size:28px;display:block;margin-bottom:10px;color:var(--pl);opacity:.4}
+        .main-container{background:white;border-radius:16px;box-shadow:var(--cs);overflow:hidden;padding:28px 32px 32px 32px;flex:1;display:flex;flex-direction:column}
+        .container-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid rgba(0,100,0,.08);position:relative;flex-shrink:0}
+        .container-header::after{content:'';position:absolute;bottom:-2px;left:0;width:80px;height:2px;background:linear-gradient(90deg,var(--p),var(--gd));border-radius:2px}
+        .container-header h1{font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,var(--pd),var(--pl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:10px}
+        .container-header h1 i{background:linear-gradient(135deg,var(--p),var(--gd));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:1.4rem}
+        .header-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+        .header-actions .updated{font-size:.7rem;color:#999;background:rgba(0,100,0,.05);padding:4px 12px;border-radius:20px;display:flex;align-items:center;gap:4px}
+        .refresh-btn{padding:7px 18px;border:none;background:linear-gradient(135deg,var(--p),var(--pd));color:white;border-radius:10px;font-size:.7rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .3s ease;box-shadow:0 4px 15px rgba(0,100,0,.25);position:relative;overflow:hidden}
+        .refresh-btn:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(0,100,0,.35)}
+        .refresh-btn:active{transform:scale(.96)}
+        .back-btn{padding:7px 16px;border:1.5px solid rgba(0,100,0,.2);background:rgba(255,255,255,.6);color:var(--pd);border-radius:10px;font-size:.7rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .3s ease;text-decoration:none}
+        .back-btn:hover{background:white;border-color:var(--p);transform:translateX(-2px);box-shadow:0 4px 15px rgba(0,0,0,.06)}
+        .sticky-filter-bar{position:sticky;top:0;z-index:50;background:white;padding:8px 0 12px 0;margin:-4px 0 16px 0;border-bottom:2px solid rgba(0,100,0,.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;flex-shrink:0}
+        .sticky-filter-bar .filter-left{display:flex;align-items:center;gap:10px}.sticky-filter-bar .filter-left .filter-label{font-size:.75rem;font-weight:700;color:var(--pd);display:flex;align-items:center;gap:6px}
+        .sticky-filter-bar .filter-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+        .sticky-filter-bar .filter-right .stat-chip{font-size:.7rem;color:#666;background:rgba(0,100,0,.04);padding:4px 14px;border-radius:20px;display:flex;align-items:center;gap:6px}
+        .sticky-filter-bar .filter-right .stat-chip strong{color:var(--pd)}
+        .content-wrapper{display:flex;gap:32px;flex:1;min-height:0}
+        .chart-panel{flex:0 0 38%;min-width:260px;display:flex;flex-direction:column;align-items:center;text-align:center;background:linear-gradient(160deg,rgba(255,255,255,.5),rgba(240,248,240,.5));border-radius:20px;padding:20px 16px;border:1px solid rgba(255,255,255,.6);position:relative;overflow:hidden;align-self:flex-start}
+        .chart-panel::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,rgba(76,175,80,.03),transparent 60%);animation:cg 8s ease-in-out infinite;pointer-events:none}
+        @keyframes cg{0%,100%{transform:translate(0,0)}50%{transform:translate(10%,5%)}}
+        .chart-panel .chart-title{font-size:.85rem;font-weight:700;color:var(--pd);margin-bottom:2px;position:relative;z-index:1}
+        .chart-panel .chart-sub{font-size:.7rem;color:#999;margin-bottom:12px;position:relative;z-index:1}
+        .donut-wrap{position:relative;width:100%;max-width:240px;margin:0 auto;z-index:1}
+        .donut-wrap canvas{filter:drop-shadow(0 8px 25px rgba(0,100,0,.08))}
+        .donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+        .donut-center .num{font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--pd),var(--gd));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+        .donut-center .lbl{font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:2px;margin-top:2px;font-weight:600}
+        .chart-stats{display:flex;gap:14px;justify-content:center;margin-top:12px;flex-wrap:wrap;font-size:.65rem;color:#666;position:relative;z-index:1;padding:8px 14px;background:rgba(255,255,255,.6);border-radius:14px;border:1px solid rgba(255,255,255,.8)}
+        .chart-stats span{display:flex;align-items:center;gap:4px}.chart-stats strong{color:var(--pd);font-weight:700}
+        .detail-panel{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+        .detail-panel .detail-title{font-size:.85rem;font-weight:700;color:var(--pd);margin-bottom:2px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+        .detail-panel .detail-sub{font-size:.7rem;color:#999;margin-bottom:12px;flex-shrink:0}
+        .kec-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:6px;min-height:200px;max-height:600px}
+        .kec-list::-webkit-scrollbar{width:6px}.kec-list::-webkit-scrollbar-track{background:rgba(0,0,0,.02);border-radius:10px}.kec-list::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--pl),var(--gd));border-radius:10px}
+        .kec-item{background:linear-gradient(160deg,#ffffff 0%,#f8fbf8 100%);border:1px solid rgba(0,100,0,.06);border-radius:14px;padding:12px 16px;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;flex-shrink:0;animation:ii .5s ease-out backwards}
+        .kec-item:nth-child(1){animation-delay:.03s}.kec-item:nth-child(2){animation-delay:.06s}.kec-item:nth-child(3){animation-delay:.09s}.kec-item:nth-child(4){animation-delay:.12s}.kec-item:nth-child(5){animation-delay:.15s}
+        @keyframes ii{from{opacity:0;transform:translateX(-20px) scale(.97)}to{opacity:1;transform:translateX(0) scale(1)}}
+        .kec-item::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,var(--pl),var(--gd));border-radius:4px 0 0 4px}
+        .kec-item:hover{transform:translateX(4px) scale(1.005);box-shadow:0 8px 30px rgba(0,100,0,.1);border-color:rgba(0,100,0,.12)}
+        .kec-item.empty{opacity:.55}.kec-item.empty::before{background:#ccc}
+        .kec-row-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px}
+        .kec-row-name{font-size:.85rem;font-weight:700;color:var(--pd);display:flex;align-items:center;gap:8px;min-width:0}
+        .kec-row-rank{font-size:.6rem;font-weight:700;color:#bbb;flex-shrink:0;width:20px;text-align:center;background:rgba(0,0,0,.03);padding:2px 0;border-radius:8px}
+        .kec-total-badge{background:linear-gradient(135deg,var(--pd),var(--p));color:white;font-size:.66rem;font-weight:700;padding:4px 14px;border-radius:20px;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 10px rgba(0,100,0,.2)}
+        .kec-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+        .pill{font-size:.64rem;font-weight:700;padding:3px 10px;border-radius:20px;color:white;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .pill.lpq{background:linear-gradient(135deg,var(--lpqa),var(--lpqb))}.pill.mdt{background:linear-gradient(135deg,var(--mdta),var(--mdtb));color:#3a2a00}.pill.ponpes{background:linear-gradient(135deg,var(--ppsa),var(--ppsb))}
+        .kec-bar{height:6px;border-radius:6px;overflow:hidden;display:flex;background:#eef2ee;box-shadow:inset 0 1px 2px rgba(0,0,0,.04)}
+        .kec-bar-seg{transition:width 1s cubic-bezier(.4,0,.2,1)}.kec-bar-seg.lpq{background:linear-gradient(90deg,var(--lpqa),var(--lpqb))}.kec-bar-seg.mdt{background:linear-gradient(90deg,var(--mdta),var(--mdtb))}.kec-bar-seg.ponpes{background:linear-gradient(90deg,var(--ppsa),var(--ppsb))}.kec-bar-seg.empty{background:transparent}
+        @media (max-width:900px){body{padding:12px}.main-container{padding:16px}.content-wrapper{flex-direction:column;gap:20px}.chart-panel{flex:1;padding:16px;align-self:stretch}.donut-wrap{max-width:200px}.donut-center .num{font-size:1.6rem}.kec-list{max-height:400px;min-height:150px}.container-header h1{font-size:1rem}.sticky-filter-bar{padding:6px 0 10px 0;flex-direction:column;align-items:stretch;gap:6px}}
+        @media (max-width:480px){body{padding:8px}.main-container{padding:12px}.kec-item{padding:10px 12px}.kec-row-name{font-size:.75rem}.kec-total-badge{font-size:.55rem;padding:2px 10px}.pill{font-size:.55rem;padding:2px 7px}.header-actions .updated{display:none}.chart-stats{gap:8px;font-size:.55rem;padding:6px 10px}.refresh-btn{padding:5px 12px;font-size:.6rem}.back-btn{padding:5px 10px;font-size:.6rem}.kec-list{max-height:300px;min-height:120px}.container-header h1{font-size:.9rem}}
     </style>
 </head>
 <body>
-
-    <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
-
-    <!-- ===== MAIN CONTENT ===== -->
     <main class="main-content">
-
-        <!-- ===== MAIN CONTAINER ===== -->
         <div class="main-container">
-
-            <!-- HEADER -->
             <div class="container-header">
                 <h1><i class="fas fa-chart-pie"></i> Sebaran Lembaga per Kecamatan</h1>
                 <div class="header-actions">
@@ -898,453 +85,66 @@
                     <button class="refresh-btn" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
                 </div>
             </div>
-
-            <!-- STICKY FILTER BAR -->
-            <div class="sticky-filter-bar" id="stickyFilterBar">
-                <div class="filter-left">
-                    <span class="filter-label"><i class="fas fa-map-marker-alt"></i> Ringkasan Data</span>
-                </div>
+            <div class="sticky-filter-bar">
+                <div class="filter-left"><span class="filter-label"><i class="fas fa-map-marker-alt"></i> Ringkasan Data</span></div>
                 <div class="filter-right">
                     <span class="stat-chip"><i class="fas fa-flag"></i> Kecamatan: <strong id="totalKecStat">0</strong></span>
                     <span class="stat-chip"><i class="fas fa-calculator"></i> Total Lembaga: <strong id="totalLembagaStat">0</strong></span>
                     <span class="stat-chip"><i class="fas fa-trophy" style="color:#ffd700;"></i> Terbanyak: <strong id="topKecStat">-</strong></span>
-                    <span class="updated-small" id="updatedSmall"></span>
                 </div>
             </div>
-
-            <!-- CONTENT: CHART + DETAIL -->
             <div class="content-wrapper">
-
-                <!-- CHART PANEL -->
                 <div class="chart-panel">
-                    <div class="chart-title"><i class="fas fa-circle" style="color:var(--primary);font-size:0.6rem;"></i> Distribusi Lembaga per Kecamatan</div>
+                    <div class="chart-title">Distribusi Lembaga</div>
                     <div class="chart-sub" id="chartSub">Total seluruh kecamatan</div>
-
-                    <div class="donut-wrap">
-                        <canvas id="donutChart" width="280" height="280"></canvas>
-                        <div class="donut-center">
-                            <div class="num" id="donutTotal">0</div>
-                            <div class="lbl">Lembaga</div>
-                        </div>
-                    </div>
-
-                    <div class="chart-stats">
-                        <span><i class="fas fa-map-marker-alt" style="color:var(--primary-light);"></i> Kecamatan: <strong id="totalKec">0</strong></span>
-                        <span><i class="fas fa-calculator" style="color:var(--gold-dark);"></i> Rata-rata: <strong id="avgLembaga">0</strong></span>
-                        <span><i class="fas fa-trophy" style="color:#ffd700;"></i> Terbanyak: <strong id="topKec">-</strong></span>
-                    </div>
+                    <div class="donut-wrap"><canvas id="donutChart"></canvas><div class="donut-center"><div class="num" id="donutTotal">0</div><div class="lbl">Lembaga</div></div></div>
+                    <div class="chart-stats"><span>🏙️ <strong id="totalKec">0</strong></span><span>📊 <strong id="avgLembaga">0</strong></span><span>🏆 <strong id="topKec">-</strong></span></div>
                 </div>
-
-                <!-- DETAIL PANEL -->
                 <div class="detail-panel">
-                    <div class="detail-title"><i class="fas fa-list-ul"></i> Detail per Kecamatan</div>
-                    <div class="detail-sub" id="detailSub">Diurutkan dari jumlah lembaga terbanyak</div>
-                    <div class="kec-list" id="kecList">
-                        <div class="spinner"></div>
-                    </div>
+                    <div class="detail-title">Detail per Kecamatan</div>
+                    <div class="detail-sub" id="detailSub">Diurutkan dari jumlah terbanyak</div>
+                    <div class="kec-list" id="kecList"><div class="spinner"></div></div>
                 </div>
-
             </div>
         </div>
-
     </main>
 
     <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
-
     <script>
-        // ============================================================
+        // ===== CACHE MANAGER =====
+        const cache={_s:{},get(k,t=600000){const e=this._s[k];if(!e)return null;if(Date.now()-e.t>t){delete this._s[k];return null}return e.d},set(k,d){this._s[k]={d,t:Date.now()}},clear(){this._s={}}};
+
         // ===== TOAST =====
-        // ============================================================
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            if (!toast) { alert(message); return; }
-            toast.textContent = message;
-            toast.className = `toast toast-${type}`;
-            void toast.offsetWidth;
-            toast.classList.add('show');
-            clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
-        }
+        function showToast(m,t='info'){const e=document.getElementById('toast');if(!e){alert(m);return}e.textContent=m;e.className=`toast toast-${t}`;void e.offsetWidth;e.classList.add('show');clearTimeout(e._to);e._to=setTimeout(()=>e.classList.remove('show'),4000)}
 
-        // ============================================================
-        // ===== UPDATE TIMESTAMP =====
-        // ============================================================
-        function updateTimestamp() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            const el = document.getElementById('updatedAt');
-            if (el) el.textContent = timeStr;
-            const small = document.getElementById('updatedSmall');
-            if (small) small.textContent = '🔄 ' + timeStr;
-        }
+        // ===== TIMESTAMP =====
+        function ts(){const n=new Date(),s=n.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});const e=document.getElementById('updatedAt');if(e)e.textContent=s}
 
-        // ============================================================
-        // ===== AUTH CHECK =====
-        // ============================================================
-        async function checkAuth() {
-            try {
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
-                if (error || !session) {
-                    window.location.href = 'index.html';
-                    return false;
-                }
+        // ===== AUTH =====
+        async function checkAuth(){try{const{data:{session}}=await supabaseClient.auth.getSession();if(!session){window.location.href='index.html';return false}const{data:u}=await supabaseClient.from('users').select('id,name,email,role,kecamatan_id,lembaga_id,active').eq('id',session.user.id).single();if(!u||!u.active){await supabaseClient.auth.signOut();window.location.href='index.html';return false}window.currentUser={id:u.id,name:u.name||session.user.email,email:session.user.email,role:u.role||'operator',kecamatan_id:u.kecamatan_id,lembaga_id:u.lembaga_id};return true}catch(e){window.location.href='index.html';return false}}
+        function getUser(){return window.currentUser||null}
+        function getRoleFilter(){const u=getUser();if(!u)return{};if(u.role==='super_admin'||u.role==='admin_kab')return{};if(!u.kecamatan_id)return{restrict:true};const f={kecamatan_id:u.kecamatan_id};if(u.role==='batko')f.jenis_lembaga='LPQ';else if(u.role==='fkdt')f.jenis_lembaga='MDT';else if(u.role==='ponpes')f.jenis_lembaga='PONPES';return f}
 
-                const { data: userData, error: userError } = await supabaseClient
-                    .from('users')
-                    .select('id, name, email, role, kecamatan_id, lembaga_id, active')
-                    .eq('id', session.user.id)
-                    .single();
+        // ===== FETCH LEMBAGA (OPTIMIZED) =====
+        async function fetchLembaga(f){const ck=`lembaga_${JSON.stringify(f)}`,cd=cache.get(ck,300000);if(cd)return cd;let all=[],from=0;const CHUNK=1000;while(true){let q=supabaseClient.from('lembaga').select('kecamatan_id,jenis_lembaga');if(f.kecamatan_id)q=q.eq('kecamatan_id',f.kecamatan_id);if(f.jenis_lembaga)q=q.eq('jenis_lembaga',f.jenis_lembaga);const{data}=await q.range(from,from+CHUNK-1);all=all.concat(data||[]);if(!data||data.length<CHUNK)break;from+=CHUNK}cache.set(ck,all);return all}
 
-                if (userError || !userData || !userData.active) {
-                    console.error('User data error:', userError);
-                    await supabaseClient.auth.signOut();
-                    window.location.href = 'index.html';
-                    return false;
-                }
+        // ===== DONUT CHART =====
+        let dc=null;
+        function renderDonut(arr){const ctx=document.getElementById('donutChart').getContext('2d'),top=arr.slice(0,10),rest=arr.slice(10);let lbs=top.map(k=>k.nama),vls=top.map(k=>k.total);const ot=rest.reduce((s,k)=>s+k.total,0);if(ot>0){lbs.push('Lainnya');vls.push(ot)}const g=vls.reduce((a,b)=>a+b,0),clrs=['#0a2e1a','#2e7d32','#4CAF50','#66BB6A','#81C784','#a5d6a7','#c8e6c9','#b8860b','#DAA520','#FFD700','#7b1fa2'];if(dc)dc.destroy();dc=new Chart(ctx,{type:'doughnut',data:{labels:lbs,datasets:[{data:g===0?[1]:vls,backgroundColor:g===0?['#e8ecf1']:clrs.slice(0,lbs.length),borderColor:'#fff',borderWidth:3,hoverOffset:10,spacing:2}]},options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{enabled:g>0,backgroundColor:'rgba(255,255,255,.95)',titleColor:'#0a2e1a',bodyColor:'#333',padding:12,cornerRadius:12,callbacks:{label:function(c){const p=g?((c.raw/g)*100).toFixed(1):0;return c.label+': '+c.raw+' ('+p+'%)'}}}},animation:{duration:1000,easing:'easeOutQuart'}}});document.getElementById('donutTotal').textContent=g}
 
-                window.currentUser = {
-                    id: userData.id,
-                    name: userData.name || session.user.email,
-                    email: session.user.email,
-                    role: userData.role || 'operator',
-                    kecamatan_id: userData.kecamatan_id,
-                    lembaga_id: userData.lembaga_id
-                };
+        // ===== RENDER KEC LIST =====
+        function renderList(arr){const l=document.getElementById('kecList');if(!arr||!arr.length){l.innerHTML='<div class="empty-note">📭 Belum ada data</div>';return}l.innerHTML=arr.map((k,i)=>{const t=k.total,pLPQ=t?(k.LPQ/t)*100:0,pMDT=t?(k.MDT/t)*100:0,pPP=t?(k.PONPES/t)*100:0;return`<div class="kec-item${t===0?' empty':''}"><div class="kec-row-head"><div class="kec-row-name"><span class="kec-row-rank">${i+1}</span>🏢 ${k.nama}</div><div class="kec-total-badge">${t}</div></div><div class="kec-pills"><span class="pill lpq">📘 LPQ ${k.LPQ}</span><span class="pill mdt">📗 MDT ${k.MDT}</span><span class="pill ponpes">📕 PONPES ${k.PONPES}</span></div><div class="kec-bar"><div class="kec-bar-seg lpq" style="width:${pLPQ}%;"></div><div class="kec-bar-seg mdt" style="width:${pMDT}%;"></div><div class="kec-bar-seg ponpes" style="width:${pPP}%;"></div>${t===0?'<div class="kec-bar-seg empty" style="width:100%;"></div>':''}</div></div>`}).join('')}
 
-                return true;
-
-            } catch (error) {
-                console.error('Auth check error:', error);
-                window.location.href = 'index.html';
-                return false;
-            }
-        }
-
-        function getUser() {
-            return window.currentUser || null;
-        }
-
-        function getRoleFilter() {
-            if (!window.currentUser) return {};
-            const user = window.currentUser;
-            const role = user.role;
-            const filter = {};
-
-            if (role === 'super_admin' || role === 'admin_kab') {
-                return {};
-            }
-
-            if (!user.kecamatan_id) {
-                return { restrict: true };
-            }
-
-            filter.kecamatan_id = user.kecamatan_id;
-
-            if (role === 'batko') {
-                filter.jenis_lembaga = 'LPQ';
-            } else if (role === 'fkdt') {
-                filter.jenis_lembaga = 'MDT';
-            } else if (role === 'ponpes') {
-                filter.jenis_lembaga = 'PONPES';
-            }
-
-            return filter;
-        }
-
-        // ============================================================
-        // ===== FETCH ALL LEMBAGA (bypass limit 1000) =====
-        // ============================================================
-        async function fetchAllLembaga(filter) {
-            const CHUNK = 1000;
-            let from = 0;
-            let allRows = [];
-
-            while (true) {
-                let q = supabaseClient
-                    .from('lembaga')
-                    .select('kecamatan_id, jenis_lembaga');
-
-                if (filter.kecamatan_id) q = q.eq('kecamatan_id', filter.kecamatan_id);
-                if (filter.jenis_lembaga) q = q.eq('jenis_lembaga', filter.jenis_lembaga);
-
-                const { data, error } = await q.range(from, from + CHUNK - 1);
-                if (error) throw error;
-
-                allRows = allRows.concat(data || []);
-                if (!data || data.length < CHUNK) break;
-                from += CHUNK;
-            }
-
-            return allRows;
-        }
-
-        // ============================================================
-        // ===== DONUT CHART (sebaran per kecamatan) =====
-        // ============================================================
-        let donutChartInstance = null;
-
-        function renderDonut(kecArray) {
-            const ctx = document.getElementById('donutChart').getContext('2d');
-
-            const top10 = kecArray.slice(0, 10);
-            const others = kecArray.slice(10);
-
-            let labels = top10.map(k => k.nama);
-            let values = top10.map(k => k.total);
-
-            const othersTotal = others.reduce((sum, k) => sum + k.total, 0);
-            if (othersTotal > 0) {
-                labels.push('Lainnya');
-                values.push(othersTotal);
-            }
-
-            const grand = values.reduce((a, b) => a + b, 0);
-
-            const colors = [
-                '#0a2e1a', '#2e7d32', '#4CAF50', '#66BB6A', '#81C784',
-                '#a5d6a7', '#c8e6c9', '#b8860b', '#DAA520', '#FFD700',
-                '#5e1073', '#7b1fa2', '#9c27b0', '#ab47bc', '#ce93d8',
-                '#e1bee7', '#f44336', '#ef5350'
-            ];
-
-            if (donutChartInstance) donutChartInstance.destroy();
-
-            donutChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: grand === 0 ? [1] : values,
-                        backgroundColor: grand === 0 ? ['#e8ecf1'] : colors.slice(0, labels.length),
-                        borderColor: '#ffffff',
-                        borderWidth: 3,
-                        hoverOffset: 10,
-                        spacing: 2,
-                        hoverBorderColor: 'rgba(255,255,255,0.8)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '70%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            enabled: grand > 0,
-                            backgroundColor: 'rgba(255,255,255,0.95)',
-                            titleColor: '#0a2e1a',
-                            bodyColor: '#333',
-                            borderColor: 'rgba(0,100,0,0.1)',
-                            borderWidth: 1,
-                            padding: 12,
-                            cornerRadius: 12,
-                            callbacks: {
-                                label: function(ctx) {
-                                    const val = ctx.raw;
-                                    const pct = grand ? ((val / grand) * 100).toFixed(1) : 0;
-                                    return ctx.label + ': ' + val + ' (' + pct + '%)';
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        animateRotate: true,
-                        duration: 1000,
-                        easing: 'easeOutQuart'
-                    }
-                }
-            });
-
-            document.getElementById('donutTotal').textContent = grand;
-        }
-
-        // ============================================================
         // ===== LOAD DATA =====
-        // ============================================================
-        async function loadKecamatanData() {
-            const list = document.getElementById('kecList');
-            list.innerHTML = '<div class="spinner"></div>';
+        async function loadData(){const l=document.getElementById('kecList');l.innerHTML='<div class="spinner"></div>';try{const f=getRoleFilter();if(f.restrict){l.innerHTML='<div class="empty-note">🔒 Akses ditolak</div>';return}let kq=supabaseClient.from('master_kecamatan').select('id,nama').order('nama');if(f.kecamatan_id)kq=kq.eq('id',f.kecamatan_id);const{data:kl}=await kq,lm=await fetchLembaga(f),cnt={};(kl||[]).forEach(k=>{cnt[k.id]={nama:k.nama,LPQ:0,MDT:0,PONPES:0,total:0}});lm.forEach(r=>{const j=r.jenis_lembaga;if(r.kecamatan_id&&cnt[r.kecamatan_id]&&(j==='LPQ'||j==='MDT'||j==='PONPES')){cnt[r.kecamatan_id][j]++;cnt[r.kecamatan_id].total++}});const arr=Object.values(cnt).sort((a,b)=>b.total-a.total||a.nama.localeCompare(b.nama));renderDonut(arr);renderList(arr);const g=arr.reduce((s,k)=>s+k.total,0);document.getElementById('totalKec').textContent=arr.length;document.getElementById('avgLembaga').textContent=arr.length?(g/arr.length).toFixed(1):'0';document.getElementById('topKec').textContent=arr.length&&arr[0].total>0?arr[0].nama:'-';document.getElementById('totalKecStat').textContent=arr.length;document.getElementById('totalLembagaStat').textContent=g;document.getElementById('topKecStat').textContent=arr.length&&arr[0].total>0?arr[0].nama:'-';ts()}catch(e){console.error(e);l.innerHTML=`<div class="empty-note" style="color:#f44336;">Gagal: ${e.message}</div>`}}
 
-            try {
-                const filter = getRoleFilter();
+        function refreshData(){cache.clear();showToast('Memperbarui...','info');loadData()}
 
-                if (filter.restrict) {
-                    list.innerHTML =
-                        `<div class="empty-note"><i class="fas fa-lock"></i>Anda tidak memiliki akses ke data ini</div>`;
-                    return;
-                }
+        document.addEventListener('DOMContentLoaded',async()=>{if(!await checkAuth())return;await loadData();supabaseClient.from('pendidik').select('*',{count:'exact',head:true}).eq('status_aktif',true).then(({count})=>document.getElementById('navPendidikCount').textContent=count||0)});
 
-                // Ambil daftar kecamatan
-                let kecQuery = supabaseClient.from('master_kecamatan').select('id, nama').order('nama');
-                if (filter.kecamatan_id) kecQuery = kecQuery.eq('id', filter.kecamatan_id);
-                const { data: kecList, error: kecErr } = await kecQuery;
-                if (kecErr) throw kecErr;
-
-                // Ambil semua lembaga
-                const lembagaRows = await fetchAllLembaga(filter);
-
-                // Aggregate per kecamatan
-                const counts = {};
-                (kecList || []).forEach(k => {
-                    counts[k.id] = {
-                        nama: k.nama,
-                        LPQ: 0,
-                        MDT: 0,
-                        PONPES: 0,
-                        total: 0
-                    };
-                });
-
-                (lembagaRows || []).forEach(row => {
-                    const jenis = row.jenis_lembaga;
-                    if (row.kecamatan_id && counts[row.kecamatan_id]) {
-                        if (jenis === 'LPQ' || jenis === 'MDT' || jenis === 'PONPES') {
-                            counts[row.kecamatan_id][jenis]++;
-                            counts[row.kecamatan_id].total++;
-                        }
-                    }
-                });
-
-                const kecArray = Object.values(counts).sort((a, b) => b.total - a.total || a.nama.localeCompare(b.nama));
-
-                renderDonut(kecArray);
-                renderKecList(kecArray);
-
-                const grand = kecArray.reduce((sum, k) => sum + k.total, 0);
-                document.getElementById('totalKec').textContent = kecArray.length;
-                document.getElementById('avgLembaga').textContent = kecArray.length ? (grand / kecArray.length).toFixed(1) :
-                    '0';
-                document.getElementById('topKec').textContent = kecArray.length && kecArray[0].total > 0 ? kecArray[0].nama :
-                    '-';
-
-                // Update sticky stats
-                document.getElementById('totalKecStat').textContent = kecArray.length;
-                document.getElementById('totalLembagaStat').textContent = grand;
-                document.getElementById('topKecStat').textContent = kecArray.length && kecArray[0].total > 0 ? kecArray[0]
-                    .nama : '-';
-
-                updateTimestamp();
-                updateStats();
-
-            } catch (e) {
-                console.error('Error:', e);
-                list.innerHTML =
-                    `<div class="empty-note" style="color:#f44336;"><i class="fas fa-triangle-exclamation"></i>Gagal memuat data: ${e.message}</div>`;
-            }
-        }
-
-        function renderKecList(kecArray) {
-            const list = document.getElementById('kecList');
-            if (!kecArray || kecArray.length === 0) {
-                list.innerHTML = `<div class="empty-note"><i class="fas fa-inbox"></i>Belum ada data kecamatan</div>`;
-                return;
-            }
-
-            list.innerHTML = kecArray.map((k, i) => {
-                const total = k.total;
-                const pctLPQ = total ? (k.LPQ / total) * 100 : 0;
-                const pctMDT = total ? (k.MDT / total) * 100 : 0;
-                const pctPONPES = total ? (k.PONPES / total) * 100 : 0;
-
-                const pillLPQ =
-                    `<span class="pill lpq"><i class="fas fa-book-quran"></i> LPQ ${k.LPQ}</span>`;
-                const pillMDT = `<span class="pill mdt"><i class="fas fa-school"></i> MDT ${k.MDT}</span>`;
-                const pillPONPES =
-                    `<span class="pill ponpes"><i class="fas fa-mosque"></i> PONPES ${k.PONPES}</span>`;
-
-                return `
-                        <div class="kec-item ${total === 0 ? 'empty' : ''}">
-                            <div class="kec-row-head">
-                                <div class="kec-row-name">
-                                    <span class="kec-row-rank">${i + 1}</span>
-                                    🏢 ${k.nama}
-                                </div>
-                                <div class="kec-total-badge">Jumlah ${total}</div>
-                            </div>
-                            <div class="kec-pills">${pillLPQ}${pillMDT}${pillPONPES}</div>
-                            <div class="kec-bar">
-                                <div class="kec-bar-seg lpq" style="width:${pctLPQ}%;"></div>
-                                <div class="kec-bar-seg mdt" style="width:${pctMDT}%;"></div>
-                                <div class="kec-bar-seg ponpes" style="width:${pctPONPES}%;"></div>
-                                ${total === 0 ? '<div class="kec-bar-seg empty" style="width:100%;"></div>' : ''}
-                            </div>
-                        </div>
-                    `;
-            }).join('');
-        }
-
-        function refreshData() {
-            showToast('Memperbarui data...', 'info');
-            loadKecamatanData();
-        }
-
-        // ============================================================
-        // ===== STATISTIK =====
-        // ============================================================
-        async function updateStats() {
-            try {
-                const filter = getRoleFilter();
-
-                let query = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true });
-                let queryLpq = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga',
-                    'LPQ');
-                let queryMdt = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga',
-                    'MDT');
-                let queryPonpes = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq(
-                    'jenis_lembaga', 'PONPES');
-
-                if (filter.kecamatan_id) {
-                    query = query.eq('kecamatan_id', filter.kecamatan_id);
-                    queryLpq = queryLpq.eq('kecamatan_id', filter.kecamatan_id);
-                    queryMdt = queryMdt.eq('kecamatan_id', filter.kecamatan_id);
-                    queryPonpes = queryPonpes.eq('kecamatan_id', filter.kecamatan_id);
-                }
-                if (filter.jenis_lembaga) {
-                    query = query.eq('jenis_lembaga', filter.jenis_lembaga);
-                }
-
-                const [total, lpq, mdt, ponpes] = await Promise.all([
-                    query,
-                    queryLpq,
-                    queryMdt,
-                    queryPonpes
-                ]);
-
-                document.getElementById('totalLembagaStat').textContent = total.count || 0;
-                document.getElementById('totalLPQ').textContent = lpq.count || 0;
-                document.getElementById('totalMDT').textContent = mdt.count || 0;
-                document.getElementById('totalPONPES').textContent = ponpes.count || 0;
-
-            } catch (e) { console.error(e); }
-        }
-
-        // ============================================================
-        // ===== INIT =====
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', async function() {
-            await checkAuth();
-            await loadKecamatanData();
-
-            // Update pendidik count di sidebar
-            const { count } = await supabaseClient
-                .from('pendidik')
-                .select('*', { count: 'exact', head: true })
-                .eq('status_aktif', true);
-            document.getElementById('navPendidikCount').textContent = count || 0;
-        });
-
-        // ============================================================
-        // ===== EXPOSE FUNCTIONS =====
-        // ============================================================
-        window.showToast = showToast;
-        window.refreshData = refreshData;
-        window.getUser = getUser;
-        window.getRoleFilter = getRoleFilter;
+        window.showToast=showToast;window.refreshData=refreshData;window.getUser=getUser;
     </script>
-
 </body>
 </html>
