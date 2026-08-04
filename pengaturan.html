@@ -215,7 +215,7 @@
         .progress-bar { width: 100%; height: 6px; background: #f0f2f5; border-radius: 3px; margin-top: 8px; overflow: hidden; }
         .progress-bar .fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s ease; width: 0%; }
 
-        /* Style khusus untuk BADKO TPQ */
+        /* Style khusus untuk BADKO LPQ */
         .badge-badko {
             background: #e3f2fd !important;
             color: #0d47a1 !important;
@@ -396,7 +396,7 @@
 
     <script>
         // ============================================================
-        // ===== FUNGSI UTAMA - MENGUBAH TAMPILAN BATKO MENJADI BADKO TPQ =====
+        // ===== FUNGSI UTAMA - MENGUBAH TAMPILAN BATKO MENJADI BADKO LPQ =====
         // ============================================================
         
         /**
@@ -408,7 +408,7 @@
             const roleDisplayMap = {
                 'super_admin': '🛡️ Super Admin',
                 'admin_kab': '🏛️ Admin Kabupaten',
-                'batko': '📘 BADKO TPQ',  // ← INI YANG DIUBAH
+                'batko': '📘 BADKO LPQ',  // ← DIUBAH MENJADI BADKO LPQ
                 'fkdt': '📗 FKDT',
                 'ponpes': '📕 PONPES',
                 'operator': '📋 Operator'
@@ -432,10 +432,10 @@
         }
 
         /**
-         * Fungsi untuk mengecek apakah user adalah BADKO TPQ (termasuk batko dari database)
+         * Fungsi untuk mengecek apakah user adalah BADKO LPQ (termasuk batko dari database)
          */
-        function isBadkoTpq(role) {
-            return role === 'batko' || role === 'badko_tpq';
+        function isBadkoLpq(role) {
+            return role === 'batko' || role === 'badko_lpq';
         }
 
         /**
@@ -444,16 +444,16 @@
         function getSafeRoleDisplay(role) {
             if (!role) return 'Unknown';
             
-            // Jika role adalah 'batko', tampilkan 'BADKO TPQ'
+            // Jika role adalah 'batko', tampilkan 'BADKO LPQ'
             if (role === 'batko') {
-                return '📘 BADKO TPQ';
+                return '📘 BADKO LPQ';
             }
             
             // Mapping role lainnya
             const displayMap = {
                 'super_admin': '🛡️ Super Admin',
                 'admin_kab': '🏛️ Admin Kabupaten',
-                'badko_tpq': '📘 BADKO TPQ',
+                'badko_lpq': '📘 BADKO LPQ',
                 'fkdt': '📗 FKDT',
                 'ponpes': '📕 PONPES',
                 'operator': '📋 Operator'
@@ -584,7 +584,7 @@
             const roleDescMap = {
                 'super_admin': 'Super Admin SI-MUSTAFA',
                 'admin_kab': 'Admin Kemenag Kabupaten Tegal',
-                'batko': 'Admin BADKO TPQ',  // ← DIUBAH
+                'batko': 'Admin BADKO LPQ',  // ← DIUBAH MENJADI BADKO LPQ
                 'fkdt': 'Admin FKDT',
                 'ponpes': 'Admin PONPES',
                 'operator': 'Operator Lembaga'
@@ -620,10 +620,10 @@
             if (role === 'super_admin' || role === 'admin_kab') {
                 html = `<div class="form-inline"><select id="inputKecamatan" onchange="loadLembagaByKecamatan()"><option value="">-- Kecamatan --</option></select><select id="inputJenisLembaga" onchange="loadLembagaByKecamatan()"><option value="">-- Jenis --</option><option value="LPQ">LPQ</option><option value="MDT">MDT</option><option value="PONPES">PONPES</option></select></div>
                 <div class="form-inline" style="margin-top:8px;"><select id="inputLembaga" onchange="autoFillFromLembaga()"><option value="">-- Lembaga --</option></select></div>
-                <div class="form-inline" style="margin-top:8px;"><select id="inputRole"><option value="">-- Role --</option><option value="batko">BADKO TPQ</option><option value="fkdt">FKDT MDT</option><option value="ponpes">PONPES</option><option value="operator">Operator</option></select></div>`;
+                <div class="form-inline" style="margin-top:8px;"><select id="inputRole"><option value="">-- Role --</option><option value="batko">BADKO LPQ</option><option value="fkdt">FKDT MDT</option><option value="ponpes">PONPES</option><option value="operator">Operator</option></select></div>`;
             } else if (['batko', 'fkdt', 'ponpes'].includes(role)) {
                 const rl = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
-                const displayName = role === 'batko' ? 'BADKO TPQ' : role.toUpperCase();
+                const displayName = role === 'batko' ? 'BADKO LPQ' : role.toUpperCase();
                 html = `<div class="form-inline"><select id="inputDesa" onchange="loadLembagaByDesa()"><option value="">-- Desa --</option></select><select id="inputLembaga" onchange="autoFillFromLembaga()"><option value="">-- Lembaga ${rl[role]} --</option></select></div>
                 <input type="hidden" id="inputKecamatan" value="${user.kecamatan_id || ''}"><input type="hidden" id="inputRole" value="operator">
                 <div class="info-box"><i class="fas fa-info-circle"></i> Membuat akun Operator ${rl[role]} di kecamatan Anda</div>`;
@@ -836,7 +836,7 @@
                 const rl = { 
                     'super_admin': '🛡️ Super Admin', 
                     'admin_kab': '🏛️ Admin Kab', 
-                    'batko': '📘 BADKO TPQ',  // ← DIUBAH
+                    'batko': '📘 BADKO LPQ',  // ← DIUBAH MENJADI BADKO LPQ
                     'fkdt': '📗 FKDT', 
                     'ponpes': '📕 PONPES', 
                     'operator': '📋 Operator' 
@@ -861,7 +861,7 @@
             if (!user) return;
             if (user.role === 'operator') { document.getElementById('mainContent').innerHTML = '<div class="access-denied"><i class="fas fa-lock"></i><h2>Akses Ditolak</h2><p>Anda tidak memiliki izin.</p><a href="dashboard.html" class="btn btn-primary" style="margin-top:16px;"><i class="fas fa-arrow-left"></i> Kembali</a></div>'; return; }
             if (['batko', 'fkdt', 'ponpes'].includes(user.role)) {
-                const rn = { 'batko': 'BADKO TPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
+                const rn = { 'batko': 'BADKO LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
                 document.getElementById('addUserTitle').innerHTML = `<i class="fas fa-user-plus"></i>Tambah Operator ${rn[user.role]}`;
                 document.getElementById('addUserDesc').textContent = `Pilih desa → lembaga ${user.role === 'batko' ? 'LPQ' : user.role === 'fkdt' ? 'MDT' : 'PONPES'} → auto-fill`;
                 document.getElementById('userListDesc').textContent = `Kelola akun Operator ${rn[user.role]} di Kecamatan Anda`;
@@ -984,7 +984,7 @@
         // Ekspos fungsi-fungsi baru
         window.formatRoleDisplay = formatRoleDisplay;
         window.getSafeRoleDisplay = getSafeRoleDisplay;
-        window.isBadkoTpq = isBadkoTpq;
+        window.isBadkoLpq = isBadkoLpq;
         window.getJenisLembagaFromRole = getJenisLembagaFromRole;
     </script>
 </body>
