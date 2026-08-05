@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Sebaran Lembaga - SI-MUSTAFA</title>
+    <title>Sebaran Lembaga per Kecamatan - SI-MUSTAFA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -89,7 +89,8 @@
                 <div class="filter-left"><span class="filter-label"><i class="fas fa-map-marker-alt"></i> Ringkasan Data</span></div>
                 <div class="filter-right">
                     <span class="stat-chip"><i class="fas fa-flag"></i> Kecamatan: <strong id="totalKecStat">0</strong></span>
-                    <span class="stat-chip"><i class="fas fa-calculator"></i> Total Lembaga: <strong id="totalLembagaStat">0</strong></span>
+                    <span class="stat-chip"><i class="fas fa-building"></i> Lembaga: <strong id="totalLembagaStat">0</strong></span>
+                    <span class="stat-chip"><i class="fas fa-user-graduate"></i> Pendidik: <strong id="totalPendidikStat">0</strong></span>
                     <span class="stat-chip"><i class="fas fa-trophy" style="color:#ffd700;"></i> Terbanyak: <strong id="topKecStat">-</strong></span>
                 </div>
             </div>
@@ -98,7 +99,7 @@
                     <div class="chart-title">Distribusi Lembaga</div>
                     <div class="chart-sub" id="chartSub">Total seluruh kecamatan</div>
                     <div class="donut-wrap"><canvas id="donutChart"></canvas><div class="donut-center"><div class="num" id="donutTotal">0</div><div class="lbl">Lembaga</div></div></div>
-                    <div class="chart-stats"><span>🏙️ <strong id="totalKec">0</strong></span><span>📊 <strong id="avgLembaga">0</strong></span><span>🏆 <strong id="topKec">-</strong></span></div>
+                    <div class="chart-stats"><span>🏙️ <strong id="totalKec">0</strong></span><span>📊 <strong id="avgLembaga">0</strong></span><span>👥 <strong id="totalPendidikChart">0</strong></span><span>🏆 <strong id="topKec">-</strong></span></div>
                 </div>
                 <div class="detail-panel">
                     <div class="detail-title">Detail per Kecamatan</div>
@@ -113,36 +114,38 @@
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
     <script>
-        // ===== CACHE MANAGER =====
         const cache={_s:{},get(k,t=600000){const e=this._s[k];if(!e)return null;if(Date.now()-e.t>t){delete this._s[k];return null}return e.d},set(k,d){this._s[k]={d,t:Date.now()}},clear(){this._s={}}};
+        let dc=null;
 
-        // ===== TOAST =====
-        function showToast(m,t='info'){const e=document.getElementById('toast');if(!e){alert(m);return}e.textContent=m;e.className=`toast toast-${t}`;void e.offsetWidth;e.classList.add('show');clearTimeout(e._to);e._to=setTimeout(()=>e.classList.remove('show'),4000)}
-
-        // ===== TIMESTAMP =====
+        function showToast(m,t='info'){const e=document.getElementById('toast');if(!e){console.log(m);return}e.textContent=m;e.className=`toast toast-${t}`;void e.offsetWidth;e.classList.add('show');clearTimeout(e._to);e._to=setTimeout(()=>e.classList.remove('show'),4000)}
         function ts(){const n=new Date(),s=n.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});const e=document.getElementById('updatedAt');if(e)e.textContent=s}
+        function st(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 
-        // ===== AUTH =====
         async function checkAuth(){try{const{data:{session}}=await supabaseClient.auth.getSession();if(!session){window.location.href='index.html';return false}const{data:u}=await supabaseClient.from('users').select('id,name,email,role,kecamatan_id,lembaga_id,active').eq('id',session.user.id).single();if(!u||!u.active){await supabaseClient.auth.signOut();window.location.href='index.html';return false}window.currentUser={id:u.id,name:u.name||session.user.email,email:session.user.email,role:u.role||'operator',kecamatan_id:u.kecamatan_id,lembaga_id:u.lembaga_id};return true}catch(e){window.location.href='index.html';return false}}
         function getUser(){return window.currentUser||null}
         function getRoleFilter(){const u=getUser();if(!u)return{};if(u.role==='super_admin'||u.role==='admin_kab')return{};if(!u.kecamatan_id)return{restrict:true};const f={kecamatan_id:u.kecamatan_id};if(u.role==='batko')f.jenis_lembaga='LPQ';else if(u.role==='fkdt')f.jenis_lembaga='MDT';else if(u.role==='ponpes')f.jenis_lembaga='PONPES';return f}
 
-        // ===== FETCH LEMBAGA (OPTIMIZED) =====
-        async function fetchLembaga(f){const ck=`lembaga_${JSON.stringify(f)}`,cd=cache.get(ck,300000);if(cd)return cd;let all=[],from=0;const CHUNK=1000;while(true){let q=supabaseClient.from('lembaga').select('kecamatan_id,jenis_lembaga');if(f.kecamatan_id)q=q.eq('kecamatan_id',f.kecamatan_id);if(f.jenis_lembaga)q=q.eq('jenis_lembaga',f.jenis_lembaga);const{data}=await q.range(from,from+CHUNK-1);all=all.concat(data||[]);if(!data||data.length<CHUNK)break;from+=CHUNK}cache.set(ck,all);return all}
+        async function fetchLembaga(f){const ck=`lembaga_${JSON.stringify(f)}`,cd=cache.get(ck,300000);if(cd)return cd;let all=[],from=0;while(true){let q=supabaseClient.from('lembaga').select('id,kecamatan_id,jenis_lembaga');if(f.kecamatan_id)q=q.eq('kecamatan_id',f.kecamatan_id);if(f.jenis_lembaga)q=q.eq('jenis_lembaga',f.jenis_lembaga);const{data}=await q.range(from,from+999);all=all.concat(data||[]);if(!data||data.length<1000)break;from+=1000}cache.set(ck,all);return all}
 
-        // ===== DONUT CHART =====
-        let dc=null;
-        function renderDonut(arr){const ctx=document.getElementById('donutChart').getContext('2d'),top=arr.slice(0,10),rest=arr.slice(10);let lbs=top.map(k=>k.nama),vls=top.map(k=>k.total);const ot=rest.reduce((s,k)=>s+k.total,0);if(ot>0){lbs.push('Lainnya');vls.push(ot)}const g=vls.reduce((a,b)=>a+b,0),clrs=['#0a2e1a','#2e7d32','#4CAF50','#66BB6A','#81C784','#a5d6a7','#c8e6c9','#b8860b','#DAA520','#FFD700','#7b1fa2'];if(dc)dc.destroy();dc=new Chart(ctx,{type:'doughnut',data:{labels:lbs,datasets:[{data:g===0?[1]:vls,backgroundColor:g===0?['#e8ecf1']:clrs.slice(0,lbs.length),borderColor:'#fff',borderWidth:3,hoverOffset:10,spacing:2}]},options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{enabled:g>0,backgroundColor:'rgba(255,255,255,.95)',titleColor:'#0a2e1a',bodyColor:'#333',padding:12,cornerRadius:12,callbacks:{label:function(c){const p=g?((c.raw/g)*100).toFixed(1):0;return c.label+': '+c.raw+' ('+p+'%)'}}}},animation:{duration:1000,easing:'easeOutQuart'}}});document.getElementById('donutTotal').textContent=g}
+        function renderDonut(arr){const ctx=document.getElementById('donutChart').getContext('2d'),top=arr.slice(0,10),rest=arr.slice(10);let lbs=top.map(k=>k.nama),vls=top.map(k=>k.total);const ot=rest.reduce((s,k)=>s+k.total,0);if(ot>0){lbs.push('Lainnya');vls.push(ot)}const g=vls.reduce((a,b)=>a+b,0),clrs=['#0a2e1a','#2e7d32','#4CAF50','#66BB6A','#81C784','#a5d6a7','#c8e6c9','#b8860b','#DAA520','#FFD700','#7b1fa2'];if(dc)dc.destroy();dc=new Chart(ctx,{type:'doughnut',data:{labels:lbs,datasets:[{data:g===0?[1]:vls,backgroundColor:g===0?['#e8ecf1']:clrs.slice(0,lbs.length),borderColor:'#fff',borderWidth:3,hoverOffset:10,spacing:2}]},options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{enabled:g>0,backgroundColor:'rgba(255,255,255,.95)',titleColor:'#0a2e1a',bodyColor:'#333',padding:12,cornerRadius:12,callbacks:{label:function(c){const p=g?((c.raw/g)*100).toFixed(1):0;return c.label+': '+c.raw+' ('+p+'%)'}}}},animation:{duration:1000,easing:'easeOutQuart'}}});st('donutTotal',g)}
 
-        // ===== RENDER KEC LIST =====
         function renderList(arr){const l=document.getElementById('kecList');if(!arr||!arr.length){l.innerHTML='<div class="empty-note">📭 Belum ada data</div>';return}l.innerHTML=arr.map((k,i)=>{const t=k.total,pLPQ=t?(k.LPQ/t)*100:0,pMDT=t?(k.MDT/t)*100:0,pPP=t?(k.PONPES/t)*100:0;return`<div class="kec-item${t===0?' empty':''}"><div class="kec-row-head"><div class="kec-row-name"><span class="kec-row-rank">${i+1}</span>🏢 ${k.nama}</div><div class="kec-total-badge">${t}</div></div><div class="kec-pills"><span class="pill lpq">📘 LPQ ${k.LPQ}</span><span class="pill mdt">📗 MDT ${k.MDT}</span><span class="pill ponpes">📕 PONPES ${k.PONPES}</span></div><div class="kec-bar"><div class="kec-bar-seg lpq" style="width:${pLPQ}%;"></div><div class="kec-bar-seg mdt" style="width:${pMDT}%;"></div><div class="kec-bar-seg ponpes" style="width:${pPP}%;"></div>${t===0?'<div class="kec-bar-seg empty" style="width:100%;"></div>':''}</div></div>`}).join('')}
 
-        // ===== LOAD DATA =====
-        async function loadData(){const l=document.getElementById('kecList');l.innerHTML='<div class="spinner"></div>';try{const f=getRoleFilter();if(f.restrict){l.innerHTML='<div class="empty-note">🔒 Akses ditolak</div>';return}let kq=supabaseClient.from('master_kecamatan').select('id,nama').order('nama');if(f.kecamatan_id)kq=kq.eq('id',f.kecamatan_id);const{data:kl}=await kq,lm=await fetchLembaga(f),cnt={};(kl||[]).forEach(k=>{cnt[k.id]={nama:k.nama,LPQ:0,MDT:0,PONPES:0,total:0}});lm.forEach(r=>{const j=r.jenis_lembaga;if(r.kecamatan_id&&cnt[r.kecamatan_id]&&(j==='LPQ'||j==='MDT'||j==='PONPES')){cnt[r.kecamatan_id][j]++;cnt[r.kecamatan_id].total++}});const arr=Object.values(cnt).sort((a,b)=>b.total-a.total||a.nama.localeCompare(b.nama));renderDonut(arr);renderList(arr);const g=arr.reduce((s,k)=>s+k.total,0);document.getElementById('totalKec').textContent=arr.length;document.getElementById('avgLembaga').textContent=arr.length?(g/arr.length).toFixed(1):'0';document.getElementById('topKec').textContent=arr.length&&arr[0].total>0?arr[0].nama:'-';document.getElementById('totalKecStat').textContent=arr.length;document.getElementById('totalLembagaStat').textContent=g;document.getElementById('topKecStat').textContent=arr.length&&arr[0].total>0?arr[0].nama:'-';ts()}catch(e){console.error(e);l.innerHTML=`<div class="empty-note" style="color:#f44336;">Gagal: ${e.message}</div>`}}
+        async function loadData(){const l=document.getElementById('kecList');l.innerHTML='<div class="spinner"></div>';try{const f=getRoleFilter();if(f.restrict){l.innerHTML='<div class="empty-note">🔒 Akses ditolak</div>';return}let kq=supabaseClient.from('master_kecamatan').select('id,nama').order('nama');if(f.kecamatan_id)kq=kq.eq('id',f.kecamatan_id);const{data:kl}=await kq,lm=await fetchLembaga(f),cnt={};(kl||[]).forEach(k=>{cnt[k.id]={nama:k.nama,LPQ:0,MDT:0,PONPES:0,total:0}});lm.forEach(r=>{const j=r.jenis_lembaga;if(r.kecamatan_id&&cnt[r.kecamatan_id]&&(j==='LPQ'||j==='MDT'||j==='PONPES')){cnt[r.kecamatan_id][j]++;cnt[r.kecamatan_id].total++}});const arr=Object.values(cnt).sort((a,b)=>b.total-a.total||a.nama.localeCompare(b.nama));renderDonut(arr);renderList(arr);const g=arr.reduce((s,k)=>s+k.total,0);st('totalKec',arr.length);st('avgLembaga',arr.length?(g/arr.length).toFixed(1):'0');st('topKec',arr.length&&arr[0].total>0?arr[0].nama:'-');st('totalKecStat',arr.length);st('totalLembagaStat',g);st('topKecStat',arr.length&&arr[0].total>0?arr[0].nama:'-');ts();updatePendidikStats(f,lm);}catch(e){console.error(e);l.innerHTML=`<div class="empty-note" style="color:#f44336;">Gagal: ${e.message}</div>`}}
+
+        // ===== PENDIDIK STATS (pakai total keseluruhan - tanpa filter kecamatan) =====
+        async function updatePendidikStats(f,lembagaRows){
+            // Ambil TOTAL pendidik aktif sesuai role filter (jenis_lembaga saja, bukan per kecamatan)
+            let qP=supabaseClient.from('pendidik').select('*',{count:'exact',head:true}).eq('status_aktif',true);
+            if(f.jenis_lembaga)qP=qP.eq('jenis_lembaga',f.jenis_lembaga);
+            const{count:pc}=await qP;
+            st('totalPendidikStat',pc||0);
+            st('totalPendidikChart',pc||0);
+        }
 
         function refreshData(){cache.clear();showToast('Memperbarui...','info');loadData()}
 
-        document.addEventListener('DOMContentLoaded',async()=>{if(!await checkAuth())return;await loadData();supabaseClient.from('pendidik').select('*',{count:'exact',head:true}).eq('status_aktif',true).then(({count})=>document.getElementById('navPendidikCount').textContent=count||0)});
+        document.addEventListener('DOMContentLoaded',async()=>{if(!await checkAuth())return;await loadData();supabaseClient.from('pendidik').select('*',{count:'exact',head:true}).eq('status_aktif',true).then(({count})=>st('navPendidikCount',count||0))});
 
         window.showToast=showToast;window.refreshData=refreshData;window.getUser=getUser;
     </script>
