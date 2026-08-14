@@ -7,12 +7,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         /* ============================================================
-           SI-MUSTAFA - LEMBAGA (FULL VERSION - FIXED)
+           SI-MUSTAFA - LEMBAGA (FULL VERSION)
            ============================================================ */
 
-        /* ===== RESET & VARIABLES ===== */
         * {
             margin: 0;
             padding: 0;
@@ -35,7 +35,6 @@
             --purple: #9C27B0;
             --bg-gray: #f0f4f0;
             --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --card-shadow-hover: 0 8px 30px rgba(0, 100, 0, 0.15);
         }
 
         body {
@@ -62,22 +61,10 @@
             transform: translateX(0);
         }
 
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
+        .sidebar.collapsed { transform: translateX(-100%); }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
 
         .sidebar-brand {
             padding: 16px 20px;
@@ -99,35 +86,12 @@
             flex-shrink: 0;
         }
 
-        .sidebar-brand .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
+        .sidebar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+        .sidebar-brand .brand-text h1 { font-size: 1rem; font-weight: 700; color: white; letter-spacing: 0.5px; }
+        .sidebar-brand .brand-text h1 span { color: var(--gold); }
+        .sidebar-brand .brand-text small { font-size: 0.55rem; opacity: 0.7; font-weight: 300; }
 
-        .sidebar-brand .brand-text h1 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: white;
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar-brand .brand-text h1 span {
-            color: var(--gold);
-        }
-
-        .sidebar-brand .brand-text small {
-            font-size: 0.55rem;
-            opacity: 0.7;
-            font-weight: 300;
-        }
-
-        .sidebar-menu {
-            flex: 1;
-            padding: 12px 0;
-            list-style: none;
-        }
-
+        .sidebar-menu { flex: 1; padding: 12px 0; list-style: none; }
         .sidebar-menu .menu-label {
             padding: 8px 20px;
             font-size: 0.6rem;
@@ -151,24 +115,9 @@
             cursor: pointer;
         }
 
-        .sidebar-menu .menu-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: white;
-        }
-
-        .sidebar-menu .menu-item.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--gold);
-            border-left-color: var(--gold);
-        }
-
-        .sidebar-menu .menu-item i {
-            width: 20px;
-            font-size: 1.1rem;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
+        .sidebar-menu .menu-item:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+        .sidebar-menu .menu-item.active { background: rgba(255, 255, 255, 0.1); color: var(--gold); border-left-color: var(--gold); }
+        .sidebar-menu .menu-item i { width: 20px; font-size: 1.1rem; text-align: center; flex-shrink: 0; }
         .sidebar-menu .menu-item .badge {
             margin-left: auto;
             background: var(--danger);
@@ -204,11 +153,7 @@
             flex-shrink: 0;
         }
 
-        .sidebar-footer .user-info {
-            flex: 1;
-            min-width: 0;
-        }
-
+        .sidebar-footer .user-info { flex: 1; min-width: 0; }
         .sidebar-footer .user-info .name {
             font-size: 0.8rem;
             font-weight: 600;
@@ -237,12 +182,8 @@
             border-radius: 6px;
         }
 
-        .sidebar-footer .logout-btn:hover {
-            color: #ff6b6b;
-            background: rgba(255, 0, 0, 0.1);
-        }
+        .sidebar-footer .logout-btn:hover { color: #ff6b6b; background: rgba(255, 0, 0, 0.1); }
 
-        /* ===== OVERLAY ===== */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -254,9 +195,7 @@
             z-index: 999;
         }
 
-        .sidebar-overlay.active {
-            display: block;
-        }
+        .sidebar-overlay.active { display: block; }
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
@@ -269,9 +208,7 @@
             padding: 20px 40px 40px 40px;
         }
 
-        .main-content.expanded {
-            margin-left: 0;
-        }
+        .main-content.expanded { margin-left: 0; }
 
         /* ===== HEADER ===== */
         .header {
@@ -289,12 +226,7 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
+        .header-left { display: flex; align-items: center; gap: 16px; }
         .header-left .sidebar-toggle {
             background: none;
             border: none;
@@ -306,97 +238,22 @@
             transition: 0.2s;
         }
 
-        .header-left .sidebar-toggle:hover {
-            background: var(--bg-gray);
-            color: var(--primary);
-        }
+        .header-left .sidebar-toggle:hover { background: var(--bg-gray); color: var(--primary); }
+        .header-left .page-title h1 { font-size: 1.1rem; font-weight: 700; color: var(--primary-dark); }
+        .header-left .page-title p { font-size: 0.7rem; color: #888; }
 
-        .header-left .page-title h1 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .header-date { font-size: 0.75rem; color: #888; }
+        .header-right .role-badge { background: var(--primary); color: white; padding: 4px 14px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
+        .header-right .role-scope { font-size: 0.6rem; color: #888; }
+        .header-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 10px; border-radius: 8px; transition: 0.2s; }
+        .header-user:hover { background: var(--bg-gray); }
+        .header-user .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; }
+        .header-user .user-name { font-size: 0.8rem; font-weight: 600; color: var(--primary-dark); }
+        .logout-btn-header { background: none; border: none; color: #999; cursor: pointer; font-size: 1rem; padding: 4px 8px; transition: 0.2s; border-radius: 6px; }
+        .logout-btn-header:hover { color: var(--danger); background: rgba(244, 67, 54, 0.08); }
 
-        .header-left .page-title p {
-            font-size: 0.7rem;
-            color: #888;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .header-date {
-            font-size: 0.75rem;
-            color: #888;
-        }
-
-        .header-right .role-badge {
-            background: var(--primary);
-            color: white;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            font-weight: 600;
-        }
-
-        .header-right .role-scope {
-            font-size: 0.6rem;
-            color: #888;
-        }
-
-        .header-user {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 8px;
-            transition: 0.2s;
-        }
-
-        .header-user:hover {
-            background: var(--bg-gray);
-        }
-
-        .header-user .avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
-
-        .header-user .user-name {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-        }
-
-        .logout-btn-header {
-            background: none;
-            border: none;
-            color: #999;
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 4px 8px;
-            transition: 0.2s;
-            border-radius: 6px;
-        }
-
-        .logout-btn-header:hover {
-            color: var(--danger);
-            background: rgba(244, 67, 54, 0.08);
-        }
-
-        /* ===== WELCOME SECTION ===== */
+        /* ===== WELCOME ===== */
         .welcome-section {
             background: linear-gradient(135deg, #0a2e1a 0%, #1a5a3a 50%, #2e7d32 100%);
             border-radius: 14px;
@@ -411,26 +268,10 @@
             box-shadow: 0 8px 32px rgba(0, 100, 0, 0.3);
         }
 
-        .welcome-section .welcome-text h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-
-        .welcome-section .welcome-text h2 span {
-            color: var(--gold);
-        }
-
-        .welcome-section .welcome-text p {
-            font-size: 0.85rem;
-            opacity: 0.85;
-            margin-top: 2px;
-        }
-
-        .welcome-section .welcome-text p i {
-            margin-right: 6px;
-            color: var(--gold);
-        }
-
+        .welcome-section .welcome-text h2 { font-size: 1.3rem; font-weight: 700; }
+        .welcome-section .welcome-text h2 span { color: var(--gold); }
+        .welcome-section .welcome-text p { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
+        .welcome-section .welcome-text p i { margin-right: 6px; color: var(--gold); }
         .welcome-section .welcome-badge {
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -444,11 +285,9 @@
             white-space: nowrap;
         }
 
-        .welcome-section .welcome-badge i {
-            color: var(--gold);
-        }
+        .welcome-section .welcome-badge i { color: var(--gold); }
 
-        /* ===== STAT MINI ===== */
+        /* ===== STATS ===== */
         .stat-mini {
             display: flex;
             gap: 16px;
@@ -466,22 +305,10 @@
             border-left: 3px solid var(--primary);
         }
 
-        .stat-mini .stat-item strong {
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
-
-        .stat-mini .stat-item:nth-child(2) {
-            border-left-color: #7b1fa2;
-        }
-
-        .stat-mini .stat-item:nth-child(3) {
-            border-left-color: #00897b;
-        }
-
-        .stat-mini .stat-item:nth-child(4) {
-            border-left-color: #f9a825;
-        }
+        .stat-mini .stat-item strong { color: var(--primary); font-size: 1.1rem; }
+        .stat-mini .stat-item:nth-child(2) { border-left-color: #7b1fa2; }
+        .stat-mini .stat-item:nth-child(3) { border-left-color: #00897b; }
+        .stat-mini .stat-item:nth-child(4) { border-left-color: #f9a825; }
 
         /* ===== FILTER ===== */
         .filter-section {
@@ -498,19 +325,8 @@
             position: relative;
         }
 
-        .filter-section .filter-item {
-            flex: 1;
-            min-width: 180px;
-        }
-
-        .filter-section .filter-item label {
-            display: block;
-            font-size: 0.7rem;
-            color: #888;
-            margin-bottom: 2px;
-            font-weight: 600;
-        }
-
+        .filter-section .filter-item { flex: 1; min-width: 180px; }
+        .filter-section .filter-item label { display: block; font-size: 0.7rem; color: #888; margin-bottom: 2px; font-weight: 600; }
         .filter-section .filter-item input {
             width: 100%;
             padding: 8px 14px;
@@ -527,40 +343,13 @@
             box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.08);
         }
 
-        .filter-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .filter-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .filter-actions .btn { white-space: nowrap; }
 
-        .filter-actions .btn {
-            white-space: nowrap;
-        }
-
-        .badge-filter-active {
-            animation: pulse-dot 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.3;
-            }
-        }
-
-        .btn-filter-active {
-            background: var(--primary) !important;
-            color: white !important;
-            border-color: var(--primary) !important;
-        }
-
-        .btn-filter-active i {
-            color: white !important;
-        }
+        .badge-filter-active { animation: pulse-dot 1.5s ease-in-out infinite; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .btn-filter-active { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
+        .btn-filter-active i { color: white !important; }
 
         .role-badge-filter {
             background: var(--primary);
@@ -581,28 +370,11 @@
             box-shadow: var(--card-shadow);
         }
 
-        .card .card-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-        }
+        .card .card-title { font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); }
+        .card .card-title i { margin-right: 8px; color: var(--primary); }
 
-        .card .card-title i {
-            margin-right: 8px;
-            color: var(--primary);
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        .table-responsive table {
-            width: 100%;
-            font-size: 0.85rem;
-            border-collapse: collapse;
-        }
-
-        /* ===== TABLE HEADER ===== */
+        .table-responsive { overflow-x: auto; }
+        .table-responsive table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
         .table-responsive table th {
             padding: 10px 12px;
             text-align: left;
@@ -617,27 +389,10 @@
             top: 0;
         }
 
-        /* ===== TABLE STRIPED (SELANG-SELING SOFT) ===== */
-        .table-responsive table tbody tr:nth-child(even) {
-            background: #f6faf6;
-        }
-
-        .table-responsive table tbody tr:nth-child(odd) {
-            background: #ffffff;
-        }
-
-        .table-responsive table tbody tr:hover {
-            background: #e8f5e9;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        /* ===== TABLE CELL ===== */
-        .table-responsive table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #f0f4f0;
-            vertical-align: middle;
-        }
+        .table-responsive table tbody tr:nth-child(even) { background: #f6faf6; }
+        .table-responsive table tbody tr:nth-child(odd) { background: #ffffff; }
+        .table-responsive table tbody tr:hover { background: #e8f5e9; cursor: pointer; transition: background 0.2s ease; }
+        .table-responsive table td { padding: 10px 12px; border-bottom: 1px solid #f0f4f0; vertical-align: middle; }
 
         /* ===== BADGE ===== */
         .badge {
@@ -648,15 +403,8 @@
             display: inline-block;
         }
 
-        .badge.active {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .badge.inactive {
-            background: #ffebee;
-            color: #c62828;
-        }
+        .badge.active { background: #e8f5e9; color: #2e7d32; }
+        .badge.inactive { background: #ffebee; color: #c62828; }
 
         /* ===== BUTTONS ===== */
         .btn {
@@ -672,53 +420,16 @@
             gap: 6px;
         }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 1.5px solid var(--primary);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-light);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #43a047;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #d32f2f;
-        }
-
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: 0.7rem;
-        }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-light); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #43a047; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #d32f2f; }
+        .btn-sm { padding: 4px 10px; font-size: 0.7rem; }
 
         /* ===== TOAST ===== */
         .toast {
@@ -738,26 +449,11 @@
             max-width: 90%;
         }
 
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .toast-success {
-            background: var(--success);
-        }
-
-        .toast-error {
-            background: var(--danger);
-        }
-
-        .toast-info {
-            background: var(--primary);
-        }
-
-        .toast-warning {
-            background: var(--warning);
-        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+        .toast-info { background: var(--primary); }
+        .toast-warning { background: var(--warning); }
 
         /* ===== SPINNER ===== */
         .spinner {
@@ -770,11 +466,43 @@
             margin: 0 auto;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== SPINNER OVERLAY ===== */
+        .spinner-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 4000;
+            justify-content: center;
+            align-items: center;
         }
+
+        .spinner-overlay.active { display: flex; }
+
+        .spinner-box {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .spinner-box .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        .spinner-box p { margin: 0; color: #555; font-size: 0.9rem; }
 
         /* ===== MODAL ===== */
         .modal-overlay {
@@ -791,9 +519,7 @@
             padding: 20px;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal-container {
             background: white;
@@ -808,14 +534,8 @@
         }
 
         @keyframes fadeInModal {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .modal-header {
@@ -827,12 +547,7 @@
             border-bottom: 2px solid #f0f2f5;
         }
 
-        .modal-header h2 {
-            font-size: 1.2rem;
-            color: var(--primary);
-            font-weight: 700;
-        }
-
+        .modal-header h2 { font-size: 1.2rem; color: var(--primary); font-weight: 700; }
         .modal-header .close-btn {
             background: none;
             border: none;
@@ -842,22 +557,10 @@
             padding: 0 8px;
         }
 
-        .modal-header .close-btn:hover {
-            color: #333;
-        }
+        .modal-header .close-btn:hover { color: #333; }
 
-        .modal-body .form-group {
-            margin-bottom: 14px;
-        }
-
-        .modal-body .form-group label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 2px;
-        }
-
+        .modal-body .form-group { margin-bottom: 14px; }
+        .modal-body .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #555; margin-bottom: 2px; }
         .modal-body .form-group input,
         .modal-body .form-group select {
             width: 100%;
@@ -893,195 +596,48 @@
             border-top: 1px solid #f0f2f5;
         }
 
-        /* ===== FILTER MODAL ===== */
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 2px;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            background: #fafafa;
-            transition: 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: var(--primary);
-            outline: none;
-            background: white;
-        }
-
         /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .sidebar-overlay.active {
-                display: block;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 16px 20px 30px 20px;
-            }
-
-            .header {
-                padding: 0 20px;
-            }
-
-            .header-left .page-title p {
-                display: none;
-            }
-
-            .header-date {
-                display: none;
-            }
-
-            .header-right .role-scope {
-                display: none;
-            }
-
-            .filter-section .filter-item {
-                min-width: 100%;
-            }
-
-            .filter-actions {
-                width: 100%;
-                justify-content: stretch;
-            }
-
-            .filter-actions .btn {
-                flex: 1;
-                justify-content: center;
-                font-size: 0.7rem;
-                padding: 6px 10px;
-            }
-
-            .stat-mini {
-                gap: 10px;
-            }
-
-            .stat-mini .stat-item {
-                font-size: 0.75rem;
-                padding: 6px 14px;
-            }
-
-            .stat-mini .stat-item strong {
-                font-size: 0.95rem;
-            }
-
-            .welcome-section {
-                padding: 16px 20px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .welcome-section .welcome-text h2 {
-                font-size: 1rem;
-            }
-
-            .welcome-section .welcome-text p {
-                font-size: 0.75rem;
-            }
-
-            .welcome-section .welcome-badge {
-                font-size: 0.65rem;
-                padding: 4px 12px;
-            }
-
-            .table-responsive table {
-                font-size: 0.75rem;
-            }
-
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+            .main-content { margin-left: 0; padding: 16px 20px 30px 20px; }
+            .header { padding: 0 20px; }
+            .header-left .page-title p { display: none; }
+            .header-date { display: none; }
+            .header-right .role-scope { display: none; }
+            .filter-section .filter-item { min-width: 100%; }
+            .filter-actions { width: 100%; justify-content: stretch; }
+            .filter-actions .btn { flex: 1; justify-content: center; font-size: 0.7rem; padding: 6px 10px; }
+            .stat-mini { gap: 10px; }
+            .stat-mini .stat-item { font-size: 0.75rem; padding: 6px 14px; }
+            .stat-mini .stat-item strong { font-size: 0.95rem; }
+            .welcome-section { padding: 16px 20px; flex-direction: column; align-items: flex-start; }
+            .welcome-section .welcome-text h2 { font-size: 1rem; }
+            .welcome-section .welcome-text p { font-size: 0.75rem; }
+            .welcome-section .welcome-badge { font-size: 0.65rem; padding: 4px 12px; }
+            .table-responsive table { font-size: 0.75rem; }
             .table-responsive table th,
-            .table-responsive table td {
-                padding: 6px 8px;
-            }
+            .table-responsive table td { padding: 6px 8px; }
         }
 
         @media (max-width: 480px) {
-            .header {
-                padding: 0 12px;
-                height: 56px;
-            }
-
-            .header-left .page-title h1 {
-                font-size: 0.85rem;
-            }
-
-            .header-left .sidebar-toggle {
-                font-size: 1rem;
-                padding: 2px 6px;
-            }
-
-            .header-user .user-name {
-                display: none;
-            }
-
-            .header-right .role-badge {
-                display: none;
-            }
-
-            .main-content {
-                padding: 12px 12px 20px 12px;
-            }
-
-            .stat-mini .stat-item {
-                font-size: 0.7rem;
-                padding: 4px 10px;
-            }
-
-            .stat-mini .stat-item strong {
-                font-size: 0.85rem;
-            }
-
-            .card {
-                padding: 16px;
-            }
-
-            .filter-section {
-                padding: 12px 16px;
-            }
-
-            .modal-container {
-                padding: 16px;
-                margin: 10px;
-            }
-
-            .welcome-section {
-                padding: 14px 16px;
-            }
-
-            .welcome-section .welcome-text h2 {
-                font-size: 0.9rem;
-            }
-
-            .table-responsive table {
-                font-size: 0.7rem;
-            }
-
+            .header { padding: 0 12px; height: 56px; }
+            .header-left .page-title h1 { font-size: 0.85rem; }
+            .header-left .sidebar-toggle { font-size: 1rem; padding: 2px 6px; }
+            .header-user .user-name { display: none; }
+            .header-right .role-badge { display: none; }
+            .main-content { padding: 12px 12px 20px 12px; }
+            .stat-mini .stat-item { font-size: 0.7rem; padding: 4px 10px; }
+            .stat-mini .stat-item strong { font-size: 0.85rem; }
+            .card { padding: 16px; }
+            .filter-section { padding: 12px 16px; }
+            .modal-container { padding: 16px; margin: 10px; }
+            .welcome-section { padding: 14px 16px; }
+            .welcome-section .welcome-text h2 { font-size: 0.9rem; }
+            .table-responsive table { font-size: 0.7rem; }
             .table-responsive table th,
-            .table-responsive table td {
-                padding: 4px 6px;
-            }
+            .table-responsive table td { padding: 4px 6px; }
         }
     </style>
 </head>
@@ -1099,37 +655,12 @@
 
         <ul class="sidebar-menu">
             <li class="menu-label">Menu Utama</li>
-            <li>
-                <a class="menu-item" href="dashboard.html">
-                    <i class="fas fa-chart-pie"></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a class="menu-item active" href="lembaga.html">
-                    <i class="fas fa-building"></i> Lembaga
-                </a>
-            </li>
-            <li>
-                <a class="menu-item" href="pendidik.html">
-                    <i class="fas fa-user-graduate"></i> Pendidik
-                    <span class="badge" id="navPendidikCount">0</span>
-                </a>
-            </li>
-            <li>
-                <a class="menu-item" href="mutasi.html">
-                    <i class="fas fa-exchange-alt"></i> Mutasi Pendidik
-                </a>
-            </li>
-            <li>
-                <a class="menu-item" href="bantuan.html">
-                    <i class="fas fa-hand-holding-heart"></i> Bantuan
-                </a>
-            </li>
-            <li>
-                <a class="menu-item" href="pengaturan.html">
-                    <i class="fas fa-cog"></i> Pengaturan
-                </a>
-            </li>
+            <li><a class="menu-item" href="dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+            <li><a class="menu-item active" href="lembaga.html"><i class="fas fa-building"></i> Lembaga</a></li>
+            <li><a class="menu-item" href="pendidik.html"><i class="fas fa-user-graduate"></i> Pendidik <span class="badge" id="navPendidikCount">0</span></a></li>
+            <li><a class="menu-item" href="mutasi.html"><i class="fas fa-exchange-alt"></i> Mutasi Pendidik</a></li>
+            <li><a class="menu-item" href="bantuan.html"><i class="fas fa-hand-holding-heart"></i> Bantuan</a></li>
+            <li><a class="menu-item" href="pengaturan.html"><i class="fas fa-cog"></i> Pengaturan</a></li>
         </ul>
 
         <div class="sidebar-footer">
@@ -1138,9 +669,7 @@
                 <div class="name" id="userName">Admin</div>
                 <div class="role" id="userRole">Super Admin</div>
             </div>
-            <button class="logout-btn" onclick="handleLogout()" title="Logout">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
         </div>
     </aside>
 
@@ -1175,7 +704,7 @@
             </div>
         </header>
 
-        <!-- ===== WELCOME SECTION ===== -->
+        <!-- ===== WELCOME ===== -->
         <div class="welcome-section">
             <div class="welcome-text">
                 <h2>Selamat datang, <span id="welcomeName">Admin</span> 👋</h2>
@@ -1187,7 +716,7 @@
             </div>
         </div>
 
-        <!-- ===== STATISTIK RINGKAS ===== -->
+        <!-- ===== STATISTIK ===== -->
         <div class="stat-mini" id="statMini">
             <div class="stat-item">Total Lembaga: <strong id="totalLembagaStat">0</strong></div>
             <div class="stat-item">LPQ: <strong id="totalLPQ">0</strong></div>
@@ -1195,7 +724,7 @@
             <div class="stat-item">PONPES: <strong id="totalPONPES">0</strong></div>
         </div>
 
-        <!-- ===== FILTER & ACTION ===== -->
+        <!-- ===== FILTER ===== -->
         <div class="filter-section">
             <div class="filter-item" style="flex:2;">
                 <label><i class="fas fa-search"></i> Cari Lembaga</label>
@@ -1206,25 +735,17 @@
                     <i class="fas fa-sliders-h"></i> Filter
                     <span class="badge-filter-active" id="filterActiveBadge" style="display:none;background:#ff9800;color:white;font-size:0.55rem;padding:1px 8px;border-radius:10px;margin-left:4px;">●</span>
                 </button>
-                <button class="btn btn-outline" onclick="resetFilter()">
-                    <i class="fas fa-undo"></i> Reset
-                </button>
-                <button class="btn btn-success" onclick="openAddModal()" id="btnTambah">
-                    <i class="fas fa-plus"></i> Tambah
-                </button>
-                <button class="btn btn-outline" onclick="openImportModal()" id="btnImport">
-                    <i class="fas fa-file-import"></i> Import
-                </button>
-                <button class="btn btn-primary" onclick="exportData()" id="btnExport">
-                    <i class="fas fa-file-excel"></i> Export
-                </button>
+                <button class="btn btn-outline" onclick="resetFilter()"><i class="fas fa-undo"></i> Reset</button>
+                <button class="btn btn-success" onclick="openAddModal()" id="btnTambah"><i class="fas fa-plus"></i> Tambah</button>
+                <button class="btn btn-outline" onclick="openImportModal()" id="btnImport"><i class="fas fa-file-import"></i> Import</button>
+                <button class="btn btn-primary" onclick="exportData()" id="btnExport"><i class="fas fa-file-excel"></i> Export</button>
                 <button class="btn btn-outline" onclick="cekDanPerbaikiDataLembaga()" style="border-color:#9C27B0;color:#9C27B0;">
                     <i class="fas fa-wrench"></i> Perbaiki
                 </button>
             </div>
         </div>
 
-        <!-- ===== TABEL LEMBAGA ===== -->
+        <!-- ===== TABEL ===== -->
         <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
                 <div class="card-title" style="margin-bottom:0;"><i class="fas fa-list"></i>Daftar Lembaga</div>
@@ -1259,6 +780,14 @@
 
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
+
+    <!-- ===== SPINNER OVERLAY ===== -->
+    <div class="spinner-overlay" id="spinnerOverlay">
+        <div class="spinner-box">
+            <div class="spinner"></div>
+            <p id="spinnerText">Sedang memproses...</p>
+        </div>
+    </div>
 
     <!-- ===== MODAL FILTER ===== -->
     <div class="modal-overlay" id="filterModal">
@@ -1427,7 +956,6 @@
     <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
         // ============================================================
@@ -1435,7 +963,6 @@
         // ============================================================
         const dataCache = {
             _store: {},
-
             get(key, ttlMs = 30 * 60 * 1000) {
                 const entry = this._store[key];
                 if (!entry) return null;
@@ -1445,11 +972,9 @@
                 }
                 return entry.data;
             },
-
             set(key, data) {
                 this._store[key] = { data, timestamp: Date.now() };
             },
-
             clear(key) {
                 if (key) {
                     delete this._store[key];
@@ -1458,6 +983,18 @@
                 }
             }
         };
+
+        // ============================================================
+        // ===== VARIABLES =====
+        // ============================================================
+        let currentPage = 1;
+        let pageSize = 50;
+        let totalData = 0;
+        let currentFilters = { search: '', jenis: 'all', status: 'all', kecamatan: '', desa: '' };
+        let modalMode = 'view';
+        let isNewRecord = false;
+        let searchTimeout;
+        let isExporting = false;
 
         // ============================================================
         // ===== SIDEBAR FUNCTIONS =====
@@ -1471,10 +1008,8 @@
 
         window.addEventListener('resize', function() {
             if (window.innerWidth > 992) {
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.getElementById('sidebarOverlay');
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
             }
         });
 
@@ -1712,18 +1247,7 @@
         }
 
         // ============================================================
-        // ===== LEMBAGA VARIABLES =====
-        // ============================================================
-        let currentPage = 1;
-        let pageSize = 50;
-        let totalData = 0;
-        let currentFilters = { search: '', jenis: 'all', status: 'all', kecamatan: '', desa: '' };
-        let modalMode = 'view';
-        let isNewRecord = false;
-        let searchTimeout;
-
-        // ============================================================
-        // ===== FILTER MODAL =====
+        // ===== FILTER FUNCTIONS =====
         // ============================================================
         function openFilterModal() {
             document.getElementById('filterJenis').value = currentFilters.jenis || 'all';
@@ -1859,7 +1383,7 @@
         }
 
         // ============================================================
-        // ===== MASTER DATA =====
+        // ===== MASTER DATA LOADING =====
         // ============================================================
         async function loadKecamatanOptions() {
             const cached = dataCache.get('kecamatan_options', 60 * 60 * 1000);
@@ -1916,8 +1440,6 @@
                     select.value = currentValue;
                 }
 
-                console.log(`✅ Load ${data.length} desa untuk kecamatan ${kecamatanId}`);
-
             } catch (e) {
                 console.error('Error loading desa:', e);
                 select.innerHTML = '<option value="">-- Error loading desa --</option>';
@@ -1942,49 +1464,23 @@
         }
 
         // ============================================================
-        // ===== EVENT LISTENER =====
+        // ===== EVENT LISTENERS =====
         // ============================================================
         document.getElementById('editKecamatan').addEventListener('change', function() {
             const kecamatanId = this.value;
-            console.log('🔄 Kecamatan berubah:', kecamatanId);
             loadDesaOptions(kecamatanId, 'editDesa');
         });
 
-        // Filter kecamatan change listener
         document.getElementById('filterKecamatan').addEventListener('change', function() {
             loadDesaFilter(this.value);
         });
 
-        // Search debounce
         document.getElementById('searchInput').addEventListener('input', function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 applyFilter();
             }, 500);
         });
-
-        // ============================================================
-        // ===== SHOW ROLE BADGE =====
-        // ============================================================
-        function showRoleBadge(jenis) {
-            const label = {
-                'LPQ': '📘 BATKO - LPQ',
-                'MDT': '📗 FKDT - MDT',
-                'PONPES': '📕 PONPES'
-            };
-
-            const oldBadge = document.querySelector('.role-badge-filter');
-            if (oldBadge) oldBadge.remove();
-
-            const badge = document.createElement('div');
-            badge.className = 'role-badge-filter';
-            badge.textContent = `📌 ${label[jenis] || jenis}`;
-
-            const filterSection = document.querySelector('.filter-section');
-            if (filterSection) {
-                filterSection.prepend(badge);
-            }
-        }
 
         // ============================================================
         // ===== LOAD LEMBAGA =====
@@ -1996,13 +1492,11 @@
 
                 let query = supabaseClient
                     .from('lembaga')
-                    .select(
-                        `
+                    .select(`
                         *,
                         master_kecamatan!lembaga_kecamatan_id_fkey(nama),
                         master_kelurahan!lembaga_desa_id_fkey(nama)
-                    `, { count: 'exact' }
-                    );
+                    `, { count: 'exact' });
 
                 if (filter.restrict) {
                     document.getElementById('lembagaTableBody').innerHTML =
@@ -2023,7 +1517,7 @@
                 if (currentFilters.search) {
                     query = query.or(
                         `nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`
-                        );
+                    );
                 }
 
                 if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') {
@@ -2078,8 +1572,28 @@
             }
         }
 
+        function showRoleBadge(jenis) {
+            const label = {
+                'LPQ': '📘 BATKO - LPQ',
+                'MDT': '📗 FKDT - MDT',
+                'PONPES': '📕 PONPES'
+            };
+
+            const oldBadge = document.querySelector('.role-badge-filter');
+            if (oldBadge) oldBadge.remove();
+
+            const badge = document.createElement('div');
+            badge.className = 'role-badge-filter';
+            badge.textContent = `📌 ${label[jenis] || jenis}`;
+
+            const filterSection = document.querySelector('.filter-section');
+            if (filterSection) {
+                filterSection.prepend(badge);
+            }
+        }
+
         // ============================================================
-        // ===== RENDER TABEL =====
+        // ===== RENDER TABLE =====
         // ============================================================
         function renderTable(data) {
             const tbody = document.getElementById('lembagaTableBody');
@@ -2108,37 +1622,37 @@
         }
 
         // ============================================================
-        // ===== STATISTIK (FIXED) =====
+        // ===== STATISTIK =====
         // ============================================================
-async function updateStats() {
-    try {
-        const user = getUser();
-        const filter = getRoleFilter();
+        async function updateStats() {
+            try {
+                const user = getUser();
+                const filter = getRoleFilter();
 
-        let qTotal = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true });
-        let qLpq = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'LPQ');
-        let qMdt = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'MDT');
-        let qPonpes = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'PONPES');
+                let qTotal = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true });
+                let qLpq = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'LPQ');
+                let qMdt = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'MDT');
+                let qPonpes = supabaseClient.from('lembaga').select('*', { count: 'exact', head: true }).eq('jenis_lembaga', 'PONPES');
 
-        if (filter.kecamatan_id) {
-            qTotal = qTotal.eq('kecamatan_id', filter.kecamatan_id);
-            qLpq = qLpq.eq('kecamatan_id', filter.kecamatan_id);
-            qMdt = qMdt.eq('kecamatan_id', filter.kecamatan_id);
-            qPonpes = qPonpes.eq('kecamatan_id', filter.kecamatan_id);
+                if (filter.kecamatan_id) {
+                    qTotal = qTotal.eq('kecamatan_id', filter.kecamatan_id);
+                    qLpq = qLpq.eq('kecamatan_id', filter.kecamatan_id);
+                    qMdt = qMdt.eq('kecamatan_id', filter.kecamatan_id);
+                    qPonpes = qPonpes.eq('kecamatan_id', filter.kecamatan_id);
+                }
+                if (filter.jenis_lembaga) {
+                    qTotal = qTotal.eq('jenis_lembaga', filter.jenis_lembaga);
+                }
+
+                const [total, lpq, mdt, ponpes] = await Promise.all([qTotal, qLpq, qMdt, qPonpes]);
+
+                document.getElementById('totalLembagaStat').textContent = total.count || 0;
+                document.getElementById('totalLPQ').textContent = lpq.count || 0;
+                document.getElementById('totalMDT').textContent = mdt.count || 0;
+                document.getElementById('totalPONPES').textContent = ponpes.count || 0;
+
+            } catch (e) { console.error('Error updating stats:', e); }
         }
-        if (filter.jenis_lembaga) {
-            qTotal = qTotal.eq('jenis_lembaga', filter.jenis_lembaga);
-        }
-
-        const [total, lpq, mdt, ponpes] = await Promise.all([qTotal, qLpq, qMdt, qPonpes]);
-
-        document.getElementById('totalLembagaStat').textContent = total.count || 0;
-        document.getElementById('totalLPQ').textContent = lpq.count || 0;
-        document.getElementById('totalMDT').textContent = mdt.count || 0;
-        document.getElementById('totalPONPES').textContent = ponpes.count || 0;
-
-    } catch (e) { console.error('Error updating stats:', e); }
-}
 
         // ============================================================
         // ===== PAGINATION =====
@@ -2248,13 +1762,11 @@ async function updateStats() {
             try {
                 const { data, error } = await supabaseClient
                     .from('lembaga')
-                    .select(
-                        `
+                    .select(`
                         *,
                         master_kecamatan!lembaga_kecamatan_id_fkey(id, nama),
                         master_kelurahan!lembaga_desa_id_fkey(id, nama)
-                    `
-                        )
+                    `)
                     .eq('id', id)
                     .single();
 
@@ -2264,9 +1776,6 @@ async function updateStats() {
                     return;
                 }
 
-                console.log('📋 Data lembaga:', data);
-
-                // Isi data dasar
                 document.getElementById('editId').value = data.id;
                 document.getElementById('editNama').value = data.nama || '';
                 document.getElementById('editJenis').value = data.jenis_lembaga || 'LPQ';
@@ -2281,7 +1790,6 @@ async function updateStats() {
                 document.getElementById('editKabupaten').value = data.kabupaten || 'Tegal';
                 document.getElementById('editProvinsi').value = data.provinsi || 'Jawa Tengah';
 
-                // Set kecamatan
                 const kecamatanSelect = document.getElementById('editKecamatan');
                 const desaSelect = document.getElementById('editDesa');
 
@@ -2303,12 +1811,10 @@ async function updateStats() {
                     }
                 }
 
-                // Load desa berdasarkan kecamatan
                 const kecamatanId = kecamatanSelect.value;
                 if (kecamatanId) {
                     await loadDesaOptions(kecamatanId, 'editDesa');
 
-                    // Set desa
                     if (data.desa_id) {
                         desaSelect.value = data.desa_id;
                     } else if (data.desa) {
@@ -2326,30 +1832,6 @@ async function updateStats() {
                                 .eq('id', data.id);
                             showToast('Desa berhasil diperbaiki!', 'success');
                         }
-                    }
-                }
-
-                // Jika desa masih kosong, coba dari field desa (varchar)
-                if (!desaSelect.value && data.desa && kecamatanId) {
-                    const { data: allDesa } = await supabaseClient
-                        .from('master_kelurahan')
-                        .select('id, nama')
-                        .eq('kecamatan_id', kecamatanId);
-
-                    const desaName = data.desa.toLowerCase().trim();
-                    const match = allDesa?.find(d =>
-                        d.nama.toLowerCase().trim() === desaName ||
-                        d.nama.toLowerCase().trim().includes(desaName) ||
-                        desaName.includes(d.nama.toLowerCase().trim())
-                    );
-
-                    if (match) {
-                        desaSelect.value = match.id;
-                        await supabaseClient
-                            .from('lembaga')
-                            .update({ desa_id: match.id })
-                            .eq('id', data.id);
-                        showToast('Desa berhasil diperbaiki!', 'success');
                     }
                 }
 
@@ -2382,7 +1864,6 @@ async function updateStats() {
                 return;
             }
 
-            // Disable button saat proses
             const saveBtn = document.getElementById('btnSave');
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
@@ -2405,7 +1886,6 @@ async function updateStats() {
                 updated_at: new Date().toISOString()
             };
 
-            // Update field desa dan kecamatan (varchar) juga
             const kecamatanSelect = document.getElementById('editKecamatan');
             const desaSelect = document.getElementById('editDesa');
 
@@ -2446,7 +1926,6 @@ async function updateStats() {
 
                 if (error) throw error;
 
-                // Clear cache yang terkait
                 dataCache.clear();
 
                 showToast(`Data lembaga berhasil ${isEdit ? 'diperbarui' : 'ditambahkan'}!`, 'success');
@@ -2483,12 +1962,11 @@ async function updateStats() {
         }
 
         // ============================================================
-        // ===== CEK DAN PERBAIKI DATA LEMBAGA =====
+        // ===== CEK DAN PERBAIKI DATA =====
         // ============================================================
         async function cekDanPerbaikiDataLembaga() {
             try {
                 showToast('🔍 Memeriksa data lembaga...', 'info');
-                console.log('🔍 Memeriksa data lembaga...');
 
                 const { data: lembaga, error } = await supabaseClient
                     .from('lembaga')
@@ -2498,13 +1976,11 @@ async function updateStats() {
 
                 let fixed = 0;
                 let noMatch = 0;
-                let updated = [];
 
                 for (const l of lembaga) {
                     let perluUpdate = false;
                     const updates = {};
 
-                    // Cek kecamatan
                     if (!l.kecamatan_id && l.kecamatan) {
                         const { data: kecData } = await supabaseClient
                             .from('master_kecamatan')
@@ -2515,11 +1991,9 @@ async function updateStats() {
                         if (kecData) {
                             updates.kecamatan_id = kecData.id;
                             perluUpdate = true;
-                            console.log(`✅ Fix kecamatan: ${l.nama} -> ${l.kecamatan}`);
                         }
                     }
 
-                    // Cek desa
                     if (!l.desa_id && l.desa) {
                         let desaId = null;
 
@@ -2546,10 +2020,8 @@ async function updateStats() {
                         if (desaId) {
                             updates.desa_id = desaId;
                             perluUpdate = true;
-                            console.log(`✅ Fix desa: ${l.nama} -> ${l.desa}`);
                         } else {
                             noMatch++;
-                            console.warn(`⚠️ Desa tidak ditemukan: ${l.desa} untuk ${l.nama}`);
                         }
                     }
 
@@ -2559,18 +2031,11 @@ async function updateStats() {
                             .update(updates)
                             .eq('id', l.id);
 
-                        if (updateError) {
-                            console.error(`❌ Gagal update ${l.nama}:`, updateError);
-                        } else {
+                        if (!updateError) {
                             fixed++;
-                            updated.push(l.nama);
                         }
                     }
                 }
-
-                console.log(`📊 Hasil perbaikan:`);
-                console.log(`✅ Berhasil diperbaiki: ${fixed} lembaga`);
-                console.log(`❌ Desa tidak ditemukan: ${noMatch} lembaga`);
 
                 if (fixed > 0) {
                     dataCache.clear();
@@ -2589,214 +2054,172 @@ async function updateStats() {
             }
         }
 
-// ============================================================
-// ===== EXPORT DATA LEMBAGA (ALL DATA - PAGINATION) =====
-// ============================================================
-async function exportData() {
-    if (isExporting) { 
-        showToast('Export sedang diproses...', 'warning'); 
-        return; 
-    }
-
-    const exportBtn = document.getElementById('btnExport');
-    isExporting = true;
-    exportBtn.disabled = true;
-    exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengambil semua data...';
-
-    const spinnerOverlay = document.getElementById('spinnerOverlay');
-    const spinnerText = document.getElementById('spinnerText');
-    spinnerText.textContent = 'Mengambil semua data lembaga...';
-    spinnerOverlay.classList.add('active');
-
-    try {
-        const user = getUser();
-        const filter = getRoleFilter();
-
-        // ===== AMBIL SEMUA DATA DENGAN PAGINATION =====
-        let allData = [];
-        let page = 0;
-        const batchSize = 1000; // Ambil 1000 per batch
-        let hasMore = true;
-
-        while (hasMore) {
-            const from = page * batchSize;
-            const to = from + batchSize - 1;
-
-            let query = supabaseClient
-                .from('lembaga')
-                .select(
-                    `
-                    *,
-                    master_kecamatan!lembaga_kecamatan_id_fkey(nama),
-                    master_kelurahan!lembaga_desa_id_fkey(nama)
-                `
-                );
-
-            // Apply role-based filters
-            if (filter.kecamatan_id) {
-                query = query.eq('kecamatan_id', filter.kecamatan_id);
-            }
-            if (filter.jenis_lembaga) {
-                query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+        // ============================================================
+        // ===== EXPORT DATA (FIXED) =====
+        // ============================================================
+        async function exportData() {
+            if (isExporting) {
+                showToast('Export sedang diproses...', 'warning');
+                return;
             }
 
-            // Apply search filter
-            if (currentFilters.search) {
-                query = query.or(
-                    `nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`
-                );
+            const exportBtn = document.getElementById('btnExport');
+            isExporting = true;
+            exportBtn.disabled = true;
+            exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengambil semua data...';
+
+            const spinnerOverlay = document.getElementById('spinnerOverlay');
+            const spinnerText = document.getElementById('spinnerText');
+
+            if (spinnerOverlay) {
+                spinnerText.textContent = 'Mengambil semua data lembaga...';
+                spinnerOverlay.classList.add('active');
             }
 
-            // Apply other filters
-            if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') {
-                query = query.eq('jenis_lembaga', currentFilters.jenis);
-            }
-            if (currentFilters.status !== 'all') {
-                query = query.eq('status_aktif', currentFilters.status === 'true');
-            }
-            if (!filter.kecamatan_id && currentFilters.kecamatan) {
-                query = query.eq('kecamatan_id', currentFilters.kecamatan);
-            }
-            if (!filter.kecamatan_id && currentFilters.desa) {
-                query = query.eq('desa_id', currentFilters.desa);
-            }
+            try {
+                const user = getUser();
+                const filter = getRoleFilter();
 
-            const { data, error } = await query
-                .order('nama', { ascending: true })
-                .range(from, to);
+                let allData = [];
+                let page = 0;
+                const batchSize = 1000;
+                let hasMore = true;
 
-            if (error) throw error;
+                while (hasMore) {
+                    const from = page * batchSize;
+                    const to = from + batchSize - 1;
 
-            if (!data || data.length === 0) {
-                hasMore = false;
-            } else {
-                // Client-side filter tambahan untuk search di nama kecamatan/desa
-                let filteredData = data;
-                if (currentFilters.search && !filter.kecamatan_id) {
-                    const searchLower = currentFilters.search.toLowerCase();
-                    filteredData = data.filter(item => {
-                        const kecamatanName = (item.master_kecamatan?.nama || '').toLowerCase();
-                        const desaName = (item.master_kelurahan?.nama || '').toLowerCase();
-                        if (kecamatanName.includes(searchLower)) return true;
-                        if (desaName.includes(searchLower)) return true;
-                        return (item.nama || '').toLowerCase().includes(searchLower);
-                    });
+                    let query = supabaseClient
+                        .from('lembaga')
+                        .select(`
+                            *,
+                            master_kecamatan!lembaga_kecamatan_id_fkey(nama),
+                            master_kelurahan!lembaga_desa_id_fkey(nama)
+                        `);
+
+                    if (filter.kecamatan_id) {
+                        query = query.eq('kecamatan_id', filter.kecamatan_id);
+                    }
+                    if (filter.jenis_lembaga) {
+                        query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+                    }
+
+                    if (currentFilters.search) {
+                        query = query.or(
+                            `nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`
+                        );
+                    }
+
+                    if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') {
+                        query = query.eq('jenis_lembaga', currentFilters.jenis);
+                    }
+                    if (currentFilters.status !== 'all') {
+                        query = query.eq('status_aktif', currentFilters.status === 'true');
+                    }
+                    if (!filter.kecamatan_id && currentFilters.kecamatan) {
+                        query = query.eq('kecamatan_id', currentFilters.kecamatan);
+                    }
+                    if (!filter.kecamatan_id && currentFilters.desa) {
+                        query = query.eq('desa_id', currentFilters.desa);
+                    }
+
+                    const { data, error } = await query
+                        .order('nama', { ascending: true })
+                        .range(from, to);
+
+                    if (error) throw error;
+
+                    if (!data || data.length === 0) {
+                        hasMore = false;
+                    } else {
+                        let filteredData = data;
+                        if (currentFilters.search && !filter.kecamatan_id) {
+                            const searchLower = currentFilters.search.toLowerCase();
+                            filteredData = data.filter(item => {
+                                const kecamatanName = (item.master_kecamatan?.nama || '').toLowerCase();
+                                const desaName = (item.master_kelurahan?.nama || '').toLowerCase();
+                                if (kecamatanName.includes(searchLower)) return true;
+                                if (desaName.includes(searchLower)) return true;
+                                return (item.nama || '').toLowerCase().includes(searchLower);
+                            });
+                        }
+                        allData = allData.concat(filteredData);
+
+                        if (data.length < batchSize) {
+                            hasMore = false;
+                        } else {
+                            page++;
+                            if (spinnerText) {
+                                spinnerText.textContent = `Mengambil data... ${allData.length} data terkumpul`;
+                            }
+                        }
+                    }
                 }
-                allData = allData.concat(filteredData);
 
-                // Jika data yang didapat kurang dari batchSize, berarti sudah selesai
-                if (data.length < batchSize) {
-                    hasMore = false;
-                } else {
-                    page++;
-                    // Update progress
-                    spinnerText.textContent = `Mengambil data... ${allData.length} data terkumpul`;
+                if (allData.length === 0) {
+                    showToast('Tidak ada data untuk diexport', 'warning');
+                    if (spinnerOverlay) spinnerOverlay.classList.remove('active');
+                    return;
                 }
+
+                if (spinnerText) {
+                    spinnerText.textContent = `Memproses ${allData.length} data untuk export...`;
+                }
+
+                const headers = [
+                    'NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP',
+                    'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
+                    'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI',
+                    'NO. HP', 'EMAIL', 'STATUS'
+                ];
+
+                const rows = allData.map(item => [
+                    item.nama || '',
+                    item.jenis_lembaga || '',
+                    item.nslp || '',
+                    item.tahun_berdiri || '',
+                    item.pimpinan || '',
+                    item.alamat || '',
+                    item.master_kecamatan?.nama || item.kecamatan || '',
+                    item.master_kelurahan?.nama || item.desa || '',
+                    item.kabupaten || 'Tegal',
+                    item.provinsi || 'Jawa Tengah',
+                    item.no_hp || '',
+                    item.email || '',
+                    item.status_aktif ? 'Aktif' : 'Tidak Aktif'
+                ]);
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
+                XLSX.utils.book_append_sheet(wb, ws, 'Lembaga');
+
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([wbout], { type: 'application/octet-stream' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                const date = new Date().toISOString().split('T')[0];
+                link.download = `data_lembaga_${date}_${allData.length}.xlsx`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+
+                if (spinnerOverlay) spinnerOverlay.classList.remove('active');
+                showToast(`Export berhasil! ${allData.length} data`, 'success');
+
+            } catch (e) {
+                console.error('Export error:', e);
+                const spinnerOverlay = document.getElementById('spinnerOverlay');
+                if (spinnerOverlay) spinnerOverlay.classList.remove('active');
+                showToast('Gagal export: ' + e.message, 'error');
+            } finally {
+                isExporting = false;
+                exportBtn.disabled = false;
+                exportBtn.innerHTML = '<i class="fas fa-file-excel"></i> Export';
             }
         }
 
-        if (allData.length === 0) {
-            showToast('Tidak ada data untuk diexport', 'warning');
-            spinnerOverlay.classList.remove('active');
-            return;
-        }
-
-        spinnerText.textContent = `Memproses ${allData.length} data untuk export...`;
-
-        // ===== BUAT HEADER EXCEL =====
-        const headers = [
-            'NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP',
-            'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
-            'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI',
-            'NO. HP', 'EMAIL', 'STATUS'
-        ];
-
-        // ===== BUAT ROWS DARI SEMUA DATA =====
-        const rows = allData.map(item => [
-            item.nama || '',
-            item.jenis_lembaga || '',
-            item.nslp || '',
-            item.tahun_berdiri || '',
-            item.pimpinan || '',
-            item.alamat || '',
-            item.master_kecamatan?.nama || item.kecamatan || '',
-            item.master_kelurahan?.nama || item.desa || '',
-            item.kabupaten || 'Tegal',
-            item.provinsi || 'Jawa Tengah',
-            item.no_hp || '',
-            item.email || '',
-            item.status_aktif ? 'Aktif' : 'Tidak Aktif'
-        ]);
-
-        // ===== BUAT FILE EXCEL =====
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-        
-        // Set column widths
-        ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
-        
-        XLSX.utils.book_append_sheet(wb, ws, 'Lembaga');
-
-        // ===== DOWNLOAD =====
-        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([wbout], { type: 'application/octet-stream' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        const date = new Date().toISOString().split('T')[0];
-        link.download = `data_lembaga_${date}_${allData.length}.xlsx`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-
-        spinnerOverlay.classList.remove('active');
-        showToast(`Export berhasil! ${allData.length} data`, 'success');
-
-    } catch (e) {
-        console.error('Export error:', e);
-        spinnerOverlay.classList.remove('active');
-        showToast('Gagal export: ' + e.message, 'error');
-    } finally {
-        isExporting = false;
-        exportBtn.disabled = false;
-        exportBtn.innerHTML = '<i class="fas fa-file-excel"></i> Export';
-    }
-}
-
         // ============================================================
-        // ===== DOWNLOAD TEMPLATE =====
-        // ============================================================
-        function downloadTemplate() {
-            const headers = [
-                'NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP',
-                'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
-                'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI',
-                'NO. HP', 'EMAIL', 'STATUS'
-            ];
-
-            const exampleRow = [
-                'MDTU Lafutuhiyah', 'MDT', '1234567890',
-                '1998', 'H. Ahmad', 'Jl. Karangdawa No. 1',
-                'Margasari', 'Karangdawa', 'Tegal', 'Jawa Tengah',
-                '08123456789', 'lafutuhiyah@example.com', 'Aktif'
-            ];
-
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
-            ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
-            XLSX.utils.book_append_sheet(wb, ws, 'Template Lembaga');
-
-            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-            const blob = new Blob([wbout], { type: 'application/octet-stream' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'template_lembaga.xlsx';
-            link.click();
-            URL.revokeObjectURL(link.href);
-
-            showToast('Template berhasil diunduh!', 'success');
-        }
-
-        // ============================================================
-        // ===== IMPORT LEMBAGA =====
+        // ===== IMPORT FUNCTIONS =====
         // ============================================================
         function openImportModal() {
             document.getElementById('importModal').classList.add('active');
@@ -2883,7 +2306,7 @@ async function exportData() {
                                 if (desaData) desaId = desaData.id;
                                 else errors.push(
                                     `Baris ${i + 2}: Desa "${desaNama}" tidak ditemukan di kecamatan tersebut`
-                                    );
+                                );
                             }
 
                             const status = row['STATUS'] || row['Status'] || 'Aktif';
@@ -2922,7 +2345,6 @@ async function exportData() {
                         }
                     }
 
-                    // Tampilkan detail error jika ada
                     if (errors.length > 0) {
                         console.warn('⚠️ Import errors:', errors);
                     }
@@ -2931,7 +2353,7 @@ async function exportData() {
                     showToast(
                         `Import selesai: ${success} berhasil, ${failed} gagal${errors.length > 0 ? '. Cek console untuk detail.' : ''}`,
                         success > 0 ? 'success' : 'error'
-                        );
+                    );
                     loadLembaga();
 
                 } catch (error) {
@@ -2967,6 +2389,37 @@ async function exportData() {
             return mapping[value] || 'LPQ';
         }
 
+        function downloadTemplate() {
+            const headers = [
+                'NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP',
+                'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
+                'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI',
+                'NO. HP', 'EMAIL', 'STATUS'
+            ];
+
+            const exampleRow = [
+                'MDTU Lafutuhiyah', 'MDT', '1234567890',
+                '1998', 'H. Ahmad', 'Jl. Karangdawa No. 1',
+                'Margasari', 'Karangdawa', 'Tegal', 'Jawa Tengah',
+                '08123456789', 'lafutuhiyah@example.com', 'Aktif'
+            ];
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
+            ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
+            XLSX.utils.book_append_sheet(wb, ws, 'Template Lembaga');
+
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'template_lembaga.xlsx';
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+            showToast('Template berhasil diunduh!', 'success');
+        }
+
         // ============================================================
         // ===== REFRESH =====
         // ============================================================
@@ -2974,8 +2427,7 @@ async function exportData() {
             showToast('Memperbarui data...', 'info');
             dataCache.clear();
             loadLembaga();
-            supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif',
-                    true)
+            supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true)
                 .then(({ count }) => { document.getElementById('navPendidikCount').textContent = count || 0; });
         }
 
@@ -2983,7 +2435,6 @@ async function exportData() {
         // ===== INIT =====
         // ============================================================
         document.addEventListener('DOMContentLoaded', async function() {
-            // Set page size berdasarkan device
             pageSize = window.innerWidth < 768 ? 20 : 50;
 
             const authOk = await checkAuth();
