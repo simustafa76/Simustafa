@@ -2589,104 +2589,177 @@ async function updateStats() {
             }
         }
 
-        // ============================================================
-        // ===== EXPORT DATA =====
-        // ============================================================
-        async function exportData() {
-            try {
-                showToast('Mengambil data...', 'info');
+// ============================================================
+// ===== EXPORT DATA LEMBAGA (ALL DATA - PAGINATION) =====
+// ============================================================
+async function exportData() {
+    if (isExporting) { 
+        showToast('Export sedang diproses...', 'warning'); 
+        return; 
+    }
 
-                const user = getUser();
-                const filter = getRoleFilter();
+    const exportBtn = document.getElementById('btnExport');
+    isExporting = true;
+    exportBtn.disabled = true;
+    exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengambil semua data...';
 
-                let query = supabaseClient
-                    .from('lembaga')
-                    .select(
-                        `
-                        *,
-                        master_kecamatan!lembaga_kecamatan_id_fkey(nama),
-                        master_kelurahan!lembaga_desa_id_fkey(nama)
+    const spinnerOverlay = document.getElementById('spinnerOverlay');
+    const spinnerText = document.getElementById('spinnerText');
+    spinnerText.textContent = 'Mengambil semua data lembaga...';
+    spinnerOverlay.classList.add('active');
+
+    try {
+        const user = getUser();
+        const filter = getRoleFilter();
+
+        // ===== AMBIL SEMUA DATA DENGAN PAGINATION =====
+        let allData = [];
+        let page = 0;
+        const batchSize = 1000; // Ambil 1000 per batch
+        let hasMore = true;
+
+        while (hasMore) {
+            const from = page * batchSize;
+            const to = from + batchSize - 1;
+
+            let query = supabaseClient
+                .from('lembaga')
+                .select(
                     `
-                        );
+                    *,
+                    master_kecamatan!lembaga_kecamatan_id_fkey(nama),
+                    master_kelurahan!lembaga_desa_id_fkey(nama)
+                `
+                );
 
-                if (filter.kecamatan_id) {
-                    query = query.eq('kecamatan_id', filter.kecamatan_id);
+            // Apply role-based filters
+            if (filter.kecamatan_id) {
+                query = query.eq('kecamatan_id', filter.kecamatan_id);
+            }
+            if (filter.jenis_lembaga) {
+                query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+            }
+
+            // Apply search filter
+            if (currentFilters.search) {
+                query = query.or(
+                    `nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`
+                );
+            }
+
+            // Apply other filters
+            if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') {
+                query = query.eq('jenis_lembaga', currentFilters.jenis);
+            }
+            if (currentFilters.status !== 'all') {
+                query = query.eq('status_aktif', currentFilters.status === 'true');
+            }
+            if (!filter.kecamatan_id && currentFilters.kecamatan) {
+                query = query.eq('kecamatan_id', currentFilters.kecamatan);
+            }
+            if (!filter.kecamatan_id && currentFilters.desa) {
+                query = query.eq('desa_id', currentFilters.desa);
+            }
+
+            const { data, error } = await query
+                .order('nama', { ascending: true })
+                .range(from, to);
+
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                hasMore = false;
+            } else {
+                // Client-side filter tambahan untuk search di nama kecamatan/desa
+                let filteredData = data;
+                if (currentFilters.search && !filter.kecamatan_id) {
+                    const searchLower = currentFilters.search.toLowerCase();
+                    filteredData = data.filter(item => {
+                        const kecamatanName = (item.master_kecamatan?.nama || '').toLowerCase();
+                        const desaName = (item.master_kelurahan?.nama || '').toLowerCase();
+                        if (kecamatanName.includes(searchLower)) return true;
+                        if (desaName.includes(searchLower)) return true;
+                        return (item.nama || '').toLowerCase().includes(searchLower);
+                    });
                 }
-                if (filter.jenis_lembaga) {
-                    query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+                allData = allData.concat(filteredData);
+
+                // Jika data yang didapat kurang dari batchSize, berarti sudah selesai
+                if (data.length < batchSize) {
+                    hasMore = false;
+                } else {
+                    page++;
+                    // Update progress
+                    spinnerText.textContent = `Mengambil data... ${allData.length} data terkumpul`;
                 }
-
-                if (currentFilters.search) {
-                    query = query.or(
-                        `nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`
-                        );
-                }
-                if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') {
-                    query = query.eq('jenis_lembaga', currentFilters.jenis);
-                }
-                if (currentFilters.status !== 'all') {
-                    query = query.eq('status_aktif', currentFilters.status === 'true');
-                }
-                if (!filter.kecamatan_id && currentFilters.kecamatan) {
-                    query = query.eq('kecamatan_id', currentFilters.kecamatan);
-                }
-                if (!filter.kecamatan_id && currentFilters.desa) {
-                    query = query.eq('desa_id', currentFilters.desa);
-                }
-
-                const { data, error } = await query.order('nama', { ascending: true });
-
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    showToast('Tidak ada data untuk diexport', 'warning');
-                    return;
-                }
-
-                const headers = [
-                    'NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP',
-                    'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
-                    'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI',
-                    'NO. HP', 'EMAIL', 'STATUS'
-                ];
-
-                const rows = data.map(item => [
-                    item.nama || '',
-                    item.jenis_lembaga || '',
-                    item.nslp || '',
-                    item.tahun_berdiri || '',
-                    item.pimpinan || '',
-                    item.alamat || '',
-                    item.master_kecamatan?.nama || item.kecamatan || '',
-                    item.master_kelurahan?.nama || item.desa || '',
-                    item.kabupaten || 'Tegal',
-                    item.provinsi || 'Jawa Tengah',
-                    item.no_hp || '',
-                    item.email || '',
-                    item.status_aktif ? 'Aktif' : 'Tidak Aktif'
-                ]);
-
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
-                XLSX.utils.book_append_sheet(wb, ws, 'Lembaga');
-
-                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                const blob = new Blob([wbout], { type: 'application/octet-stream' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                const date = new Date().toISOString().split('T')[0];
-                link.download = `data_lembaga_${date}.xlsx`;
-                link.click();
-                URL.revokeObjectURL(link.href);
-
-                showToast(`Export berhasil! ${data.length} data`, 'success');
-
-            } catch (e) {
-                console.error(e);
-                showToast('Gagal export: ' + e.message, 'error');
             }
         }
+
+        if (allData.length === 0) {
+            showToast('Tidak ada data untuk diexport', 'warning');
+            spinnerOverlay.classList.remove('active');
+            return;
+        }
+
+        spinnerText.textContent = `Memproses ${allData.length} data untuk export...`;
+
+        // ===== BUAT HEADER EXCEL =====
+        const headers = [
+            'NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP',
+            'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
+            'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI',
+            'NO. HP', 'EMAIL', 'STATUS'
+        ];
+
+        // ===== BUAT ROWS DARI SEMUA DATA =====
+        const rows = allData.map(item => [
+            item.nama || '',
+            item.jenis_lembaga || '',
+            item.nslp || '',
+            item.tahun_berdiri || '',
+            item.pimpinan || '',
+            item.alamat || '',
+            item.master_kecamatan?.nama || item.kecamatan || '',
+            item.master_kelurahan?.nama || item.desa || '',
+            item.kabupaten || 'Tegal',
+            item.provinsi || 'Jawa Tengah',
+            item.no_hp || '',
+            item.email || '',
+            item.status_aktif ? 'Aktif' : 'Tidak Aktif'
+        ]);
+
+        // ===== BUAT FILE EXCEL =====
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+        
+        // Set column widths
+        ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
+        
+        XLSX.utils.book_append_sheet(wb, ws, 'Lembaga');
+
+        // ===== DOWNLOAD =====
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([wbout], { type: 'application/octet-stream' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        const date = new Date().toISOString().split('T')[0];
+        link.download = `data_lembaga_${date}_${allData.length}.xlsx`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+        spinnerOverlay.classList.remove('active');
+        showToast(`Export berhasil! ${allData.length} data`, 'success');
+
+    } catch (e) {
+        console.error('Export error:', e);
+        spinnerOverlay.classList.remove('active');
+        showToast('Gagal export: ' + e.message, 'error');
+    } finally {
+        isExporting = false;
+        exportBtn.disabled = false;
+        exportBtn.innerHTML = '<i class="fas fa-file-excel"></i> Export';
+    }
+}
 
         // ============================================================
         // ===== DOWNLOAD TEMPLATE =====
