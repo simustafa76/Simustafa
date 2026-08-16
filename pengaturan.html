@@ -167,6 +167,7 @@
         .user-list-item .user-status { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .user-list-item .user-status.active { background: var(--success); }
         .user-list-item .user-status.inactive { background: #ccc; }
+        .user-list-item .action-buttons { display: flex; gap: 4px; align-items: center; }
 
         .btn { padding: 6px 14px; border: none; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -182,6 +183,8 @@
         .btn-icon { padding: 4px 8px; border: none; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; background: transparent; color: #888; }
         .btn-icon:hover { background: #f0f2f5; color: var(--primary); }
         .btn-icon.danger:hover { background: #ffebee; color: var(--danger); }
+        .btn-icon.success:hover { background: #e8f5e9; color: var(--success); }
+        .btn-icon.warning:hover { background: #fff3e0; color: var(--warning); }
 
         .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f5f6f8; }
         .setting-item:last-child { border-bottom: none; }
@@ -215,6 +218,86 @@
         .progress-bar { width: 100%; height: 6px; background: #f0f2f5; border-radius: 3px; margin-top: 8px; overflow: hidden; }
         .progress-bar .fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s ease; width: 0%; }
 
+        /* Modal Edit */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            padding: 24px 32px;
+            max-width: 500px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-box .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        .modal-box .modal-header h3 {
+            font-size: 1rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-box .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #999;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .modal-box .modal-close:hover { background: #f0f2f5; color: var(--danger); }
+        .modal-box .form-group { margin-bottom: 12px; }
+        .modal-box .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 4px; }
+        .modal-box .form-group input, .modal-box .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .modal-box .form-group input:focus, .modal-box .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,100,0,0.08);
+        }
+        .modal-box .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 2px solid #f0f2f5;
+        }
+
         /* Style khusus untuk BADKO LPQ */
         .badge-badko {
             background: #e3f2fd !important;
@@ -241,6 +324,7 @@
             .user-list-item { flex-wrap: wrap; }
             .welcome-section { padding: 16px 20px; flex-direction: column; align-items: flex-start; }
             .welcome-section .welcome-text h2 { font-size: 1rem; }
+            .modal-box { padding: 20px; }
         }
 
         @media (max-width: 480px) {
@@ -252,6 +336,7 @@
             .setting-section { padding: 16px; }
             .tab-btn { font-size: 0.65rem; padding: 4px 8px; }
             .welcome-section { padding: 14px 16px; }
+            .user-list-item .action-buttons { margin-left: auto; }
         }
     </style>
 </head>
@@ -388,6 +473,50 @@
         </div>
     </main>
 
+    <!-- Modal Edit User -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-edit" style="color:var(--primary);"></i> Edit Pengguna</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" id="editName" placeholder="Nama lengkap">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="editEmail" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label>Password (kosongkan jika tidak diubah)</label>
+                <input type="text" id="editPassword" placeholder="Password baru (min 6)">
+            </div>
+            <div class="form-group" id="editRoleGroup">
+                <label>Role</label>
+                <select id="editRole">
+                    <option value="operator">Operator</option>
+                    <option value="batko">BADKO LPQ</option>
+                    <option value="fkdt">FKDT</option>
+                    <option value="ponpes">PONPES</option>
+                    <option value="admin_kab">Admin Kabupaten</option>
+                    <option value="super_admin">Super Admin</option>
+                </select>
+            </div>
+            <div class="form-group" id="editStatusGroup">
+                <label>Status</label>
+                <select id="editStatus">
+                    <option value="true">Aktif</option>
+                    <option value="false">Nonaktif</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" onclick="closeEditModal()">Batal</button>
+                <button class="btn btn-primary" id="btnSaveEdit" onclick="saveEditUser()"><i class="fas fa-save"></i> Simpan</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script src="js/supabase-client.js"></script>
@@ -482,6 +611,7 @@
         // ============================================================
         let allLembaga = [];
         let isProcessing = false;
+        let editingUserId = null;
 
         // ============================================================
         // ===== SIDEBAR =====
@@ -788,6 +918,153 @@
         }
 
         // ============================================================
+        // ===== EDIT USER =====
+        // ============================================================
+        function openEditModal(userId) {
+            const user = getUser();
+            if (!user) return;
+            
+            // Cari data user dari daftar yang sudah dimuat
+            const userList = document.querySelectorAll('.user-list-item');
+            let userData = null;
+            
+            // Ambil data dari DOM atau dari cache
+            const users = document.querySelectorAll('.user-list-item');
+            for (const el of users) {
+                const btn = el.querySelector('[data-user-id]');
+                if (btn && btn.dataset.userId === userId) {
+                    const nameEl = el.querySelector('.name');
+                    const emailEl = el.querySelector('.email');
+                    const roleEl = el.querySelector('.user-role');
+                    const statusEl = el.querySelector('.user-status');
+                    
+                    userData = {
+                        id: userId,
+                        name: nameEl ? nameEl.textContent.replace(' (Nonaktif)', '') : '',
+                        email: emailEl ? emailEl.textContent : '',
+                        role: roleEl ? roleEl.textContent.replace(/[^\w_]/g, '').toLowerCase() : 'operator',
+                        active: statusEl ? statusEl.classList.contains('active') : true
+                    };
+                    break;
+                }
+            }
+            
+            if (!userData) {
+                // Jika tidak ditemukan di DOM, ambil dari database
+                supabaseClient.from('users').select('*').eq('id', userId).single()
+                    .then(({ data, error }) => {
+                        if (error || !data) {
+                            showToast('Gagal memuat data pengguna', 'error');
+                            return;
+                        }
+                        fillEditModal(data);
+                    });
+                return;
+            }
+            
+            fillEditModal(userData);
+        }
+
+        function fillEditModal(userData) {
+            editingUserId = userData.id;
+            document.getElementById('editName').value = userData.name || '';
+            document.getElementById('editEmail').value = userData.email || '';
+            document.getElementById('editPassword').value = '';
+            
+            // Set role
+            const roleSelect = document.getElementById('editRole');
+            const roleMap = {
+                'super_admin': 'super_admin',
+                'admin_kab': 'admin_kab',
+                'batko': 'batko',
+                'fkdt': 'fkdt',
+                'ponpes': 'ponpes',
+                'operator': 'operator'
+            };
+            const roleKey = roleMap[userData.role] || 'operator';
+            roleSelect.value = roleKey;
+            
+            // Set status
+            document.getElementById('editStatus').value = userData.active !== false ? 'true' : 'false';
+            
+            // Tampilkan modal
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingUserId = null;
+            document.getElementById('editPassword').value = '';
+        }
+
+        async function saveEditUser() {
+            if (!editingUserId) {
+                showToast('Tidak ada pengguna yang diedit', 'error');
+                return;
+            }
+            
+            const name = document.getElementById('editName').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const password = document.getElementById('editPassword').value.trim();
+            const role = document.getElementById('editRole').value;
+            const status = document.getElementById('editStatus').value === 'true';
+            
+            if (!name) { showToast('Nama wajib diisi!', 'error'); return; }
+            if (!email) { showToast('Email wajib diisi!', 'error'); return; }
+            if (!isValidEmail(email)) { showToast('Format email tidak valid!', 'error'); return; }
+            
+            // Cek email duplikat (kecuali dirinya sendiri)
+            const { data: exist } = await supabaseClient.from('users')
+                .select('email')
+                .eq('email', email)
+                .neq('id', editingUserId)
+                .maybeSingle();
+            if (exist) { showToast('Email sudah digunakan oleh pengguna lain!', 'error'); return; }
+            
+            isProcessing = true;
+            const btn = document.getElementById('btnSaveEdit');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            
+            try {
+                // Update data di tabel users
+                const updateData = {
+                    name: name,
+                    email: email,
+                    role: role,
+                    active: status,
+                    updated_at: new Date().toISOString()
+                };
+                
+                const { error: ue } = await supabaseClient.from('users')
+                    .update(updateData)
+                    .eq('id', editingUserId);
+                if (ue) throw ue;
+                
+                // Update email di auth jika berubah
+                if (password && password.length >= 6) {
+                    // Update password di auth
+                    const { error: pe } = await supabaseClient.auth.updateUser({ password: password });
+                    if (pe) throw pe;
+                }
+                
+                // Jika email berubah, update di auth juga
+                // Note: Supabase tidak mengizinkan update email melalui client-side tanpa verifikasi
+                // Kita hanya update di tabel users
+                
+                showToast('Pengguna berhasil diperbarui!', 'success');
+                closeEditModal();
+                loadUsers();
+            } catch (e) {
+                showToast('Gagal: ' + e.message, 'error');
+            } finally {
+                isProcessing = false;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Simpan';
+            }
+        }
+
+        // ============================================================
         // ===== DELETE USER (nonaktifkan) =====
         // ============================================================
         async function deleteUser(userId) {
@@ -850,10 +1127,36 @@
                         <div class="user-info"><div class="name${act?'':' inactive-name'}">${u.name||'-'}${act?'':' (Nonaktif)'}</div><div class="email">${u.email||'-'}</div>${u.role==='operator'?`<div class="email" style="color:var(--primary);">🏫 ${lm[u.lembaga_id]||'-'}</div>`:''}</div>
                         <span class="user-role ${u.role||'viewer'}">${displayRole}</span>
                         <span class="user-status ${act?'active':'inactive'}"></span>
-                        ${act?`<button class="btn-icon danger" onclick="deleteUser('${u.id}')" title="Nonaktifkan"><i class="fas fa-ban"></i></button>`:''}
+                        <div class="action-buttons">
+                            ${act ? `
+                                <button class="btn-icon warning" onclick="openEditModal('${u.id}')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon danger" onclick="deleteUser('${u.id}')" title="Nonaktifkan">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                            ` : `
+                                <button class="btn-icon success" onclick="reactivateUser('${u.id}')" title="Aktifkan kembali">
+                                    <i class="fas fa-check-circle"></i>
+                                </button>
+                            `}
+                        </div>
                     </div>`;
                 }).join('');
             } catch (e) { document.getElementById('userList').innerHTML = `<div style="text-align:center;padding:30px;color:#f44336;">Gagal: ${e.message}</div>`; }
+        }
+
+        // ============================================================
+        // ===== REACTIVATE USER =====
+        // ============================================================
+        async function reactivateUser(userId) {
+            if (!confirm('Aktifkan kembali pengguna ini?')) return;
+            try {
+                const { error } = await supabaseClient.from('users').update({ active: true, updated_at: new Date().toISOString() }).eq('id', userId);
+                if (error) throw error;
+                showToast('Pengguna diaktifkan kembali!', 'success');
+                loadUsers();
+            } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
         }
 
         function applyUIRestrictions() {
@@ -966,6 +1269,10 @@
         window.loadUsers = loadUsers;
         window.addUser = addUser;
         window.deleteUser = deleteUser;
+        window.reactivateUser = reactivateUser;
+        window.openEditModal = openEditModal;
+        window.closeEditModal = closeEditModal;
+        window.saveEditUser = saveEditUser;
         window.toggleSwitch = toggleSwitch;
         window.backupDatabase = backupDatabase;
         window.restoreDatabase = restoreDatabase;
