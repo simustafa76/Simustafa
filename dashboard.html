@@ -1,0 +1,3853 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Dashboard - SI-MUSTAFA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* ===== RESET & VARIABLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed: 0px;
+            --header-height: 64px;
+            --primary: #006400;
+            --primary-light: #4CAF50;
+            --primary-dark: #0a2e1a;
+            --gold: #FFD700;
+            --gold-dark: #DAA520;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #f44336;
+            --info: #2196F3;
+            --purple: #9C27B0;
+            --bg-gray: #f0f4f0;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 30px rgba(0, 100, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e8f5e9 0%, #e3f2fd 50%, #f3e5f5 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(180deg, #0a2e1a 0%, #1a5a3a 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(0);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .sidebar-brand {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: var(--header-height);
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .sidebar-brand .brand-text h1 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-brand .brand-text h1 span {
+            color: var(--gold);
+        }
+
+        .sidebar-brand .brand-text small {
+            font-size: 0.55rem;
+            opacity: 0.7;
+            font-weight: 300;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 12px 0;
+            list-style: none;
+        }
+
+        .sidebar-menu .menu-label {
+            padding: 8px 20px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 600;
+        }
+
+        .sidebar-menu .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .sidebar-menu .menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .sidebar-menu .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--gold);
+            border-left-color: var(--gold);
+        }
+
+        .sidebar-menu .menu-item i {
+            width: 20px;
+            font-size: 1.1rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-menu .menu-item .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar-footer .user-info .name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-footer .user-info .role {
+            font-size: 0.6rem;
+            opacity: 0.6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-footer .logout-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 8px;
+            transition: 0.2s;
+            border-radius: 6px;
+        }
+
+        .sidebar-footer .logout-btn:hover {
+            color: #ff6b6b;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        /* ===== OVERLAY ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 12px 12px 12px 12px;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: white;
+            padding: 0 28px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e8ecf1;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-left .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .header-left .sidebar-toggle:hover {
+            background: var(--bg-gray);
+            color: var(--primary);
+        }
+
+        .header-left .page-title h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .header-left .page-title p {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-date {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .header-right .role-badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .header-right .role-scope {
+            font-size: 0.6rem;
+            color: #888;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .header-user:hover {
+            background: var(--bg-gray);
+        }
+
+        .header-user .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .header-user .user-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .logout-btn-header {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 8px;
+            transition: 0.2s;
+            border-radius: 6px;
+        }
+
+        .logout-btn-header:hover {
+            color: var(--danger);
+            background: rgba(244, 67, 54, 0.08);
+        }
+
+        /* ===== WELCOME SECTION ===== */
+        .welcome-section {
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5a3a 100%);
+            border-radius: 14px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0, 100, 0, 0.2);
+        }
+
+        .welcome-section .welcome-text h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .welcome-section .welcome-text h2 span {
+            color: var(--gold);
+        }
+
+        .welcome-section .welcome-text p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .welcome-section .welcome-text p i {
+            margin-right: 6px;
+            color: var(--gold);
+        }
+
+        .welcome-section .welcome-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 8px 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .welcome-section .welcome-badge i {
+            color: var(--gold);
+        }
+
+        /* ===== FILTER INFO ===== */
+        #filterInfo {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            box-shadow: var(--card-shadow);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 18px 20px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-left: 4px solid var(--primary);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .stat-card .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .stat-card .icon.purple { background: #7b1fa2; }
+        .stat-card .icon.teal { background: #00897b; }
+        .stat-card .icon.gold { background: #f9a825; }
+        .stat-card .icon.green { background: #2e7d32; }
+        .stat-card .icon.blue { background: #1565c0; }
+        .stat-card .icon.orange { background: #e65100; }
+
+        .stat-card .info .label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .info .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            line-height: 1.2;
+        }
+
+        /* ===== SEBARAN PENDIDIK SECTION ===== */
+        .sebaran-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .sebaran-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .sebaran-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .sebaran-card .card-header h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .sebaran-card .card-header h3 i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        /* Filter Button */
+        .filter-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 4px 12px;
+            border: 1.5px solid #e0e0e0;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-btn .badge-filter {
+            background: rgba(255,255,255,0.2);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 0.55rem;
+            margin-left: 4px;
+        }
+
+        .filter-btn.active .badge-filter {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* Donut Chart Container */
+        .donut-container {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .donut-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            flex-shrink: 0;
+        }
+
+        .donut-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .donut-center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .donut-center-text .total-number {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            line-height: 1;
+        }
+
+        .donut-center-text .total-label {
+            font-size: 0.6rem;
+            color: #888;
+            font-weight: 500;
+        }
+
+        /* Detail Info */
+        .detail-info {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #f5f6f8;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-item .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-item .color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .detail-item .label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .detail-item .value {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .detail-item .percentage {
+            font-size: 0.65rem;
+            color: #888;
+            margin-left: 4px;
+            font-weight: 400;
+        }
+
+        /* Filter Select */
+        .filter-select-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f2f5;
+        }
+
+        .filter-select-group select {
+            padding: 6px 12px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            background: white;
+            color: #555;
+            cursor: pointer;
+            min-width: 140px;
+            transition: border-color 0.2s;
+        }
+
+        .filter-select-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .filter-select-group select:hover {
+            border-color: var(--primary-light);
+        }
+
+        .filter-select-group .btn-filter-clear {
+            padding: 6px 14px;
+            background: #f5f5f5;
+            color: #888;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .filter-select-group .btn-filter-clear:hover {
+            background: #ffebee;
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .filter-active-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            background: #e8f5e9;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            color: #2e7d32;
+            font-weight: 500;
+        }
+
+        .filter-active-tag i {
+            font-size: 0.55rem;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .filter-active-tag i:hover {
+            color: var(--danger);
+        }
+
+        /* Chart Wrapper */
+        .chart-wrapper {
+            position: relative;
+            height: 220px;
+        }
+
+        .chart-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .chart-legend-custom {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .chart-legend-custom .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            color: #555;
+        }
+
+        .chart-legend-custom .legend-item .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ===== KYC CARD ===== */
+        .kyc-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            border-left: 4px solid #1976d2;
+        }
+
+        .kyc-card .kyc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .kyc-card .kyc-header .title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .kyc-card .kyc-header .title i {
+            color: #1976d2;
+        }
+
+        .kyc-card .kyc-header .progress-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .kyc-progress {
+            background: #f0f2f5;
+            border-radius: 8px;
+            height: 6px;
+            overflow: hidden;
+            width: 120px;
+        }
+
+        .kyc-progress .bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+
+        .kyc-stats-mini {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .kyc-stats-mini .stat-item {
+            background: #f8faf8;
+            border-radius: 8px;
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        .kyc-stats-mini .stat-item .label {
+            font-size: 0.6rem;
+            color: #888;
+        }
+
+        .kyc-stats-mini .stat-item .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .kyc-stats-mini .stat-item .value.pending { color: #ff9800; }
+        .kyc-stats-mini .stat-item .value.verified { color: #4CAF50; }
+        .kyc-stats-mini .stat-item .value.rejected { color: #f44336; }
+
+        .kyc-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .kyc-table-wrapper table {
+            width: 100%;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+
+        .kyc-table-wrapper table th {
+            padding: 8px 10px;
+            text-align: left;
+            background: #f8faf8;
+            border-bottom: 2px solid #f0f2f5;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #888;
+        }
+
+        .kyc-table-wrapper table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f5f6f8;
+        }
+
+        .kyc-table-wrapper table tr:hover {
+            background: #f8faf8;
+            cursor: pointer;
+        }
+
+        .kyc-table-wrapper table tr.kyc-pending {
+            background: #fffde7;
+        }
+
+        .kyc-table-wrapper table tr.kyc-pending:hover {
+            background: #fff9c4;
+        }
+
+        .kyc-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .kyc-status-badge.draft { background: #f5f5f5; color: #888; }
+        .kyc-status-badge.pending { background: #fff3e0; color: #ff9800; }
+        .kyc-status-badge.verified { background: #e8f5e9; color: #4CAF50; }
+        .kyc-status-badge.rejected { background: #ffebee; color: #f44336; }
+
+        /* ===== PAGINATION ===== */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f2f5;
+        }
+
+        .pagination-container .info {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .pagination-container .pagination-buttons {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-container .pagination-buttons button {
+            padding: 4px 12px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+            color: #555;
+        }
+
+        .pagination-container .pagination-buttons button:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-container .pagination-buttons button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-container .pagination-buttons button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 0.7rem;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 90%;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+        .toast-info { background: var(--primary); }
+        .toast-warning { background: var(--warning); }
+
+        /* ===== SPINNER ===== */
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f0f2f5;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            padding: 28px 30px;
+            max-width: 850px;
+            width: 100%;
+            max-height: 92vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInModal 0.25s ease;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .modal-header h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #888;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .modal-header .close-btn:hover {
+            color: #333;
+        }
+
+        .kyc-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #f8faf8;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+
+        .kyc-status-bar .item .label {
+            font-size: 0.65rem;
+            color: #888;
+        }
+        .kyc-status-bar .item .value {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .kyc-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #f0f2f5;
+            overflow-x: auto;
+        }
+
+        .kyc-tabs .tab-btn {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .kyc-tabs .tab-btn:hover {
+            color: var(--primary);
+            background: var(--primary-bg);
+        }
+        .kyc-tabs .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .kyc-tab-content {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        .kyc-tab-content.active {
+            display: block;
+        }
+
+        .kyc-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .kyc-info-grid .field {
+            padding: 6px 10px;
+            background: #f8faf8;
+            border-radius: 6px;
+        }
+
+        .kyc-info-grid .field .label {
+            font-size: 0.6rem;
+            color: #888;
+        }
+        .kyc-info-grid .field .value {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .kyc-info-grid .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .dokumen-preview {
+            margin-top: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            max-height: 400px;
+            display: none;
+            background: #fafafa;
+        }
+
+        .dokumen-preview img {
+            width: 100%;
+            height: auto;
+            max-height: 350px;
+            object-fit: contain;
+        }
+
+        .dokumen-preview iframe {
+            width: 100%;
+            height: 350px;
+            border: none;
+        }
+
+        .dokumen-preview .empty {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+
+        .dokumen-preview .empty i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+
+        .kyc-action-box {
+            padding: 16px;
+            background: #fff8e1;
+            border-radius: 10px;
+            border-left: 4px solid var(--warning);
+            margin-top: 16px;
+        }
+
+        .kyc-action-box .action-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .kyc-action-box .action-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .kyc-action-box .action-row input {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .kyc-action-box .action-row input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f2f5;
+        }
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .header {
+                padding: 0 16px;
+            }
+            .header-left .page-title p {
+                display: none;
+            }
+            .header-date {
+                display: none;
+            }
+            .header-right .role-scope {
+                display: none;
+            }
+            .sebaran-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                height: 56px;
+                padding: 0 12px;
+            }
+            .header-left .page-title h1 {
+                font-size: 0.9rem;
+            }
+            .header-user .user-name {
+                display: none;
+            }
+            .header-right .role-badge {
+                display: none;
+            }
+            .welcome-section {
+                padding: 16px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .welcome-section .welcome-text h2 {
+                font-size: 1rem;
+            }
+            .welcome-section .welcome-text p {
+                font-size: 0.75rem;
+            }
+            .welcome-section .welcome-badge {
+                font-size: 0.65rem;
+                padding: 4px 12px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 10px;
+            }
+            .stat-card {
+                padding: 14px 16px;
+                gap: 12px;
+            }
+            .stat-card .icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            .stat-card .info .value {
+                font-size: 1.2rem;
+            }
+            .donut-wrapper {
+                width: 150px;
+                height: 150px;
+            }
+            .donut-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .detail-info {
+                width: 100%;
+            }
+            .filter-select-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-select-group select {
+                width: 100%;
+            }
+            .chart-wrapper {
+                height: 180px;
+            }
+            .kyc-info-grid {
+                grid-template-columns: 1fr;
+            }
+            .kyc-status-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .kyc-stats-mini {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dokumen-preview {
+                max-height: 300px;
+            }
+            .dokumen-preview iframe {
+                height: 250px;
+            }
+            .dokumen-preview img {
+                max-height: 250px;
+            }
+            .pagination-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-left .page-title h1 {
+                font-size: 0.8rem;
+            }
+            .header-left .sidebar-toggle {
+                font-size: 1rem;
+                padding: 2px 6px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .stat-card {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            .stat-card .icon {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
+            .stat-card .info .value {
+                font-size: 1rem;
+            }
+            .stat-card .info .label {
+                font-size: 0.55rem;
+            }
+            .donut-wrapper {
+                width: 130px;
+                height: 130px;
+            }
+            .donut-center-text .total-number {
+                font-size: 1.2rem;
+            }
+            .chart-wrapper {
+                height: 150px;
+            }
+            .chart-legend-custom {
+                gap: 10px;
+            }
+            .chart-legend-custom .legend-item {
+                font-size: 0.6rem;
+            }
+            .modal-container {
+                padding: 16px;
+                margin: 10px;
+            }
+            .kyc-card .kyc-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .dokumen-preview {
+                max-height: 200px;
+            }
+            .dokumen-preview iframe {
+                height: 180px;
+            }
+            .dokumen-preview img {
+                max-height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="assets/logo-kemenag.png" alt="Logo" 
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+            <div class="brand-text">
+                <h1>SI-<span>MUSTAFA</span></h1>
+                <small>Kemenag Kab. Tegal</small>
+            </div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="menu-label">Menu Utama</li>
+            <li>
+                <a class="menu-item active" href="dashboard.html">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a class="menu-item" href="lembaga.html">
+                    <i class="fas fa-building"></i> Lembaga
+                </a>
+            </li>
+            <li>
+                <a class="menu-item" href="pendidik.html">
+                    <i class="fas fa-user-graduate"></i> Pendidik
+                    <span class="badge" id="navPendidikCount">0</span>
+                </a>
+            </li>
+            <li>
+                <a class="menu-item" href="mutasi.html">
+                    <i class="fas fa-exchange-alt"></i> Mutasi Pendidik
+                </a>
+            </li>
+            <li>
+                <a class="menu-item" href="bantuan.html">
+                    <i class="fas fa-hand-holding-heart"></i> Bantuan
+                </a>
+            </li>
+            <li>
+                <a class="menu-item" href="pengaturan.html">
+                    <i class="fas fa-cog"></i> Pengaturan
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="avatar" id="userAvatar">A</div>
+            <div class="user-info">
+                <div class="name" id="userName">Admin</div>
+                <div class="role" id="userRole">Super Admin</div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ===== OVERLAY ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content" id="mainContent">
+
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="page-title">
+                    <h1>Dashboard</h1>
+                    <p>Data Terpadu Pendidik Keagamaan Kabupaten Tegal</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="header-date" id="currentDate"></span>
+                <span class="role-badge" id="headerRoleBadge">Admin</span>
+                <span class="role-scope" id="headerScope"></span>
+                <div class="header-user" onclick="showToast('Profile', 'info')">
+                    <div class="avatar" id="userAvatarSmall">A</div>
+                    <span class="user-name" id="userNameSmall">Admin</span>
+                </div>
+                <button class="logout-btn-header" onclick="handleLogout()" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ===== WELCOME SECTION ===== -->
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h2>Selamat datang, <span id="welcomeName">Admin</span> 👋</h2>
+                <p id="welcomeStatus"><i class="fas fa-user-shield"></i> <span id="welcomeRole">Super Admin SI-MUSTAFA</span></p>
+            </div>
+            <div class="welcome-badge">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="welcomeDate">Loading...</span>
+            </div>
+        </div>
+
+        <!-- ===== FILTER INFO ===== -->
+        <div id="filterInfo">
+            <i class="fas fa-info-circle"></i>
+            <span id="filterInfoText">Menampilkan semua data</span>
+        </div>
+
+        <!-- ===== STATS GRID ===== -->
+        <div class="stats-grid" id="statsGrid">
+            <a href="kecamatan.html" class="stat-card">
+                <div class="icon purple"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="info">
+                    <div class="label">Kecamatan</div>
+                    <div class="value" id="totalKecamatan">0</div>
+                </div>
+            </a>
+            <a href="desa.html" class="stat-card">
+                <div class="icon teal"><i class="fas fa-city"></i></div>
+                <div class="info">
+                    <div class="label">Kelurahan/Desa</div>
+                    <div class="value" id="totalKelurahan">0</div>
+                </div>
+            </a>
+            <a href="lembaga.html" class="stat-card">
+                <div class="icon gold"><i class="fas fa-building"></i></div>
+                <div class="info">
+                    <div class="label">Lembaga</div>
+                    <div class="value" id="totalLembaga">0</div>
+                </div>
+            </a>
+            <a href="pendidik.html" class="stat-card">
+                <div class="icon green"><i class="fas fa-user-graduate"></i></div>
+                <div class="info">
+                    <div class="label">Pendidik Aktif</div>
+                    <div class="value" id="totalPendidik">0</div>
+                </div>
+            </a>
+            <a href="bantuan.html" class="stat-card">
+                <div class="icon blue"><i class="fas fa-hand-holding-heart"></i></div>
+                <div class="info">
+                    <div class="label">Penerima Bantuan</div>
+                    <div class="value" id="totalBantuan">0</div>
+                </div>
+            </a>
+            <a href="laporan.html" class="stat-card">
+                <div class="icon orange"><i class="fas fa-file-alt"></i></div>
+                <div class="info">
+                    <div class="label">Laporan Bulan Ini</div>
+                    <div class="value" id="totalLaporan">0</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- ===== SEBARAN PENDIDIK SECTION ===== -->
+        <div class="sebaran-section">
+            <!-- Donut Chart Card -->
+            <div class="sebaran-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Sebaran Pendidik per Jenjang</h3>
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all" onclick="applyJenjangFilter('all')">
+                            <i class="fas fa-globe"></i> Semua
+                        </button>
+                        <button class="filter-btn" data-filter="LPQ" onclick="applyJenjangFilter('LPQ')">
+                            <i class="fas fa-flag"></i> LPQ
+                        </button>
+                        <button class="filter-btn" data-filter="MDT" onclick="applyJenjangFilter('MDT')">
+                            <i class="fas fa-flag"></i> MDT
+                        </button>
+                        <button class="filter-btn" data-filter="PONPES" onclick="applyJenjangFilter('PONPES')">
+                            <i class="fas fa-flag"></i> PONPES
+                        </button>
+                    </div>
+                </div>
+                <div class="donut-container">
+                    <div class="donut-wrapper">
+                        <canvas id="donutChart"></canvas>
+                        <div class="donut-center-text">
+                            <div class="total-number" id="donutTotal">0</div>
+                            <div class="total-label">Total Pendidik</div>
+                        </div>
+                    </div>
+                    <div class="detail-info" id="detailInfo">
+                        <!-- Detail akan diisi oleh JavaScript -->
+                    </div>
+                </div>
+                <!-- Filter Area - AUTO FILTER tanpa tombol -->
+                <div class="filter-select-group">
+                    <select id="filterKecamatan">
+                        <option value="">Semua Kecamatan</option>
+                    </select>
+                    <button class="btn-filter-clear" onclick="clearLocationFilter()">
+                        <i class="fas fa-times"></i> Reset Filter
+                    </button>
+                    <span id="activeFilterTag" style="display:none;" class="filter-active-tag">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="activeFilterText">Semua</span>
+                        <i class="fas fa-times-circle" onclick="clearLocationFilter()" style="cursor:pointer;margin-left:4px;"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Bar Chart Card -->
+            <div class="sebaran-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Jumlah Pendidik per Jenjang</h3>
+                    <span class="badge" style="background:#f0f2f5;color:#888;font-size:0.65rem;padding:2px 12px;border-radius:12px;">
+                        <i class="fas fa-users"></i> Total: <span id="barTotal">0</span>
+                    </span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div class="chart-legend-custom">
+                    <span class="legend-item">
+                        <span class="dot" style="background:#4CAF50;"></span> LPQ
+                    </span>
+                    <span class="legend-item">
+                        <span class="dot" style="background:#2196F3;"></span> MDT
+                    </span>
+                    <span class="legend-item">
+                        <span class="dot" style="background:#9C27B0;"></span> PONPES
+                    </span>
+                    <span class="legend-item">
+                        <span class="dot" style="background:#FF9800;"></span> Lainnya
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== KYC SECTION ===== -->
+        <div class="kyc-card">
+            <div class="kyc-header">
+                <div class="title">
+                    <i class="fas fa-id-card"></i>
+                    Verifikasi Dokumen
+                    <span class="badge" style="background:#ff9800;color:white;font-size:0.6rem;padding:2px 10px;border-radius:12px;">
+                        <i class="fas fa-clock"></i> Menunggu: <span id="kycPendingCount">0</span>
+                    </span>
+                </div>
+                <div class="progress-info">
+                    <span>Progress:</span>
+                    <span id="kycProgressText">0%</span>
+                    <div class="kyc-progress">
+                        <div class="bar" id="kycProgressBar" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kyc-stats-mini">
+                <div class="stat-item">
+                    <div class="label">Total</div>
+                    <div class="value" id="kycTotal">0</div>
+                </div>
+                <div class="stat-item" style="background:#fff3e0;">
+                    <div class="label">Menunggu</div>
+                    <div class="value pending" id="kycPending">0</div>
+                </div>
+                <div class="stat-item" style="background:#e8f5e9;">
+                    <div class="label">Terverifikasi</div>
+                    <div class="value verified" id="kycVerified">0</div>
+                </div>
+                <div class="stat-item" style="background:#ffebee;">
+                    <div class="label">Ditolak</div>
+                    <div class="value rejected" id="kycRejected">0</div>
+                </div>
+            </div>
+
+            <div class="kyc-table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>NIK</th>
+                            <th>Lembaga</th>
+                            <th>Status</th>
+                            <th>Diajukan</th>
+                            <th style="text-align:center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kycTableBody">
+                        <tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">
+                            <div class="spinner" style="margin:0 auto;"></div>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ===== PAGINATION ===== -->
+            <div class="pagination-container" id="paginationContainer">
+                <div class="info" id="paginationInfo">Menampilkan 0 dari 0 data</div>
+                <div class="pagination-buttons" id="paginationButtons">
+                    <button onclick="changePage('prev')" id="prevPageBtn" disabled>
+                        <i class="fas fa-chevron-left"></i> Sebelumnya
+                    </button>
+                    <span id="pageNumbers"></span>
+                    <button onclick="changePage('next')" id="nextPageBtn" disabled>
+                        Selanjutnya <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ===== MODAL KYC DETAIL ===== -->
+    <div class="modal-overlay" id="kycModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2><i class="fas fa-id-card" style="color:#1976d2;margin-right:8px;"></i>Detail Verifikasi Dokumen</h2>
+                <button class="close-btn" onclick="closeKycModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="kycPendidikId">
+                
+                <div class="kyc-status-bar">
+                    <div class="item">
+                        <div class="label">Status Verifikasi</div>
+                        <div class="value" id="kycDetailStatus">-</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">Status Keaktifan</div>
+                        <div class="value" id="kycDetailAktif">-</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">Tanggal Pengajuan</div>
+                        <div class="value" id="kycDetailTanggal">-</div>
+                    </div>
+                </div>
+
+                <div class="kyc-tabs">
+                    <button class="tab-btn active" data-tab="identitas" onclick="switchKycTab('identitas', this)">
+                        <i class="fas fa-user"></i> Identitas
+                    </button>
+                    <button class="tab-btn" data-tab="mengajar" onclick="switchKycTab('mengajar', this)">
+                        <i class="fas fa-chalkboard-teacher"></i> Data Mengajar
+                    </button>
+                    <button class="tab-btn" data-tab="dokumen" onclick="switchKycTab('dokumen', this)">
+                        <i class="fas fa-file-alt"></i> Dokumen
+                    </button>
+                </div>
+
+                <div id="tab-identitas" class="kyc-tab-content active">
+                    <div class="kyc-info-grid">
+                        <div class="field"><div class="label">NIK</div><div class="value" id="kycDetailNik">-</div></div>
+                        <div class="field"><div class="label">Nama Lengkap</div><div class="value" id="kycDetailNama">-</div></div>
+                        <div class="field"><div class="label">Tempat Lahir</div><div class="value" id="kycDetailTempatLahir">-</div></div>
+                        <div class="field"><div class="label">Tanggal Lahir</div><div class="value" id="kycDetailTanggalLahir">-</div></div>
+                        <div class="field"><div class="label">Jenis Kelamin</div><div class="value" id="kycDetailJenisKelamin">-</div></div>
+                        <div class="field"><div class="label">Status Perkawinan</div><div class="value" id="kycDetailStatusPerkawinan">-</div></div>
+                        <div class="field"><div class="label">Ibu Kandung</div><div class="value" id="kycDetailIbuKandung">-</div></div>
+                        <div class="field"><div class="label">Pendidikan Terakhir</div><div class="value" id="kycDetailPendidikan">-</div></div>
+                        <div class="field full"><div class="label">Alamat</div><div class="value" id="kycDetailAlamat">-</div></div>
+                        <div class="field">
+                            <div class="label">Desa Pengajar</div>
+                            <div class="value" id="kycDetailDesaPengajar">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Kecamatan Pengajar</div>
+                            <div class="value" id="kycDetailKecamatanPengajar">-</div>
+                        </div>
+                        <div class="field"><div class="label">Kabupaten Pengajar</div><div class="value" id="kycDetailKabupatenPengajar">-</div></div>
+                        <div class="field"><div class="label">No. HP</div><div class="value" id="kycDetailNoHp">-</div></div>
+                        <div class="field"><div class="label">Email</div><div class="value" id="kycDetailEmail">-</div></div>
+                        <div class="field">
+                            <div class="label">Nomor Rekening Bupati</div>
+                            <div class="value" id="kycDetailNomorRekeningBupati">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Nama Bank Bupati</div>
+                            <div class="value" id="kycDetailNamaBankBupati">-</div>
+                        </div>
+                        <div class="field" style="grid-column:1/-1;">
+                            <div class="label">Pemilik Rekening Bupati</div>
+                            <div class="value" id="kycDetailPemilikRekeningBupati">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Nomor Rekening Gubernur</div>
+                            <div class="value" id="kycDetailNomorRekeningGubernur">-</div>
+                        </div>
+                        <div class="field">
+                            <div class="label">Nama Bank Gubernur</div>
+                            <div class="value" id="kycDetailNamaBankGubernur">-</div>
+                        </div>
+                        <div class="field" style="grid-column:1/-1;">
+                            <div class="label">Pemilik Rekening Gubernur</div>
+                            <div class="value" id="kycDetailPemilikRekeningGubernur">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-mengajar" class="kyc-tab-content" style="display:none;">
+                    <div class="kyc-info-grid">
+                        <div class="field full"><div class="label">Lembaga</div><div class="value" id="kycDetailLembaga">-</div></div>
+                        <div class="field"><div class="label">NSLP Lembaga</div><div class="value" id="kycDetailNslpLembaga">-</div></div>
+                        <div class="field"><div class="label">Jenis Lembaga</div><div class="value" id="kycDetailJenisLembaga">-</div></div>
+                        <div class="field"><div class="label">Kecamatan Lembaga</div><div class="value" id="kycDetailKecamatanLembaga">-</div></div>
+                        <div class="field"><div class="label">Desa Lembaga</div><div class="value" id="kycDetailDesaLembaga">-</div></div>
+                        <div class="field"><div class="label">RT/RW</div><div class="value" id="kycDetailRtRw">-</div></div>
+                        <div class="field"><div class="label">TMT Mengajar</div><div class="value" id="kycDetailTmt">-</div></div>
+                        <div class="field full"><div class="label">Lama Mengabdi</div><div class="value" id="kycDetailLamaMengabdi">-</div></div>
+                    </div>
+                </div>
+
+                <div id="tab-dokumen" class="kyc-tab-content" style="display:none;">
+                    <!-- KTP -->
+                    <div style="margin-bottom:16px;padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #1976d2;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <div style="font-size:0.75rem;font-weight:700;color:#1976d2;">
+                                <i class="fas fa-id-card"></i> Kartu Tanda Penduduk (KTP)
+                            </div>
+                            <div style="display:flex;gap:6px;flex-shrink:0;">
+                                <button class="btn btn-primary btn-sm" onclick="previewDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-eye"></i> Lihat
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
+                            <span id="kycDokumenKtpName" style="font-weight:500;">Belum ada dokumen</span>
+                        </div>
+                        <div class="dokumen-preview" id="dokumenKtpPreview" style="display:none;margin-top:8px;">
+                            <img id="dokumenKtpImg" src="" alt="KTP" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
+                            <iframe id="dokumenKtpPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
+                            <div class="empty" id="dokumenKtpEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
+                                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                                File tidak dapat ditampilkan
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rekening Bupati -->
+                    <div style="margin-bottom:16px;padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #2e7d32;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <div style="font-size:0.75rem;font-weight:700;color:#2e7d32;">
+                                <i class="fas fa-university"></i> Rekening Insentif Bupati
+                            </div>
+                            <div style="display:flex;gap:6px;flex-shrink:0;">
+                                <button class="btn btn-primary btn-sm" onclick="previewDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-eye"></i> Lihat
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
+                            <span id="kycDokumenBupatiName" style="font-weight:500;">Belum ada dokumen</span>
+                        </div>
+                        <div class="dokumen-preview" id="dokumenBupatiPreview" style="display:none;margin-top:8px;">
+                            <img id="dokumenBupatiImg" src="" alt="Rekening Bupati" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
+                            <iframe id="dokumenBupatiPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
+                            <div class="empty" id="dokumenBupatiEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
+                                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                                File tidak dapat ditampilkan
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rekening Gubernur -->
+                    <div style="padding:12px 16px;background:#f8faf8;border-radius:10px;border-left:3px solid #7b1fa2;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <div style="font-size:0.75rem;font-weight:700;color:#7b1fa2;">
+                                <i class="fas fa-university"></i> Rekening Insentif Gubernur
+                            </div>
+                            <div style="display:flex;gap:6px;flex-shrink:0;">
+                                <button class="btn btn-primary btn-sm" onclick="previewDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-eye"></i> Lihat
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="downloadDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-top:4px;font-size:0.8rem;color:#555;">
+                            <span id="kycDokumenGubernurName" style="font-weight:500;">Belum ada dokumen</span>
+                        </div>
+                        <div class="dokumen-preview" id="dokumenGubernurPreview" style="display:none;margin-top:8px;">
+                            <img id="dokumenGubernurImg" src="" alt="Rekening Gubernur" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
+                            <iframe id="dokumenGubernurPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
+                            <div class="empty" id="dokumenGubernurEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
+                                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                                File tidak dapat ditampilkan
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kyc-action-box" id="kycActionBox" style="display:none;">
+                    <div class="action-title">
+                        <i class="fas fa-gavel"></i> Tindakan Verifikasi
+                    </div>
+                    <div class="action-row">
+                        <input type="text" id="kycKeterangan" placeholder="Keterangan (opsional)">
+                        <button class="btn btn-success" onclick="verifyKyc('accept')">
+                            <i class="fas fa-check-circle"></i> Terima & Verifikasi
+                        </button>
+                        <button class="btn btn-danger" onclick="verifyKyc('reject')">
+                            <i class="fas fa-times-circle"></i> Tolak
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeKycModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+<script src="js/supabase-client.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+// ============================================================
+// ===== CACHE MANAGER =====
+// ============================================================
+const CacheManager = {
+    CACHE_DURATION: 5 * 60 * 1000, // 5 menit
+    
+    get(key) {
+        try {
+            const cached = localStorage.getItem(`cache_${key}`);
+            if (!cached) return null;
+            const { data, timestamp } = JSON.parse(cached);
+            if (Date.now() - timestamp > this.CACHE_DURATION) {
+                localStorage.removeItem(`cache_${key}`);
+                return null;
+            }
+            return data;
+        } catch {
+            return null;
+        }
+    },
+    
+    set(key, data) {
+        try {
+            localStorage.setItem(`cache_${key}`, JSON.stringify({
+                data,
+                timestamp: Date.now()
+            }));
+        } catch (e) {
+            console.warn('Cache set error:', e);
+        }
+    },
+    
+    clear(key) {
+        if (key) {
+            localStorage.removeItem(`cache_${key}`);
+        } else {
+            Object.keys(localStorage)
+                .filter(k => k.startsWith('cache_'))
+                .forEach(k => localStorage.removeItem(k));
+        }
+    },
+    
+    isExpired(key) {
+        const cached = localStorage.getItem(`cache_${key}`);
+        if (!cached) return true;
+        try {
+            const { timestamp } = JSON.parse(cached);
+            return Date.now() - timestamp > this.CACHE_DURATION;
+        } catch {
+            return true;
+        }
+    }
+};
+
+// ============================================================
+// ===== SIDEBAR FUNCTIONS =====
+// ============================================================
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+}
+
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 992) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+    }
+});
+
+// ============================================================
+// ===== DASHBOARD + KYC =====
+// ============================================================
+let currentKycPendidik = null;
+let currentKycTab = 'identitas';
+let currentPage = 1;
+const ITEMS_PER_PAGE = 20;
+let totalKycData = 0;
+
+// ===== DOKUMEN VARIABLES =====
+let kycDokumen = {
+    ktp: null,
+    bupati: null,
+    gubernur: null
+};
+
+// ===== CHART VARIABLES =====
+let donutChartInstance = null;
+let barChartInstance = null;
+
+// ===== FILTER VARIABLES =====
+let currentFilter = {
+    jenis: 'all', // all, LPQ, MDT, PONPES
+    kecamatan_id: null,
+    desa_id: null
+};
+
+// ===== DEBOUNCE =====
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// ============================================================
+// ===== TOAST =====
+// ============================================================
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    if (!toast) { alert(message); return; }
+    toast.textContent = message;
+    toast.className = `toast toast-${type}`;
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 4000);
+}
+
+// ============================================================
+// ===== DATE =====
+// ============================================================
+function updateDate() {
+    const el = document.getElementById('currentDate');
+    if (!el) return;
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    el.textContent = now.toLocaleDateString('id-ID', options);
+
+    const welcomeDate = document.getElementById('welcomeDate');
+    if (welcomeDate) {
+        const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        welcomeDate.textContent = now.toLocaleDateString('id-ID', dateOptions);
+    }
+}
+
+// ============================================================
+// ===== AUTH CHECK =====
+// ============================================================
+async function checkAuth() {
+    try {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        if (error || !session) {
+            window.location.href = 'index.html';
+            return false;
+        }
+        
+        const { data: userData, error: userError } = await supabaseClient
+            .from('users')
+            .select('id, name, email, role, kecamatan_id, lembaga_id, active')
+            .eq('id', session.user.id)
+            .single();
+        
+        if (userError || !userData || !userData.active) {
+            console.error('User data error:', userError);
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+            return false;
+        }
+
+        window.currentUser = {
+            id: userData.id,
+            name: userData.name || session.user.email,
+            email: session.user.email,
+            role: userData.role || 'operator',
+            kecamatan_id: userData.kecamatan_id,
+            lembaga_id: userData.lembaga_id
+        };
+
+        updateHeaderUI(window.currentUser);
+        updateWelcomeUI(window.currentUser);
+        
+        return true;
+        
+    } catch (error) {
+        console.error('Auth check error:', error);
+        window.location.href = 'index.html';
+        return false;
+    }
+}
+
+function getUser() {
+    return window.currentUser || null;
+}
+
+// ============================================================
+// ===== GET ROLE FILTER =====
+// ============================================================
+function getRoleFilter() {
+    if (!window.currentUser) return {};
+    const user = window.currentUser;
+    const role = user.role;
+    const filter = {};
+
+    console.log('User role:', role, 'Kecamatan ID:', user.kecamatan_id, 'Lembaga ID:', user.lembaga_id);
+
+    if (role === 'super_admin' || role === 'admin_kab') {
+        return {};
+    }
+
+    if (role === 'operator' && user.lembaga_id) {
+        filter.lembaga_id = user.lembaga_id;
+        return filter;
+    }
+
+    if (!user.kecamatan_id) {
+        console.warn('User tidak memiliki kecamatan_id');
+        return { restrict: true };
+    }
+
+    filter.kecamatan_id = user.kecamatan_id;
+
+    if (role === 'batko') {
+        filter.jenis_lembaga = 'LPQ';
+    } else if (role === 'fkdt') {
+        filter.jenis_lembaga = 'MDT';
+    } else if (role === 'ponpes') {
+        filter.jenis_lembaga = 'PONPES';
+    }
+
+    console.log('Filter yang dibuat:', filter);
+    return filter;
+}
+
+// ============================================================
+// ===== UPDATE UI =====
+// ============================================================
+function updateHeaderUI(user) {
+    if (!user) return;
+    
+    const avatarEl = document.getElementById('userAvatar');
+    if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
+    
+    const nameEl = document.getElementById('userName');
+    if (nameEl) nameEl.textContent = user.name;
+    
+    const roleNames = {
+        'super_admin': 'Super Admin',
+        'admin_kab': 'Admin Kabupaten',
+        'batko': 'BADKO',
+        'fkdt': 'FKDT',
+        'ponpes': 'PONPES',
+        'operator': 'Operator'
+    };
+    const roleEl = document.getElementById('userRole');
+    if (roleEl) roleEl.textContent = roleNames[user.role] || user.role;
+
+    const avatarSmall = document.getElementById('userAvatarSmall');
+    if (avatarSmall) avatarSmall.textContent = user.name.charAt(0).toUpperCase();
+    
+    const nameSmall = document.getElementById('userNameSmall');
+    if (nameSmall) nameSmall.textContent = user.name;
+    
+    const roleBadge = document.getElementById('headerRoleBadge');
+    if (roleBadge) roleBadge.textContent = roleNames[user.role] || user.role;
+    
+    const scopeEl = document.getElementById('headerScope');
+    if (scopeEl) {
+        if (user.role === 'super_admin' || user.role === 'admin_kab') {
+            scopeEl.textContent = '';
+        } else if (user.role === 'operator' && user.lembaga_id) {
+            supabaseClient
+                .from('lembaga')
+                .select('nama')
+                .eq('id', user.lembaga_id)
+                .single()
+                .then(({ data }) => {
+                    scopeEl.textContent = `🏫 ${data?.nama || 'Lembaga'}`;
+                })
+                .catch(err => console.error('Error fetching lembaga:', err));
+        } else if (user.kecamatan_id) {
+            supabaseClient
+                .from('master_kecamatan')
+                .select('nama')
+                .eq('id', user.kecamatan_id)
+                .single()
+                .then(({ data }) => {
+                    const jenis = {
+                        'batko': 'LPQ',
+                        'fkdt': 'MDT',
+                        'ponpes': 'PONPES'
+                    };
+                    scopeEl.textContent = `📍 ${data?.nama || 'Kecamatan'} • ${jenis[user.role] || ''}`;
+                })
+                .catch(err => console.error('Error fetching kecamatan:', err));
+        }
+    }
+}
+
+function updateWelcomeUI(user) {
+    if (!user) return;
+    
+    const welcomeName = document.getElementById('welcomeName');
+    if (welcomeName) welcomeName.textContent = user.name;
+    
+    const roleNames = {
+        'super_admin': 'Super Admin SI-MUSTAFA',
+        'admin_kab': 'Admin Kemenag Kabupaten Tegal',
+        'batko': 'Admin BADKO',
+        'fkdt': 'Admin FKDT',
+        'ponpes': 'Admin PONPES',
+        'operator': 'Operator Lembaga'
+    };
+
+    let roleText = roleNames[user.role] || user.role;
+    
+    if (user.role === 'operator' && user.lembaga_id) {
+        supabaseClient
+            .from('lembaga')
+            .select('nama')
+            .eq('id', user.lembaga_id)
+            .single()
+            .then(({ data }) => {
+                const welcomeRole = document.getElementById('welcomeRole');
+                if (welcomeRole) {
+                    welcomeRole.textContent = `Operator ${data?.nama || 'Lembaga'}`;
+                }
+            })
+            .catch(() => {
+                const welcomeRole = document.getElementById('welcomeRole');
+                if (welcomeRole) welcomeRole.textContent = roleText;
+            });
+    } else if (['batko', 'fkdt', 'ponpes'].includes(user.role) && user.kecamatan_id) {
+        supabaseClient
+            .from('master_kecamatan')
+            .select('nama')
+            .eq('id', user.kecamatan_id)
+            .single()
+            .then(({ data }) => {
+                const jenis = {
+                    'batko': 'LPQ',
+                    'fkdt': 'MDT',
+                    'ponpes': 'PONPES'
+                };
+                const welcomeRole = document.getElementById('welcomeRole');
+                if (welcomeRole) {
+                    welcomeRole.textContent = `Admin ${jenis[user.role] || ''} ${data?.nama || 'Kecamatan'}`;
+                }
+            })
+            .catch(() => {
+                const welcomeRole = document.getElementById('welcomeRole');
+                if (welcomeRole) welcomeRole.textContent = roleText;
+            });
+    } else {
+        const welcomeRole = document.getElementById('welcomeRole');
+        if (welcomeRole) welcomeRole.textContent = roleText;
+    }
+}
+
+// ============================================================
+// ===== HANDLE LOGOUT =====
+// ============================================================
+async function handleLogout() {
+    if (!confirm('Apakah Anda yakin ingin keluar?')) return;
+    try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+        CacheManager.clear();
+        showToast('Logout berhasil!', 'success');
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1000);
+    } catch (e) {
+        console.error('Logout error:', e);
+        showToast('Gagal logout: ' + e.message, 'error');
+    }
+}
+
+// ============================================================
+// ===== BATCH FETCHING UTILITY =====
+// ============================================================
+const BatchFetcher = {
+    async fetchAll(table, query = {}, batchSize = 1000, orderBy = 'id', ascending = true) {
+        let allData = [];
+        let start = 0;
+        let hasMore = true;
+        
+        console.log(`[BatchFetcher] Mulai mengambil data dari tabel: ${table}`);
+        
+        while (hasMore) {
+            try {
+                let supabaseQuery = supabaseClient
+                    .from(table)
+                    .select('*')
+                    .order(orderBy, { ascending })
+                    .range(start, start + batchSize - 1);
+                
+                if (query.filters) {
+                    Object.keys(query.filters).forEach(key => {
+                        const filter = query.filters[key];
+                        if (filter.operator === 'eq') {
+                            supabaseQuery = supabaseQuery.eq(key, filter.value);
+                        } else if (filter.operator === 'neq') {
+                            supabaseQuery = supabaseQuery.neq(key, filter.value);
+                        } else if (filter.operator === 'gt') {
+                            supabaseQuery = supabaseQuery.gt(key, filter.value);
+                        } else if (filter.operator === 'gte') {
+                            supabaseQuery = supabaseQuery.gte(key, filter.value);
+                        } else if (filter.operator === 'lt') {
+                            supabaseQuery = supabaseQuery.lt(key, filter.value);
+                        } else if (filter.operator === 'lte') {
+                            supabaseQuery = supabaseQuery.lte(key, filter.value);
+                        } else if (filter.operator === 'like') {
+                            supabaseQuery = supabaseQuery.like(key, filter.value);
+                        } else if (filter.operator === 'in') {
+                            supabaseQuery = supabaseQuery.in(key, filter.value);
+                        } else if (filter.operator === 'or') {
+                            supabaseQuery = supabaseQuery.or(filter.value);
+                        } else if (filter.operator === 'is') {
+                            supabaseQuery = supabaseQuery.is(key, filter.value);
+                        }
+                    });
+                }
+                
+                if (query.notNull) {
+                    Object.keys(query.notNull).forEach(key => {
+                        supabaseQuery = supabaseQuery.not(key, 'is', null);
+                    });
+                }
+                
+                const { data, error } = await supabaseQuery;
+                
+                if (error) {
+                    console.error(`[BatchFetcher] Error pada batch:`, error);
+                    throw error;
+                }
+                
+                if (!data || data.length === 0) {
+                    hasMore = false;
+                    break;
+                }
+                
+                allData = allData.concat(data);
+                console.log(`[BatchFetcher] Batch: ${data.length} data, Total: ${allData.length}`);
+                
+                start += batchSize;
+                
+                if (data.length < batchSize) {
+                    hasMore = false;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+            } catch (error) {
+                console.error('[BatchFetcher] Error:', error);
+                throw error;
+            }
+        }
+        
+        console.log(`[BatchFetcher] Selesai! Total data: ${allData.length}`);
+        return allData;
+    }
+};
+
+// ============================================================
+// ===== LOAD DASHBOARD =====
+// ============================================================
+async function loadDashboard(forceRefresh = false) {
+    try {
+        const user = getUser();
+        const filter = getRoleFilter();
+        const cacheKey = `dashboard_${JSON.stringify(filter)}`;
+
+        if (filter.restrict) {
+            document.querySelector('.stats-grid').innerHTML = `
+                <div style="grid-column:1/-1;text-align:center;padding:40px;color:#f44336;">
+                    <i class="fas fa-lock" style="font-size:32px;display:block;margin-bottom:12px;"></i>
+                    Anda tidak memiliki akses ke data ini
+                </div>
+            `;
+            return;
+        }
+
+        if (!forceRefresh) {
+            const cachedData = CacheManager.get(cacheKey);
+            if (cachedData) {
+                updateDashboardStats(cachedData);
+                showFilterInfo(filter);
+                return;
+            }
+        }
+
+        // Build filters
+        const lembagaFilters = {};
+        const pendidikFilters = {};
+        const bantuanFilters = {};
+        
+        pendidikFilters.status_aktif = { operator: 'eq', value: true };
+        bantuanFilters.tahun_anggaran = { operator: 'eq', value: new Date().getFullYear() };
+        bantuanFilters.status = { operator: 'eq', value: 'cair' };
+
+        if (filter.lembaga_id) {
+            lembagaFilters.id = { operator: 'eq', value: filter.lembaga_id };
+            pendidikFilters.lembaga_id = { operator: 'eq', value: filter.lembaga_id };
+            bantuanFilters.lembaga_id = { operator: 'eq', value: filter.lembaga_id };
+        }
+
+        if (filter.kecamatan_id) {
+            lembagaFilters.kecamatan_id = { operator: 'eq', value: filter.kecamatan_id };
+            pendidikFilters.kecamatan_lembaga_id = { operator: 'or', value: `kecamatan_lembaga_id.eq.${filter.kecamatan_id},kecamatan_pengajar_id.eq.${filter.kecamatan_id}` };
+            bantuanFilters.kecamatan_id = { operator: 'eq', value: filter.kecamatan_id };
+        }
+        
+        if (filter.jenis_lembaga) {
+            lembagaFilters.jenis_lembaga = { operator: 'eq', value: filter.jenis_lembaga };
+            pendidikFilters.jenis_lembaga = { operator: 'eq', value: filter.jenis_lembaga };
+            bantuanFilters.jenis_lembaga = { operator: 'eq', value: filter.jenis_lembaga };
+        }
+
+        const [kecamatanResult, kelurahanResult, lembagaResult, pendidikResult, bantuanResult] = await Promise.all([
+            supabaseClient.from('master_kecamatan').select('*', { count: 'exact', head: true }),
+            supabaseClient.from('master_kelurahan').select('*', { count: 'exact', head: true }),
+            BatchFetcher.fetchAll('lembaga', { filters: lembagaFilters }, 1000, 'id', true),
+            BatchFetcher.fetchAll('pendidik', { filters: pendidikFilters }, 1000, 'id', true),
+            BatchFetcher.fetchAll('bantuan', { filters: bantuanFilters }, 1000, 'id', true)
+        ]);
+
+        CacheManager.set('master_kecamatan', kecamatanResult.count || 0);
+        CacheManager.set('master_kelurahan', kelurahanResult.count || 0);
+
+        const statsData = {
+            kecamatan: kecamatanResult.count || 0,
+            kelurahan: kelurahanResult.count || 0,
+            lembaga: lembagaResult.length || 0,
+            pendidik: pendidikResult.length || 0,
+            bantuan: bantuanResult.length || 0
+        };
+
+        CacheManager.set(cacheKey, statsData);
+        updateDashboardStats(statsData);
+        showFilterInfo(filter);
+
+    } catch (e) {
+        console.error('Error loading dashboard:', e);
+        showToast('Gagal memuat data: ' + e.message, 'error');
+    }
+}
+
+function updateDashboardStats(data) {
+    document.getElementById('totalKecamatan').textContent = data.kecamatan || 0;
+    document.getElementById('totalKelurahan').textContent = data.kelurahan || 0;
+    document.getElementById('totalLembaga').textContent = data.lembaga || 0;
+    document.getElementById('totalPendidik').textContent = data.pendidik || 0;
+    document.getElementById('totalBantuan').textContent = data.bantuan || 0;
+}
+
+function showFilterInfo(filter) {
+    const infoText = document.getElementById('filterInfoText');
+    const filterInfoEl = document.getElementById('filterInfo');
+    if (!infoText || !filterInfoEl) return;
+
+    filterInfoEl.style.background = 'white';
+    filterInfoEl.style.borderLeftColor = 'var(--primary)';
+    filterInfoEl.style.color = '#888';
+
+    if (filter.lembaga_id) {
+        supabaseClient
+            .from('lembaga')
+            .select('nama, jenis_lembaga')
+            .eq('id', filter.lembaga_id)
+            .single()
+            .then(({ data }) => {
+                infoText.textContent = `Menampilkan: ${data?.nama || 'Lembaga'} (${data?.jenis_lembaga || 'Semua'})`;
+                filterInfoEl.style.background = '#e8f5e9';
+                filterInfoEl.style.borderLeftColor = '#2e7d32';
+                filterInfoEl.style.color = '#2e7d32';
+            })
+            .catch(() => {
+                infoText.textContent = 'Menampilkan data lembaga';
+            });
+        return;
+    }
+
+    if (filter.kecamatan_id) {
+        supabaseClient
+            .from('master_kecamatan')
+            .select('nama')
+            .eq('id', filter.kecamatan_id)
+            .single()
+            .then(({ data }) => {
+                const jenisNames = { 'LPQ': 'LPQ (BADKO)', 'MDT': 'MDT (FKDT)', 'PONPES': 'PONPES' };
+                let text = `Menampilkan: Kecamatan ${data?.nama || ''}`;
+                if (filter.jenis_lembaga) {
+                    text += ` - ${jenisNames[filter.jenis_lembaga] || filter.jenis_lembaga}`;
+                }
+                infoText.textContent = text;
+                filterInfoEl.style.background = '#e8f5e9';
+                filterInfoEl.style.borderLeftColor = '#2e7d32';
+                filterInfoEl.style.color = '#2e7d32';
+            })
+            .catch(() => {
+                infoText.textContent = 'Menampilkan data dengan filter';
+            });
+        return;
+    }
+
+    infoText.textContent = 'Menampilkan semua data';
+}
+
+// ============================================================
+// ===== LOAD SEBARAN DATA =====
+// ============================================================
+async function loadSebaranData(forceRefresh = false) {
+    try {
+        const user = getUser();
+        const roleFilter = getRoleFilter();
+        
+        if (roleFilter.restrict) {
+            document.querySelector('.sebaran-section').innerHTML = `
+                <div style="grid-column:1/-1;text-align:center;padding:40px;color:#f44336;">
+                    <i class="fas fa-lock" style="font-size:32px;display:block;margin-bottom:12px;"></i>
+                    Anda tidak memiliki akses ke data ini
+                </div>
+            `;
+            return;
+        }
+
+        await loadKecamatanDropdown();
+
+        const cacheKey = `sebaran_${JSON.stringify({...roleFilter, ...currentFilter})}`;
+        let sebaranData = null;
+
+        if (!forceRefresh) {
+            sebaranData = CacheManager.get(cacheKey);
+        }
+
+        if (!sebaranData || forceRefresh) {
+            const filters = {};
+            const notNull = {};
+            
+            notNull.jenis_lembaga = true;
+            
+            if (roleFilter.lembaga_id) {
+                filters.lembaga_id = { operator: 'eq', value: roleFilter.lembaga_id };
+            }
+
+            if (roleFilter.kecamatan_id) {
+                filters.kecamatan_lembaga_id = { operator: 'or', value: `kecamatan_lembaga_id.eq.${roleFilter.kecamatan_id},kecamatan_pengajar_id.eq.${roleFilter.kecamatan_id}` };
+            }
+
+            if (roleFilter.jenis_lembaga) {
+                filters.jenis_lembaga = { operator: 'eq', value: roleFilter.jenis_lembaga };
+            }
+
+            if (currentFilter.jenis && currentFilter.jenis !== 'all') {
+                filters.jenis_lembaga = { operator: 'eq', value: currentFilter.jenis };
+            }
+
+            if (currentFilter.kecamatan_id) {
+                filters.kecamatan_lembaga_id = { operator: 'or', value: `kecamatan_lembaga_id.eq.${currentFilter.kecamatan_id},kecamatan_pengajar_id.eq.${currentFilter.kecamatan_id}` };
+            }
+
+            if (currentFilter.desa_id) {
+                filters.desa_lembaga = { operator: 'or', value: `desa_lembaga.eq.${currentFilter.desa_id},desa_pengajar.eq.${currentFilter.desa_id}` };
+            }
+
+            filters.status_aktif = { operator: 'eq', value: true };
+
+            const result = await BatchFetcher.fetchAll('pendidik', {
+                filters,
+                notNull
+            }, 1000, 'id', true);
+
+            const data = result;
+            console.log(`[Sebaran] Total data pendidik aktif: ${data.length}`);
+
+            const lpq = (data || []).filter(d => d.jenis_lembaga === 'LPQ').length;
+            const mdt = (data || []).filter(d => d.jenis_lembaga === 'MDT').length;
+            const ponpes = (data || []).filter(d => d.jenis_lembaga === 'PONPES').length;
+            const lainnya = (data || []).filter(d => d.jenis_lembaga && !['LPQ', 'MDT', 'PONPES'].includes(d.jenis_lembaga)).length;
+            const total = lpq + mdt + ponpes + lainnya;
+
+            sebaranData = {
+                lpq,
+                mdt,
+                ponpes,
+                lainnya,
+                total,
+                labels: ['LPQ', 'MDT', 'PONPES', 'Lainnya'],
+                values: [lpq, mdt, ponpes, lainnya],
+                colors: ['#4CAF50', '#2196F3', '#9C27B0', '#FF9800']
+            };
+
+            CacheManager.set(cacheKey, sebaranData);
+        }
+
+        updateSebaranCharts(sebaranData);
+        updateDetailInfo(sebaranData);
+        updateFilterTag();
+
+        if (currentFilter.kecamatan_id) {
+            await loadDesaDropdown(currentFilter.kecamatan_id);
+        }
+
+    } catch (e) {
+        console.error('Error loading sebaran data:', e);
+        showToast('Gagal memuat data sebaran: ' + e.message, 'error');
+    }
+}
+
+// ============================================================
+// ===== UPDATE SEBARAN CHARTS =====
+// ============================================================
+function updateSebaranCharts(data) {
+    const total = data.total;
+    document.getElementById('donutTotal').textContent = total;
+    document.getElementById('barTotal').textContent = total;
+
+    const filteredLabels = [];
+    const filteredValues = [];
+    const filteredColors = [];
+    
+    const order = ['LPQ', 'MDT', 'PONPES', 'Lainnya'];
+    const colorMap = {
+        'LPQ': '#4CAF50',
+        'MDT': '#2196F3',
+        'PONPES': '#9C27B0',
+        'Lainnya': '#FF9800'
+    };
+    
+    order.forEach(label => {
+        const index = data.labels.indexOf(label);
+        if (index !== -1 && data.values[index] > 0) {
+            filteredLabels.push(label);
+            filteredValues.push(data.values[index]);
+            filteredColors.push(colorMap[label] || '#888');
+        }
+    });
+
+    // Donut Chart
+    const donutCtx = document.getElementById('donutChart');
+    if (donutCtx) {
+        if (donutChartInstance) {
+            donutChartInstance.destroy();
+        }
+
+        if (filteredValues.length === 0) {
+            donutChartInstance = new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Tidak Ada Data'],
+                    datasets: [{
+                        data: [1],
+                        backgroundColor: ['#e0e0e0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    cutout: '70%'
+                }
+            });
+            return;
+        }
+
+        donutChartInstance = new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: filteredLabels,
+                datasets: [{
+                    data: filteredValues,
+                    backgroundColor: filteredColors,
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                return `${context.label}: ${context.parsed} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    }
+
+    // Bar Chart
+    const barCtx = document.getElementById('barChart');
+    if (barCtx) {
+        if (barChartInstance) {
+            barChartInstance.destroy();
+        }
+
+        const usedColors = filteredLabels.map(label => colorMap[label] || '#888');
+
+        barChartInstance = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: filteredLabels,
+                datasets: [{
+                    label: 'Jumlah Pendidik',
+                    data: filteredValues,
+                    backgroundColor: usedColors.map(c => c + 'CC'),
+                    borderColor: usedColors,
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            font: { size: 10 }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: { size: 11, weight: 'bold' }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// ============================================================
+// ===== UPDATE DETAIL INFO =====
+// ============================================================
+function updateDetailInfo(data) {
+    const detailInfo = document.getElementById('detailInfo');
+    if (!detailInfo) return;
+
+    const total = data.total;
+    const items = [
+        { label: 'LPQ', value: data.lpq, color: '#4CAF50' },
+        { label: 'MDT', value: data.mdt, color: '#2196F3' },
+        { label: 'PONPES', value: data.ponpes, color: '#9C27B0' }
+    ];
+    
+    if (data.lainnya && data.lainnya > 0) {
+        items.push({ label: 'Lainnya', value: data.lainnya, color: '#FF9800' });
+    }
+
+    detailInfo.innerHTML = items.map(item => {
+        const percentage = total > 0 ? ((item.value / total) * 100).toFixed(1) : 0;
+        const isActive = currentFilter.jenis === 'all' || currentFilter.jenis === item.label;
+        return `
+            <div class="detail-item" style="${isActive ? '' : 'opacity:0.5;'}">
+                <div class="left">
+                    <span class="color-dot" style="background:${item.color};"></span>
+                    <span class="label">${item.label}</span>
+                </div>
+                <div>
+                    <span class="value">${item.value}</span>
+                    <span class="percentage">(${percentage}%)</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    detailInfo.innerHTML += `
+        <div class="detail-item" style="border-top:2px solid #f0f2f5;padding-top:8px;margin-top:4px;">
+            <div class="left">
+                <span class="color-dot" style="background:var(--primary);"></span>
+                <span class="label" style="font-weight:700;">Total</span>
+            </div>
+            <div>
+                <span class="value" style="font-size:1.1rem;">${total}</span>
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
+// ===== LOAD KECAMATAN DROPDOWN =====
+// ============================================================
+async function loadKecamatanDropdown() {
+    try {
+        const select = document.getElementById('filterKecamatan');
+        if (!select) return;
+
+        // Hapus event listener lama untuk menghindari duplikasi
+        const newSelect = select.cloneNode(true);
+        select.parentNode.replaceChild(newSelect, select);
+        const freshSelect = document.getElementById('filterKecamatan');
+
+        const cached = CacheManager.get('master_kecamatan_list');
+        let kecamatanData;
+
+        if (cached) {
+            kecamatanData = cached;
+        } else {
+            const result = await BatchFetcher.fetchAll('master_kecamatan', {}, 1000, 'nama', true);
+            kecamatanData = result;
+            CacheManager.set('master_kecamatan_list', kecamatanData);
+        }
+
+        freshSelect.innerHTML = '<option value="">Semua Kecamatan</option>';
+        
+        kecamatanData.forEach(k => {
+            const option = document.createElement('option');
+            option.value = k.id;
+            option.textContent = k.nama;
+            if (currentFilter.kecamatan_id === k.id) {
+                option.selected = true;
+            }
+            freshSelect.appendChild(option);
+        });
+
+        // === AUTO FILTER: Event listener untuk perubahan kecamatan ===
+        freshSelect.addEventListener('change', function() {
+            const value = this.value;
+            currentFilter.kecamatan_id = value || null;
+            currentFilter.desa_id = null; // Reset desa
+            
+            // Reset dropdown desa
+            const desaSelect = document.getElementById('filterDesa');
+            if (desaSelect) {
+                desaSelect.innerHTML = '<option value="">Semua Desa</option>';
+            }
+            
+            if (value) {
+                loadDesaDropdown(value).then(() => {
+                    loadSebaranData(true);
+                    showToast(`Filter: Kecamatan ${this.options[this.selectedIndex].text}`, 'info');
+                });
+            } else {
+                loadSebaranData(true);
+                showToast('Filter: Semua Kecamatan', 'info');
+            }
+        });
+
+        const user = getUser();
+        if (user && user.kecamatan_id && !currentFilter.kecamatan_id) {
+            const roleFilter = getRoleFilter();
+            if (roleFilter.kecamatan_id) {
+                currentFilter.kecamatan_id = roleFilter.kecamatan_id;
+                freshSelect.value = roleFilter.kecamatan_id;
+                await loadDesaDropdown(roleFilter.kecamatan_id);
+            }
+        }
+
+    } catch (e) {
+        console.error('Error loading kecamatan dropdown:', e);
+    }
+}
+
+// ============================================================
+// ===== LOAD DESA DROPDOWN =====
+// ============================================================
+async function loadDesaDropdown(kecamatanId) {
+    try {
+        const select = document.getElementById('filterDesa');
+        if (!select) return;
+
+        // Hapus event listener lama
+        const newSelect = select.cloneNode(true);
+        select.parentNode.replaceChild(newSelect, select);
+        const freshSelect = document.getElementById('filterDesa');
+
+        if (!kecamatanId) {
+            freshSelect.innerHTML = '<option value="">Semua Desa</option>';
+            return;
+        }
+
+        const cacheKey = `master_desa_${kecamatanId}`;
+        const cached = CacheManager.get(cacheKey);
+        let desaData;
+
+        if (cached) {
+            desaData = cached;
+        } else {
+            const result = await BatchFetcher.fetchAll('master_kelurahan', {
+                filters: {
+                    kecamatan_id: { operator: 'eq', value: kecamatanId }
+                }
+            }, 1000, 'nama', true);
+            desaData = result;
+            CacheManager.set(cacheKey, desaData);
+        }
+
+        freshSelect.innerHTML = '<option value="">Semua Desa</option>';
+        
+        desaData.forEach(d => {
+            const option = document.createElement('option');
+            option.value = d.id;
+            option.textContent = d.nama;
+            if (currentFilter.desa_id === d.id) {
+                option.selected = true;
+            }
+            freshSelect.appendChild(option);
+        });
+
+        // === AUTO FILTER: Event listener untuk perubahan desa ===
+        freshSelect.addEventListener('change', function() {
+            const value = this.value;
+            currentFilter.desa_id = value || null;
+            loadSebaranData(true);
+            if (value) {
+                const text = this.options[this.selectedIndex]?.text || 'Desa';
+                showToast(`Filter: Desa ${text}`, 'info');
+            } else {
+                showToast('Filter: Semua Desa', 'info');
+            }
+        });
+
+    } catch (e) {
+        console.error('Error loading desa dropdown:', e);
+    }
+}
+
+// ============================================================
+// ===== FILTER FUNCTIONS =====
+// ============================================================
+function applyJenjangFilter(jenis) {
+    currentFilter.jenis = jenis;
+    
+    document.querySelectorAll('.filter-group .filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === jenis);
+    });
+    
+    loadSebaranData(true);
+    showToast(`Menampilkan data ${jenis === 'all' ? 'semua jenjang' : jenis}`, 'info');
+}
+
+function clearLocationFilter() {
+    currentFilter.kecamatan_id = null;
+    currentFilter.desa_id = null;
+    
+    const kecSelect = document.getElementById('filterKecamatan');
+    const desaSelect = document.getElementById('filterDesa');
+    
+    if (kecSelect) kecSelect.value = '';
+    if (desaSelect) {
+        desaSelect.innerHTML = '<option value="">Semua Desa</option>';
+    }
+    
+    loadSebaranData(true);
+    showToast('Filter reset ke semua data', 'info');
+}
+
+function updateFilterTag() {
+    const tag = document.getElementById('activeFilterTag');
+    const text = document.getElementById('activeFilterText');
+    
+    if (!tag || !text) return;
+    
+    const parts = [];
+    
+    if (currentFilter.jenis && currentFilter.jenis !== 'all') {
+        parts.push(currentFilter.jenis);
+    }
+    
+    if (currentFilter.kecamatan_id) {
+        const select = document.getElementById('filterKecamatan');
+        const option = select?.querySelector(`option[value="${currentFilter.kecamatan_id}"]`);
+        if (option) parts.push(option.textContent);
+    }
+    
+    if (currentFilter.desa_id) {
+        const select = document.getElementById('filterDesa');
+        const option = select?.querySelector(`option[value="${currentFilter.desa_id}"]`);
+        if (option) parts.push(option.textContent);
+    }
+    
+    if (parts.length > 0) {
+        tag.style.display = 'inline-flex';
+        text.textContent = parts.join(' • ');
+    } else {
+        tag.style.display = 'none';
+        text.textContent = 'Semua';
+    }
+}
+
+// ============================================================
+// ===== LOAD KYC DATA =====
+// ============================================================
+async function loadKYCData(page = 1, forceRefresh = false) {
+    try {
+        const user = getUser();
+        const filter = getRoleFilter();
+        const cacheKey = `kyc_stats_${JSON.stringify(filter)}`;
+        let statsData = null;
+
+        if (!forceRefresh) {
+            statsData = CacheManager.get(cacheKey);
+        }
+
+        if (!statsData || forceRefresh) {
+            let baseQuery = supabaseClient
+                .from('pendidik')
+                .select('*', { count: 'exact', head: true })
+                .not('dokumen_kyc', 'is', null);
+
+            if (filter.restrict) {
+                document.getElementById('kycTableBody').innerHTML = 
+                    `<tr><td colspan="6" style="text-align:center;padding:20px;color:#f44336;">
+                        <i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+                        Anda tidak memiliki akses ke data ini
+                    </td></tr>`;
+                return;
+            }
+
+            if (filter.lembaga_id) {
+                baseQuery = baseQuery.eq('lembaga_id', filter.lembaga_id);
+            }
+
+            if (filter.kecamatan_id) {
+                baseQuery = baseQuery.or(
+                    `kecamatan_lembaga_id.eq.${filter.kecamatan_id},kecamatan_pengajar_id.eq.${filter.kecamatan_id}`
+                );
+            }
+
+            if (filter.jenis_lembaga) {
+                baseQuery = baseQuery.eq('jenis_lembaga', filter.jenis_lembaga);
+            }
+
+            const { count, error: countError } = await baseQuery;
+
+            if (countError) {
+                console.error('Error count KYC:', countError);
+                throw countError;
+            }
+
+            let statusQuery = supabaseClient
+                .from('pendidik')
+                .select('status_verifikasi')
+                .not('dokumen_kyc', 'is', null);
+
+            if (filter.lembaga_id) {
+                statusQuery = statusQuery.eq('lembaga_id', filter.lembaga_id);
+            }
+
+            if (filter.kecamatan_id) {
+                statusQuery = statusQuery.or(
+                    `kecamatan_lembaga_id.eq.${filter.kecamatan_id},kecamatan_pengajar_id.eq.${filter.kecamatan_id}`
+                );
+            }
+
+            if (filter.jenis_lembaga) {
+                statusQuery = statusQuery.eq('jenis_lembaga', filter.jenis_lembaga);
+            }
+
+            const { data: statusData, error: statusError } = await statusQuery;
+
+            if (statusError) {
+                console.error('Error status KYC:', statusError);
+                throw statusError;
+            }
+
+            const pending = (statusData || []).filter(d => 
+                d.status_verifikasi === 'Pending' || 
+                d.status_verifikasi === 'Draft' || 
+                !d.status_verifikasi
+            ).length;
+            
+            const verified = (statusData || []).filter(d => 
+                d.status_verifikasi === 'Diverifikasi'
+            ).length;
+            
+            const rejected = (statusData || []).filter(d => 
+                d.status_verifikasi === 'Ditolak'
+            ).length;
+
+            statsData = {
+                total: count || 0,
+                pending,
+                verified,
+                rejected
+            };
+
+            CacheManager.set(cacheKey, statsData);
+        }
+
+        document.getElementById('kycTotal').textContent = statsData.total;
+        document.getElementById('kycPending').textContent = statsData.pending;
+        document.getElementById('kycVerified').textContent = statsData.verified;
+        document.getElementById('kycRejected').textContent = statsData.rejected;
+        document.getElementById('kycPendingCount').textContent = statsData.pending;
+
+        const progress = statsData.total > 0 ? ((statsData.verified / statsData.total) * 100) : 0;
+        document.getElementById('kycProgressText').textContent = `${Math.round(progress)}%`;
+        document.getElementById('kycProgressBar').style.width = `${Math.min(progress, 100)}%`;
+
+        totalKycData = statsData.total;
+
+        const offset = (page - 1) * ITEMS_PER_PAGE;
+        
+        let dataQuery = supabaseClient
+            .from('pendidik')
+            .select(`
+                id,
+                nama_lengkap,
+                nik,
+                nslp_lembaga,
+                status_verifikasi,
+                updated_at,
+                kecamatan_lembaga_id,
+                kecamatan_pengajar_id,
+                jenis_lembaga,
+                lembaga_id,
+                lembaga:lembaga_id (
+                    id,
+                    nama,
+                    nslp,
+                    jenis_lembaga
+                )
+            `)
+            .not('dokumen_kyc', 'is', null);
+
+        if (filter.lembaga_id) {
+            dataQuery = dataQuery.eq('lembaga_id', filter.lembaga_id);
+        }
+
+        if (filter.kecamatan_id) {
+            dataQuery = dataQuery.or(
+                `kecamatan_lembaga_id.eq.${filter.kecamatan_id},kecamatan_pengajar_id.eq.${filter.kecamatan_id}`
+            );
+        }
+
+        if (filter.jenis_lembaga) {
+            dataQuery = dataQuery.eq('jenis_lembaga', filter.jenis_lembaga);
+        }
+
+        const { data, error } = await dataQuery
+            .order('updated_at', { ascending: false })
+            .range(offset, offset + ITEMS_PER_PAGE - 1);
+
+        if (error) {
+            console.error('Error data KYC:', error);
+            throw error;
+        }
+
+        renderKYCTable(data || []);
+        renderPagination(page, statsData.total);
+
+    } catch (e) {
+        console.error('Error loading KYC data:', e);
+        document.getElementById('kycTableBody').innerHTML = 
+            `<tr><td colspan="6" style="text-align:center;padding:20px;color:#f44336;">
+                Gagal memuat data KYC: ${e.message}
+            </td></tr>`;
+    }
+}
+
+// ============================================================
+// ===== RENDER KYC TABLE =====
+// ============================================================
+function renderKYCTable(data) {
+    const tbody = document.getElementById('kycTableBody');
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = `
+            <tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">
+                <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+                Tidak ada data KYC
+            </td></tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = data.map(item => {
+        let statusClass = 'draft';
+        let statusText = 'Draft';
+        if (item.status_verifikasi === 'Diverifikasi') {
+            statusClass = 'verified';
+            statusText = '✅ Terverifikasi';
+        } else if (item.status_verifikasi === 'Pending') {
+            statusClass = 'pending';
+            statusText = '⏳ Menunggu';
+        } else if (item.status_verifikasi === 'Ditolak') {
+            statusClass = 'rejected';
+            statusText = '❌ Ditolak';
+        }
+
+        const isPending = item.status_verifikasi === 'Pending' || item.status_verifikasi === 'Draft' || !item.status_verifikasi;
+
+        return `
+            <tr onclick="openKycModal('${item.id}')" style="cursor:pointer;${isPending ? 'background:#fffde7;' : ''}">
+                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><strong>${item.nama_lengkap || '-'}</strong></td>
+                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${item.nik || '-'}</code></td>
+                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;">${item.lembaga?.nama || item.nslp_lembaga || '-'}</td>
+                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><span class="kyc-status-badge ${statusClass}">${statusText}</span></td>
+                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
+                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;text-align:center;">
+                    ${isPending ? `
+                        <span class="badge" style="background:#ff9800;color:white;font-size:0.6rem;padding:2px 10px;border-radius:12px;">
+                            <i class="fas fa-clock"></i> Perlu Verifikasi
+                        </span>
+                    ` : `
+                        <span class="badge" style="background:${item.status_verifikasi === 'Diverifikasi' ? '#4CAF50' : '#f44336'};color:white;font-size:0.6rem;padding:2px 10px;border-radius:12px;">
+                            ${item.status_verifikasi === 'Diverifikasi' ? '✓ Selesai' : '✗ Ditolak'}
+                        </span>
+                    `}
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ============================================================
+// ===== PAGINATION =====
+// ============================================================
+function renderPagination(currentPage, total) {
+    const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+    const info = document.getElementById('paginationInfo');
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+    const pageNumbers = document.getElementById('pageNumbers');
+
+    if (!info) return;
+
+    if (total === 0) {
+        info.textContent = 'Tidak ada data';
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        pageNumbers.innerHTML = '';
+        return;
+    }
+
+    const start = ((currentPage - 1) * ITEMS_PER_PAGE) + 1;
+    const end = Math.min(currentPage * ITEMS_PER_PAGE, total);
+    info.textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages;
+
+    let pagesHtml = '';
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+    if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    if (startPage > 1) {
+        pagesHtml += `<button onclick="changePage(1)">1</button>`;
+        if (startPage > 2) pagesHtml += `<span style="padding:0 4px;color:#888;">...</span>`;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        pagesHtml += `<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) pagesHtml += `<span style="padding:0 4px;color:#888;">...</span>`;
+        pagesHtml += `<button onclick="changePage(${totalPages})">${totalPages}</button>`;
+    }
+
+    pageNumbers.innerHTML = pagesHtml;
+}
+
+function changePage(direction) {
+    if (direction === 'prev') {
+        if (currentPage > 1) currentPage--;
+    } else if (direction === 'next') {
+        const totalPages = Math.ceil(totalKycData / ITEMS_PER_PAGE);
+        if (currentPage < totalPages) currentPage++;
+    } else if (typeof direction === 'number') {
+        currentPage = direction;
+    }
+    loadKYCData(currentPage);
+}
+
+// ============================================================
+// ===== KYC MODAL FUNCTIONS =====
+// ============================================================
+function switchKycTab(tab, btn) {
+    currentKycTab = tab;
+    document.querySelectorAll('.kyc-tab-content').forEach(el => {
+        el.style.display = 'none';
+        el.classList.remove('active');
+    });
+    const target = document.getElementById(`tab-${tab}`);
+    if (target) {
+        target.style.display = 'block';
+        target.classList.add('active');
+    }
+    document.querySelectorAll('.kyc-tabs .tab-btn').forEach(b => {
+        b.classList.remove('active');
+    });
+    if (btn) {
+        btn.classList.add('active');
+    }
+}
+
+async function openKycModal(pendidikId) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('pendidik')
+            .select(`
+                *,
+                lembaga:lembaga_id (
+                    id,
+                    nama,
+                    nslp,
+                    jenis_lembaga,
+                    alamat,
+                    kecamatan,
+                    desa
+                )
+            `)
+            .eq('id', pendidikId)
+            .single();
+
+        if (error) throw error;
+
+        currentKycPendidik = data;
+
+        const fields = [
+            'kycDetailNama', 'kycDetailNik', 'kycDetailTempatLahir',
+            'kycDetailTanggalLahir', 'kycDetailJenisKelamin',
+            'kycDetailStatusPerkawinan', 'kycDetailIbuKandung',
+            'kycDetailPendidikan', 'kycDetailAlamat', 'kycDetailNoHp',
+            'kycDetailEmail'
+        ];
+        
+        const values = [
+            data.nama_lengkap, data.nik, data.tempat_lahir,
+            data.tanggal_lahir, data.jenis_kelamin,
+            data.status_perkawinan, data.ibu_kandung,
+            data.pendidikan_terakhir, data.alamat, data.no_hp,
+            data.email
+        ];
+
+        fields.forEach((id, index) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = values[index] || '-';
+        });
+
+        const rekFields = [
+            'kycDetailNomorRekeningBupati', 'kycDetailNamaBankBupati',
+            'kycDetailPemilikRekeningBupati', 'kycDetailNomorRekeningGubernur',
+            'kycDetailNamaBankGubernur', 'kycDetailPemilikRekeningGubernur'
+        ];
+        
+        const rekValues = [
+            data.nomor_rekening_bupati, data.nama_bank_bupati,
+            data.pemilik_rekening_bupati, data.nomor_rekening_gubernur,
+            data.nama_bank_gubernur, data.pemilik_rekening_gubernur
+        ];
+
+        rekFields.forEach((id, index) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = rekValues[index] || '-';
+        });
+
+        const lembaga = data.lembaga || {};
+        
+        const mengajarFields = {
+            'kycDetailLembaga': lembaga.nama || data.nslp_lembaga || '-',
+            'kycDetailNslpLembaga': lembaga.nslp || data.nslp_lembaga || '-',
+            'kycDetailJenisLembaga': lembaga.jenis_lembaga || data.jenis_lembaga || '-',
+            'kycDetailKecamatanLembaga': data.kecamatan_lembaga || '-',
+            'kycDetailDesaLembaga': data.desa_lembaga || '-',
+            'kycDetailRtRw': data.rt_rw_pengajar || '-',
+            'kycDetailKecamatanPengajar': data.kecamatan_pengajar || '-',
+            'kycDetailDesaPengajar': data.desa_pengajar || '-',
+            'kycDetailKabupatenPengajar': data.kabupaten_pengajar || 'Tegal',
+            'kycDetailTmt': data.tmt_mengajar || '-',
+            'kycDetailLamaMengabdi': data.lama_mengabdi ? data.lama_mengabdi + ' tahun' : '-'
+        };
+
+        Object.keys(mengajarFields).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = mengajarFields[id];
+        });
+
+        let statusText = data.status_verifikasi || 'Draft';
+        let statusClass = 'draft';
+        if (statusText === 'Diverifikasi') { 
+            statusClass = 'verified'; 
+            statusText = '✅ Terverifikasi'; 
+        } else if (statusText === 'Pending') { 
+            statusClass = 'pending'; 
+            statusText = '⏳ Menunggu Verifikasi'; 
+        } else if (statusText === 'Ditolak') { 
+            statusClass = 'rejected'; 
+            statusText = '❌ Ditolak'; 
+        } else { 
+            statusText = '📝 Draft'; 
+        }
+        
+        const statusEl = document.getElementById('kycDetailStatus');
+        if (statusEl) statusEl.innerHTML = `<span class="kyc-status-badge ${statusClass}" style="font-size:0.9rem;padding:4px 14px;">${statusText}</span>`;
+
+        const aktifText = data.status_aktif ? 'Aktif' : 'Tidak Aktif';
+        const aktifEl = document.getElementById('kycDetailAktif');
+        if (aktifEl) aktifEl.innerHTML = `<span class="badge" style="padding:2px 12px;border-radius:12px;font-size:0.8rem;font-weight:600;background:${data.status_aktif ? '#e8f5e9' : '#ffebee'};color:${data.status_aktif ? '#2e7d32' : '#c62828'};">${aktifText}</span>`;
+
+        const tanggalEl = document.getElementById('kycDetailTanggal');
+        if (tanggalEl) tanggalEl.textContent = formatDate(data.updated_at);
+
+        kycDokumen = { ktp: null, bupati: null, gubernur: null };
+        document.querySelectorAll('.dokumen-preview').forEach(el => el.style.display = 'none');
+        
+        const ktpNameEl = document.getElementById('kycDokumenKtpName');
+        const bupatiNameEl = document.getElementById('kycDokumenBupatiName');
+        const gubernurNameEl = document.getElementById('kycDokumenGubernurName');
+        
+        if (ktpNameEl) ktpNameEl.textContent = 'Belum ada dokumen';
+        if (bupatiNameEl) bupatiNameEl.textContent = 'Belum ada dokumen';
+        if (gubernurNameEl) gubernurNameEl.textContent = 'Belum ada dokumen';
+
+        if (data.dokumen_kyc) {
+            try {
+                const docs = typeof data.dokumen_kyc === 'string' ? JSON.parse(data.dokumen_kyc) : data.dokumen_kyc;
+                
+                if (docs.ktp && ktpNameEl) {
+                    kycDokumen.ktp = docs.ktp;
+                    ktpNameEl.textContent = `📄 ${docs.ktp.split('/').pop() || 'KTP'}`;
+                }
+                if (docs.bupati && bupatiNameEl) {
+                    kycDokumen.bupati = docs.bupati;
+                    bupatiNameEl.textContent = `📄 ${docs.bupati.split('/').pop() || 'Rek Bupati'}`;
+                }
+                if (docs.gubernur && gubernurNameEl) {
+                    kycDokumen.gubernur = docs.gubernur;
+                    gubernurNameEl.textContent = `📄 ${docs.gubernur.split('/').pop() || 'Rek Gubernur'}`;
+                }
+            } catch (e) {
+                if (data.dokumen_kyc && ktpNameEl) {
+                    kycDokumen.ktp = data.dokumen_kyc;
+                    ktpNameEl.textContent = `📄 ${data.dokumen_kyc.split('/').pop() || 'Dokumen'}`;
+                }
+            }
+        }
+
+        const actionBox = document.getElementById('kycActionBox');
+        const isPending = data.status_verifikasi === 'Pending' || data.status_verifikasi === 'Draft' || !data.status_verifikasi;
+        
+        if (actionBox) {
+            if (isPending) {
+                actionBox.style.display = 'block';
+                const keteranganEl = document.getElementById('kycKeterangan');
+                if (keteranganEl) keteranganEl.value = '';
+            } else {
+                actionBox.style.display = 'none';
+            }
+        }
+
+        const pendidikIdEl = document.getElementById('kycPendidikId');
+        if (pendidikIdEl) pendidikIdEl.value = data.id;
+
+        switchKycTab('identitas', document.querySelector('.kyc-tabs .tab-btn'));
+
+        const modal = document.getElementById('kycModal');
+        if (modal) modal.classList.add('active');
+
+    } catch (e) {
+        console.error('Error opening KYC modal:', e);
+        showToast('Gagal memuat detail KYC: ' + e.message, 'error');
+    }
+}
+
+function closeKycModal() {
+    document.getElementById('kycModal').classList.remove('active');
+    currentKycPendidik = null;
+}
+
+function previewDokumen(type) {
+    const url = kycDokumen[type];
+    if (!url) {
+        showToast('Tidak ada dokumen untuk dilihat', 'warning');
+        return;
+    }
+
+    const previewId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Preview`;
+    const imgId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Img`;
+    const pdfId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Pdf`;
+    const emptyId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Empty`;
+
+    const preview = document.getElementById(previewId);
+    const img = document.getElementById(imgId);
+    const pdf = document.getElementById(pdfId);
+    const empty = document.getElementById(emptyId);
+
+    if (!preview || !img || !pdf || !empty) {
+        console.error('Preview elements not found for type:', type);
+        return;
+    }
+
+    img.style.display = 'none';
+    pdf.style.display = 'none';
+    empty.style.display = 'none';
+    preview.style.display = 'block';
+
+    const urlLower = url.toLowerCase();
+    
+    if (urlLower.endsWith('.pdf')) {
+        pdf.src = url;
+        pdf.style.display = 'block';
+    } else if (urlLower.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) {
+        img.src = url;
+        img.style.display = 'block';
+    } else {
+        img.src = url;
+        img.style.display = 'block';
+        img.onerror = function() {
+            img.style.display = 'none';
+            empty.style.display = 'block';
+            empty.innerHTML = `<i class="fas fa-file" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                File tidak dapat ditampilkan. 
+                <br><button class="btn btn-primary btn-sm" onclick="downloadDokumen('${type}')" style="margin-top:8px;">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            `;
+        };
+    }
+}
+
+function downloadDokumen(type) {
+    const url = kycDokumen[type];
+    if (!url) {
+        showToast('Tidak ada dokumen untuk didownload', 'warning');
+        return;
+    }
+    window.open(url, '_blank');
+}
+
+async function verifyKyc(action) {
+    if (!currentKycPendidik) {
+        showToast('Data tidak ditemukan', 'error');
+        return;
+    }
+
+    const keterangan = document.getElementById('kycKeterangan').value.trim();
+    const status = action === 'accept' ? 'Diverifikasi' : 'Ditolak';
+    const statusText = action === 'accept' ? 'menerima' : 'menolak';
+
+    if (!confirm(`Yakin ${statusText} verifikasi untuk ${currentKycPendidik.nama_lengkap}?`)) return;
+
+    try {
+        const updateData = {
+            status_verifikasi: status,
+            verified_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+
+        if (keterangan) {
+            updateData.catatan_verifikasi = keterangan;
+        }
+
+        const { error } = await supabaseClient
+            .from('pendidik')
+            .update(updateData)
+            .eq('id', currentKycPendidik.id);
+
+        if (error) throw error;
+
+        CacheManager.clear();
+        
+        showToast(`Verifikasi ${statusText} untuk ${currentKycPendidik.nama_lengkap} berhasil!`, 'success');
+        closeKycModal();
+        await loadKYCData(currentPage, true);
+        await loadDashboard(true);
+        await loadSebaranData(true);
+
+    } catch (e) {
+        console.error('Error verifying KYC:', e);
+        showToast('Gagal verifikasi: ' + e.message, 'error');
+    }
+}
+
+// ============================================================
+// ===== FORMAT DATE =====
+// ============================================================
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    try {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch {
+        return dateStr;
+    }
+}
+
+// ============================================================
+// ===== LOAD RECENT =====
+// ============================================================
+async function loadRecent() {
+    try {
+        const user = getUser();
+        const filter = getRoleFilter();
+        
+        if (filter.restrict) {
+            document.getElementById('recentTableBody').innerHTML = 
+                `<tr><td colspan="4" style="text-align:center;padding:20px;color:#f44336;">
+                    Anda tidak memiliki akses
+                </td></tr>`;
+            return;
+        }
+        
+        let query = supabaseClient
+            .from('pendidik')
+            .select('nama_lengkap, status_aktif, updated_at, nslp_lembaga, kecamatan_lembaga_id, kecamatan_pengajar_id, jenis_lembaga, lembaga_id')
+            .order('updated_at', { ascending: false })
+            .limit(5);
+
+        if (filter.lembaga_id) {
+            query = query.eq('lembaga_id', filter.lembaga_id);
+        }
+
+        if (filter.kecamatan_id) {
+            query = query.or(
+                `kecamatan_lembaga_id.eq.${filter.kecamatan_id},kecamatan_pengajar_id.eq.${filter.kecamatan_id}`
+            );
+        }
+
+        if (filter.jenis_lembaga) {
+            query = query.eq('jenis_lembaga', filter.jenis_lembaga);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        const tbody = document.getElementById('recentTableBody');
+        if (!tbody) return;
+        
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Belum ada data</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = data.map(item => `
+            <tr>
+                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><strong>${item.nama_lengkap || '-'}</strong></td>
+                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;">${item.nslp_lembaga || '-'}</td>
+                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;">
+                    <span class="badge" style="padding:2px 12px;border-radius:12px;font-size:0.7rem;font-weight:600;background:${item.status_aktif ? '#e8f5e9' : '#ffebee'};color:${item.status_aktif ? '#2e7d32' : '#c62828'};">
+                        ${item.status_aktif ? 'Aktif' : 'Tidak Aktif'}
+                    </span>
+                </td>
+                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        console.error('Error in loadRecent:', e);
+        const tbody = document.getElementById('recentTableBody');
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#f44336;">Gagal memuat data terbaru</td></tr>`;
+        }
+    }
+}
+
+// ============================================================
+// ===== REFRESH =====
+// ============================================================
+let refreshTimeout;
+
+function refreshData() {
+    clearTimeout(refreshTimeout);
+    refreshTimeout = setTimeout(() => {
+        showToast('Memperbarui data...', 'info');
+        CacheManager.clear();
+        loadKYCData(1, true);
+        loadDashboard(true);
+        loadSebaranData(true);
+        loadRecent();
+    }, 500);
+}
+
+// ============================================================
+// ===== INIT =====
+// ============================================================
+document.addEventListener('DOMContentLoaded', async function() {
+    await checkAuth();
+    updateDate();
+    
+    await loadKYCData(1);
+    await loadDashboard();
+    await loadSebaranData();
+    await loadRecent();
+
+    const user = getUser();
+    const filter = getRoleFilter();
+    
+    let pendidikNavQuery = supabaseClient
+        .from('pendidik')
+        .select('*', { count: 'exact', head: true })
+        .eq('status_aktif', true);
+
+    if (filter.lembaga_id) {
+        pendidikNavQuery = pendidikNavQuery.eq('lembaga_id', filter.lembaga_id);
+    }
+
+    if (filter.kecamatan_id) {
+        pendidikNavQuery = pendidikNavQuery.or(
+            `kecamatan_lembaga_id.eq.${filter.kecamatan_id},kecamatan_pengajar_id.eq.${filter.kecamatan_id}`
+        );
+    }
+
+    if (filter.jenis_lembaga) {
+        pendidikNavQuery = pendidikNavQuery.eq('jenis_lembaga', filter.jenis_lembaga);
+    }
+
+    try {
+        const { count, error } = await pendidikNavQuery;
+        if (error) {
+            console.error('Error loading nav count:', error);
+        } else {
+            document.getElementById('navPendidikCount').textContent = count || 0;
+        }
+    } catch (e) {
+        console.error('Error in nav count:', e);
+    }
+    
+    setInterval(updateDate, 60000);
+    setInterval(() => { 
+        loadKYCData(currentPage, true);
+        loadDashboard(true);
+        loadSebaranData(true);
+    }, 600000);
+});
+
+// ============================================================
+// ===== EXPOSE =====
+// ============================================================
+window.refreshData = refreshData;
+window.openKycModal = openKycModal;
+window.closeKycModal = closeKycModal;
+window.previewDokumen = previewDokumen;
+window.downloadDokumen = downloadDokumen;
+window.verifyKyc = verifyKyc;
+window.switchKycTab = switchKycTab;
+window.showToast = showToast;
+window.handleLogout = handleLogout;
+window.getUser = getUser;
+window.getRoleFilter = getRoleFilter;
+window.toggleSidebar = toggleSidebar;
+window.changePage = changePage;
+window.applyJenjangFilter = applyJenjangFilter;
+window.clearLocationFilter = clearLocationFilter;
+</script>
+</body>
+</html>
