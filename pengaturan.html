@@ -7,16 +7,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ============================================================
-           SI-MUSTAFA - PENGATURAN (FIXED - NO DUPLICATE currentUser)
-           ============================================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
+        /* ===== CSS SAMA SEPERTI SEBELUMNYA ===== */
+        /* (saya ringkas untuk menghemat space) */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         :root {
             --sidebar-width: 250px;
             --header-height: 64px;
@@ -32,65 +25,25 @@
             --purple: #9C27B0;
             --bg-gray: #f0f4f0;
             --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --card-shadow-hover: 0 8px 30px rgba(0, 100, 0, 0.15);
         }
-
-        body {
-            background: var(--bg-gray);
-            min-height: 100vh;
-            display: flex;
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: linear-gradient(180deg, #0a2e1a 0%, #1a5a3a 100%);
-            color: white;
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            transform: translateX(0);
-        }
-
+        body { background: var(--bg-gray); min-height: 100vh; display: flex; }
+        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; top: 0; left: 0; background: linear-gradient(180deg, #0a2e1a 0%, #1a5a3a 100%); color: white; z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; display: flex; flex-direction: column; transform: translateX(0); }
         .sidebar.collapsed { transform: translateX(-100%); }
         .sidebar::-webkit-scrollbar { width: 4px; }
-        .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-
-        .sidebar-brand {
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            min-height: var(--header-height);
-            flex-shrink: 0;
-        }
-
+        .sidebar-brand { padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); min-height: var(--header-height); flex-shrink: 0; }
         .sidebar-brand img { width: 36px; height: 36px; border-radius: 50%; object-fit: contain; background: rgba(255,255,255,0.1); padding: 4px; flex-shrink: 0; }
         .sidebar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
         .sidebar-brand .brand-text h1 { font-size: 1rem; font-weight: 700; color: white; letter-spacing: 0.5px; }
         .sidebar-brand .brand-text h1 span { color: var(--gold); }
         .sidebar-brand .brand-text small { font-size: 0.55rem; opacity: 0.7; font-weight: 300; }
-
         .sidebar-menu { flex: 1; padding: 12px 0; list-style: none; }
         .sidebar-menu .menu-label { padding: 8px 20px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.35); font-weight: 600; }
-        .sidebar-menu .menu-item {
-            display: flex; align-items: center; gap: 14px; padding: 10px 20px;
-            color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.85rem;
-            font-weight: 500; transition: all 0.25s ease; border-left: 3px solid transparent; cursor: pointer;
-        }
+        .sidebar-menu .menu-item { display: flex; align-items: center; gap: 14px; padding: 10px 20px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.25s ease; border-left: 3px solid transparent; cursor: pointer; }
         .sidebar-menu .menu-item:hover { background: rgba(255,255,255,0.08); color: white; }
         .sidebar-menu .menu-item.active { background: rgba(255,255,255,0.1); color: var(--gold); border-left-color: var(--gold); }
         .sidebar-menu .menu-item i { width: 20px; font-size: 1.1rem; text-align: center; flex-shrink: 0; }
         .sidebar-menu .menu-item .badge { margin-left: auto; background: var(--danger); color: white; font-size: 0.55rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; min-width: 18px; text-align: center; }
-
         .sidebar-footer { padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .sidebar-footer .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--gold); color: var(--primary-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
         .sidebar-footer .user-info { flex: 1; min-width: 0; }
@@ -98,13 +51,10 @@
         .sidebar-footer .user-info .role { font-size: 0.6rem; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sidebar-footer .logout-btn { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 1rem; padding: 4px 8px; transition: 0.2s; border-radius: 6px; }
         .sidebar-footer .logout-btn:hover { color: #ff6b6b; background: rgba(255,0,0,0.1); }
-
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
         .sidebar-overlay.active { display: block; }
-
         .main-content { margin-left: var(--sidebar-width); flex: 1; min-height: 100vh; transition: margin-left 0.3s ease; display: flex; flex-direction: column; padding: 20px 40px 40px 40px; }
         .main-content.expanded { margin-left: 0; }
-
         .header { background: white; padding: 0 40px; height: var(--header-height); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e8ecf1; position: sticky; top: 0; z-index: 100; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .header-left { display: flex; align-items: center; gap: 16px; }
         .header-left .sidebar-toggle { background: none; border: none; font-size: 1.3rem; color: var(--primary-dark); cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; }
@@ -121,7 +71,6 @@
         .header-user .user-name { font-size: 0.8rem; font-weight: 600; color: var(--primary-dark); }
         .logout-btn-header { background: none; border: none; color: #999; cursor: pointer; font-size: 1rem; padding: 4px 8px; transition: 0.2s; border-radius: 6px; }
         .logout-btn-header:hover { color: var(--danger); background: rgba(244,67,54,0.08); }
-
         .welcome-section { background: linear-gradient(135deg, #0a2e1a 0%, #1a5a3a 50%, #2e7d32 100%); border-radius: 14px; padding: 24px 36px; margin-bottom: 24px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 8px 32px rgba(0,100,0,0.3); }
         .welcome-section .welcome-text h2 { font-size: 1.3rem; font-weight: 700; }
         .welcome-section .welcome-text h2 span { color: var(--gold); }
@@ -129,7 +78,6 @@
         .welcome-section .welcome-text p i { margin-right: 6px; color: var(--gold); }
         .welcome-section .welcome-badge { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px 20px; font-size: 0.75rem; font-weight: 500; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
         .welcome-section .welcome-badge i { color: var(--gold); }
-
         .tabs { display: flex; gap: 4px; background: white; border-radius: 12px; padding: 4px; box-shadow: var(--card-shadow); margin-bottom: 16px; flex-wrap: wrap; }
         .tab-btn { padding: 8px 18px; border: none; background: transparent; border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: #666; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; }
         .tab-btn:hover { background: var(--bg-gray); color: var(--primary); }
@@ -137,18 +85,15 @@
         .tab-content { display: none; animation: fadeIn 0.25s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
         .setting-section { background: white; border-radius: 14px; padding: 20px 24px; box-shadow: var(--card-shadow); margin-bottom: 16px; }
         .setting-section .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f0f2f5; }
         .setting-section .section-title { font-size: 0.95rem; font-weight: 600; color: var(--primary); }
         .setting-section .section-title i { margin-right: 10px; color: var(--primary-light); }
         .setting-section .section-desc { font-size: 0.8rem; color: #888; margin-top: 2px; }
-
         .form-inline { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
         .form-inline select, .form-inline input { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.85rem; background: white; flex: 1; min-width: 150px; transition: 0.2s; }
         .form-inline select:focus, .form-inline input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,100,0,0.08); }
         .form-inline input[readonly] { background: #f5f5f5; color: #666; cursor: not-allowed; }
-
         .user-list-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #f8faf8; border-radius: 10px; margin-bottom: 8px; transition: 0.2s; }
         .user-list-item:hover { background: var(--bg-gray); }
         .user-list-item .user-avatar-sm { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
@@ -268,42 +213,39 @@
         .btn-success:hover { background: #43a047; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-danger:hover { background: #d32f2f; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning:hover { background: #e68900; }
         .btn-sm { padding: 4px 10px; font-size: 0.7rem; }
         .btn-icon { padding: 4px 8px; border: none; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; background: transparent; color: #888; }
         .btn-icon:hover { background: #f0f2f5; color: var(--primary); }
         .btn-icon.danger:hover { background: #ffebee; color: var(--danger); }
         .btn-icon.success:hover { background: #e8f5e9; color: var(--success); }
         .btn-icon.warning:hover { background: #fff3e0; color: var(--warning); }
+        .btn-icon.info:hover { background: #e3f2fd; color: var(--info); }
 
         .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f5f6f8; }
         .setting-item:last-child { border-bottom: none; }
         .setting-item .item-label { font-size: 0.85rem; color: #333; }
         .setting-item .item-label small { display: block; font-size: 0.7rem; color: #888; font-weight: 400; }
         .setting-item .item-control { display: flex; align-items: center; gap: 10px; }
-
         .toggle { position: relative; width: 44px; height: 24px; background: #ccc; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; flex-shrink: 0; }
         .toggle.active { background: var(--primary); }
         .toggle .toggle-slider { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
         .toggle.active .toggle-slider { left: 22px; }
-
         .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); padding: 12px 24px; border-radius: 12px; color: white; font-weight: 500; font-size: 0.85rem; box-shadow: 0 8px 30px rgba(0,0,0,0.2); z-index: 9999; opacity: 0; transition: all 0.3s ease; max-width: 90%; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast-success { background: var(--success); }
         .toast-error { background: var(--danger); }
         .toast-info { background: var(--primary); }
         .toast-warning { background: var(--warning); }
-
         .spinner { width: 32px; height: 32px; border: 3px solid #f0f2f5; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
         .access-denied { text-align: center; padding: 60px 20px; }
         .access-denied i { font-size: 48px; color: #f44336; display: block; margin-bottom: 16px; }
         .access-denied h2 { color: #f44336; }
         .access-denied p { color: #888; }
-
         .info-box { margin-top: 4px; padding: 6px 12px; background: #e8f5e9; border-radius: 6px; font-size: 0.8rem; color: #2e7d32; }
         .info-box i { margin-right: 6px; }
-
         .progress-bar { width: 100%; height: 6px; background: #f0f2f5; border-radius: 3px; margin-top: 8px; overflow: hidden; }
         .progress-bar .fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s ease; width: 0%; }
 
@@ -386,8 +328,30 @@
             padding-top: 12px;
             border-top: 2px solid #f0f2f5;
         }
+        .modal-box .password-hint {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 4px;
+        }
+        .modal-box .password-hint i {
+            color: var(--warning);
+            margin-right: 4px;
+        }
 
-        /* Style khusus untuk BADKO LPQ */
+        /* Modal Reset Password */
+        .modal-box .reset-password-info {
+            background: #fff3e0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            color: #e65100;
+            border-left: 3px solid var(--warning);
+        }
+        .modal-box .reset-password-info i {
+            margin-right: 8px;
+        }
+
         .badge-badko {
             background: #e3f2fd !important;
             color: #0d47a1 !important;
@@ -417,7 +381,6 @@
             .search-bar { flex-direction: column; align-items: stretch; }
             .search-bar .search-filter { flex-wrap: wrap; }
         }
-
         @media (max-width: 480px) {
             .header { padding: 0 12px; height: 56px; }
             .header-left .page-title h1 { font-size: 0.85rem; }
@@ -615,10 +578,6 @@
                 <label>Email</label>
                 <input type="email" id="editEmail" placeholder="Email">
             </div>
-            <div class="form-group">
-                <label>Password (kosongkan jika tidak diubah)</label>
-                <input type="text" id="editPassword" placeholder="Password baru (min 6)">
-            </div>
             <div class="form-group" id="editRoleGroup">
                 <label>Role</label>
                 <select id="editRole">
@@ -644,6 +603,36 @@
         </div>
     </div>
 
+    <!-- Modal Reset Password -->
+    <div class="modal-overlay" id="resetPasswordModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-key" style="color:var(--warning);"></i> Reset Password</h3>
+                <button class="modal-close" onclick="closeResetPasswordModal()">&times;</button>
+            </div>
+            <div class="reset-password-info">
+                <i class="fas fa-info-circle"></i>
+                <strong id="resetUserDisplay">Pengguna</strong>
+                <div style="font-size:0.8rem;margin-top:4px;">Password akan direset dan user harus login dengan password baru</div>
+            </div>
+            <div class="form-group">
+                <label>Password Baru</label>
+                <input type="text" id="resetNewPassword" placeholder="Masukkan password baru (min 6 karakter)">
+                <div class="password-hint"><i class="fas fa-lightbulb"></i> Gunakan password yang kuat: kombinasi huruf, angka, dan simbol</div>
+            </div>
+            <div class="form-group">
+                <label>Konfirmasi Password</label>
+                <input type="text" id="resetConfirmPassword" placeholder="Ketik ulang password baru">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" onclick="closeResetPasswordModal()">Batal</button>
+                <button class="btn btn-warning" id="btnResetPassword" onclick="confirmResetPassword()">
+                    <i class="fas fa-key"></i> Reset Password
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script src="js/supabase-client.js"></script>
@@ -652,60 +641,24 @@
 
     <script>
         // ============================================================
-        // ===== FUNGSI UTAMA - MENGUBAH TAMPILAN BATKO MENJADI BADKO LPQ =====
+        // ===== FUNGSI UTAMA =====
         // ============================================================
         
-        /**
-         * Fungsi untuk mengubah role dari database menjadi tampilan yang diinginkan
-         * Ini adalah pendekatan SAFE - hanya mengubah tampilan, tidak menyentuh database
-         */
         function formatRoleDisplay(role) {
-            // Mapping role database -> tampilan frontend
             const roleDisplayMap = {
                 'super_admin': '🛡️ Super Admin',
                 'admin_kab': '🏛️ Admin Kabupaten',
-                'batko': '📘 BADKO LPQ',  // ← DIUBAH MENJADI BADKO LPQ
+                'batko': '📘 BADKO LPQ',
                 'fkdt': '📗 FKDT',
                 'ponpes': '📕 PONPES',
                 'operator': '📋 Operator'
             };
-            
-            // Jika role tidak ada di map, kembalikan role asli dengan huruf kapital
             return roleDisplayMap[role] || role.charAt(0).toUpperCase() + role.slice(1);
         }
 
-        /**
-         * Fungsi untuk mendapatkan jenis lembaga dari role
-         * Tetap menggunakan 'batko' untuk filter karena database masih menggunakan 'batko'
-         */
-        function getJenisLembagaFromRole(role) {
-            const jenisMap = {
-                'batko': 'LPQ',
-                'fkdt': 'MDT',
-                'ponpes': 'PONPES'
-            };
-            return jenisMap[role] || null;
-        }
-
-        /**
-         * Fungsi untuk mengecek apakah user adalah BADKO LPQ (termasuk batko dari database)
-         */
-        function isBadkoLpq(role) {
-            return role === 'batko' || role === 'badko_lpq';
-        }
-
-        /**
-         * Fungsi untuk mendapatkan role display yang aman
-         */
         function getSafeRoleDisplay(role) {
             if (!role) return 'Unknown';
-            
-            // Jika role adalah 'batko', tampilkan 'BADKO LPQ'
-            if (role === 'batko') {
-                return '📘 BADKO LPQ';
-            }
-            
-            // Mapping role lainnya
+            if (role === 'batko') return '📘 BADKO LPQ';
             const displayMap = {
                 'super_admin': '🛡️ Super Admin',
                 'admin_kab': '🏛️ Admin Kabupaten',
@@ -714,7 +667,6 @@
                 'ponpes': '📕 PONPES',
                 'operator': '📋 Operator'
             };
-            
             return displayMap[role] || role.charAt(0).toUpperCase() + role.slice(1);
         }
 
@@ -739,10 +691,11 @@
         let allLembaga = [];
         let isProcessing = false;
         let editingUserId = null;
-        let allUsersData = []; // Untuk menyimpan data pengguna yang sudah dimuat
+        let allUsersData = [];
+        let resetPasswordTarget = null; // Untuk menyimpan target reset password
 
         // ============================================================
-        // ===== SIDEBAR =====
+        // ===== SIDEBAR & TOAST =====
         // ============================================================
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -755,9 +708,6 @@
             }
         });
 
-        // ============================================================
-        // ===== TOAST =====
-        // ============================================================
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             if (!toast) { console.log(message); return; }
@@ -807,25 +757,9 @@
 
         function getUser() { return window.currentUser || null; }
 
-        function getRoleFilter() {
-            const user = getUser();
-            if (!user) return {};
-            if (user.role === 'super_admin' || user.role === 'admin_kab') return {};
-            if (!user.kecamatan_id) return { restrict: true };
-            const f = { kecamatan_id: user.kecamatan_id };
-            
-            // Gunakan 'batko' untuk filter karena database masih menggunakan 'batko'
-            if (user.role === 'batko') f.jenis_lembaga = 'LPQ';
-            else if (user.role === 'fkdt') f.jenis_lembaga = 'MDT';
-            else if (user.role === 'ponpes') f.jenis_lembaga = 'PONPES';
-            return f;
-        }
-
         function updateHeaderUI(user) {
             if (!user) return;
-            // Gunakan fungsi getSafeRoleDisplay untuk tampilan yang aman
             const displayRole = getSafeRoleDisplay(user.role);
-            
             document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
             document.getElementById('userName').textContent = user.name;
             document.getElementById('userRole').textContent = displayRole;
@@ -837,12 +771,10 @@
         function updateWelcomeUI(user) {
             if (!user) return;
             document.getElementById('welcomeName').textContent = user.name;
-            
-            // Mapping role ke deskripsi
             const roleDescMap = {
                 'super_admin': 'Super Admin SI-MUSTAFA',
                 'admin_kab': 'Admin Kemenag Kabupaten Tegal',
-                'batko': 'Admin BADKO LPQ',  // ← DIUBAH MENJADI BADKO LPQ
+                'batko': 'Admin BADKO LPQ',
                 'fkdt': 'Admin FKDT',
                 'ponpes': 'Admin PONPES',
                 'operator': 'Operator Lembaga'
@@ -881,7 +813,6 @@
                 <div class="form-inline" style="margin-top:8px;"><select id="inputRole"><option value="">-- Role --</option><option value="batko">BADKO LPQ</option><option value="fkdt">FKDT MDT</option><option value="ponpes">PONPES</option><option value="operator">Operator</option></select></div>`;
             } else if (['batko', 'fkdt', 'ponpes'].includes(role)) {
                 const rl = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
-                const displayName = role === 'batko' ? 'BADKO LPQ' : role.toUpperCase();
                 html = `<div class="form-inline"><select id="inputDesa" onchange="loadLembagaByDesa()"><option value="">-- Desa --</option></select><select id="inputLembaga" onchange="autoFillFromLembaga()"><option value="">-- Lembaga ${rl[role]} --</option></select></div>
                 <input type="hidden" id="inputKecamatan" value="${user.kecamatan_id || ''}"><input type="hidden" id="inputRole" value="operator">
                 <div class="info-box"><i class="fas fa-info-circle"></i> Membuat akun Operator ${rl[role]} di kecamatan Anda</div>`;
@@ -1052,11 +983,7 @@
             const user = getUser();
             if (!user) return;
             
-            // Cari data user dari daftar yang sudah dimuat
-            const userList = document.querySelectorAll('.user-list-item');
             let userData = null;
-            
-            // Ambil data dari DOM atau dari cache
             const users = document.querySelectorAll('.user-list-item');
             for (const el of users) {
                 const btn = el.querySelector('[data-user-id]');
@@ -1078,7 +1005,6 @@
             }
             
             if (!userData) {
-                // Jika tidak ditemukan di DOM, ambil dari database
                 supabaseClient.from('users').select('*').eq('id', userId).single()
                     .then(({ data, error }) => {
                         if (error || !data) {
@@ -1097,9 +1023,7 @@
             editingUserId = userData.id;
             document.getElementById('editName').value = userData.name || '';
             document.getElementById('editEmail').value = userData.email || '';
-            document.getElementById('editPassword').value = '';
             
-            // Set role
             const roleSelect = document.getElementById('editRole');
             const roleMap = {
                 'super_admin': 'super_admin',
@@ -1112,17 +1036,13 @@
             const roleKey = roleMap[userData.role] || 'operator';
             roleSelect.value = roleKey;
             
-            // Set status
             document.getElementById('editStatus').value = userData.active !== false ? 'true' : 'false';
-            
-            // Tampilkan modal
             document.getElementById('editModal').classList.add('active');
         }
 
         function closeEditModal() {
             document.getElementById('editModal').classList.remove('active');
             editingUserId = null;
-            document.getElementById('editPassword').value = '';
         }
 
         async function saveEditUser() {
@@ -1133,7 +1053,6 @@
             
             const name = document.getElementById('editName').value.trim();
             const email = document.getElementById('editEmail').value.trim();
-            const password = document.getElementById('editPassword').value.trim();
             const role = document.getElementById('editRole').value;
             const status = document.getElementById('editStatus').value === 'true';
             
@@ -1141,7 +1060,6 @@
             if (!email) { showToast('Email wajib diisi!', 'error'); return; }
             if (!isValidEmail(email)) { showToast('Format email tidak valid!', 'error'); return; }
             
-            // Cek email duplikat (kecuali dirinya sendiri)
             const { data: exist } = await supabaseClient.from('users')
                 .select('email')
                 .eq('email', email)
@@ -1155,7 +1073,6 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             
             try {
-                // Update data di tabel users
                 const updateData = {
                     name: name,
                     email: email,
@@ -1168,17 +1085,6 @@
                     .update(updateData)
                     .eq('id', editingUserId);
                 if (ue) throw ue;
-                
-                // Update email di auth jika berubah
-                if (password && password.length >= 6) {
-                    // Update password di auth
-                    const { error: pe } = await supabaseClient.auth.updateUser({ password: password });
-                    if (pe) throw pe;
-                }
-                
-                // Jika email berubah, update di auth juga
-                // Note: Supabase tidak mengizinkan update email melalui client-side tanpa verifikasi
-                // Kita hanya update di tabel users
                 
                 showToast('Pengguna berhasil diperbarui!', 'success');
                 closeEditModal();
@@ -1193,7 +1099,140 @@
         }
 
         // ============================================================
-        // ===== DELETE USER (nonaktifkan) =====
+        // ===== RESET PASSWORD (FIXED - Menggunakan RPC) =====
+        // ============================================================
+        
+        /**
+         * Membuka modal reset password untuk user tertentu
+         */
+        function openResetPasswordModal(userId) {
+            const user = getUser();
+            if (!user) return;
+            
+            // Cari data user
+            let userData = null;
+            const users = document.querySelectorAll('.user-list-item');
+            for (const el of users) {
+                const btn = el.querySelector('[data-user-id]');
+                if (btn && btn.dataset.userId === userId) {
+                    const nameEl = el.querySelector('.name');
+                    const emailEl = el.querySelector('.email');
+                    userData = {
+                        id: userId,
+                        name: nameEl ? nameEl.textContent.replace(' (Nonaktif)', '') : 'Pengguna',
+                        email: emailEl ? emailEl.textContent : ''
+                    };
+                    break;
+                }
+            }
+            
+            if (!userData) {
+                // Ambil dari database
+                supabaseClient.from('users').select('id, name, email').eq('id', userId).single()
+                    .then(({ data, error }) => {
+                        if (error || !data) {
+                            showToast('Gagal memuat data pengguna', 'error');
+                            return;
+                        }
+                        resetPasswordTarget = data;
+                        document.getElementById('resetUserDisplay').textContent = `${data.name} (${data.email})`;
+                        document.getElementById('resetNewPassword').value = '';
+                        document.getElementById('resetConfirmPassword').value = '';
+                        document.getElementById('resetPasswordModal').classList.add('active');
+                    });
+                return;
+            }
+            
+            resetPasswordTarget = userData;
+            document.getElementById('resetUserDisplay').textContent = `${userData.name} (${userData.email})`;
+            document.getElementById('resetNewPassword').value = '';
+            document.getElementById('resetConfirmPassword').value = '';
+            document.getElementById('resetPasswordModal').classList.add('active');
+        }
+
+        function closeResetPasswordModal() {
+            document.getElementById('resetPasswordModal').classList.remove('active');
+            resetPasswordTarget = null;
+            document.getElementById('resetNewPassword').value = '';
+            document.getElementById('resetConfirmPassword').value = '';
+        }
+
+        /**
+         * Konfirmasi dan jalankan reset password
+         * Menggunakan RPC function di Supabase
+         */
+        async function confirmResetPassword() {
+            if (!resetPasswordTarget) {
+                showToast('Tidak ada target reset password', 'error');
+                return;
+            }
+
+            const newPassword = document.getElementById('resetNewPassword').value.trim();
+            const confirmPassword = document.getElementById('resetConfirmPassword').value.trim();
+
+            // Validasi
+            if (!newPassword) {
+                showToast('Password baru tidak boleh kosong!', 'error');
+                return;
+            }
+            if (newPassword.length < 6) {
+                showToast('Password minimal 6 karakter!', 'error');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                showToast('Password dan konfirmasi tidak sama!', 'error');
+                return;
+            }
+
+            // Konfirmasi dari admin
+            if (!confirm(`Yakin akan mereset password untuk ${resetPasswordTarget.name}?`)) {
+                return;
+            }
+
+            isProcessing = true;
+            const btn = document.getElementById('btnResetPassword');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+            try {
+                // === SOLUSI: Menggunakan RPC function ===
+                // Pastikan Anda sudah membuat fungsi RPC di Supabase SQL Editor
+                // dengan nama 'reset_user_password'
+                
+                const { data, error } = await supabaseClient.rpc('reset_user_password', {
+                    target_user_id: resetPasswordTarget.id,
+                    new_password: newPassword
+                });
+
+                if (error) {
+                    // Jika RPC gagal, coba alternatif: update langsung via auth admin
+                    console.warn('RPC gagal, mencoba metode alternatif...', error);
+                    
+                    // Alternatif: Menggunakan auth admin API (perlu service_role key)
+                    // Catatan: Ini hanya bisa dilakukan dari backend atau Edge Function
+                    // Untuk frontend, kita akan gunakan pendekatan lain
+                    
+                    throw new Error('Fungsi RPC tidak ditemukan. Silakan buat fungsi reset_user_password di Supabase SQL Editor.');
+                }
+
+                showToast(`Password untuk ${resetPasswordTarget.name} berhasil direset!`, 'success');
+                closeResetPasswordModal();
+                
+                // Optional: Kirim notifikasi ke user via email
+                // await sendPasswordResetEmail(resetPasswordTarget.email, newPassword);
+                
+            } catch (e) {
+                console.error('Reset password error:', e);
+                showToast('Gagal reset password: ' + e.message, 'error');
+            } finally {
+                isProcessing = false;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-key"></i> Reset Password';
+            }
+        }
+
+        // ============================================================
+        // ===== DELETE USER =====
         // ============================================================
         async function deleteUser(userId) {
             if (!confirm('Nonaktifkan pengguna ini?\nMereka tidak akan bisa login lagi.')) return;
@@ -1209,7 +1248,7 @@
         }
 
         // ============================================================
-        // ===== LOAD USERS =====
+        // ===== LOAD & RENDER USERS =====
         // ============================================================
         async function loadUsers() {
             const user = getUser();
@@ -1229,9 +1268,6 @@
             } catch (e) { document.getElementById('userList').innerHTML = `<div style="text-align:center;padding:30px;color:#f44336;">Gagal: ${e.message}</div>`; }
         }
 
-        // ============================================================
-        // ===== RENDER USER LIST =====
-        // ============================================================
         function renderUserList(users) {
             const container = document.getElementById('userList');
             if (!users?.length) { 
@@ -1251,11 +1287,10 @@
                 (kecData.data || []).forEach(k => km[k.id] = k.nama);
                 (lemData.data || []).forEach(l => lm[l.id] = l.nama);
 
-                // Gunakan getSafeRoleDisplay untuk tampilan yang aman
                 const rl = { 
                     'super_admin': '🛡️ Super Admin', 
                     'admin_kab': '🏛️ Admin Kab', 
-                    'batko': '📘 BADKO LPQ',  // ← DIUBAH MENJADI BADKO LPQ
+                    'batko': '📘 BADKO LPQ',
                     'fkdt': '📗 FKDT', 
                     'ponpes': '📕 PONPES', 
                     'operator': '📋 Operator' 
@@ -1274,6 +1309,9 @@
                                 <button class="btn-icon warning" onclick="openEditModal('${u.id}')" title="Edit" data-user-id="${u.id}">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <button class="btn-icon info" onclick="openResetPasswordModal('${u.id}')" title="Reset Password" data-user-id="${u.id}">
+                                    <i class="fas fa-key"></i>
+                                </button>
                                 <button class="btn-icon danger" onclick="deleteUser('${u.id}')" title="Nonaktifkan" data-user-id="${u.id}">
                                     <i class="fas fa-ban"></i>
                                 </button>
@@ -1286,13 +1324,12 @@
                     </div>`;
                 }).join('');
                 
-                // Update jumlah hasil pencarian
                 document.getElementById('searchResultCount').innerHTML = `Menampilkan <strong>${users.length}</strong> pengguna`;
             });
         }
 
         // ============================================================
-        // ===== FILTER USERS (SEARCH) =====
+        // ===== FILTER USERS =====
         // ============================================================
         function filterUsers() {
             const searchQuery = document.getElementById('searchUserInput').value.toLowerCase().trim();
@@ -1301,25 +1338,19 @@
             
             let filtered = allUsersData;
             
-            // Filter berdasarkan teks pencarian
             if (searchQuery) {
                 filtered = filtered.filter(u => {
                     const name = (u.name || '').toLowerCase();
                     const email = (u.email || '').toLowerCase();
                     const role = (u.role || '').toLowerCase();
-                    // Cari di nama, email, atau role
-                    return name.includes(searchQuery) || 
-                           email.includes(searchQuery) || 
-                           role.includes(searchQuery);
+                    return name.includes(searchQuery) || email.includes(searchQuery) || role.includes(searchQuery);
                 });
             }
             
-            // Filter berdasarkan role
             if (roleFilter) {
                 filtered = filtered.filter(u => u.role === roleFilter);
             }
             
-            // Filter berdasarkan status
             if (statusFilter === 'active') {
                 filtered = filtered.filter(u => u.active !== false);
             } else if (statusFilter === 'inactive') {
@@ -1329,9 +1360,6 @@
             renderUserList(filtered);
         }
 
-        // ============================================================
-        // ===== CLEAR SEARCH =====
-        // ============================================================
         function clearSearch() {
             document.getElementById('searchUserInput').value = '';
             document.getElementById('searchRoleFilter').value = '';
@@ -1457,7 +1485,7 @@
         });
 
         // ============================================================
-        // ===== EXPOSE FUNCTIONS KE GLOBAL =====
+        // ===== EXPOSE FUNCTIONS =====
         // ============================================================
         window.switchTab = switchTab;
         window.loadUsers = loadUsers;
@@ -1467,6 +1495,9 @@
         window.openEditModal = openEditModal;
         window.closeEditModal = closeEditModal;
         window.saveEditUser = saveEditUser;
+        window.openResetPasswordModal = openResetPasswordModal;
+        window.closeResetPasswordModal = closeResetPasswordModal;
+        window.confirmResetPassword = confirmResetPassword;
         window.toggleSwitch = toggleSwitch;
         window.backupDatabase = backupDatabase;
         window.restoreDatabase = restoreDatabase;
@@ -1475,7 +1506,6 @@
         window.handleLogout = handleLogout;
         window.toggleSidebar = toggleSidebar;
         window.getUser = getUser;
-        window.getRoleFilter = getRoleFilter;
         window.loadLembagaByKecamatan = loadLembagaByKecamatan;
         window.loadLembagaByDesa = loadLembagaByDesa;
         window.autoFillFromLembaga = autoFillFromLembaga;
@@ -1483,12 +1513,8 @@
         window.resetSystemSettings = resetSystemSettings;
         window.filterUsers = filterUsers;
         window.clearSearch = clearSearch;
-        
-        // Ekspos fungsi-fungsi baru
         window.formatRoleDisplay = formatRoleDisplay;
         window.getSafeRoleDisplay = getSafeRoleDisplay;
-        window.isBadkoLpq = isBadkoLpq;
-        window.getJenisLembagaFromRole = getJenisLembagaFromRole;
     </script>
 </body>
 </html>
