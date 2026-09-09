@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         /* ============================================================
-           SI-MUSTAFA - PENDIDIK (FULL CSS - FIXED SEARCH & PAGINATION)
+           SI-MUSTAFA - PENDIDIK (FULL CSS - FIXED SEARCH LEMBAGA)
            ============================================================ */
         * {
             margin: 0;
@@ -1187,7 +1187,7 @@
     }
 
     // ============================================================
-    // ===== LOAD PENDIDIK (FIXED SEARCH & PAGINATION) =====
+    // ===== LOAD PENDIDIK (FIXED - CAN SEARCH LEMBAGA NAME) =====
     // ============================================================
     async function loadPendidik() {
         try {
@@ -1217,7 +1217,7 @@
             if (filter.lembaga_id) query = query.eq('lembaga_id', filter.lembaga_id);
             if (filter.jenis_lembaga) query = query.eq('jenis_lembaga', filter.jenis_lembaga);
 
-            // ===== SEARCH - FIXED: lebih komprehensif =====
+            // ===== SEARCH DI DATABASE (untuk field di tabel pendidik) =====
             if (currentFilter.search) {
                 const searchTerm = currentFilter.search.trim();
                 const isNumericSearch = /^\d+$/.test(searchTerm);
@@ -1225,6 +1225,7 @@
                 if (isNumericSearch) {
                     query = query.ilike('nik', `%${searchTerm}%`);
                 } else {
+                    // Cari di field pendidik (tidak termasuk lembaga.nama)
                     query = query.or(
                         `nama_lengkap.ilike.%${searchTerm}%,` +
                         `nslp_lembaga.ilike.%${searchTerm}%,` +
@@ -1300,12 +1301,17 @@
             // ===== CLIENT-SIDE FILTER UNTUK LEMBAGA.NAMA =====
             let filteredData = data || [];
             let searchMatchCount = filteredData.length;
-            
+
             if (currentFilter.search && !/^\d+$/.test(currentFilter.search.trim())) {
                 const searchLower = currentFilter.search.trim().toLowerCase();
+                
+                // Filter di client-side untuk mencari di lembaga.nama
                 filteredData = filteredData.filter(item => {
+                    // Cari di nama lembaga (relasi)
                     const lembagaName = (item.lembaga?.nama || '').toLowerCase();
                     if (lembagaName.includes(searchLower)) return true;
+                    
+                    // Cari di field pendidik lainnya (sudah di-filter di database, tapi tetap cek)
                     return (item.nama_lengkap || '').toLowerCase().includes(searchLower) || 
                            (item.nslp_lembaga || '').toLowerCase().includes(searchLower) ||
                            (item.kecamatan_lembaga || '').toLowerCase().includes(searchLower) ||
@@ -1314,6 +1320,7 @@
                            (item.alamat || '').toLowerCase().includes(searchLower) ||
                            (item.no_hp || '').toLowerCase().includes(searchLower);
                 });
+                
                 searchMatchCount = filteredData.length;
             }
 
@@ -1992,7 +1999,7 @@
                 if (!data || data.length === 0) {
                     hasMore = false;
                 } else {
-                    // Client-side filter untuk lembaga.nama
+                    // ===== CLIENT-SIDE FILTER UNTUK LEMBAGA.NAMA =====
                     if (currentFilter.search && !/^\d+$/.test(currentFilter.search.trim())) {
                         const searchLower = currentFilter.search.trim().toLowerCase();
                         const filtered = data.filter(item => {
