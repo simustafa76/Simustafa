@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         /* ============================================================
-           SI-MUSTAFA - LEMBAGA (FULL VERSION)
+           SI-MUSTAFA - LEMBAGA (FULL VERSION - FIXED SEARCH)
            ============================================================ */
 
         * {
@@ -362,6 +362,35 @@
             margin-right: 8px;
         }
 
+        /* Search info */
+        .search-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: #666;
+        }
+        .search-info .search-count { font-weight: 600; color: var(--primary); }
+        .search-info .btn-clear-search {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+        .search-info .btn-clear-search:hover { background: #f0f0f0; color: var(--danger); }
+
+        /* Highlight search */
+        mark.search-highlight {
+            background: #ffeb3b;
+            padding: 0 2px;
+            border-radius: 2px;
+            font-weight: 600;
+        }
+
         /* ===== CARD ===== */
         .card {
             background: white;
@@ -619,6 +648,7 @@
             .table-responsive table { font-size: 0.75rem; }
             .table-responsive table th,
             .table-responsive table td { padding: 6px 8px; }
+            .search-info { font-size: 0.65rem; }
         }
 
         @media (max-width: 480px) {
@@ -638,6 +668,8 @@
             .table-responsive table { font-size: 0.7rem; }
             .table-responsive table th,
             .table-responsive table td { padding: 4px 6px; }
+            .filter-actions .btn { font-size: 0.6rem; padding: 4px 8px; }
+            #prevPage, #nextPage { padding: 8px 16px; min-width: 44px; }
         }
     </style>
 </head>
@@ -728,7 +760,15 @@
         <div class="filter-section">
             <div class="filter-item" style="flex:2;">
                 <label><i class="fas fa-search"></i> Cari Lembaga</label>
-                <input type="text" id="searchInput" placeholder="Cari nama lembaga...">
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input type="text" id="searchInput" placeholder="Cari nama, desa, kecamatan, pimpinan..." style="flex:1;">
+                    <div class="search-info" id="searchInfo">
+                        <span class="search-count" id="searchCount"></span>
+                        <button class="btn-clear-search" id="btnClearSearch" onclick="clearSearch()" style="display:none;" title="Hapus pencarian">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="filter-actions">
                 <button class="btn btn-outline" onclick="openFilterModal()" id="btnFilter">
@@ -1351,6 +1391,7 @@
             currentPage = 1;
             resetFilterModal();
             updateFilterBadge();
+            updateSearchInfo();
             loadLembaga();
             showToast('Filter direset', 'info');
         }
@@ -1359,6 +1400,7 @@
             currentFilters.search = document.getElementById('searchInput').value.trim();
             currentPage = 1;
             updateFilterBadge();
+            updateSearchInfo();
             loadLembaga();
         }
 
@@ -1380,6 +1422,33 @@
                 badge.style.display = 'none';
                 btnFilter.classList.remove('btn-filter-active');
             }
+        }
+
+        function updateSearchInfo() {
+            const searchCount = document.getElementById('searchCount');
+            const btnClear = document.getElementById('btnClearSearch');
+
+            if (currentFilters.search) {
+                btnClear.style.display = 'inline-flex';
+                if (totalData > 0) {
+                    searchCount.textContent = `${totalData} hasil`;
+                } else {
+                    searchCount.textContent = 'Mencari...';
+                }
+            } else {
+                btnClear.style.display = 'none';
+                searchCount.textContent = '';
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            currentFilters.search = '';
+            currentPage = 1;
+            updateFilterBadge();
+            updateSearchInfo();
+            loadLembaga();
+            showToast('Pencarian dihapus', 'info');
         }
 
         // ============================================================
@@ -1482,6 +1551,14 @@
             }, 500);
         });
 
+        // Enter key untuk search
+        document.getElementById('searchInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                clearTimeout(searchTimeout);
+                applyFilter();
+            }
+        });
+
         // ============================================================
         // ===== LOAD LEMBAGA =====
         // ============================================================
@@ -1514,9 +1591,15 @@
                     query = query.eq('jenis_lembaga', filter.jenis_lembaga);
                 }
 
+                // ========== SEARCH - FIXED ==========
                 if (currentFilters.search) {
+                    const searchTerm = currentFilters.search.trim();
                     query = query.or(
-                        `nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`
+                        `nama.ilike.%${searchTerm}%,` +
+                        `desa.ilike.%${searchTerm}%,` +
+                        `kecamatan.ilike.%${searchTerm}%,` +
+                        `alamat.ilike.%${searchTerm}%,` +
+                        `pimpinan.ilike.%${searchTerm}%`
                     );
                 }
 
@@ -1546,6 +1629,7 @@
                 renderTable(data || []);
                 updatePagination();
                 updateStats();
+                updateSearchInfo();
 
                 if (filter.jenis_lembaga) {
                     showRoleBadge(filter.jenis_lembaga);
@@ -1568,7 +1652,10 @@
             } catch (e) {
                 console.error('Error loading lembaga:', e);
                 document.getElementById('lembagaTableBody').innerHTML =
-                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">Gagal memuat data: ${e.message}</td></tr>`;
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">
+                        <i class="fas fa-exclamation-circle" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+                        Gagal memuat data: ${e.message}
+                    </td></tr>`;
             }
         }
 
@@ -1598,27 +1685,46 @@
         function renderTable(data) {
             const tbody = document.getElementById('lembagaTableBody');
             if (!data || data.length === 0) {
+                const searchMsg = currentFilters.search ?
+                    `Tidak ada hasil untuk "<strong>${escapeHtml(currentFilters.search)}</strong>"` :
+                    'Belum ada data';
                 tbody.innerHTML =
                     `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">
-                        <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>Belum ada data</td></tr>`;
+                        <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+                        ${searchMsg}
+                    </td></tr>`;
                 return;
             }
 
             const start = (currentPage - 1) * pageSize;
             tbody.innerHTML = data.map((item, i) => `
-                    <tr onclick="viewLembaga('${item.id}')" style="cursor:pointer;">
-                        <td>${start + i + 1}</td>
-                        <td><strong>${item.nama || '-'}</strong></td>
-                        <td><span class="badge active">${item.jenis_lembaga || '-'}</span></td>
-                        <td>${item.master_kelurahan?.nama || item.desa || '-'}</td>
-                        <td>${item.master_kecamatan?.nama || item.kecamatan || '-'}</td>
-                        <td><span class="badge ${item.status_aktif ? 'active' : 'inactive'}">${item.status_aktif ? 'Aktif' : 'Tidak Aktif'}</span></td>
-                        <td>
-                            <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:0.65rem;" onclick="event.stopPropagation(); editLembaga('${item.id}')"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:0.65rem;border-color:#f44336;color:#f44336;" onclick="event.stopPropagation(); deleteLembaga('${item.id}')"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
+                <tr onclick="viewLembaga('${item.id}')" style="cursor:pointer;">
+                    <td>${start + i + 1}</td>
+                    <td><strong>${highlightText(item.nama || '-', currentFilters.search)}</strong></td>
+                    <td><span class="badge active">${item.jenis_lembaga || '-'}</span></td>
+                    <td>${highlightText(item.master_kelurahan?.nama || item.desa || '-', currentFilters.search)}</td>
+                    <td>${highlightText(item.master_kecamatan?.nama || item.kecamatan || '-', currentFilters.search)}</td>
+                    <td><span class="badge ${item.status_aktif ? 'active' : 'inactive'}">${item.status_aktif ? 'Aktif' : 'Tidak Aktif'}</span></td>
+                    <td>
+                        <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:0.65rem;" onclick="event.stopPropagation(); editLembaga('${item.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:0.65rem;border-color:#f44336;color:#f44336;" onclick="event.stopPropagation(); deleteLembaga('${item.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function highlightText(text, search) {
+            if (!search || !text) return text || '-';
+            const escaped = escapeHtml(String(text));
+            const searchEscaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${searchEscaped})`, 'gi');
+            return escaped.replace(regex, '<mark class="search-highlight">$1</mark>');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // ============================================================
@@ -1815,24 +1921,21 @@
                 if (kecamatanId) {
                     await loadDesaOptions(kecamatanId, 'editDesa');
 
-                    if (data.desa_id) {
-                        desaSelect.value = data.desa_id;
-                    } else if (data.desa) {
-                        const { data: desaData } = await supabaseClient
-                            .from('master_kelurahan')
-                            .select('id')
-                            .eq('nama', data.desa)
-                            .eq('kecamatan_id', kecamatanId)
-                            .maybeSingle();
-                        if (desaData) {
-                            desaSelect.value = desaData.id;
-                            await supabaseClient
-                                .from('lembaga')
-                                .update({ desa_id: desaData.id })
-                                .eq('id', data.id);
-                            showToast('Desa berhasil diperbaiki!', 'success');
+                    // Set desa value setelah options dimuat
+                    setTimeout(() => {
+                        if (data.desa_id) {
+                            desaSelect.value = data.desa_id;
+                        } else if (data.desa) {
+                            // Coba cari desa berdasarkan nama
+                            const options = desaSelect.options;
+                            for (let i = 0; i < options.length; i++) {
+                                if (options[i].text === data.desa) {
+                                    desaSelect.value = options[i].value;
+                                    break;
+                                }
+                            }
                         }
-                    }
+                    }, 200);
                 }
 
                 enableInputs(true);
@@ -1927,7 +2030,6 @@
                 if (error) throw error;
 
                 dataCache.clear();
-
                 showToast(`Data lembaga berhasil ${isEdit ? 'diperbarui' : 'ditambahkan'}!`, 'success');
                 closeModal();
                 loadLembaga();
@@ -2055,7 +2157,7 @@
         }
 
         // ============================================================
-        // ===== EXPORT DATA (FIXED) =====
+        // ===== EXPORT DATA =====
         // ============================================================
         async function exportData() {
             if (isExporting) {
@@ -2066,7 +2168,7 @@
             const exportBtn = document.getElementById('btnExport');
             isExporting = true;
             exportBtn.disabled = true;
-            exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengambil semua data...';
+            exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengambil data...';
 
             const spinnerOverlay = document.getElementById('spinnerOverlay');
             const spinnerText = document.getElementById('spinnerText');
@@ -2104,9 +2206,15 @@
                         query = query.eq('jenis_lembaga', filter.jenis_lembaga);
                     }
 
+                    // SEARCH - sama dengan loadLembaga
                     if (currentFilters.search) {
+                        const searchTerm = currentFilters.search.trim();
                         query = query.or(
-                            `nama.ilike.%${currentFilters.search}%,desa.ilike.%${currentFilters.search}%,kecamatan.ilike.%${currentFilters.search}%`
+                            `nama.ilike.%${searchTerm}%,` +
+                            `desa.ilike.%${searchTerm}%,` +
+                            `kecamatan.ilike.%${searchTerm}%,` +
+                            `alamat.ilike.%${searchTerm}%,` +
+                            `pimpinan.ilike.%${searchTerm}%`
                         );
                     }
 
@@ -2132,19 +2240,7 @@
                     if (!data || data.length === 0) {
                         hasMore = false;
                     } else {
-                        let filteredData = data;
-                        if (currentFilters.search && !filter.kecamatan_id) {
-                            const searchLower = currentFilters.search.toLowerCase();
-                            filteredData = data.filter(item => {
-                                const kecamatanName = (item.master_kecamatan?.nama || '').toLowerCase();
-                                const desaName = (item.master_kelurahan?.nama || '').toLowerCase();
-                                if (kecamatanName.includes(searchLower)) return true;
-                                if (desaName.includes(searchLower)) return true;
-                                return (item.nama || '').toLowerCase().includes(searchLower);
-                            });
-                        }
-                        allData = allData.concat(filteredData);
-
+                        allData = allData.concat(data);
                         if (data.length < batchSize) {
                             hasMore = false;
                         } else {
@@ -2204,13 +2300,13 @@
                 URL.revokeObjectURL(link.href);
 
                 if (spinnerOverlay) spinnerOverlay.classList.remove('active');
-                showToast(`Export berhasil! ${allData.length} data`, 'success');
+                showToast(`✅ Export berhasil! ${allData.length} data`, 'success');
 
             } catch (e) {
                 console.error('Export error:', e);
                 const spinnerOverlay = document.getElementById('spinnerOverlay');
                 if (spinnerOverlay) spinnerOverlay.classList.remove('active');
-                showToast('Gagal export: ' + e.message, 'error');
+                showToast('❌ Gagal export: ' + e.message, 'error');
             } finally {
                 isExporting = false;
                 exportBtn.disabled = false;
@@ -2490,6 +2586,10 @@
         window.updateFilterBadge = updateFilterBadge;
         window.cekDanPerbaikiDataLembaga = cekDanPerbaikiDataLembaga;
         window.loadDesaOptions = loadDesaOptions;
+        window.clearSearch = clearSearch;
+        window.updateSearchInfo = updateSearchInfo;
+        window.highlightText = highlightText;
+        window.escapeHtml = escapeHtml;
     </script>
 </body>
 </html>
