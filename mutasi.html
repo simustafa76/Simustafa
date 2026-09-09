@@ -8,9 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ============================================================
-           SI-MUSTAFA - MUTASI (FIXED SEARCH, PAGINATION & MODAL)
-           ============================================================ */
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
         :root{--sidebar-width:250px;--header-height:64px;--primary:#006400;--primary-light:#4CAF50;--primary-dark:#0a2e1a;--gold:#FFD700;--gold-dark:#DAA520;--success:#4CAF50;--warning:#FF9800;--danger:#f44336;--info:#2196F3;--purple:#9C27B0;--bg-gray:#f0f4f0;--card-shadow:0 4px 20px rgba(0,0,0,0.08)}
         body{background:var(--bg-gray);min-height:100vh;display:flex}
@@ -152,8 +149,6 @@
         .hidden-field{display:none}
         .hidden-field.visible{display:block}
         .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #f0f2f5}
-
-        /* ===== SEARCHABLE SELECT WITH PAGINATION ===== */
         .searchable-select-wrapper{position:relative;width:100%}
         .searchable-select-wrapper input[type="text"]{width:100%;padding:8px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.9rem;background:#fafafa;transition:0.2s;cursor:pointer}
         .searchable-select-wrapper input[type="text"]:focus{border-color:var(--primary);outline:none;background:white}
@@ -168,24 +163,18 @@
         .badge-jenis-lpq{background:#e3f2fd;color:#0d47a1}
         .badge-jenis-mdt{background:#f3e5f5;color:#4a148c}
         .badge-jenis-ponpes{background:#fff3e0;color:#e65100}
-
-        /* Dropdown pagination controls */
         .dropdown-pagination{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-top:1px solid #e0e0e0;background:#f8faf8;font-size:0.7rem;color:#888}
         .dropdown-pagination .page-info{font-weight:600;color:var(--primary-dark)}
         .dropdown-pagination .btn-page{background:none;border:1px solid #ddd;border-radius:4px;padding:2px 10px;cursor:pointer;font-size:0.7rem;transition:0.2s;color:#555}
         .dropdown-pagination .btn-page:hover:not(:disabled){background:#e8f5e9;border-color:var(--primary)}
         .dropdown-pagination .btn-page:disabled{opacity:0.4;cursor:not-allowed}
         .dropdown-loading{text-align:center;padding:12px;color:#888;font-size:0.8rem}
-
         .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
         .form-group.full-width{grid-column:1/-1}
-
-        /* Info box untuk menampilkan data pendidik yang dipilih */
         .selected-info{background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:4px solid var(--primary);margin-bottom:12px;display:none}
         .selected-info .info-label{font-size:0.7rem;color:#888}
         .selected-info .info-value{font-weight:600;font-size:0.95rem}
         .selected-info .info-sub{font-size:0.8rem;color:#666}
-
         @media (max-width:992px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.sidebar-overlay.active{display:block}.main-content{margin-left:0;padding:16px 20px 30px 20px}.header{padding:0 20px}.header-left .page-title p{display:none}.header-date{display:none}.header-right .role-scope{display:none}.filter-section .filter-item{min-width:100%}.filter-actions{width:100%;justify-content:stretch}.filter-actions .btn{flex:1;justify-content:center;font-size:0.7rem;padding:6px 10px}.stat-mini{grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}.welcome-section{padding:16px 20px;flex-direction:column;align-items:flex-start}.table-responsive table{font-size:0.75rem}.table-responsive table th,.table-responsive table td{padding:6px 8px}.form-row{grid-template-columns:1fr}}
         @media (max-width:480px){.header{padding:0 12px;height:56px}.header-left .page-title h1{font-size:0.85rem}.header-user .user-name{display:none}.header-right .role-badge{display:none}.main-content{padding:12px 12px 20px 12px}.stat-mini{grid-template-columns:repeat(2,1fr);gap:8px}.card{padding:16px}.filter-section{padding:12px 16px}.modal-container{padding:16px;margin:10px}.welcome-section{padding:14px 16px}.table-responsive table{font-size:0.7rem}}
     </style>
@@ -268,11 +257,10 @@
     <!-- MODAL FILTER -->
     <div class="modal-overlay" id="filterModal"><div class="modal-container" style="max-width:500px;"><div class="modal-header"><h2><i class="fas fa-sliders-h"></i> Filter</h2><button class="close-btn" onclick="closeFilterModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="form-group"><label>Status</label><select id="filterStatus" onchange="applyFilterFromModal()"><option value="all">Semua</option><option value="diajukan">Diajukan</option><option value="disetujui">Disetujui</option><option value="berlaku">Berlaku</option><option value="ditolak">Ditolak</option></select></div><div class="form-group"><label>Jenis Mutasi</label><select id="filterJenis" onchange="applyFilterFromModal()"><option value="all">Semua</option><option value="antar_lembaga">Antar Lembaga</option><option value="antar_kecamatan">Antar Kecamatan</option><option value="pensiun">Pensiun</option><option value="berhenti">Berhenti</option><option value="meninggal">Meninggal</option></select></div><div class="form-group"><label>Tanggal</label><input type="date" id="filterTanggal" onchange="applyFilterFromModal()"></div><div style="display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:2px solid #f0f2f5;"><button class="btn btn-outline" onclick="resetFilterModal()" style="flex:1;"><i class="fas fa-undo"></i> Reset</button><button class="btn btn-primary" onclick="applyFilterFromModal()" style="flex:1;"><i class="fas fa-check"></i> Terapkan</button></div></div></div></div>
 
-    <!-- MODAL TAMBAH / EDIT DENGAN SEARCHABLE SELECT + PAGINATION -->
+    <!-- MODAL TAMBAH / EDIT -->
     <div class="modal-overlay" id="mutasiModal"><div class="modal-container"><div class="modal-header"><h2 id="modalTitle">Tambah Mutasi</h2><button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body">
         <input type="hidden" id="editId">
         
-        <!-- Informasi Pendidik yang Dipilih -->
         <div class="selected-info" id="selectedInfo">
             <div class="info-label">Pendidik Terpilih</div>
             <div class="info-value" id="selectedNama">-</div>
@@ -280,7 +268,6 @@
             <div class="info-sub" id="selectedLembagaAsal">Lembaga: -</div>
         </div>
 
-        <!-- Pilih Pendidik - Searchable Select with Pagination -->
         <div class="form-group">
             <label>Pendidik <span style="color:red;">*</span></label>
             <div class="searchable-select-wrapper" id="pendidikSelectWrapper">
@@ -292,14 +279,12 @@
             </div>
         </div>
 
-        <!-- Asal - Readonly -->
         <div class="form-group">
             <label>Asal <span style="color:red;">*</span></label>
             <input type="text" id="editLembagaAsal" readonly placeholder="Pilih pendidik terlebih dahulu" style="background:#f5f5f5;cursor:not-allowed;">
             <input type="hidden" id="editLembagaAsalId">
         </div>
 
-        <!-- Tujuan - Searchable Select with Pagination -->
         <div class="form-group">
             <label>Tujuan <span style="color:red;">*</span></label>
             <div class="searchable-select-wrapper" id="tujuanSelectWrapper">
@@ -400,7 +385,6 @@
             isSaving = false,
             selectedPendidik = null;
 
-        // Pagination state untuk dropdown
         let pendidikPage = 1,
             pendidikTotal = 0,
             pendidikSearch = '',
@@ -623,14 +607,10 @@
         }
 
         // ============================================================
-        // ===== SEARCHABLE SELECT FUNCTIONS - WITH PAGINATION =====
+        // ===== SEARCHABLE SELECT FUNCTIONS =====
         // ============================================================
-
-        // ---- PENDIDIK DROPDOWN ----
         async function loadPendidikDropdown(page = 1, search = '') {
             const dropdown = document.getElementById('pendidikDropdown');
-            
-            // Tampilkan loading
             dropdown.innerHTML = `<div class="dropdown-loading"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>`;
             dropdown.classList.add('open');
 
@@ -664,7 +644,6 @@
                     return;
                 }
 
-                // Get lembaga names
                 const lembagaIds = [...new Set(data.map(p => p.lembaga_id).filter(Boolean))];
                 let lembagaMap = {};
                 if (lembagaIds.length) {
@@ -689,7 +668,6 @@
                     </div>`;
                 }).join('');
 
-                // Tambahkan pagination controls
                 if (totalPages > 1) {
                     dropdown.innerHTML += `
                         <div class="dropdown-pagination">
@@ -704,7 +682,6 @@
                     `;
                 }
 
-                // Simpan state
                 pendidikPage = page;
                 pendidikSearch = search;
 
@@ -721,7 +698,6 @@
             loadPendidikDropdown(newPage, pendidikSearch);
         }
 
-        // ---- TUJUAN DROPDOWN ----
         async function loadTujuanDropdown(page = 1, search = '') {
             const dropdown = document.getElementById('tujuanDropdown');
             const asalId = document.getElementById('editLembagaAsalId').value;
@@ -746,7 +722,6 @@
 
                 if (error) throw error;
 
-                // Filter asal
                 let filtered = data || [];
                 if (asalId) {
                     filtered = filtered.filter(l => l.id !== asalId);
@@ -803,9 +778,10 @@
             loadTujuanDropdown(newPage, tujuanSearch);
         }
 
-        // ===== SELECT PENDIDIK =====
+        // ============================================================
+        // ===== SELECT FUNCTIONS =====
+        // ============================================================
         function selectPendidik(id) {
-            // Cari data lengkap pendidik dari database
             supabaseClient.from('pendidik').select('*, lembaga:lembaga_id(id,nama,jenis_lembaga)')
                 .eq('id', id).single().then(({ data }) => {
                     if (data) {
@@ -814,12 +790,10 @@
                         document.getElementById('pendidikSearchInput').value = data.nama_lengkap + ' (' + data.nik + ')';
                         document.getElementById('pendidikDropdown').classList.remove('open');
 
-                        // Update info
                         document.getElementById('selectedInfo').style.display = 'block';
                         document.getElementById('selectedNama').textContent = data.nama_lengkap;
                         document.getElementById('selectedNik').textContent = 'NIK: ' + data.nik;
 
-                        // Load lembaga asal
                         if (data.lembaga) {
                             document.getElementById('editLembagaAsal').value = data.lembaga.nama + ' (' + data.lembaga.jenis_lembaga + ')';
                             document.getElementById('editLembagaAsalId').value = data.lembaga.id;
@@ -830,7 +804,6 @@
                             document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: -';
                         }
 
-                        // Reset tujuan dan refresh dropdown tujuan
                         document.getElementById('editLembagaTujuanId').value = '';
                         document.getElementById('tujuanSearchInput').value = '';
                         tujuanPage = 1;
@@ -840,7 +813,6 @@
                 });
         }
 
-        // ===== SELECT TUJUAN =====
         function selectTujuan(id) {
             const items = document.querySelectorAll('#tujuanDropdown .option-item');
             let lembaga = null;
@@ -853,7 +825,6 @@
             }
 
             if (!lembaga) {
-                // Cari di allLembaga
                 const found = allLembaga.find(l => l.id === id);
                 if (found) lembaga = found;
             }
@@ -918,6 +889,21 @@
                     .gte('created_at', `${y}-${m}-01`).lte('created_at', `${y}-${m}-31`);
                 return `MUT/${y}/${m}/${String((count||0)+1).padStart(3,'0')}`
             } catch (e) { const n = new Date(); return `MUT/${n.getFullYear()}/${String(n.getMonth()+1).padStart(2,'0')}/001` }
+        }
+
+        // ============================================================
+        // ===== REFRESH COUNTER =====
+        // ============================================================
+        async function refreshPendidikCount() {
+            try {
+                const { count } = await supabaseClient
+                    .from('pendidik')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status_aktif', true);
+                document.getElementById('navPendidikCount').textContent = count || 0;
+            } catch (e) {
+                console.error('Error refreshing count:', e);
+            }
         }
 
         // ============================================================
@@ -1025,13 +1011,10 @@
                     j = jm[i.jenis_mutasi] || i.jenis_mutasi,
                     c = jc[i.jenis_mutasi] || 'badge-jenis-antar_lembaga';
                 
-                // Cek apakah user bisa approve/reject (Super Admin atau Admin Kab)
                 const canApprove = ['super_admin', 'admin_kab'].includes(currentUser?.role);
-                // Cek apakah user bisa edit (Super Admin, Admin Kab, atau pembuat data)
                 const canEdit = ['super_admin', 'admin_kab'].includes(currentUser?.role) || 
                                (currentUser?.id === i.diajukan_oleh);
                 
-                // Status buttons
                 let statusButtons = '';
                 if (canApprove && i.status === 'diajukan') {
                     statusButtons = `
@@ -1120,7 +1103,6 @@
             document.getElementById('modalTitle').textContent = 'Tambah Mutasi Pendidik';
             document.getElementById('editId').value = '';
             
-            // Reset semua field
             selectedPendidik = null;
             document.getElementById('editPendidikId').value = '';
             document.getElementById('pendidikSearchInput').value = '';
@@ -1140,13 +1122,11 @@
             document.getElementById('btnSaveMutasi').innerHTML = '<i class="fas fa-save"></i> Simpan';
             isSaving = false;
 
-            // Reset pagination state
             pendidikPage = 1;
             pendidikSearch = '';
             tujuanPage = 1;
             tujuanSearch = '';
 
-            // Load data dropdown dengan pagination
             loadPendidikOptions().then(() => {
                 loadPendidikDropdown(1, '');
                 loadTujuanDropdown(1, '');
@@ -1158,7 +1138,6 @@
         function closeModal() {
             document.getElementById('mutasiModal').classList.remove('active');
             document.getElementById('alasanLainnyaGroup').classList.remove('visible');
-            // Tutup dropdown
             document.getElementById('pendidikDropdown').classList.remove('open');
             document.getElementById('tujuanDropdown').classList.remove('open');
             isSaving = false
@@ -1202,6 +1181,7 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
+            const now = new Date().toISOString();
             const d = {
                 pendidik_id: pid,
                 dari_lembaga_id: did,
@@ -1211,49 +1191,71 @@
                 alasan_mutasi: alasan,
                 keterangan: ket || null,
                 status: status,
-                updated_at: new Date().toISOString()
+                updated_at: now
             };
 
             try {
                 let err;
+                let savedId = id;
+                
                 if (id) {
                     if (status === 'disetujui' || status === 'berlaku') {
                         d.disetujui_oleh = u.id;
-                        d.disetujui_pada = new Date().toISOString()
+                        d.disetujui_pada = now;
                     }
                     const { error } = await supabaseClient.from('mutasi').update(d).eq('id', id);
-                    err = error
+                    err = error;
+                    savedId = id;
                 } else {
                     d.nomor_mutasi = await generateNomorMutasi();
                     d.diajukan_oleh = u.id;
-                    d.created_at = new Date().toISOString();
-                    const { error } = await supabaseClient.from('mutasi').insert([d]);
-                    err = error
+                    d.created_at = now;
+                    const { data: inserted, error } = await supabaseClient.from('mutasi').insert([d]).select();
+                    err = error;
+                    if (inserted && inserted.length > 0) {
+                        savedId = inserted[0].id;
+                    }
                 }
                 if (err) throw err;
 
-                // Jika status berlaku, update data pendidik
+                // JIKA STATUS BERLAKU, UPDATE DATA PENDIDIK
                 if (status === 'berlaku') {
-                    const upData = { updated_at: new Date().toISOString() };
+                    const upData = { updated_at: now };
+                    
                     if (['pensiun', 'berhenti', 'meninggal'].includes(jenis)) {
-                        upData.status_aktif = false
+                        upData.status_aktif = false;
                     } else {
-                        upData.lembaga_id = kid
+                        upData.lembaga_id = kid;
+                        // Update kecamatan dari lembaga tujuan
+                        const { data: lembagaTujuan } = await supabaseClient
+                            .from('lembaga')
+                            .select('kecamatan_id')
+                            .eq('id', kid)
+                            .single();
+                        if (lembagaTujuan?.kecamatan_id) {
+                            upData.kecamatan_lembaga_id = lembagaTujuan.kecamatan_id;
+                        }
                     }
-                    await supabaseClient.from('pendidik').update(upData).eq('id', pid)
+                    
+                    await supabaseClient
+                        .from('pendidik')
+                        .update(upData)
+                        .eq('id', pid);
                 }
 
                 showToast(id ? 'Mutasi berhasil diperbarui!' : 'Mutasi berhasil ditambahkan!', 'success');
                 closeModal();
                 loadMutasi();
-                loadPendidikOptions()
+                loadPendidikOptions();
+                refreshPendidikCount();
+                
             } catch (e) {
                 console.error(e);
-                showToast('Gagal: ' + e.message, 'error')
+                showToast('Gagal: ' + e.message, 'error');
             } finally {
                 isSaving = false;
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> Simpan'
+                btn.innerHTML = '<i class="fas fa-save"></i> Simpan';
             }
         }
 
@@ -1272,12 +1274,25 @@
             try {
                 const u = getUser();
                 const now = new Date().toISOString();
+                
+                // AMBIL DATA MUTASI LENGKAP
+                const { data: mutasi, error: getError } = await supabaseClient
+                    .from('mutasi')
+                    .select('*, pendidik:pendidik_id(*)')
+                    .eq('id', id)
+                    .single();
+                    
+                if (getError) throw getError;
+                if (!mutasi) {
+                    showToast('Data mutasi tidak ditemukan', 'error');
+                    return;
+                }
+                
                 const updateData = {
                     status: newStatus,
                     updated_at: now
                 };
                 
-                // Jika disetujui atau berlaku, catat siapa yang menyetujui
                 if (newStatus === 'disetujui' || newStatus === 'berlaku') {
                     updateData.disetujui_oleh = u.id;
                     updateData.disetujui_pada = now;
@@ -1290,32 +1305,49 @@
                     
                 if (error) throw error;
                 
-                // Jika status berlaku, update data pendidik
+                // JIKA STATUS BERLAKU, UPDATE DATA PENDIDIK
                 if (newStatus === 'berlaku') {
-                    // Ambil data mutasi untuk mendapatkan pendidik_id dan lembaga tujuan
-                    const { data: mutasi } = await supabaseClient
-                        .from('mutasi')
-                        .select('pendidik_id, ke_lembaga_id, jenis_mutasi')
-                        .eq('id', id)
-                        .single();
+                    const upData = { updated_at: now };
+                    
+                    if (['pensiun', 'berhenti', 'meninggal'].includes(mutasi.jenis_mutasi)) {
+                        upData.status_aktif = false;
+                        showToast(`Pendidik ${mutasi.pendidik?.nama_lengkap || ''} dinonaktifkan (${mutasi.jenis_mutasi})`, 'info');
+                    } else {
+                        upData.lembaga_id = mutasi.ke_lembaga_id;
                         
-                    if (mutasi) {
-                        const upData = { updated_at: now };
-                        if (['pensiun', 'berhenti', 'meninggal'].includes(mutasi.jenis_mutasi)) {
-                            upData.status_aktif = false;
-                        } else {
-                            upData.lembaga_id = mutasi.ke_lembaga_id;
+                        // Update kecamatan dari lembaga tujuan
+                        const { data: lembagaTujuan } = await supabaseClient
+                            .from('lembaga')
+                            .select('kecamatan_id')
+                            .eq('id', mutasi.ke_lembaga_id)
+                            .single();
+                            
+                        if (lembagaTujuan?.kecamatan_id) {
+                            upData.kecamatan_lembaga_id = lembagaTujuan.kecamatan_id;
                         }
-                        await supabaseClient
-                            .from('pendidik')
-                            .update(upData)
-                            .eq('id', mutasi.pendidik_id);
+                        
+                        showToast(`Pendidik ${mutasi.pendidik?.nama_lengkap || ''} dipindahkan ke lembaga tujuan`, 'success');
                     }
+                    
+                    const { error: updatePendidikError } = await supabaseClient
+                        .from('pendidik')
+                        .update(upData)
+                        .eq('id', mutasi.pendidik_id);
+                        
+                    if (updatePendidikError) {
+                        console.error('Error updating pendidik:', updatePendidikError);
+                        showToast('Status berhasil diubah, tapi gagal update data pendidik: ' + updatePendidikError.message, 'warning');
+                    } else {
+                        showToast(`Status berhasil diubah menjadi ${statusLabels[newStatus] || newStatus}! Data pendidik sudah terupdate.`, 'success');
+                    }
+                } else {
+                    showToast(`Status berhasil diubah menjadi ${statusLabels[newStatus] || newStatus}!`, 'success');
                 }
                 
-                showToast(`Status berhasil diubah menjadi ${statusLabels[newStatus] || newStatus}!`, 'success');
                 loadMutasi();
                 loadStats();
+                refreshPendidikCount();
+                
             } catch (e) {
                 console.error(e);
                 showToast('Gagal mengubah status: ' + e.message, 'error');
@@ -1327,7 +1359,6 @@
         // ============================================================
         async function editMutasi(id) {
             try {
-                // Ambil data mutasi
                 const { data, error } = await supabaseClient
                     .from('mutasi')
                     .select('*')
@@ -1340,11 +1371,9 @@
                     return;
                 }
                 
-                // Set judul modal
                 document.getElementById('modalTitle').textContent = 'Edit Mutasi Pendidik';
                 document.getElementById('editId').value = data.id;
                 
-                // Set field-field
                 document.getElementById('editPendidikId').value = data.pendidik_id;
                 document.getElementById('editLembagaAsalId').value = data.dari_lembaga_id;
                 document.getElementById('editLembagaTujuanId').value = data.ke_lembaga_id;
@@ -1353,7 +1382,6 @@
                 document.getElementById('editStatus').value = data.status;
                 document.getElementById('editKeterangan').value = data.keterangan || '';
                 
-                // Set alasan
                 const alasanOptions = ['permohonan', 'pemerataan', 'kebutuhan_organisasi', 
                                        'mutasi_masuk', 'mutasi_keluar', 'peningkatan_kompetensi', 'lainnya'];
                 if (alasanOptions.includes(data.alasan_mutasi)) {
@@ -1362,13 +1390,11 @@
                         document.getElementById('alasanLainnyaGroup').classList.add('visible');
                     }
                 } else {
-                    // Jika alasan tidak ada di pilihan, set ke 'lainnya' dan isi dengan nilai
                     document.getElementById('editAlasan').value = 'lainnya';
                     document.getElementById('alasanLainnyaGroup').classList.add('visible');
                     document.getElementById('editAlasanLainnya').value = data.alasan_mutasi || '';
                 }
                 
-                // Tampilkan informasi pendidik
                 const { data: pendidik } = await supabaseClient
                     .from('pendidik')
                     .select('*, lembaga:lembaga_id(id,nama,jenis_lembaga)')
@@ -1387,7 +1413,6 @@
                     }
                 }
                 
-                // Tampilkan tujuan
                 const { data: tujuan } = await supabaseClient
                     .from('lembaga')
                     .select('id,nama,jenis_lembaga')
@@ -1398,18 +1423,15 @@
                     document.getElementById('tujuanSearchInput').value = tujuan.nama;
                 }
                 
-                // Reset pagination state
                 pendidikPage = 1;
                 pendidikSearch = '';
                 tujuanPage = 1;
                 tujuanSearch = '';
                 
-                // Load data dropdown dengan pagination
                 await loadPendidikOptions();
                 loadPendidikDropdown(1, '');
                 loadTujuanDropdown(1, '');
                 
-                // Enable save button
                 document.getElementById('btnSaveMutasi').disabled = false;
                 document.getElementById('btnSaveMutasi').innerHTML = '<i class="fas fa-save"></i> Update';
                 isSaving = false;
@@ -1504,8 +1526,7 @@
         function refreshData() { dataCache.clear();
             showToast('Memperbarui...', 'info');
             loadMutasi();
-            supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true)
-                .then(({ count }) => document.getElementById('navPendidikCount').textContent = count || 0) }
+            refreshPendidikCount(); }
 
         // ============================================================
         // ===== EVENT LISTENERS =====
@@ -1518,14 +1539,13 @@
             await loadLembagaOptions();
             loadMutasi();
             updateFilterBadge();
+            refreshPendidikCount();
 
-            // Event listener untuk search input
             document.getElementById('searchInput').addEventListener('input', function() {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => applyFilter(), 500)
             });
 
-            // Event listener untuk pendidik search
             let pendidikSearchTimeout;
             document.getElementById('pendidikSearchInput').addEventListener('input', function() {
                 clearTimeout(pendidikSearchTimeout);
@@ -1541,7 +1561,6 @@
                 } else {
                     // Jangan reload jika sudah ada data
                 }
-                // Tampilkan dropdown
                 const dropdown = document.getElementById('pendidikDropdown');
                 if (dropdown.innerHTML.includes('Memuat')) {
                     loadPendidikDropdown(pendidikPage, this.value);
@@ -1554,7 +1573,6 @@
                 }, 200);
             });
 
-            // Event listener untuk tujuan search
             let tujuanSearchTimeout;
             document.getElementById('tujuanSearchInput').addEventListener('input', function() {
                 clearTimeout(tujuanSearchTimeout);
@@ -1580,7 +1598,6 @@
                 }, 200);
             });
 
-            // Tutup dropdown saat klik di luar
             document.addEventListener('click', function(e) {
                 if (!e.target.closest('#pendidikSelectWrapper')) {
                     document.getElementById('pendidikDropdown').classList.remove('open');
@@ -1590,9 +1607,6 @@
                 }
             });
 
-            const { count } = await supabaseClient.from('pendidik').select('*', { count: 'exact', head: true })
-                .eq('status_aktif', true);
-            document.getElementById('navPendidikCount').textContent = count || 0;
             setInterval(updateDate, 60000)
         });
 
@@ -1630,6 +1644,7 @@
         window.changeTujuanPage = changeTujuanPage;
         window.updateStatus = updateStatus;
         window.editMutasi = editMutasi;
+        window.refreshPendidikCount = refreshPendidikCount;
     </script>
 </body>
 </html>
