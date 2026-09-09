@@ -150,11 +150,11 @@
         .hidden-field.visible{display:block}
         .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #f0f2f5}
 
-        /* ===== SEARCHABLE SELECT ===== */
+        /* ===== SEARCHABLE SELECT WITH PAGINATION ===== */
         .searchable-select-wrapper{position:relative;width:100%}
         .searchable-select-wrapper input[type="text"]{width:100%;padding:8px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.9rem;background:#fafafa;transition:0.2s;cursor:pointer}
         .searchable-select-wrapper input[type="text"]:focus{border-color:var(--primary);outline:none;background:white}
-        .searchable-select-wrapper .dropdown-list{display:none;position:absolute;top:100%;left:0;right:0;background:white;border:2px solid #e0e0e0;border-top:none;border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+        .searchable-select-wrapper .dropdown-list{display:none;position:absolute;top:100%;left:0;right:0;background:white;border:2px solid #e0e0e0;border-top:none;border-radius:0 0 8px 8px;max-height:250px;overflow-y:auto;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
         .searchable-select-wrapper .dropdown-list.open{display:block}
         .searchable-select-wrapper .dropdown-list .option-item{padding:8px 12px;cursor:pointer;font-size:0.85rem;border-bottom:1px solid #f0f2f5;transition:0.15s}
         .searchable-select-wrapper .dropdown-list .option-item:hover{background:#e8f5e9}
@@ -165,6 +165,14 @@
         .badge-jenis-lpq{background:#e3f2fd;color:#0d47a1}
         .badge-jenis-mdt{background:#f3e5f5;color:#4a148c}
         .badge-jenis-ponpes{background:#fff3e0;color:#e65100}
+
+        /* Dropdown pagination controls */
+        .dropdown-pagination{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-top:1px solid #e0e0e0;background:#f8faf8;font-size:0.7rem;color:#888}
+        .dropdown-pagination .page-info{font-weight:600;color:var(--primary-dark)}
+        .dropdown-pagination .btn-page{background:none;border:1px solid #ddd;border-radius:4px;padding:2px 10px;cursor:pointer;font-size:0.7rem;transition:0.2s;color:#555}
+        .dropdown-pagination .btn-page:hover:not(:disabled){background:#e8f5e9;border-color:var(--primary)}
+        .dropdown-pagination .btn-page:disabled{opacity:0.4;cursor:not-allowed}
+        .dropdown-loading{text-align:center;padding:12px;color:#888;font-size:0.8rem}
 
         .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
         .form-group.full-width{grid-column:1/-1}
@@ -257,7 +265,7 @@
     <!-- MODAL FILTER -->
     <div class="modal-overlay" id="filterModal"><div class="modal-container" style="max-width:500px;"><div class="modal-header"><h2><i class="fas fa-sliders-h"></i> Filter</h2><button class="close-btn" onclick="closeFilterModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="form-group"><label>Status</label><select id="filterStatus" onchange="applyFilterFromModal()"><option value="all">Semua</option><option value="diajukan">Diajukan</option><option value="disetujui">Disetujui</option><option value="berlaku">Berlaku</option><option value="ditolak">Ditolak</option></select></div><div class="form-group"><label>Jenis Mutasi</label><select id="filterJenis" onchange="applyFilterFromModal()"><option value="all">Semua</option><option value="antar_lembaga">Antar Lembaga</option><option value="antar_kecamatan">Antar Kecamatan</option><option value="pensiun">Pensiun</option><option value="berhenti">Berhenti</option><option value="meninggal">Meninggal</option></select></div><div class="form-group"><label>Tanggal</label><input type="date" id="filterTanggal" onchange="applyFilterFromModal()"></div><div style="display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:2px solid #f0f2f5;"><button class="btn btn-outline" onclick="resetFilterModal()" style="flex:1;"><i class="fas fa-undo"></i> Reset</button><button class="btn btn-primary" onclick="applyFilterFromModal()" style="flex:1;"><i class="fas fa-check"></i> Terapkan</button></div></div></div></div>
 
-    <!-- MODAL TAMBAH / EDIT DENGAN SEARCHABLE SELECT -->
+    <!-- MODAL TAMBAH / EDIT DENGAN SEARCHABLE SELECT + PAGINATION -->
     <div class="modal-overlay" id="mutasiModal"><div class="modal-container"><div class="modal-header"><h2 id="modalTitle">Tambah Mutasi</h2><button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body">
         <input type="hidden" id="editId">
         
@@ -269,12 +277,14 @@
             <div class="info-sub" id="selectedLembagaAsal">Lembaga: -</div>
         </div>
 
-        <!-- Pilih Pendidik - Searchable Select -->
+        <!-- Pilih Pendidik - Searchable Select with Pagination -->
         <div class="form-group">
             <label>Pendidik <span style="color:red;">*</span></label>
             <div class="searchable-select-wrapper" id="pendidikSelectWrapper">
                 <input type="text" id="pendidikSearchInput" placeholder="Cari pendidik (nama atau NIK)..." autocomplete="off">
-                <div class="dropdown-list" id="pendidikDropdown"></div>
+                <div class="dropdown-list" id="pendidikDropdown">
+                    <div class="dropdown-loading">Memuat data...</div>
+                </div>
                 <input type="hidden" id="editPendidikId">
             </div>
         </div>
@@ -286,12 +296,14 @@
             <input type="hidden" id="editLembagaAsalId">
         </div>
 
-        <!-- Tujuan - Searchable Select -->
+        <!-- Tujuan - Searchable Select with Pagination -->
         <div class="form-group">
             <label>Tujuan <span style="color:red;">*</span></label>
             <div class="searchable-select-wrapper" id="tujuanSelectWrapper">
                 <input type="text" id="tujuanSearchInput" placeholder="Cari lembaga tujuan..." autocomplete="off">
-                <div class="dropdown-list" id="tujuanDropdown"></div>
+                <div class="dropdown-list" id="tujuanDropdown">
+                    <div class="dropdown-loading">Memuat data...</div>
+                </div>
                 <input type="hidden" id="editLembagaTujuanId">
             </div>
         </div>
@@ -384,6 +396,16 @@
             searchTimeout,
             isSaving = false,
             selectedPendidik = null;
+
+        // Pagination state untuk dropdown
+        let pendidikPage = 1,
+            pendidikTotal = 0,
+            pendidikSearch = '',
+            pendidikPageSize = 20;
+        let tujuanPage = 1,
+            tujuanTotal = 0,
+            tujuanSearch = '',
+            tujuanPageSize = 20;
 
         // ============================================================
         // ===== SIDEBAR =====
@@ -598,124 +620,273 @@
         }
 
         // ============================================================
-        // ===== SEARCHABLE SELECT FUNCTIONS =====
+        // ===== SEARCHABLE SELECT FUNCTIONS - WITH PAGINATION =====
         // ============================================================
-        function renderPendidikDropdown(filter = '') {
+
+        // ---- PENDIDIK DROPDOWN ----
+        async function loadPendidikDropdown(page = 1, search = '') {
             const dropdown = document.getElementById('pendidikDropdown');
-            const search = filter.toLowerCase().trim();
+            const wrapper = document.getElementById('pendidikSelectWrapper');
             
-            let filtered = allPendidik;
-            if (search) {
-                filtered = allPendidik.filter(p => 
-                    p.nama_lengkap.toLowerCase().includes(search) ||
-                    p.nik.includes(search)
-                );
-            }
-
-            if (!filtered.length) {
-                dropdown.innerHTML = `<div class="no-result">😕 Tidak ada pendidik ditemukan</div>`;
-                dropdown.classList.add('open');
-                return;
-            }
-
-            dropdown.innerHTML = filtered.map(p => {
-                const lembaga = allLembaga.find(l => l.id === p.lembaga_id);
-                const lembagaNama = lembaga?.nama || 'Belum punya lembaga';
-                const jenisLabel = lembaga?.jenis_lembaga || '';
-                const jenisClass = jenisLabel ? `badge-jenis-${jenisLabel.toLowerCase()}` : '';
-                
-                const selected = selectedPendidik?.id === p.id ? 'selected' : '';
-                
-                return `<div class="option-item ${selected}" data-id="${p.id}" data-lembaga="${p.lembaga_id || ''}" onclick="selectPendidik('${p.id}')">
-                    <strong>${highlightText(p.nama_lengkap, filter)}</strong>
-                    <span class="sub-text">NIK: ${highlightText(p.nik, filter)} | Lembaga: ${highlightText(lembagaNama, filter)}</span>
-                    ${jenisLabel ? `<span class="badge-jenis ${jenisClass}">${jenisLabel}</span>` : ''}
-                </div>`;
-            }).join('');
+            // Tampilkan loading
+            dropdown.innerHTML = `<div class="dropdown-loading"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>`;
             dropdown.classList.add('open');
+
+            try {
+                const u = getUser(),
+                    f = getRoleFilter();
+                let q = supabaseClient.from('pendidik')
+                    .select('id,nik,nama_lengkap,lembaga_id', { count: 'exact' })
+                    .eq('status_aktif', true);
+
+                if (f.kecamatan_id) q = q.eq('kecamatan_lembaga_id', f.kecamatan_id);
+                if (f.jenis_lembaga) q = q.eq('jenis_lembaga', f.jenis_lembaga);
+
+                if (search.trim()) {
+                    const s = search.trim();
+                    q = q.or(`nama_lengkap.ilike.%${s}%,nik.ilike.%${s}%`);
+                }
+
+                const from = (page - 1) * pendidikPageSize;
+                const { data, count, error } = await q
+                    .order('nama_lengkap')
+                    .range(from, from + pendidikPageSize - 1);
+
+                if (error) throw error;
+
+                pendidikTotal = count || 0;
+                const totalPages = Math.ceil(pendidikTotal / pendidikPageSize);
+
+                if (!data || !data.length) {
+                    dropdown.innerHTML = `<div class="no-result">😕 Tidak ada pendidik ditemukan</div>`;
+                    return;
+                }
+
+                // Get lembaga names
+                const lembagaIds = [...new Set(data.map(p => p.lembaga_id).filter(Boolean))];
+                let lembagaMap = {};
+                if (lembagaIds.length) {
+                    const { data: lembagaData } = await supabaseClient.from('lembaga')
+                        .select('id,nama,jenis_lembaga')
+                        .in('id', lembagaIds);
+                    lembagaMap = Object.fromEntries((lembagaData || []).map(l => [l.id, l]));
+                }
+
+                const selectedId = document.getElementById('editPendidikId').value;
+
+                dropdown.innerHTML = data.map(p => {
+                    const lembaga = lembagaMap[p.lembaga_id];
+                    const lembagaNama = lembaga?.nama || 'Belum punya lembaga';
+                    const jenisLabel = lembaga?.jenis_lembaga || '';
+                    const jenisClass = jenisLabel ? `badge-jenis-${jenisLabel.toLowerCase()}` : '';
+                    const selected = p.id === selectedId ? 'selected' : '';
+                    return `<div class="option-item ${selected}" data-id="${p.id}" onclick="selectPendidik('${p.id}')">
+                        <strong>${highlightText(p.nama_lengkap, search)}</strong>
+                        <span class="sub-text">NIK: ${highlightText(p.nik, search)} | Lembaga: ${highlightText(lembagaNama, search)}</span>
+                        ${jenisLabel ? `<span class="badge-jenis ${jenisClass}">${jenisLabel}</span>` : ''}
+                    </div>`;
+                }).join('');
+
+                // Tambahkan pagination controls
+                if (totalPages > 1) {
+                    dropdown.innerHTML += `
+                        <div class="dropdown-pagination">
+                            <button class="btn-page" onclick="event.stopPropagation();changePendidikPage(-1)" ${page <= 1 ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="page-info">${page} / ${totalPages}</span>
+                            <button class="btn-page" onclick="event.stopPropagation();changePendidikPage(1)" ${page >= totalPages ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                // Simpan state
+                pendidikPage = page;
+                pendidikSearch = search;
+
+            } catch (e) {
+                console.error(e);
+                dropdown.innerHTML = `<div class="no-result">❌ Gagal memuat data</div>`;
+            }
         }
 
-        function renderTujuanDropdown(filter = '') {
+        function changePendidikPage(delta) {
+            const newPage = pendidikPage + delta;
+            const totalPages = Math.ceil(pendidikTotal / pendidikPageSize);
+            if (newPage < 1 || newPage > totalPages) return;
+            loadPendidikDropdown(newPage, pendidikSearch);
+        }
+
+        // ---- TUJUAN DROPDOWN ----
+        async function loadTujuanDropdown(page = 1, search = '') {
             const dropdown = document.getElementById('tujuanDropdown');
-            const search = filter.toLowerCase().trim();
-            
-            // Filter lembaga tujuan: semua lembaga aktif
-            let filtered = allLembaga;
-            if (search) {
-                filtered = allLembaga.filter(l => 
-                    l.nama.toLowerCase().includes(search) ||
-                    l.jenis_lembaga.toLowerCase().includes(search)
-                );
-            }
-
-            // Jika ada asal, filter agar tidak sama
             const asalId = document.getElementById('editLembagaAsalId').value;
-            if (asalId) {
-                filtered = filtered.filter(l => l.id !== asalId);
-            }
-
-            if (!filtered.length) {
-                const msg = asalId ? '😕 Tidak ada lembaga tujuan (asal sudah dipilih)' : '😕 Tidak ada lembaga ditemukan';
-                dropdown.innerHTML = `<div class="no-result">${msg}</div>`;
-                dropdown.classList.add('open');
-                return;
-            }
-
-            const selectedTujuan = document.getElementById('editLembagaTujuanId').value;
-
-            dropdown.innerHTML = filtered.map(l => {
-                const jenisLabel = l.jenis_lembaga || '';
-                const jenisClass = jenisLabel ? `badge-jenis-${jenisLabel.toLowerCase()}` : '';
-                const selected = l.id === selectedTujuan ? 'selected' : '';
-                return `<div class="option-item ${selected}" data-id="${l.id}" onclick="selectTujuan('${l.id}')">
-                    <strong>${highlightText(l.nama, filter)}</strong>
-                    <span class="sub-text">Jenis: ${highlightText(jenisLabel, filter)}</span>
-                    ${jenisLabel ? `<span class="badge-jenis ${jenisClass}">${jenisLabel}</span>` : ''}
-                </div>`;
-            }).join('');
+            
+            dropdown.innerHTML = `<div class="dropdown-loading"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>`;
             dropdown.classList.add('open');
+
+            try {
+                let q = supabaseClient.from('lembaga')
+                    .select('id,nama,jenis_lembaga', { count: 'exact' })
+                    .eq('status_aktif', true);
+
+                if (search.trim()) {
+                    const s = search.trim();
+                    q = q.ilike('nama', `%${s}%`);
+                }
+
+                const from = (page - 1) * tujuanPageSize;
+                const { data, count, error } = await q
+                    .order('nama')
+                    .range(from, from + tujuanPageSize - 1);
+
+                if (error) throw error;
+
+                // Filter asal
+                let filtered = data || [];
+                if (asalId) {
+                    filtered = filtered.filter(l => l.id !== asalId);
+                }
+
+                tujuanTotal = count || 0;
+                const totalPages = Math.ceil(tujuanTotal / tujuanPageSize);
+                const selectedId = document.getElementById('editLembagaTujuanId').value;
+
+                if (!filtered.length) {
+                    const msg = asalId ? '😕 Tidak ada lembaga tujuan (asal sudah dipilih)' : '😕 Tidak ada lembaga ditemukan';
+                    dropdown.innerHTML = `<div class="no-result">${msg}</div>`;
+                    return;
+                }
+
+                dropdown.innerHTML = filtered.map(l => {
+                    const jenisLabel = l.jenis_lembaga || '';
+                    const jenisClass = jenisLabel ? `badge-jenis-${jenisLabel.toLowerCase()}` : '';
+                    const selected = l.id === selectedId ? 'selected' : '';
+                    return `<div class="option-item ${selected}" data-id="${l.id}" onclick="selectTujuan('${l.id}')">
+                        <strong>${highlightText(l.nama, search)}</strong>
+                        <span class="sub-text">Jenis: ${highlightText(jenisLabel, search)}</span>
+                        ${jenisLabel ? `<span class="badge-jenis ${jenisClass}">${jenisLabel}</span>` : ''}
+                    </div>`;
+                }).join('');
+
+                if (totalPages > 1) {
+                    dropdown.innerHTML += `
+                        <div class="dropdown-pagination">
+                            <button class="btn-page" onclick="event.stopPropagation();changeTujuanPage(-1)" ${page <= 1 ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="page-info">${page} / ${totalPages}</span>
+                            <button class="btn-page" onclick="event.stopPropagation();changeTujuanPage(1)" ${page >= totalPages ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                tujuanPage = page;
+                tujuanSearch = search;
+
+            } catch (e) {
+                console.error(e);
+                dropdown.innerHTML = `<div class="no-result">❌ Gagal memuat data</div>`;
+            }
+        }
+
+        function changeTujuanPage(delta) {
+            const newPage = tujuanPage + delta;
+            const totalPages = Math.ceil(tujuanTotal / tujuanPageSize);
+            if (newPage < 1 || newPage > totalPages) return;
+            loadTujuanDropdown(newPage, tujuanSearch);
         }
 
         // ===== SELECT PENDIDIK =====
         function selectPendidik(id) {
-            const p = allPendidik.find(x => x.id === id);
-            if (!p) return;
+            // Cari di data yang sudah dimuat
+            const items = document.querySelectorAll('#pendidikDropdown .option-item');
+            let p = null;
+            for (const item of items) {
+                if (item.dataset.id === id) {
+                    const nama = item.querySelector('strong')?.textContent || '';
+                    const subText = item.querySelector('.sub-text')?.textContent || '';
+                    p = { id, nama_lengkap: nama };
+                    break;
+                }
+            }
             
-            selectedPendidik = p;
-            document.getElementById('editPendidikId').value = id;
-            document.getElementById('pendidikSearchInput').value = p.nama_lengkap + ' (' + p.nik + ')';
-            document.getElementById('pendidikDropdown').classList.remove('open');
-
-            // Update info
-            document.getElementById('selectedInfo').style.display = 'block';
-            document.getElementById('selectedNama').textContent = p.nama_lengkap;
-            document.getElementById('selectedNik').textContent = 'NIK: ' + p.nik;
-
-            // Load lembaga asal
-            const lembaga = allLembaga.find(l => l.id === p.lembaga_id);
-            if (lembaga) {
-                document.getElementById('editLembagaAsal').value = lembaga.nama + ' (' + lembaga.jenis_lembaga + ')';
-                document.getElementById('editLembagaAsalId').value = lembaga.id;
-                document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: ' + lembaga.nama;
-            } else {
-                document.getElementById('editLembagaAsal').value = 'Pendidik belum memiliki lembaga';
-                document.getElementById('editLembagaAsalId').value = '';
-                document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: -';
+            // Jika tidak ditemukan, cari dari database
+            if (!p) {
+                // Coba cari di allPendidik
+                const found = allPendidik.find(x => x.id === id);
+                if (found) p = found;
             }
 
-            // Reset tujuan dan refresh dropdown tujuan
-            document.getElementById('editLembagaTujuanId').value = '';
-            document.getElementById('tujuanSearchInput').value = '';
-            renderTujuanDropdown('');
+            if (!p) {
+                showToast('Data pendidik tidak ditemukan', 'error');
+                return;
+            }
+
+            // Cari data lengkap pendidik dari database
+            supabaseClient.from('pendidik').select('*, lembaga:lembaga_id(id,nama,jenis_lembaga)')
+                .eq('id', id).single().then(({ data }) => {
+                    if (data) {
+                        selectedPendidik = data;
+                        document.getElementById('editPendidikId').value = id;
+                        document.getElementById('pendidikSearchInput').value = data.nama_lengkap + ' (' + data.nik + ')';
+                        document.getElementById('pendidikDropdown').classList.remove('open');
+
+                        // Update info
+                        document.getElementById('selectedInfo').style.display = 'block';
+                        document.getElementById('selectedNama').textContent = data.nama_lengkap;
+                        document.getElementById('selectedNik').textContent = 'NIK: ' + data.nik;
+
+                        // Load lembaga asal
+                        if (data.lembaga) {
+                            document.getElementById('editLembagaAsal').value = data.lembaga.nama + ' (' + data.lembaga.jenis_lembaga + ')';
+                            document.getElementById('editLembagaAsalId').value = data.lembaga.id;
+                            document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: ' + data.lembaga.nama;
+                        } else {
+                            document.getElementById('editLembagaAsal').value = 'Pendidik belum memiliki lembaga';
+                            document.getElementById('editLembagaAsalId').value = '';
+                            document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: -';
+                        }
+
+                        // Reset tujuan dan refresh dropdown tujuan
+                        document.getElementById('editLembagaTujuanId').value = '';
+                        document.getElementById('tujuanSearchInput').value = '';
+                        tujuanPage = 1;
+                        tujuanSearch = '';
+                        loadTujuanDropdown(1, '');
+                    }
+                });
         }
 
         // ===== SELECT TUJUAN =====
         function selectTujuan(id) {
-            const l = allLembaga.find(x => x.id === id);
-            if (!l) return;
-            
+            const items = document.querySelectorAll('#tujuanDropdown .option-item');
+            let lembaga = null;
+            for (const item of items) {
+                if (item.dataset.id === id) {
+                    const nama = item.querySelector('strong')?.textContent || '';
+                    lembaga = { id, nama };
+                    break;
+                }
+            }
+
+            if (!lembaga) {
+                // Cari di allLembaga
+                const found = allLembaga.find(l => l.id === id);
+                if (found) lembaga = found;
+            }
+
+            if (!lembaga) {
+                showToast('Lembaga tidak ditemukan', 'error');
+                return;
+            }
+
             document.getElementById('editLembagaTujuanId').value = id;
-            document.getElementById('tujuanSearchInput').value = l.nama + ' (' + l.jenis_lembaga + ')';
+            document.getElementById('tujuanSearchInput').value = lembaga.nama;
             document.getElementById('tujuanDropdown').classList.remove('open');
         }
 
@@ -730,7 +901,7 @@
                     .eq('status_aktif', true).order('nama_lengkap');
                 if (f.kecamatan_id) q = q.eq('kecamatan_lembaga_id', f.kecamatan_id);
                 if (f.jenis_lembaga) q = q.eq('jenis_lembaga', f.jenis_lembaga);
-                const { data } = await q;
+                const { data } = await q.limit(1000);
                 allPendidik = data || [];
             } catch (e) { console.error(e) }
         }
@@ -959,10 +1130,16 @@
             document.getElementById('btnSaveMutasi').innerHTML = '<i class="fas fa-save"></i> Simpan';
             isSaving = false;
 
-            // Load data
+            // Reset pagination state
+            pendidikPage = 1;
+            pendidikSearch = '';
+            tujuanPage = 1;
+            tujuanSearch = '';
+
+            // Load data dropdown dengan pagination
             loadPendidikOptions().then(() => {
-                renderPendidikDropdown('');
-                renderTujuanDropdown('');
+                loadPendidikDropdown(1, '');
+                loadTujuanDropdown(1, '');
             });
 
             document.getElementById('mutasiModal').classList.add('active')
@@ -1174,11 +1351,27 @@
             });
 
             // Event listener untuk pendidik search
+            let pendidikSearchTimeout;
             document.getElementById('pendidikSearchInput').addEventListener('input', function() {
-                renderPendidikDropdown(this.value);
+                clearTimeout(pendidikSearchTimeout);
+                const val = this.value;
+                pendidikSearchTimeout = setTimeout(() => {
+                    pendidikPage = 1;
+                    loadPendidikDropdown(1, val);
+                }, 300);
             });
             document.getElementById('pendidikSearchInput').addEventListener('focus', function() {
-                renderPendidikDropdown(this.value);
+                if (!this.value) {
+                    loadPendidikDropdown(1, '');
+                } else {
+                    // Jangan reload jika sudah ada data
+                }
+                // Tampilkan dropdown
+                const dropdown = document.getElementById('pendidikDropdown');
+                if (dropdown.innerHTML.includes('Memuat')) {
+                    loadPendidikDropdown(pendidikPage, this.value);
+                }
+                dropdown.classList.add('open');
             });
             document.getElementById('pendidikSearchInput').addEventListener('blur', function() {
                 setTimeout(() => {
@@ -1187,11 +1380,24 @@
             });
 
             // Event listener untuk tujuan search
+            let tujuanSearchTimeout;
             document.getElementById('tujuanSearchInput').addEventListener('input', function() {
-                renderTujuanDropdown(this.value);
+                clearTimeout(tujuanSearchTimeout);
+                const val = this.value;
+                tujuanSearchTimeout = setTimeout(() => {
+                    tujuanPage = 1;
+                    loadTujuanDropdown(1, val);
+                }, 300);
             });
             document.getElementById('tujuanSearchInput').addEventListener('focus', function() {
-                renderTujuanDropdown(this.value);
+                if (!this.value) {
+                    loadTujuanDropdown(1, '');
+                }
+                const dropdown = document.getElementById('tujuanDropdown');
+                if (dropdown.innerHTML.includes('Memuat')) {
+                    loadTujuanDropdown(tujuanPage, this.value);
+                }
+                dropdown.classList.add('open');
             });
             document.getElementById('tujuanSearchInput').addEventListener('blur', function() {
                 setTimeout(() => {
@@ -1243,8 +1449,10 @@
         window.highlightText = highlightText;
         window.selectPendidik = selectPendidik;
         window.selectTujuan = selectTujuan;
-        window.renderPendidikDropdown = renderPendidikDropdown;
-        window.renderTujuanDropdown = renderTujuanDropdown;
+        window.loadPendidikDropdown = loadPendidikDropdown;
+        window.loadTujuanDropdown = loadTujuanDropdown;
+        window.changePendidikPage = changePendidikPage;
+        window.changeTujuanPage = changeTujuanPage;
     </script>
 </body>
 </html>
