@@ -47,7 +47,10 @@
         .stat-mini{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
         .stat-mini .stat-item{font-size:.85rem;color:#555;background:white;padding:10px 20px;border-radius:10px;box-shadow:var(--cs);border-left:3px solid var(--p)}
         .stat-mini .stat-item strong{color:var(--p);font-size:1.1rem}
-        .stat-mini .stat-item:nth-child(2){border-left-color:var(--s)}.stat-mini .stat-item:nth-child(3){border-left-color:var(--d)}.stat-mini .stat-item:nth-child(4){border-left-color:var(--w)}
+        .stat-mini .stat-item:nth-child(2){border-left-color:var(--s)}
+        .stat-mini .stat-item:nth-child(3){border-left-color:var(--d)}
+        .stat-mini .stat-item:nth-child(4){border-left-color:var(--w)}
+        .stat-mini .stat-item:nth-child(5){border-left-color:#ff9800}
         .filter-section{display:flex;flex-wrap:wrap;gap:12px;background:linear-gradient(135deg,#ffffff 0%,#f5faf5 100%);padding:16px 24px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.04);border:1px solid rgba(0,100,0,.08);margin-bottom:16px;align-items:flex-end}
         .filter-section .filter-item{flex:1;min-width:150px}.filter-section .filter-item label{display:block;font-size:.7rem;color:#888;margin-bottom:2px;font-weight:600}
         .filter-section .filter-item input,.filter-section .filter-item select{width:100%;padding:8px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:.85rem;background:white;transition:.2s}
@@ -64,6 +67,8 @@
         .badge{padding:3px 14px;border-radius:20px;font-size:.7rem;font-weight:600;display:inline-block}
         .badge.active{background:#e8f5e9;color:#2e7d32}.badge.inactive{background:#ffebee;color:#c62828}.badge.pending{background:#fff3e0;color:#e65100}.badge.draft{background:#e3f2fd;color:#0d47a1}.badge.verified{background:#e8f5e9;color:#1b5e20}
         .badge.rejected{background:#ffebee;color:#c62828}
+        .badge-luar-daerah{background:#ff9800;color:white;font-size:.55rem;padding:2px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;margin-left:4px}
+        .badge-lokal{background:#e8f5e9;color:#2e7d32;font-size:.55rem;padding:2px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;margin-left:4px}
         .btn{padding:6px 14px;border:none;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s ease;display:inline-flex;align-items:center;gap:6px}
         .btn:disabled{opacity:.6;cursor:not-allowed}
         .btn-outline{background:transparent;color:var(--p);border:1.5px solid var(--p)}.btn-outline:hover{background:var(--p);color:white}
@@ -106,11 +111,13 @@
         .info-box.warning{background:#fff3e0;border-left-color:var(--w)}
         .info-box.success{background:#e8f5e9;border-left-color:var(--s)}
         .info-box.error{background:#ffebee;border-left-color:var(--d)}
+        .wilayah-info{font-size:.7rem;color:#888;margin-top:2px}
         @media (max-width:992px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.sidebar-overlay.active{display:block}.main-content{margin-left:0;padding:16px 20px 30px 20px}.header{padding:0 20px}.header-left .page-title p{display:none}.header-date{display:none}.header-right .role-scope{display:none}.filter-section .filter-item{min-width:100%}.form-row{grid-template-columns:1fr}.table-responsive table{font-size:.75rem}.table-responsive table th,.table-responsive table td{padding:6px 8px}}
         @media (max-width:480px){.header{padding:0 12px;height:56px}.header-left .page-title h1{font-size:.85rem}.header-user .user-name{display:none}.header-right .role-badge{display:none}.main-content{padding:12px 12px 20px 12px}.stat-mini .stat-item{font-size:.7rem;padding:4px 10px}.card{padding:16px}.filter-section{padding:12px 16px}.modal-container{padding:16px;margin:10px}.welcome-section{padding:14px 16px}.table-responsive table{font-size:.7rem}}
     </style>
 </head>
 <body>
+    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand"><img src="assets/logo-kemenag.png" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22/%3E%3C/svg%3E'"><div class="brand-text"><h1>SI-<span>MUSTAFA</span></h1><small>Kemenag Kab. Tegal</small></div></div>
         <ul class="sidebar-menu">
@@ -125,1004 +132,1139 @@
     </aside>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
+    <!-- MAIN CONTENT -->
     <main class="main-content" id="mainContent">
-        <header class="header"><div class="header-left"><button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button><div class="page-title"><h1>Dashboard Operator</h1><p>Kelola data pendidik di lembaga Anda</p></div></div><div class="header-right"><span class="header-date" id="currentDate"></span><span class="role-badge" id="headerRoleBadge">Operator</span><span class="role-scope" id="headerScope"></span><div class="header-user"><div class="avatar" id="userAvatarSmall">A</div><span class="user-name" id="userNameSmall">Operator</span></div></div></header>
-        <div class="welcome-section"><div class="welcome-text"><h2>Selamat datang, <span id="welcomeName">Operator</span> 👋</h2><p><i class="fas fa-building"></i> <span id="welcomeRole">Operator Lembaga</span></p></div><div class="welcome-badge"><i class="fas fa-calendar-alt"></i><span id="welcomeDate">Loading...</span></div></div>
-        <div class="stat-mini"><div class="stat-item">Total: <strong id="totalPendidik">0</strong></div><div class="stat-item">Aktif: <strong id="totalAktif">0</strong></div><div class="stat-item">Nonaktif: <strong id="totalNonaktif">0</strong></div><div class="stat-item">Pending: <strong id="totalPending">0</strong></div></div>
-        
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="page-title"><h1>Dashboard Operator</h1><p>Kelola data pendidik di lembaga Anda</p></div>
+            </div>
+            <div class="header-right">
+                <span class="header-date" id="currentDate"></span>
+                <span class="role-badge" id="headerRoleBadge">Operator</span>
+                <span class="role-scope" id="headerScope"></span>
+                <div class="header-user"><div class="avatar" id="userAvatarSmall">A</div><span class="user-name" id="userNameSmall">Operator</span></div>
+            </div>
+        </header>
+
+        <div class="welcome-section">
+            <div class="welcome-text"><h2>Selamat datang, <span id="welcomeName">Operator</span> 👋</h2><p><i class="fas fa-building"></i> <span id="welcomeRole">Operator Lembaga</span></p></div>
+            <div class="welcome-badge"><i class="fas fa-calendar-alt"></i><span id="welcomeDate">Loading...</span></div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stat-mini">
+            <div class="stat-item">Total: <strong id="totalPendidik">0</strong></div>
+            <div class="stat-item">Aktif: <strong id="totalAktif">0</strong></div>
+            <div class="stat-item">Nonaktif: <strong id="totalNonaktif">0</strong></div>
+            <div class="stat-item">Pending: <strong id="totalPending">0</strong></div>
+            <div class="stat-item" style="border-left-color:#ff9800;">🌍 Luar Kab.: <strong id="totalLuarDaerah">0</strong></div>
+        </div>
+
+        <!-- FILTER -->
         <div class="filter-section">
             <div class="filter-item" style="flex:2;"><label><i class="fas fa-search"></i> Cari</label><input type="text" id="searchInput" placeholder="Nama atau NIK..."></div>
             <div class="filter-item"><label>Status</label><select id="statusFilter" onchange="applyFilter()"><option value="all">Semua</option><option value="active">Aktif</option><option value="inactive">Tidak Aktif</option></select></div>
             <div class="filter-item"><label>Verifikasi</label><select id="verifikasiFilter" onchange="applyFilter()"><option value="all">Semua</option><option value="Draft">Draft</option><option value="Pending">Pending</option><option value="Diverifikasi">Diverifikasi</option><option value="Ditolak">Ditolak</option></select></div>
+            <div class="filter-item"><label>Domisili</label><select id="domisiliFilter" onchange="applyFilter()"><option value="all">Semua</option><option value="lokal">Dalam Kab. Tegal</option><option value="luar">Luar Kab. Tegal</option></select></div>
             <div class="filter-actions"><button class="btn btn-success" onclick="openAddModal()"><i class="fas fa-plus"></i> Ajukan Baru</button><button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button></div>
         </div>
-        <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;"><div class="card-title"><i class="fas fa-list"></i>Daftar Pendidik <small id="totalData">0 data</small></div></div><div class="table-responsive"><table><thead><tr><th>No</th><th>NIK</th><th>Nama</th><th>Status</th><th>Verifikasi</th><th>Aksi</th></tr></thead><tbody id="pendidikTableBody"><tr><td colspan="6" style="text-align:center;padding:30px;"><div class="spinner"></div></td></tr></tbody></table></div><div style="display:flex;justify-content:center;align-items:center;gap:16px;padding-top:12px;border-top:1px solid #f0f2f5;margin-top:12px;"><button class="btn btn-outline btn-sm" onclick="changePage(-1)" id="prevPage"><i class="fas fa-chevron-left"></i></button><span id="pageInfo">Halaman 1</span><button class="btn btn-outline btn-sm" onclick="changePage(1)" id="nextPage"><i class="fas fa-chevron-right"></i></button></div></div>
+
+        <!-- TABLE -->
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                <div class="card-title"><i class="fas fa-list"></i>Daftar Pendidik <small id="totalData">0 data</small></div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>No</th><th>NIK</th><th>Nama</th><th>Status</th><th>Verifikasi</th><th>Domisili</th><th>Aksi</th></tr></thead>
+                    <tbody id="pendidikTableBody"><tr><td colspan="7" style="text-align:center;padding:30px;"><div class="spinner"></div></td></tr></tbody>
+                </table>
+            </div>
+            <div style="display:flex;justify-content:center;align-items:center;gap:16px;padding-top:12px;border-top:1px solid #f0f2f5;margin-top:12px;">
+                <button class="btn btn-outline btn-sm" onclick="changePage(-1)" id="prevPage"><i class="fas fa-chevron-left"></i></button>
+                <span id="pageInfo">Halaman 1</span>
+                <button class="btn btn-outline btn-sm" onclick="changePage(1)" id="nextPage"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
     </main>
 
     <div class="toast" id="toast"></div>
 
-    <!-- MODAL DETAIL/TAMBAH/EDIT -->
-    <div class="modal-overlay" id="pendidikModal"><div class="modal-container"><div class="modal-header"><h2 id="modalTitle">Detail Pendidik</h2><button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body">
-        <input type="hidden" id="editId"><input type="hidden" id="editLembagaId">
-        
-        <!-- Status Verifikasi Info -->
-        <div id="verificationInfo" style="display:none;" class="info-box"></div>
-        
-        <div class="section-title"><i class="fas fa-id-card"></i> Identitas</div>
-        <div class="form-row"><div class="form-group"><label>NIK <span style="color:red;">*</span></label><input type="text" id="editNik" maxlength="16"></div><div class="form-group"><label>Nama <span style="color:red;">*</span></label><input type="text" id="editNama"></div></div>
-        <div class="form-row"><div class="form-group"><label>Tempat Lahir</label><input type="text" id="editTempatLahir"></div><div class="form-group"><label>Tanggal Lahir</label><input type="date" id="editTanggalLahir"></div></div>
-        <div class="form-row"><div class="form-group"><label>Jenis Kelamin</label><select id="editJenisKelamin"><option value="">Pilih</option><option value="LAKI-LAKI">Laki-laki</option><option value="PEREMPUAN">Perempuan</option></select></div><div class="form-group"><label>Status Perkawinan</label><input type="text" id="editStatusPerkawinan"></div></div>
-        <div class="form-row"><div class="form-group"><label>Ibu Kandung</label><input type="text" id="editIbuKandung"></div><div class="form-group"><label>Pendidikan</label><input type="text" id="editPendidikan"></div></div>
-        <div class="section-title"><i class="fas fa-map-marker-alt"></i> Alamat</div>
-        <div class="form-group full-width"><label>Alamat</label><input type="text" id="editAlamat"></div>
-        <div class="form-row"><div class="form-group"><label>Desa</label><select id="editDesaPengajar"><option value="">-- Pilih --</option></select></div><div class="form-group"><label>Kecamatan</label><select id="editKecamatanPengajar"><option value="">-- Pilih --</option></select></div></div>
-        <div class="form-row"><div class="form-group"><label>Kabupaten</label><input type="text" id="editKabupatenPengajar" value="Tegal"></div><div class="form-group"><label>Provinsi</label><input type="text" id="editProvinsi" value="Jawa Tengah"></div></div>
-        <div class="section-title"><i class="fas fa-phone"></i> Kontak</div>
-        <div class="form-row"><div class="form-group"><label>No. HP</label><input type="text" id="editNoHp"></div><div class="form-group"><label>Email</label><input type="email" id="editEmail"></div></div>
-        <div class="section-title"><i class="fas fa-university"></i> Rekening Bupati</div>
-        <div class="rekening-box"><div class="rekening-title">Rekening 1 - Bupati</div><div class="form-row"><div class="form-group"><label>No Rekening</label><input type="text" id="editNomorRekeningBupati"></div><div class="form-group"><label>Bank</label><input type="text" id="editNamaBankBupati"></div></div><div class="form-group full-width"><label>Pemilik</label><input type="text" id="editPemilikRekeningBupati"></div></div>
-        <div class="section-title"><i class="fas fa-university"></i> Rekening Gubernur</div>
-        <div class="rekening-box"><div class="rekening-title">Rekening 2 - Gubernur</div><div class="form-row"><div class="form-group"><label>No Rekening</label><input type="text" id="editNomorRekeningGubernur"></div><div class="form-group"><label>Bank</label><input type="text" id="editNamaBankGubernur"></div></div><div class="form-group full-width"><label>Pemilik</label><input type="text" id="editPemilikRekeningGubernur"></div></div>
-        <div class="section-title"><i class="fas fa-chalkboard-teacher"></i> Mengajar</div>
-        <div class="form-row"><div class="form-group"><label>TMT</label><input type="date" id="editTmt"></div><div class="form-group"><label>Lama Mengabdi</label><div class="lama-mengabdi-display" id="lamaMengabdiDisplay">0 Tahun</div><input type="hidden" id="editLamaMengabdi" value="0"></div></div>
-        <div class="form-row"><div class="form-group"><label>Lembaga</label><input type="text" id="editLembagaName" class="lembaga-readonly" readonly></div><div class="form-group"><label>Jenis</label><select id="editJenisLembaga" disabled><option value="LPQ">LPQ</option><option value="MDT">MDT</option><option value="PONPES">PONPES</option></select></div></div>
-        <div class="section-title"><i class="fas fa-file-alt"></i> Dokumen KYC</div>
-        <div class="form-group full-width"><label>KTP</label><input type="file" id="editDokumenKtp" accept=".pdf,.jpg,.jpeg,.png" onchange="uploadDokumen(this,'ktp')"><div class="upload-preview" id="dokumenKtpPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenKtpName"></span><button class="btn btn-outline btn-sm" onclick="removeDokumen('ktp')" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
-        <div class="form-group full-width"><label>Rek Bupati</label><input type="file" id="editDokumenBupati" accept=".pdf,.jpg,.jpeg,.png" onchange="uploadDokumen(this,'bupati')"><div class="upload-preview" id="dokumenBupatiPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenBupatiName"></span><button class="btn btn-outline btn-sm" onclick="removeDokumen('bupati')" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
-        <div class="form-group full-width"><label>Rek Gubernur</label><input type="file" id="editDokumenGubernur" accept=".pdf,.jpg,.jpeg,.png" onchange="uploadDokumen(this,'gubernur')"><div class="upload-preview" id="dokumenGubernurPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenGubernurName"></span><button class="btn btn-outline btn-sm" onclick="removeDokumen('gubernur')" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
-        <div class="section-title"><i class="fas fa-info-circle"></i> Status & Verifikasi</div>
-        <div class="form-row"><div class="form-group"><label>Status Keaktifan</label><select id="editStatus"><option value="true">Aktif</option><option value="false">Tidak Aktif</option></select></div><div class="form-group"><label>Status Verifikasi</label>
-            <select id="editVerifikasi" disabled>
-                <option value="Draft">Draft</option>
-                <option value="Pending">Pending (Menunggu Verifikasi)</option>
-                <option value="Diverifikasi">Diverifikasi</option>
-                <option value="Ditolak">Ditolak</option>
-            </select>
-            <small style="color:#888;font-size:.65rem;">Verifikasi dilakukan oleh Admin Kecamatan</small>
-        </div></div>
-        <div class="form-row" id="alasanPenolakanRow" style="display:none;">
-            <div class="form-group full-width"><label>Alasan Penolakan</label><textarea id="editAlasanPenolakan" disabled style="background:#f5f5f5;"></textarea></div>
-        </div>
-    </div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal()">Tutup</button><button class="btn btn-success" id="btnSave" onclick="savePendidik()"><i class="fas fa-paper-plane"></i> Ajukan</button></div></div></div>
+    <!-- MODAL -->
+    <div class="modal-overlay" id="pendidikModal">
+        <div class="modal-container">
+            <div class="modal-header"><h2 id="modalTitle">Detail Pendidik</h2><button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body">
+                <input type="hidden" id="editId"><input type="hidden" id="editLembagaId">
+                <div id="verificationInfo" style="display:none;" class="info-box"></div>
 
-<script src="js/supabase-client.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/utils.js"></script>
-<script>
-    const CLOUDINARY_CLOUD_NAME = 'ddrbmte6';
-    const CLOUDINARY_UPLOAD_PRESET = 'simustafa_preset';
-    const MAX_FILE_SIZE = 300; // KB
-    
-    const cache = {
-        _s: {},
-        get(k, t = 600000) {
-            const e = this._s[k];
-            if (!e) return null;
-            if (Date.now() - e.t > t) {
-                delete this._s[k];
+                <div class="section-title"><i class="fas fa-id-card"></i> Identitas</div>
+                <div class="form-row">
+                    <div class="form-group"><label>NIK <span style="color:red;">*</span></label><input type="text" id="editNik" maxlength="16"></div>
+                    <div class="form-group"><label>Nama <span style="color:red;">*</span></label><input type="text" id="editNama"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Tempat Lahir</label><input type="text" id="editTempatLahir"></div>
+                    <div class="form-group"><label>Tanggal Lahir</label><input type="date" id="editTanggalLahir"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Jenis Kelamin</label><select id="editJenisKelamin"><option value="">Pilih</option><option value="LAKI-LAKI">Laki-laki</option><option value="PEREMPUAN">Perempuan</option></select></div>
+                    <div class="form-group"><label>Status Perkawinan</label><input type="text" id="editStatusPerkawinan"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Ibu Kandung</label><input type="text" id="editIbuKandung"></div>
+                    <div class="form-group"><label>Pendidikan</label><input type="text" id="editPendidikan"></div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-map-marker-alt"></i> Alamat Tempat Tinggal</div>
+                <div class="form-group full-width"><label>Alamat</label><input type="text" id="editAlamat"></div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Provinsi</label>
+                        <select id="editProvinsi" onchange="onProvinsiChange()">
+                            <option value="">-- Pilih Provinsi --</option>
+                        </select>
+                        <div class="wilayah-info" id="provinsiInfo"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Kabupaten</label>
+                        <select id="editKabupatenPengajar" onchange="onKabupatenChange()">
+                            <option value="">-- Pilih Kabupaten --</option>
+                        </select>
+                        <div class="wilayah-info" id="kabupatenInfo"></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kecamatan</label>
+                        <select id="editKecamatanPengajar" onchange="onKecamatanChange()">
+                            <option value="">-- Pilih Kecamatan --</option>
+                        </select>
+                        <div class="wilayah-info" id="kecamatanInfo"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Desa</label>
+                        <select id="editDesaPengajar">
+                            <option value="">-- Pilih Desa --</option>
+                        </select>
+                        <div class="wilayah-info" id="desaInfo"></div>
+                    </div>
+                </div>
+
+                <!-- Status Domisili -->
+                <div class="form-group full-width" id="domisiliStatusGroup" style="display:none;">
+                    <label>Status Domisili</label>
+                    <div id="domisiliStatusDisplay" style="padding:8px 12px;border-radius:8px;border:2px solid #e0e0e0;font-weight:600;"></div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-phone"></i> Kontak</div>
+                <div class="form-row">
+                    <div class="form-group"><label>No. HP</label><input type="text" id="editNoHp"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="editEmail"></div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-university"></i> Rekening Bupati</div>
+                <div class="rekening-box">
+                    <div class="rekening-title">Rekening 1 - Bupati</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>No Rekening</label><input type="text" id="editNomorRekeningBupati"></div>
+                        <div class="form-group"><label>Bank</label><input type="text" id="editNamaBankBupati"></div>
+                    </div>
+                    <div class="form-group full-width"><label>Pemilik</label><input type="text" id="editPemilikRekeningBupati"></div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-university"></i> Rekening Gubernur</div>
+                <div class="rekening-box">
+                    <div class="rekening-title">Rekening 2 - Gubernur</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>No Rekening</label><input type="text" id="editNomorRekeningGubernur"></div>
+                        <div class="form-group"><label>Bank</label><input type="text" id="editNamaBankGubernur"></div>
+                    </div>
+                    <div class="form-group full-width"><label>Pemilik</label><input type="text" id="editPemilikRekeningGubernur"></div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-chalkboard-teacher"></i> Mengajar</div>
+                <div class="form-row">
+                    <div class="form-group"><label>TMT</label><input type="date" id="editTmt" onchange="hitungLamaMengabdi()"></div>
+                    <div class="form-group"><label>Lama Mengabdi</label><div class="lama-mengabdi-display" id="lamaMengabdiDisplay">0 Tahun</div><input type="hidden" id="editLamaMengabdi" value="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Lembaga</label><input type="text" id="editLembagaName" class="lembaga-readonly" readonly></div>
+                    <div class="form-group"><label>Jenis</label><select id="editJenisLembaga" disabled><option value="LPQ">LPQ</option><option value="MDT">MDT</option><option value="PONPES">PONPES</option></select></div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-file-alt"></i> Dokumen KYC</div>
+                <div class="form-group full-width"><label>KTP</label><input type="file" id="editDokumenKtp" accept=".pdf,.jpg,.jpeg,.png" onchange="uploadDokumen(this,'ktp')"><div class="upload-preview" id="dokumenKtpPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenKtpName"></span><button class="btn btn-outline btn-sm" onclick="removeDokumen('ktp')" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
+                <div class="form-group full-width"><label>Rek Bupati</label><input type="file" id="editDokumenBupati" accept=".pdf,.jpg,.jpeg,.png" onchange="uploadDokumen(this,'bupati')"><div class="upload-preview" id="dokumenBupatiPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenBupatiName"></span><button class="btn btn-outline btn-sm" onclick="removeDokumen('bupati')" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
+                <div class="form-group full-width"><label>Rek Gubernur</label><input type="file" id="editDokumenGubernur" accept=".pdf,.jpg,.jpeg,.png" onchange="uploadDokumen(this,'gubernur')"><div class="upload-preview" id="dokumenGubernurPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenGubernurName"></span><button class="btn btn-outline btn-sm" onclick="removeDokumen('gubernur')" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
+
+                <div class="section-title"><i class="fas fa-info-circle"></i> Status & Verifikasi</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Status Keaktifan</label><select id="editStatus"><option value="true">Aktif</option><option value="false">Tidak Aktif</option></select></div>
+                    <div class="form-group"><label>Status Verifikasi</label>
+                        <select id="editVerifikasi" disabled>
+                            <option value="Draft">Draft</option>
+                            <option value="Pending">Pending (Menunggu Verifikasi)</option>
+                            <option value="Diverifikasi">Diverifikasi</option>
+                            <option value="Ditolak">Ditolak</option>
+                        </select>
+                        <small style="color:#888;font-size:.65rem;">Verifikasi dilakukan oleh Admin Kecamatan</small>
+                    </div>
+                </div>
+                <div class="form-row" id="alasanPenolakanRow" style="display:none;">
+                    <div class="form-group full-width"><label>Alasan Penolakan</label><textarea id="editAlasanPenolakan" disabled style="background:#f5f5f5;"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Tutup</button>
+                <button class="btn btn-success" id="btnSave" onclick="savePendidik()"><i class="fas fa-paper-plane"></i> Ajukan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        // ============================================================
+        // ===== API WILAYAH INDONESIA =====
+        // ============================================================
+        const API_WILAYAH = {
+            BASE_URL: 'https://www.emsifa.com/api-wilayah-indonesia/api',
+            async getProvinces() { const r = await fetch(`${this.BASE_URL}/provinces.json`); return r.json(); },
+            async getRegencies(provinceId) { const r = await fetch(`${this.BASE_URL}/regencies/${provinceId}.json`); return r.json(); },
+            async getDistricts(regencyId) { const r = await fetch(`${this.BASE_URL}/districts/${regencyId}.json`); return r.json(); },
+            async getVillages(districtId) { const r = await fetch(`${this.BASE_URL}/villages/${districtId}.json`); return r.json(); }
+        };
+
+        // ============================================================
+        // ===== KONFIGURASI =====
+        // ============================================================
+        const CLOUDINARY_CLOUD_NAME = 'ddrbmte6';
+        const CLOUDINARY_UPLOAD_PRESET = 'simustafa_preset';
+        const MAX_FILE_SIZE = 300;
+
+        // ============================================================
+        // ===== VARIABLES =====
+        // ============================================================
+        let cp = 1, ps = 10, td = 0, cf = { search: '', status: 'all', verifikasi: 'all', domisili: 'all' };
+        let cPD = null, isSaving = false, searchTimeout;
+        let dokUrls = { ktp: '', bupati: '', gubernur: '' };
+        let provincesData = [], regenciesData = [], districtsData = [], villagesData = [];
+        let provinceMap = {}, regencyMap = {}, districtMap = {}, villageMap = {};
+
+        // ============================================================
+        // ===== CACHE =====
+        // ============================================================
+        const cache = {
+            _s: {},
+            get(k, t = 86400000) { const e = this._s[k]; if (!e) return null; if (Date.now() - e.t > t) { delete this._s[k]; return null; } return e.d; },
+            set(k, d) { this._s[k] = { d, t: Date.now() }; },
+            clear() { this._s = {}; }
+        };
+
+        // ============================================================
+        // ===== HELPER: SANITASI UUID =====
+        // ============================================================
+        function sanitizeUUID(value) {
+            if (!value || value === '' || value === 'null' || value === 'undefined') return null;
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (!uuidRegex.test(String(value))) {
+                console.warn('sanitizeUUID: nilai bukan UUID valid →', value);
                 return null;
             }
-            return e.d;
-        },
-        set(k, d) {
-            this._s[k] = { d, t: Date.now() };
-        },
-        clear() {
-            this._s = {};
+            return value;
         }
-    };
-    
-    let cp = 1, ps = 10, td = 0, cf = { search: '', status: 'all', verifikasi: 'all' }, cPD = null, isSaving = false, searchTimeout;
-    let dokUrls = { ktp: '', bupati: '', gubernur: '' };
-    let isEditMode = false;
 
-    // ===== SIDEBAR =====
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('sidebarOverlay').classList.toggle('active');
-    }
-    
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 992) {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
+        // ============================================================
+        // ===== SIDEBAR =====
+        // ============================================================
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
         }
-    });
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 992) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+        });
 
-    // ===== TOAST =====
-    function showToast(m, t = 'info') {
-        const e = document.getElementById('toast');
-        if (!e) { console.log(m); return; }
-        e.textContent = m;
-        e.className = `toast toast-${t}`;
-        void e.offsetWidth;
-        e.classList.add('show');
-        clearTimeout(e._to);
-        e._to = setTimeout(() => e.classList.remove('show'), 4000);
-    }
+        // ============================================================
+        // ===== TOAST =====
+        // ============================================================
+        function showToast(m, t = 'info') {
+            const e = document.getElementById('toast');
+            if (!e) { console.log(m); return; }
+            e.textContent = m;
+            e.className = `toast toast-${t}`;
+            void e.offsetWidth;
+            e.classList.add('show');
+            clearTimeout(e._to);
+            e._to = setTimeout(() => e.classList.remove('show'), 4000);
+        }
 
-    // ===== UTILITY =====
-    function st(id, v) {
-        const e = document.getElementById(id);
-        if (e) e.textContent = v;
-    }
-    
-    function updateDate() {
-        const n = new Date();
-        st('currentDate', n.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
-        st('welcomeDate', n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
-    }
+        // ============================================================
+        // ===== UTILITY =====
+        // ============================================================
+        function st(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; }
 
-    // ===== AUTH =====
-    async function checkAuth() {
-        try {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) { window.location.href = 'index.html'; return false; }
-            
-            const { data: u } = await supabaseClient
-                .from('users')
-                .select('id,name,email,role,kecamatan_id,lembaga_id,active')
-                .eq('id', session.user.id)
-                .single();
-            
-            if (!u || !u.active || u.role !== 'operator' || !u.lembaga_id) {
-                await supabaseClient.auth.signOut();
+        function updateDate() {
+            const n = new Date();
+            st('currentDate', n.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+            st('welcomeDate', n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+        }
+
+        // ============================================================
+        // ===== AUTH =====
+        // ============================================================
+        async function checkAuth() {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) { window.location.href = 'index.html'; return false; }
+                const { data: u } = await supabaseClient
+                    .from('users')
+                    .select('id,name,email,role,kecamatan_id,lembaga_id,active')
+                    .eq('id', session.user.id).single();
+                if (!u || !u.active || u.role !== 'operator' || !u.lembaga_id) {
+                    await supabaseClient.auth.signOut();
+                    window.location.href = 'index.html';
+                    return false;
+                }
+                window.currentUser = {
+                    id: u.id,
+                    name: u.name || session.user.email,
+                    email: session.user.email,
+                    role: 'operator',
+                    kecamatan_id: u.kecamatan_id,
+                    lembaga_id: u.lembaga_id
+                };
+
+                // ========== AMBIL DATA LENGKAP LEMBAGA ==========
+                const { data: ld } = await supabaseClient
+                    .from('lembaga')
+                    .select('nama, jenis_lembaga, kecamatan_id, desa_id, kecamatan, desa')
+                    .eq('id', u.lembaga_id)
+                    .single();
+                window.lembagaInfo = ld || {};
+                console.log('=== LEMBAGA INFO (saat login) ===', window.lembagaInfo);
+
+                updateHeaderUI();
+                updateWelcomeUI();
+                return true;
+            } catch (e) {
+                console.error('Auth error:', e);
                 window.location.href = 'index.html';
                 return false;
             }
-            
-            window.currentUser = {
-                id: u.id,
-                name: u.name || session.user.email,
-                email: session.user.email,
-                role: 'operator',
-                kecamatan_id: u.kecamatan_id,
-                lembaga_id: u.lembaga_id
-            };
-            
-            const { data: ld } = await supabaseClient
-                .from('lembaga')
-                .select('nama,jenis_lembaga')
-                .eq('id', u.lembaga_id)
-                .single();
-            
-            window.lembagaInfo = ld || {};
-            updateHeaderUI();
-            updateWelcomeUI();
-            return true;
-        } catch (e) {
-            console.error('Auth error:', e);
-            window.location.href = 'index.html';
-            return false;
         }
-    }
-    
-    function getUser() { return window.currentUser || null; }
-    
-    function updateHeaderUI() {
-        const u = getUser();
-        if (!u) return;
-        st('userAvatar', u.name.charAt(0).toUpperCase());
-        st('userName', u.name);
-        st('userAvatarSmall', u.name.charAt(0).toUpperCase());
-        st('userNameSmall', u.name);
-        st('headerRoleBadge', 'Operator');
-        if (window.lembagaInfo) st('headerScope', '🏫 ' + window.lembagaInfo.nama);
-    }
-    
-    function updateWelcomeUI() {
-        const u = getUser();
-        if (!u) return;
-        st('welcomeName', u.name);
-        if (window.lembagaInfo) st('welcomeRole', 'Operator ' + window.lembagaInfo.nama);
-    }
-    
-    async function handleLogout() {
-        if (!confirm('Yakin keluar?')) return;
-        await supabaseClient.auth.signOut();
-        cache.clear();
-        showToast('Logout berhasil!', 'success');
-        setTimeout(() => window.location.href = 'index.html', 1000);
-    }
 
-    // ===== UPLOAD CLOUDINARY DENGAN KOMPRESI =====
-    async function uploadDokumen(input, type) {
-        const file = input.files[0];
-        if (!file) return;
-        
-        if (file.size > 10 * 1024 * 1024) {
-            showToast('File terlalu besar! Maksimal 10MB', 'error');
-            input.value = '';
-            return;
+        function getUser() { return window.currentUser || null; }
+
+        function updateHeaderUI() {
+            const u = getUser();
+            if (!u) return;
+            st('userAvatar', u.name.charAt(0).toUpperCase());
+            st('userName', u.name);
+            st('userAvatarSmall', u.name.charAt(0).toUpperCase());
+            st('userNameSmall', u.name);
+            st('headerRoleBadge', 'Operator');
+            if (window.lembagaInfo) st('headerScope', '🏫 ' + window.lembagaInfo.nama);
         }
-        
-        showToast('Memproses file...', 'info');
-        
-        try {
-            let fileToUpload = file;
-            const originalSize = (file.size / 1024).toFixed(0);
-            
-            if (file.type.startsWith('image/')) {
-                fileToUpload = await compressImage(file, MAX_FILE_SIZE);
+
+        function updateWelcomeUI() {
+            const u = getUser();
+            if (!u) return;
+            st('welcomeName', u.name);
+            if (window.lembagaInfo) st('welcomeRole', 'Operator ' + window.lembagaInfo.nama);
+        }
+
+        async function handleLogout() {
+            if (!confirm('Yakin keluar?')) return;
+            await supabaseClient.auth.signOut();
+            cache.clear();
+            showToast('Logout berhasil!', 'success');
+            setTimeout(() => window.location.href = 'index.html', 1000);
+        }
+
+        // ============================================================
+        // ===== LOAD WILAYAH DARI API =====
+        // ============================================================
+        async function loadProvinces() {
+            try {
+                const cached = cache.get('provinces_data');
+                if (cached) { provincesData = cached; buildProvinceMap(); populateProvinceSelect(); return; }
+                showToast('Memuat data provinsi...', 'info');
+                const data = await API_WILAYAH.getProvinces();
+                provincesData = data;
+                cache.set('provinces_data', data);
+                buildProvinceMap();
+                populateProvinceSelect();
+            } catch (e) {
+                console.error('Error loading provinces:', e);
+                showToast('Gagal memuat data provinsi', 'error');
             }
-            
-            const compressedSize = (fileToUpload.size / 1024).toFixed(0);
-            
-            const fd = new FormData();
-            fd.append('file', fileToUpload);
-            fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-            
-            const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
-                method: 'POST',
-                body: fd
-            });
-            
-            const d = await r.json();
-            
-            if (d.error) throw new Error(d.error.message);
-            
-            dokUrls[type] = d.secure_url;
-            
-            const pid = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Preview`;
-            const nid = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Name`;
-            
-            document.getElementById(pid).classList.add('visible');
-            document.getElementById(nid).textContent = file.name;
-            
-            if (originalSize !== compressedSize) {
-                showToast(`Berhasil! ${originalSize}KB → ${compressedSize}KB`, 'success');
+        }
+
+        function buildProvinceMap() { provinceMap = {}; provincesData.forEach(p => { provinceMap[p.id] = p.name; }); }
+
+        function populateProvinceSelect() {
+            const select = document.getElementById('editProvinsi');
+            select.innerHTML = '<option value="">-- Pilih Provinsi --</option>';
+            provincesData.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; select.appendChild(o); });
+            const jt = provincesData.find(p => p.name === 'Jawa Tengah');
+            if (jt) select.value = jt.id;
+            st('provinsiInfo', `${provincesData.length} provinsi tersedia`);
+        }
+
+        async function loadRegencies(provinceId) {
+            if (!provinceId) { regenciesData = []; return; }
+            try {
+                const key = `regencies_${provinceId}`;
+                const cached = cache.get(key);
+                if (cached) { regenciesData = cached; buildRegencyMap(); populateRegencySelect(); return; }
+                showToast('Memuat data kabupaten...', 'info');
+                const data = await API_WILAYAH.getRegencies(provinceId);
+                regenciesData = data;
+                cache.set(key, data);
+                buildRegencyMap();
+                populateRegencySelect();
+            } catch (e) { console.error(e); showToast('Gagal memuat kabupaten', 'error'); regenciesData = []; }
+        }
+
+        function buildRegencyMap() { regencyMap = {}; regenciesData.forEach(r => { regencyMap[r.id] = r.name; }); }
+
+        function populateRegencySelect() {
+            const select = document.getElementById('editKabupatenPengajar');
+            select.innerHTML = '<option value="">-- Pilih Kabupaten --</option>';
+            regenciesData.forEach(r => { const o = document.createElement('option'); o.value = r.id; o.textContent = r.name; select.appendChild(o); });
+            st('kabupatenInfo', `${regenciesData.length} kabupaten ditemukan`);
+        }
+
+        async function loadDistricts(regencyId) {
+            if (!regencyId) { districtsData = []; return; }
+            try {
+                const key = `districts_${regencyId}`;
+                const cached = cache.get(key);
+                if (cached) { districtsData = cached; buildDistrictMap(); populateDistrictSelect(); return; }
+                showToast('Memuat data kecamatan...', 'info');
+                const data = await API_WILAYAH.getDistricts(regencyId);
+                districtsData = data;
+                cache.set(key, data);
+                buildDistrictMap();
+                populateDistrictSelect();
+            } catch (e) { console.error(e); showToast('Gagal memuat kecamatan', 'error'); districtsData = []; }
+        }
+
+        function buildDistrictMap() { districtMap = {}; districtsData.forEach(d => { districtMap[d.id] = d.name; }); }
+
+        function populateDistrictSelect() {
+            const select = document.getElementById('editKecamatanPengajar');
+            select.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+            districtsData.forEach(d => { const o = document.createElement('option'); o.value = d.id; o.textContent = d.name; select.appendChild(o); });
+            st('kecamatanInfo', `${districtsData.length} kecamatan ditemukan`);
+        }
+
+        async function loadVillages(districtId) {
+            if (!districtId) { villagesData = []; return; }
+            try {
+                const key = `villages_${districtId}`;
+                const cached = cache.get(key);
+                if (cached) { villagesData = cached; buildVillageMap(); populateVillageSelect(); return; }
+                showToast('Memuat data desa...', 'info');
+                const data = await API_WILAYAH.getVillages(districtId);
+                villagesData = data;
+                cache.set(key, data);
+                buildVillageMap();
+                populateVillageSelect();
+            } catch (e) { console.error(e); showToast('Gagal memuat desa', 'error'); villagesData = []; }
+        }
+
+        function buildVillageMap() { villageMap = {}; villagesData.forEach(v => { villageMap[v.id] = v.name; }); }
+
+        function populateVillageSelect() {
+            const select = document.getElementById('editDesaPengajar');
+            select.innerHTML = '<option value="">-- Pilih Desa --</option>';
+            villagesData.forEach(v => { const o = document.createElement('option'); o.value = v.id; o.textContent = v.name; select.appendChild(o); });
+            st('desaInfo', `${villagesData.length} desa ditemukan`);
+        }
+
+        // ============================================================
+        // ===== EVENT HANDLERS WILAYAH =====
+        // ============================================================
+        async function onProvinsiChange() {
+            const provinsiId = document.getElementById('editProvinsi').value;
+            document.getElementById('editKabupatenPengajar').innerHTML = '<option value="">-- Pilih Kabupaten --</option>';
+            document.getElementById('editKecamatanPengajar').innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+            document.getElementById('editDesaPengajar').innerHTML = '<option value="">-- Pilih Desa --</option>';
+            st('kabupatenInfo', ''); st('kecamatanInfo', ''); st('desaInfo', '');
+            if (!provinsiId) { st('kabupatenInfo', 'Pilih provinsi terlebih dahulu'); return; }
+            await loadRegencies(provinsiId);
+            document.getElementById('domisiliStatusGroup').style.display = 'none';
+        }
+
+        async function onKabupatenChange() {
+            const kabupatenId = document.getElementById('editKabupatenPengajar').value;
+            document.getElementById('editKecamatanPengajar').innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+            document.getElementById('editDesaPengajar').innerHTML = '<option value="">-- Pilih Desa --</option>';
+            st('kecamatanInfo', ''); st('desaInfo', '');
+            if (!kabupatenId) { st('kecamatanInfo', 'Pilih kabupaten terlebih dahulu'); return; }
+            await loadDistricts(kabupatenId);
+            updateDomisiliStatus(kabupatenId);
+        }
+
+        async function onKecamatanChange() {
+            const kecamatanId = document.getElementById('editKecamatanPengajar').value;
+            document.getElementById('editDesaPengajar').innerHTML = '<option value="">-- Pilih Desa --</option>';
+            st('desaInfo', '');
+            if (!kecamatanId) { st('desaInfo', 'Pilih kecamatan terlebih dahulu'); return; }
+            await loadVillages(kecamatanId);
+        }
+
+        function updateDomisiliStatus(kabupatenId) {
+            const group = document.getElementById('domisiliStatusGroup');
+            const display = document.getElementById('domisiliStatusDisplay');
+            if (!kabupatenId) { group.style.display = 'none'; return; }
+            const kabName = regencyMap[kabupatenId] || '';
+            const isTegal = kabName === 'Tegal';
+            group.style.display = 'block';
+            if (isTegal) {
+                display.innerHTML = `<span style="color:#2e7d32;"><i class="fas fa-home"></i> Dalam Kabupaten Tegal</span>`;
+                display.style.background = '#e8f5e9';
+                display.style.borderColor = '#a5d6a7';
             } else {
-                showToast(`Berhasil! Ukuran: ${compressedSize}KB`, 'success');
+                display.innerHTML = `<span style="color:#e65100;"><i class="fas fa-map-pin"></i> Luar Kabupaten Tegal (${kabName})</span>`;
+                display.style.background = '#fff3e0';
+                display.style.borderColor = '#ffcc80';
             }
-            
-        } catch (e) {
-            console.error('Upload error:', e);
-            showToast('Gagal: ' + e.message, 'error');
-            input.value = '';
         }
-    }
 
-    async function compressImage(file, targetKB = 300) {
-        return new Promise((resolve) => {
-            if (file.size <= targetKB * 1024) {
-                resolve(file);
-                return;
+        // ============================================================
+        // ===== UPLOAD CLOUDINARY =====
+        // ============================================================
+        async function uploadDokumen(input, type) {
+            const file = input.files[0];
+            if (!file) return;
+            if (file.size > 10 * 1024 * 1024) { showToast('File terlalu besar! Maksimal 10MB', 'error'); input.value = ''; return; }
+            showToast('Memproses file...', 'info');
+            try {
+                let fileToUpload = file;
+                if (file.type.startsWith('image/')) fileToUpload = await compressImage(file, MAX_FILE_SIZE);
+                const fd = new FormData();
+                fd.append('file', fileToUpload);
+                fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+                const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, { method: 'POST', body: fd });
+                const d = await r.json();
+                if (d.error) throw new Error(d.error.message);
+                dokUrls[type] = d.secure_url;
+                const pid = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Preview`;
+                const nid = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Name`;
+                document.getElementById(pid).classList.add('visible');
+                document.getElementById(nid).textContent = file.name;
+                showToast('Berhasil upload!', 'success');
+            } catch (e) {
+                console.error('Upload error:', e);
+                showToast('Gagal: ' + e.message, 'error');
+                input.value = '';
             }
+        }
 
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const img = new Image();
-                
-                img.onload = function() {
-                    let width = img.width;
-                    let height = img.height;
-                    const maxDimension = 1000;
-                    
-                    if (width > maxDimension || height > maxDimension) {
-                        const ratio = Math.min(maxDimension / width, maxDimension / height);
-                        width = Math.round(width * ratio);
-                        height = Math.round(height * ratio);
-                    }
-                    
-                    const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
-                    
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    const qualities = [0.8, 0.6, 0.4, 0.2, 0.1];
-                    
-                    function tryQuality(index) {
-                        if (index >= qualities.length) {
-                            canvas.toBlob((blob) => {
-                                if (!blob) {
-                                    resolve(file);
-                                    return;
-                                }
-                                const finalFile = new File([blob], 
-                                    file.name.replace(/\.[^.]+$/, '.jpg'), 
-                                    { type: 'image/jpeg' }
-                                );
-                                resolve(finalFile);
-                            }, 'image/jpeg', 0.1);
-                            return;
-                        }
-                        
-                        canvas.toBlob((blob) => {
-                            if (!blob) {
-                                resolve(file);
+        async function compressImage(file, targetKB = 300) {
+            return new Promise((resolve) => {
+                if (file.size <= targetKB * 1024) { resolve(file); return; }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        let w = img.width, h = img.height;
+                        const maxDim = 1000;
+                        if (w > maxDim || h > maxDim) { const r = Math.min(maxDim / w, maxDim / h); w = Math.round(w * r); h = Math.round(h * r); }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const qualities = [0.8, 0.6, 0.4, 0.2, 0.1];
+                        function tryQ(i) {
+                            if (i >= qualities.length) {
+                                canvas.toBlob((b) => { if (!b) { resolve(file); return; } resolve(new File([b], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' })); }, 'image/jpeg', 0.1);
                                 return;
                             }
-                            
-                            const compressedFile = new File([blob], 
-                                file.name.replace(/\.[^.]+$/, '.jpg'), 
-                                { type: 'image/jpeg' }
-                            );
-                            
-                            if (compressedFile.size <= targetKB * 1024 || index === qualities.length - 1) {
-                                resolve(compressedFile);
-                            } else {
-                                tryQuality(index + 1);
-                            }
-                        }, 'image/jpeg', qualities[index]);
-                    }
-                    
-                    tryQuality(0);
+                            canvas.toBlob((b) => {
+                                if (!b) { resolve(file); return; }
+                                const cf = new File([b], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+                                if (cf.size <= targetKB * 1024 || i === qualities.length - 1) resolve(cf);
+                                else tryQ(i + 1);
+                            }, 'image/jpeg', qualities[i]);
+                        }
+                        tryQ(0);
+                    };
+                    img.onerror = () => resolve(file);
+                    img.src = e.target.result;
                 };
-                
-                img.onerror = function() {
-                    resolve(file);
-                };
-                
-                img.src = e.target.result;
-            };
-            
-            reader.onerror = function() {
-                resolve(file);
-            };
-            
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function removeDokumen(type) {
-        dokUrls[type] = '';
-        const pid = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Preview`;
-        const iid = `editDokumen${type.charAt(0).toUpperCase() + type.slice(1)}`;
-        
-        const previewEl = document.getElementById(pid);
-        const inputEl = document.getElementById(iid);
-        
-        if (previewEl) previewEl.classList.remove('visible');
-        if (inputEl) inputEl.value = '';
-        
-        showToast('Dokumen dihapus', 'info');
-    }
-
-    function resetDokumen() {
-        dokUrls = { ktp: '', bupati: '', gubernur: '' };
-        ['ktp', 'bupati', 'gubernur'].forEach(t => {
-            const pid = `dokumen${t.charAt(0).toUpperCase() + t.slice(1)}Preview`;
-            const iid = `editDokumen${t.charAt(0).toUpperCase() + t.slice(1)}`;
-            
-            const previewEl = document.getElementById(pid);
-            const inputEl = document.getElementById(iid);
-            
-            if (previewEl) previewEl.classList.remove('visible');
-            if (inputEl) inputEl.value = '';
-        });
-    }
-
-    // ===== LOAD MASTER DATA =====
-    async function loadKecOptions() {
-        const cd = cache.get('kec_options', 3600000);
-        if (cd) {
-            populateSel('editKecamatanPengajar', cd, '-- Pilih --');
-            return;
+                reader.onerror = () => resolve(file);
+                reader.readAsDataURL(file);
+            });
         }
-        const { data } = await supabaseClient.from('master_kecamatan').select('id,nama').order('nama');
-        cache.set('kec_options', data || []);
-        populateSel('editKecamatanPengajar', data || [], '-- Pilih --');
-    }
-    
-    function populateSel(id, arr, ph) {
-        const s = document.getElementById(id);
-        if (!s) return;
-        const cv = s.value;
-        s.innerHTML = ph ? `<option value="">${ph}</option>` : '';
-        arr.forEach(i => s.innerHTML += `<option value="${i.id}">${i.nama}</option>`);
-        if (cv && arr.some(i => i.id === cv)) s.value = cv;
-    }
-    
-    async function loadDesaOptions(kid, tid) {
-        const s = document.getElementById(tid);
-        if (!s) return;
-        if (!kid) {
-            s.innerHTML = '<option value="">-- Pilih --</option>';
-            return;
-        }
-        const ck = `desa_${kid}`;
-        const cd = cache.get(ck, 3600000);
-        if (cd) {
-            populateSel(tid, cd, '-- Pilih --');
-            return;
-        }
-        const { data } = await supabaseClient.from('master_kelurahan').select('id,nama').eq('kecamatan_id', kid).order('nama');
-        cache.set(ck, data || []);
-        populateSel(tid, data || [], '-- Pilih --');
-    }
 
-    // ===== LOAD PENDIDIK =====
-    async function loadPendidik() {
-        try {
-            const u = getUser();
-            if (!u?.lembaga_id) return;
-            
-            let q = supabaseClient.from('pendidik').select('*', { count: 'exact' }).eq('lembaga_id', u.lembaga_id);
-            
-            if (cf.search) q = q.or(`nik.ilike.%${cf.search.trim()}%,nama_lengkap.ilike.%${cf.search.trim()}%`);
-            if (cf.status === 'active') q = q.eq('status_aktif', true);
-            else if (cf.status === 'inactive') q = q.eq('status_aktif', false);
-            if (cf.verifikasi !== 'all') q = q.eq('status_verifikasi', cf.verifikasi);
-            
-            const from = (cp - 1) * ps;
-            const { data, count } = await q.order('nama_lengkap', { ascending: true }).range(from, from + ps - 1);
-            
-            td = count || 0;
-            renderTable(data || []);
-            updatePagination();
-            updateStats();
-        } catch (e) {
-            console.error('Error loading pendidik:', e);
-            document.getElementById('pendidikTableBody').innerHTML = 
-                `<tr><td colspan="6" style="text-align:center;padding:30px;color:#f44336;">Gagal: ${e.message}</td></tr>`;
+        function removeDokumen(type) {
+            dokUrls[type] = '';
+            const pid = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Preview`;
+            const iid = `editDokumen${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            document.getElementById(pid).classList.remove('visible');
+            document.getElementById(iid).value = '';
+            showToast('Dokumen dihapus', 'info');
         }
-    }
 
-    function getVerifikasiBadge(status) {
-        const map = {
-            'Draft': 'draft',
-            'Pending': 'pending',
-            'Diverifikasi': 'verified',
-            'Ditolak': 'rejected'
-        };
-        return map[status] || 'draft';
-    }
-
-    function renderTable(data) {
-        const t = document.getElementById('pendidikTableBody');
-        st('totalData', `${td} data`);
-        
-        if (!data || !data.length) {
-            t.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">📭 Belum ada pendidik</td></tr>';
-            return;
+        function resetDokumen() {
+            dokUrls = { ktp: '', bupati: '', gubernur: '' };
+            ['ktp', 'bupati', 'gubernur'].forEach(t => {
+                const pid = `dokumen${t.charAt(0).toUpperCase() + t.slice(1)}Preview`;
+                const iid = `editDokumen${t.charAt(0).toUpperCase() + t.slice(1)}`;
+                document.getElementById(pid).classList.remove('visible');
+                document.getElementById(iid).value = '';
+            });
         }
-        
-        const start = (cp - 1) * ps;
-        t.innerHTML = data.map((i, n) => {
-            const sb = i.status_aktif ? 'active' : 'inactive';
-            const stxt = i.status_aktif ? 'Aktif' : 'Tidak Aktif';
-            const vb = getVerifikasiBadge(i.status_verifikasi);
-            const vtxt = i.status_verifikasi || 'Draft';
-            
-            return `<tr>
-                <td>${start + n + 1}</td>
-                <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:.7rem;">${i.nik || '-'}</code></td>
-                <td><strong>${i.nama_lengkap || '-'}</strong></td>
-                <td><span class="badge ${sb}">${stxt}</span></td>
-                <td><span class="badge ${vb}">${vtxt}</span></td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="btn btn-info btn-xs" onclick="viewPendidik('${i.id}')" title="Lihat Detail">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn btn-warning btn-xs" onclick="editPendidik('${i.id}')" title="Edit" ${i.status_verifikasi === 'Diverifikasi' ? 'disabled' : ''}>
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>`;
-        }).join('');
-    }
 
-    // ===== STATS =====
-    async function updateStats() {
-        try {
-            const u = getUser();
-            if (!u?.lembaga_id) return;
-            
-            const { data } = await supabaseClient
-                .from('pendidik')
-                .select('status_aktif,status_verifikasi')
-                .eq('lembaga_id', u.lembaga_id);
-            
-            const d = data || [];
-            st('totalPendidik', d.length);
-            st('totalAktif', d.filter(x => x.status_aktif === true).length);
-            st('totalNonaktif', d.filter(x => x.status_aktif === false).length);
-            st('totalPending', d.filter(x => x.status_verifikasi === 'Pending' || x.status_verifikasi === 'Draft').length);
-        } catch (e) {
-            console.error('Error updating stats:', e);
-        }
-    }
-
-    // ===== PAGINATION =====
-    function updatePagination() {
-        const tp = Math.ceil(td / ps);
-        st('pageInfo', `Halaman ${cp} dari ${tp || 1}`);
-        document.getElementById('prevPage').disabled = cp <= 1;
-        document.getElementById('nextPage').disabled = cp >= tp;
-    }
-    
-    function changePage(d) {
-        const tp = Math.ceil(td / ps);
-        const np = cp + d;
-        if (np < 1 || np > tp) return;
-        cp = np;
-        loadPendidik();
-    }
-    
-    function applyFilter() {
-        cf.search = document.getElementById('searchInput').value.trim();
-        cf.status = document.getElementById('statusFilter').value;
-        cf.verifikasi = document.getElementById('verifikasiFilter').value;
-        cp = 1;
-        loadPendidik();
-    }
-
-    // ===== MODAL FUNCTIONS =====
-    function enableInputs(dis) {
-        document.querySelectorAll('#pendidikModal .modal-body input, #pendidikModal .modal-body select').forEach(e => {
-            if (!e.id.includes('LembagaName') && !e.id.includes('JenisLembaga') && 
-                !e.id.includes('Verifikasi') && !e.id.includes('AlasanPenolakan')) {
-                e.disabled = dis;
-            }
-        });
-    }
-    
-    function openAddModal() {
-        const u = getUser();
-        if (!u?.lembaga_id) {
-            showToast('Lembaga tidak ditemukan!', 'error');
-            return;
-        }
-        
-        isEditMode = false;
-        document.getElementById('modalTitle').textContent = 'Ajukan Pendidik Baru';
-        document.getElementById('editId').value = '';
-        document.getElementById('editLembagaId').value = u.lembaga_id;
-        document.getElementById('verificationInfo').style.display = 'none';
-        document.getElementById('alasanPenolakanRow').style.display = 'none';
-        
-        // Reset semua field
-        ['editNik','editNama','editTempatLahir','editTanggalLahir','editJenisKelamin',
-         'editStatusPerkawinan','editIbuKandung','editPendidikan','editAlamat','editNoHp',
-         'editEmail','editNomorRekeningBupati','editNamaBankBupati','editPemilikRekeningBupati',
-         'editNomorRekeningGubernur','editNamaBankGubernur','editPemilikRekeningGubernur'
-        ].forEach(id => document.getElementById(id).value = '');
-        
-        document.getElementById('editKabupatenPengajar').value = 'Tegal';
-        document.getElementById('editProvinsi').value = 'Jawa Tengah';
-        document.getElementById('editTmt').value = '';
-        document.getElementById('editStatus').value = 'true';
-        document.getElementById('editVerifikasi').value = 'Draft';
-        document.getElementById('editKecamatanPengajar').value = '';
-        document.getElementById('editDesaPengajar').value = '';
-        document.getElementById('editAlasanPenolakan').value = '';
-        
-        st('lamaMengabdiDisplay', '0 Tahun');
-        document.getElementById('editLamaMengabdi').value = '0';
-        
-        resetDokumen();
-        
-        document.getElementById('editLembagaName').value = window.lembagaInfo?.nama || '';
-        document.getElementById('editJenisLembaga').value = window.lembagaInfo?.jenis_lembaga || 'LPQ';
-        
-        enableInputs(false);
-        document.getElementById('btnSave').style.display = 'inline-flex';
-        document.getElementById('btnSave').disabled = false;
-        document.getElementById('btnSave').innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan';
-        isSaving = false;
-        
-        document.getElementById('pendidikModal').classList.add('active');
-    }
-
-    async function viewPendidik(id) {
-        try {
-            const { data } = await supabaseClient
-                .from('pendidik')
-                .select('*')
-                .eq('id', id)
-                .single();
-            
-            if (!data) {
-                showToast('Tidak ditemukan', 'error');
-                return;
-            }
-            
-            cPD = data;
-            isEditMode = false;
-            
-            document.getElementById('modalTitle').textContent = 'Detail Pendidik';
-            document.getElementById('editId').value = data.id;
-            document.getElementById('editLembagaId').value = data.lembaga_id || '';
-            
-            fillFormWithData(data);
-            
-            // Mode view: disable semua input
-            enableInputs(true);
-            
-            // Sembunyikan tombol simpan
-            document.getElementById('btnSave').style.display = 'none';
-            isSaving = false;
-            
-            // Tampilkan info verifikasi
-            showVerificationInfo(data);
-            
-            document.getElementById('pendidikModal').classList.add('active');
-            
-        } catch (e) {
-            console.error('Error viewing pendidik:', e);
-            showToast('Gagal: ' + e.message, 'error');
-        }
-    }
-
-    async function editPendidik(id) {
-        try {
-            const { data } = await supabaseClient
-                .from('pendidik')
-                .select('*')
-                .eq('id', id)
-                .single();
-            
-            if (!data) {
-                showToast('Tidak ditemukan', 'error');
-                return;
-            }
-            
-            // Cek apakah sudah diverifikasi
-            if (data.status_verifikasi === 'Diverifikasi') {
-                showToast('Data sudah diverifikasi, tidak dapat diedit!', 'warning');
-                return;
-            }
-            
-            cPD = data;
-            isEditMode = true;
-            
-            document.getElementById('modalTitle').textContent = 'Edit Pengajuan';
-            document.getElementById('editId').value = data.id;
-            document.getElementById('editLembagaId').value = data.lembaga_id || '';
-            
-            fillFormWithData(data);
-            showVerificationInfo(data);
-            
-            // Mode edit: enable semua input kecuali verifikasi
-            enableInputs(false);
-            
-            // Tampilkan tombol simpan
-            document.getElementById('btnSave').style.display = 'inline-flex';
-            document.getElementById('btnSave').disabled = false;
-            document.getElementById('btnSave').innerHTML = '<i class="fas fa-paper-plane"></i> Update Pengajuan';
-            isSaving = false;
-            
-            document.getElementById('pendidikModal').classList.add('active');
-            
-        } catch (e) {
-            console.error('Error editing pendidik:', e);
-            showToast('Gagal: ' + e.message, 'error');
-        }
-    }
-
-    function showVerificationInfo(data) {
-        const info = document.getElementById('verificationInfo');
-        info.style.display = 'block';
-        
-        if (data.status_verifikasi === 'Diverifikasi') {
-            info.className = 'info-box success';
-            info.innerHTML = `<i class="fas fa-check-circle"></i> <strong>✅ Telah Diverifikasi</strong> - Data ini telah diverifikasi oleh Admin Kecamatan`;
-        } else if (data.status_verifikasi === 'Ditolak') {
-            info.className = 'info-box error';
-            const alasan = data.alasan_penolakan || 'Tidak ada alasan yang diberikan';
-            info.innerHTML = `<i class="fas fa-times-circle"></i> <strong>❌ Ditolak</strong> - ${alasan}`;
-            document.getElementById('alasanPenolakanRow').style.display = 'flex';
-            document.getElementById('editAlasanPenolakan').value = alasan;
-        } else if (data.status_verifikasi === 'Pending') {
-            info.className = 'info-box warning';
-            info.innerHTML = `<i class="fas fa-clock"></i> <strong>⏳ Menunggu Verifikasi</strong> - Data sedang dalam proses verifikasi oleh Admin Kecamatan`;
-            document.getElementById('alasanPenolakanRow').style.display = 'none';
-        } else {
-            info.className = 'info-box';
-            info.innerHTML = `<i class="fas fa-file"></i> <strong>📝 Draft</strong> - Silakan lengkapi data dan ajukan untuk verifikasi`;
-            document.getElementById('alasanPenolakanRow').style.display = 'none';
-        }
-    }
-
-    async function fillFormWithData(data) {
-        // Identitas
-        document.getElementById('editNik').value = data.nik || '';
-        document.getElementById('editNama').value = data.nama_lengkap || '';
-        document.getElementById('editTempatLahir').value = data.tempat_lahir || '';
-        document.getElementById('editTanggalLahir').value = data.tanggal_lahir || '';
-        document.getElementById('editJenisKelamin').value = data.jenis_kelamin || '';
-        document.getElementById('editStatusPerkawinan').value = data.status_perkawinan || '';
-        document.getElementById('editIbuKandung').value = data.ibu_kandung || '';
-        document.getElementById('editPendidikan').value = data.pendidikan_terakhir || '';
-        
-        // Alamat
-        document.getElementById('editAlamat').value = data.alamat || '';
-        document.getElementById('editKabupatenPengajar').value = data.kabupaten_pengajar || 'Tegal';
-        document.getElementById('editProvinsi').value = data.provinsi || 'Jawa Tengah';
-        
-        // Kontak
-        document.getElementById('editNoHp').value = data.no_hp || '';
-        document.getElementById('editEmail').value = data.email || '';
-        
-        // Rekening Bupati
-        document.getElementById('editNomorRekeningBupati').value = data.nomor_rekening_bupati || '';
-        document.getElementById('editNamaBankBupati').value = data.nama_bank_bupati || '';
-        document.getElementById('editPemilikRekeningBupati').value = data.pemilik_rekening_bupati || '';
-        
-        // Rekening Gubernur
-        document.getElementById('editNomorRekeningGubernur').value = data.nomor_rekening_gubernur || '';
-        document.getElementById('editNamaBankGubernur').value = data.nama_bank_gubernur || '';
-        document.getElementById('editPemilikRekeningGubernur').value = data.pemilik_rekening_gubernur || '';
-        
-        // Mengajar
-        document.getElementById('editTmt').value = data.tmt_mengajar || '';
-        document.getElementById('editStatus').value = data.status_aktif ? 'true' : 'false';
-        document.getElementById('editVerifikasi').value = data.status_verifikasi || 'Draft';
-        
-        // Lembaga (readonly)
-        document.getElementById('editLembagaName').value = window.lembagaInfo?.nama || '';
-        document.getElementById('editJenisLembaga').value = window.lembagaInfo?.jenis_lembaga || 'LPQ';
-        
-        // Desa & Kecamatan
-        await loadKecOptions();
-        
-        const kecamatanId = data.kecamatan_pengajar_id || data.kecamatan_lembaga_id || '';
-        if (kecamatanId) {
-            document.getElementById('editKecamatanPengajar').value = kecamatanId;
-            await loadDesaOptions(kecamatanId, 'editDesaPengajar');
-            
-            const desaId = data.desa_pengajar_id || data.desa_lembaga_id || '';
-            if (desaId) {
-                document.getElementById('editDesaPengajar').value = desaId;
-            }
-        }
-        
-        // Dokumen KYC
-        resetDokumen();
-        if (data.dokumen_kyc) {
-            try {
-                const docs = typeof data.dokumen_kyc === 'string' 
-                    ? JSON.parse(data.dokumen_kyc) 
-                    : data.dokumen_kyc;
-                
-                if (docs.ktp) {
-                    dokUrls.ktp = docs.ktp;
-                    document.getElementById('dokumenKtpPreview').classList.add('visible');
-                    document.getElementById('dokumenKtpName').textContent = docs.ktp.split('/').pop();
-                }
-                if (docs.bupati) {
-                    dokUrls.bupati = docs.bupati;
-                    document.getElementById('dokumenBupatiPreview').classList.add('visible');
-                    document.getElementById('dokumenBupatiName').textContent = docs.bupati.split('/').pop();
-                }
-                if (docs.gubernur) {
-                    dokUrls.gubernur = docs.gubernur;
-                    document.getElementById('dokumenGubernurPreview').classList.add('visible');
-                    document.getElementById('dokumenGubernurName').textContent = docs.gubernur.split('/').pop();
-                }
-            } catch (e) {
-                console.error('Error parsing dokumen_kyc:', e);
-            }
-        }
-        
-        // Lama Mengabdi
-        if (data.tmt_mengajar) {
-            const tmt = new Date(data.tmt_mengajar);
+        // ============================================================
+        // ===== HITUNG LAMA MENGABDI =====
+        // ============================================================
+        function hitungLamaMengabdi() {
+            const tmt = document.getElementById('editTmt').value;
+            if (!tmt) { st('lamaMengabdiDisplay', '0 Tahun'); document.getElementById('editLamaMengabdi').value = '0'; return; }
+            const tmtDate = new Date(tmt);
             const now = new Date();
-            let y = now.getFullYear() - tmt.getFullYear();
-            const m = now.getMonth() - tmt.getMonth();
-            if (m < 0 || (m === 0 && now.getDate() < tmt.getDate())) y--;
-            
-            const lamaMengabdi = Math.max(0, y);
-            st('lamaMengabdiDisplay', `${lamaMengabdi} Tahun`);
-            document.getElementById('editLamaMengabdi').value = lamaMengabdi;
-        } else {
+            let y = now.getFullYear() - tmtDate.getFullYear();
+            const m = now.getMonth() - tmtDate.getMonth();
+            if (m < 0 || (m === 0 && now.getDate() < tmtDate.getDate())) y--;
+            const lama = Math.max(0, y);
+            st('lamaMengabdiDisplay', `${lama} Tahun`);
+            document.getElementById('editLamaMengabdi').value = lama;
+        }
+
+        // ============================================================
+        // ===== LOAD PENDIDIK =====
+        // ============================================================
+        async function loadPendidik() {
+            try {
+                const u = getUser();
+                if (!u?.lembaga_id) return;
+                let q = supabaseClient.from('pendidik').select('*', { count: 'exact' }).eq('lembaga_id', u.lembaga_id);
+                if (cf.search) q = q.or(`nik.ilike.%${cf.search.trim()}%,nama_lengkap.ilike.%${cf.search.trim()}%`);
+                if (cf.status === 'active') q = q.eq('status_aktif', true);
+                else if (cf.status === 'inactive') q = q.eq('status_aktif', false);
+                if (cf.verifikasi !== 'all') q = q.eq('status_verifikasi', cf.verifikasi);
+                if (cf.domisili === 'lokal') q = q.eq('kabupaten_pengajar', 'Tegal');
+                else if (cf.domisili === 'luar') q = q.neq('kabupaten_pengajar', 'Tegal');
+                const from = (cp - 1) * ps;
+                const { data, count } = await q.order('nama_lengkap', { ascending: true }).range(from, from + ps - 1);
+                td = count || 0;
+                renderTable(data || []);
+                updatePagination();
+                updateStats();
+            } catch (e) {
+                console.error('Error loading pendidik:', e);
+                document.getElementById('pendidikTableBody').innerHTML =
+                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">Gagal: ${e.message}</td></tr>`;
+            }
+        }
+
+        function getVerifikasiBadge(status) {
+            const map = { 'Draft': 'draft', 'Pending': 'pending', 'Diverifikasi': 'verified', 'Ditolak': 'rejected' };
+            return map[status] || 'draft';
+        }
+
+        function renderTable(data) {
+            const t = document.getElementById('pendidikTableBody');
+            st('totalData', `${td} data`);
+            if (!data || !data.length) {
+                t.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">📭 Belum ada pendidik</td></tr>';
+                return;
+            }
+            const start = (cp - 1) * ps;
+            t.innerHTML = data.map((i, n) => {
+                const sb = i.status_aktif ? 'active' : 'inactive';
+                const stxt = i.status_aktif ? 'Aktif' : 'Tidak Aktif';
+                const vb = getVerifikasiBadge(i.status_verifikasi);
+                const vtxt = i.status_verifikasi || 'Draft';
+                const isLuarDaerah = i.kabupaten_pengajar && i.kabupaten_pengajar !== 'Tegal';
+                const domisiliBadge = isLuarDaerah ?
+                    `<span class="badge-luar-daerah"><i class="fas fa-map-pin"></i> Luar Kab.</span>` :
+                    `<span class="badge-lokal"><i class="fas fa-home"></i> Lokal</span>`;
+                return `<tr>
+                    <td>${start + n + 1}</td>
+                    <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:.7rem;">${i.nik || '-'}</code></td>
+                    <td><strong>${i.nama_lengkap || '-'}</strong></td>
+                    <td><span class="badge ${sb}">${stxt}</span></td>
+                    <td><span class="badge ${vb}">${vtxt}</span></td>
+                    <td>${domisiliBadge}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-info btn-xs" onclick="viewPendidik('${i.id}')" title="Lihat Detail"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-warning btn-xs" onclick="editPendidik('${i.id}')" title="Edit" ${i.status_verifikasi === 'Diverifikasi' ? 'disabled' : ''}><i class="fas fa-edit"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ============================================================
+        // ===== STATS =====
+        // ============================================================
+        async function updateStats() {
+            try {
+                const u = getUser();
+                if (!u?.lembaga_id) return;
+                const { data } = await supabaseClient
+                    .from('pendidik')
+                    .select('status_aktif,status_verifikasi,kabupaten_pengajar')
+                    .eq('lembaga_id', u.lembaga_id);
+                const d = data || [];
+                st('totalPendidik', d.length);
+                st('totalAktif', d.filter(x => x.status_aktif === true).length);
+                st('totalNonaktif', d.filter(x => x.status_aktif === false).length);
+                st('totalPending', d.filter(x => x.status_verifikasi === 'Pending' || x.status_verifikasi === 'Draft').length);
+                st('totalLuarDaerah', d.filter(x => x.kabupaten_pengajar && x.kabupaten_pengajar !== 'Tegal').length);
+            } catch (e) { console.error('Error updating stats:', e); }
+        }
+
+        // ============================================================
+        // ===== PAGINATION =====
+        // ============================================================
+        function updatePagination() {
+            const tp = Math.ceil(td / ps);
+            st('pageInfo', `Halaman ${cp} dari ${tp || 1}`);
+            document.getElementById('prevPage').disabled = cp <= 1;
+            document.getElementById('nextPage').disabled = cp >= tp;
+        }
+
+        function changePage(d) {
+            const tp = Math.ceil(td / ps);
+            const np = cp + d;
+            if (np < 1 || np > tp) return;
+            cp = np;
+            loadPendidik();
+        }
+
+        function applyFilter() {
+            cf.search = document.getElementById('searchInput').value.trim();
+            cf.status = document.getElementById('statusFilter').value;
+            cf.verifikasi = document.getElementById('verifikasiFilter').value;
+            cf.domisili = document.getElementById('domisiliFilter').value;
+            cp = 1;
+            loadPendidik();
+        }
+
+        // ============================================================
+        // ===== MODAL FUNCTIONS =====
+        // ============================================================
+        function enableInputs(dis) {
+            document.querySelectorAll('#pendidikModal .modal-body input, #pendidikModal .modal-body select').forEach(e => {
+                if (!e.id.includes('LembagaName') && !e.id.includes('JenisLembaga') &&
+                    !e.id.includes('Verifikasi') && !e.id.includes('AlasanPenolakan')) {
+                    e.disabled = dis;
+                }
+            });
+        }
+
+        function openAddModal() {
+            const u = getUser();
+            if (!u?.lembaga_id) { showToast('Lembaga tidak ditemukan!', 'error'); return; }
+
+            document.getElementById('modalTitle').textContent = 'Ajukan Pendidik Baru';
+            document.getElementById('editId').value = '';
+            document.getElementById('editLembagaId').value = u.lembaga_id;
+            document.getElementById('verificationInfo').style.display = 'none';
+            document.getElementById('alasanPenolakanRow').style.display = 'none';
+            document.getElementById('domisiliStatusGroup').style.display = 'none';
+
+            ['editNik','editNama','editTempatLahir','editTanggalLahir','editJenisKelamin',
+             'editStatusPerkawinan','editIbuKandung','editPendidikan','editAlamat','editNoHp',
+             'editEmail','editNomorRekeningBupati','editNamaBankBupati','editPemilikRekeningBupati',
+             'editNomorRekeningGubernur','editNamaBankGubernur','editPemilikRekeningGubernur'
+            ].forEach(id => document.getElementById(id).value = '');
+
+            document.getElementById('editKabupatenPengajar').innerHTML = '<option value="">-- Pilih Kabupaten --</option>';
+            document.getElementById('editKecamatanPengajar').innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+            document.getElementById('editDesaPengajar').innerHTML = '<option value="">-- Pilih Desa --</option>';
+            st('kabupatenInfo', ''); st('kecamatanInfo', ''); st('desaInfo', '');
+
+            document.getElementById('editTmt').value = '';
+            document.getElementById('editStatus').value = 'true';
+            document.getElementById('editVerifikasi').value = 'Draft';
+            document.getElementById('editAlasanPenolakan').value = '';
             st('lamaMengabdiDisplay', '0 Tahun');
             document.getElementById('editLamaMengabdi').value = '0';
-        }
-    }
+            resetDokumen();
+            document.getElementById('editLembagaName').value = window.lembagaInfo?.nama || '';
+            document.getElementById('editJenisLembaga').value = window.lembagaInfo?.jenis_lembaga || 'LPQ';
+            enableInputs(false);
+            document.getElementById('btnSave').style.display = 'inline-flex';
+            document.getElementById('btnSave').disabled = false;
+            document.getElementById('btnSave').innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan';
 
-    function closeModal() {
-        document.getElementById('pendidikModal').classList.remove('active');
-        cPD = null;
-        isSaving = false;
-    }
-
-    // ===== SAVE PENDIDIK (Operator hanya bisa mengajukan) =====
-    async function savePendidik() {
-        if (isSaving) {
-            showToast('Sedang memproses...', 'warning');
-            return;
-        }
-        
-        const id = document.getElementById('editId').value;
-        const isEdit = !!id;
-        const u = getUser();
-        const nik = document.getElementById('editNik').value.trim();
-        const nama = document.getElementById('editNama').value.trim();
-        
-        // Validasi
-        if (!nik || !nama) {
-            showToast('NIK dan Nama wajib!', 'error');
-            return;
-        }
-        if (nik.length !== 16 || !/^\d+$/.test(nik)) {
-            showToast('NIK harus 16 digit angka!', 'error');
-            return;
-        }
-        
-        // Cek NIK duplicate
-        const { data: ex } = await supabaseClient
-            .from('pendidik')
-            .select('id')
-            .eq('nik', nik)
-            .maybeSingle();
-        
-        if (ex && ex.id !== id) {
-            showToast('NIK sudah terdaftar!', 'error');
-            return;
-        }
-        
-        const btn = document.getElementById('btnSave');
-        isSaving = true;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengajukan...';
-        
-        // Ambil nilai desa dan kecamatan
-        const kecamatanPengajarId = document.getElementById('editKecamatanPengajar').value;
-        const desaPengajarId = document.getElementById('editDesaPengajar').value;
-        
-        // Ambil nama kecamatan dan desa
-        let kecamatanPengajarName = '';
-        let desaPengajarName = '';
-        
-        if (kecamatanPengajarId) {
-            const { data: kecData } = await supabaseClient
-                .from('master_kecamatan')
-                .select('nama')
-                .eq('id', kecamatanPengajarId)
-                .single();
-            kecamatanPengajarName = kecData?.nama || '';
-        }
-        
-        if (desaPengajarId) {
-            const { data: desaData } = await supabaseClient
-                .from('master_kelurahan')
-                .select('nama')
-                .eq('id', desaPengajarId)
-                .single();
-            desaPengajarName = desaData?.nama || '';
-        }
-        
-        // Data yang akan disimpan
-        const d = {
-            nik: nik,
-            nama_lengkap: nama,
-            tempat_lahir: document.getElementById('editTempatLahir').value.trim(),
-            tanggal_lahir: document.getElementById('editTanggalLahir').value || null,
-            jenis_kelamin: document.getElementById('editJenisKelamin').value,
-            status_perkawinan: document.getElementById('editStatusPerkawinan').value.trim(),
-            ibu_kandung: document.getElementById('editIbuKandung').value.trim(),
-            pendidikan_terakhir: document.getElementById('editPendidikan').value.trim(),
-            alamat: document.getElementById('editAlamat').value.trim(),
-            desa_pengajar: desaPengajarName,
-            desa_pengajar_id: desaPengajarId || null,
-            kecamatan_pengajar: kecamatanPengajarName,
-            kecamatan_pengajar_id: kecamatanPengajarId || null,
-            kabupaten_pengajar: document.getElementById('editKabupatenPengajar').value.trim() || 'Tegal',
-            provinsi: document.getElementById('editProvinsi').value.trim() || 'Jawa Tengah',
-            no_hp: document.getElementById('editNoHp').value.trim(),
-            email: document.getElementById('editEmail').value.trim(),
-            nomor_rekening_bupati: document.getElementById('editNomorRekeningBupati').value.trim(),
-            nama_bank_bupati: document.getElementById('editNamaBankBupati').value.trim(),
-            pemilik_rekening_bupati: document.getElementById('editPemilikRekeningBupati').value.trim(),
-            nomor_rekening_gubernur: document.getElementById('editNomorRekeningGubernur').value.trim(),
-            nama_bank_gubernur: document.getElementById('editNamaBankGubernur').value.trim(),
-            pemilik_rekening_gubernur: document.getElementById('editPemilikRekeningGubernur').value.trim(),
-            tmt_mengajar: document.getElementById('editTmt').value || null,
-            status_aktif: document.getElementById('editStatus').value === 'true',
-            // Status verifikasi selalu diatur ke 'Pending' saat diajukan
-            status_verifikasi: 'Pending',
-            jenis_lembaga: window.lembagaInfo?.jenis_lembaga || 'LPQ',
-            lembaga_id: u.lembaga_id,
-            dokumen_kyc: JSON.stringify({
-                ktp: dokUrls.ktp || null,
-                bupati: dokUrls.bupati || null,
-                gubernur: dokUrls.gubernur || null
-            }),
-            updated_at: new Date().toISOString()
-        };
-        
-        // Hitung lama mengabdi
-        if (d.tmt_mengajar) {
-            const tmt = new Date(d.tmt_mengajar);
-            const now = new Date();
-            let y = now.getFullYear() - tmt.getFullYear();
-            const m = now.getMonth() - tmt.getMonth();
-            if (m < 0 || (m === 0 && now.getDate() < tmt.getDate())) y--;
-            d.lama_mengabdi = Math.max(0, y);
-        }
-        
-        try {
-            let err;
-            if (isEdit) {
-                // Update data, tetapi status verifikasi tetap Pending (kecuali jika sebelumnya sudah diverifikasi)
-                // Operator tidak bisa mengubah data yang sudah diverifikasi
-                if (cPD && cPD.status_verifikasi === 'Diverifikasi') {
-                    throw new Error('Data sudah diverifikasi, tidak dapat diubah!');
-                }
-                
-                // Jika sebelumnya Ditolak, set ulang ke Pending
-                if (cPD && cPD.status_verifikasi === 'Ditolak') {
-                    d.status_verifikasi = 'Pending';
-                    d.alasan_penolakan = null;
-                }
-                
-                const { error } = await supabaseClient
-                    .from('pendidik')
-                    .update(d)
-                    .eq('id', id);
-                err = error;
-            } else {
-                d.created_at = new Date().toISOString();
-                const { error } = await supabaseClient
-                    .from('pendidik')
-                    .insert([d]);
-                err = error;
+            const jt = provincesData.find(p => p.name === 'Jawa Tengah');
+            if (jt) {
+                document.getElementById('editProvinsi').value = jt.id;
+                setTimeout(() => onProvinsiChange(), 300);
             }
-            
-            if (err) throw err;
-            
-            cache.clear();
-            showToast(isEdit ? 'Pengajuan berhasil diperbarui!' : 'Pengajuan berhasil dikirim! Menunggu verifikasi admin kecamatan.', 'success');
-            closeModal();
-            loadPendidik();
-            
-        } catch (e) {
-            console.error('Error saving:', e);
-            showToast('Gagal: ' + e.message, 'error');
-        } finally {
+
+            document.getElementById('pendidikModal').classList.add('active');
+        }
+
+        async function viewPendidik(id) {
+            try {
+                const { data } = await supabaseClient.from('pendidik').select('*').eq('id', id).single();
+                if (!data) { showToast('Tidak ditemukan', 'error'); return; }
+                cPD = data;
+                document.getElementById('modalTitle').textContent = 'Detail Pendidik';
+                document.getElementById('editId').value = data.id;
+                document.getElementById('editLembagaId').value = data.lembaga_id || '';
+                await fillFormWithData(data);
+                enableInputs(true);
+                document.getElementById('btnSave').style.display = 'none';
+                showVerificationInfo(data);
+                document.getElementById('pendidikModal').classList.add('active');
+            } catch (e) { console.error(e); showToast('Gagal: ' + e.message, 'error'); }
+        }
+
+        async function editPendidik(id) {
+            try {
+                const { data } = await supabaseClient.from('pendidik').select('*').eq('id', id).single();
+                if (!data) { showToast('Tidak ditemukan', 'error'); return; }
+                if (data.status_verifikasi === 'Diverifikasi') { showToast('Data sudah diverifikasi, tidak dapat diedit!', 'warning'); return; }
+                cPD = data;
+                document.getElementById('modalTitle').textContent = 'Edit Pengajuan';
+                document.getElementById('editId').value = data.id;
+                document.getElementById('editLembagaId').value = data.lembaga_id || '';
+                await fillFormWithData(data);
+                showVerificationInfo(data);
+                enableInputs(false);
+                document.getElementById('btnSave').style.display = 'inline-flex';
+                document.getElementById('btnSave').disabled = false;
+                document.getElementById('btnSave').innerHTML = '<i class="fas fa-paper-plane"></i> Update Pengajuan';
+                document.getElementById('pendidikModal').classList.add('active');
+            } catch (e) { console.error(e); showToast('Gagal: ' + e.message, 'error'); }
+        }
+
+        function showVerificationInfo(data) {
+            const info = document.getElementById('verificationInfo');
+            info.style.display = 'block';
+            if (data.status_verifikasi === 'Diverifikasi') {
+                info.className = 'info-box success';
+                info.innerHTML = `<i class="fas fa-check-circle"></i> <strong>✅ Telah Diverifikasi</strong> - Data ini telah diverifikasi oleh Admin Kecamatan`;
+            } else if (data.status_verifikasi === 'Ditolak') {
+                info.className = 'info-box error';
+                const alasan = data.alasan_penolakan || 'Tidak ada alasan yang diberikan';
+                info.innerHTML = `<i class="fas fa-times-circle"></i> <strong>❌ Ditolak</strong> - ${alasan}`;
+                document.getElementById('alasanPenolakanRow').style.display = 'flex';
+                document.getElementById('editAlasanPenolakan').value = alasan;
+            } else if (data.status_verifikasi === 'Pending') {
+                info.className = 'info-box warning';
+                info.innerHTML = `<i class="fas fa-clock"></i> <strong>⏳ Menunggu Verifikasi</strong> - Data sedang dalam proses verifikasi oleh Admin Kecamatan`;
+                document.getElementById('alasanPenolakanRow').style.display = 'none';
+            } else {
+                info.className = 'info-box';
+                info.innerHTML = `<i class="fas fa-file"></i> <strong>📝 Draft</strong> - Silakan lengkapi data dan ajukan untuk verifikasi`;
+                document.getElementById('alasanPenolakanRow').style.display = 'none';
+            }
+        }
+
+        async function fillFormWithData(data) {
+            document.getElementById('editNik').value = data.nik || '';
+            document.getElementById('editNama').value = data.nama_lengkap || '';
+            document.getElementById('editTempatLahir').value = data.tempat_lahir || '';
+            document.getElementById('editTanggalLahir').value = data.tanggal_lahir || '';
+            document.getElementById('editJenisKelamin').value = data.jenis_kelamin || '';
+            document.getElementById('editStatusPerkawinan').value = data.status_perkawinan || '';
+            document.getElementById('editIbuKandung').value = data.ibu_kandung || '';
+            document.getElementById('editPendidikan').value = data.pendidikan_terakhir || '';
+            document.getElementById('editAlamat').value = data.alamat || '';
+
+            // Set provinsi
+            const provinsiName = data.provinsi || 'Jawa Tengah';
+            const province = provincesData.find(p => p.name === provinsiName);
+            if (province) {
+                document.getElementById('editProvinsi').value = province.id;
+                await onProvinsiChange();
+            }
+
+            // Set kabupaten
+            if (data.kabupaten_pengajar) {
+                const regency = regenciesData.find(r => r.name === data.kabupaten_pengajar);
+                if (regency) {
+                    document.getElementById('editKabupatenPengajar').value = regency.id;
+                    await onKabupatenChange();
+                }
+            }
+
+            // Set kecamatan
+            if (data.kecamatan_pengajar) {
+                const district = districtsData.find(d => d.name === data.kecamatan_pengajar);
+                if (district) {
+                    document.getElementById('editKecamatanPengajar').value = district.id;
+                    await onKecamatanChange();
+                }
+            }
+
+            // Set desa
+            if (data.desa_pengajar) {
+                const village = villagesData.find(v => v.name === data.desa_pengajar);
+                if (village) document.getElementById('editDesaPengajar').value = village.id;
+            }
+
+            document.getElementById('editNoHp').value = data.no_hp || '';
+            document.getElementById('editEmail').value = data.email || '';
+            document.getElementById('editNomorRekeningBupati').value = data.nomor_rekening_bupati || '';
+            document.getElementById('editNamaBankBupati').value = data.nama_bank_bupati || '';
+            document.getElementById('editPemilikRekeningBupati').value = data.pemilik_rekening_bupati || '';
+            document.getElementById('editNomorRekeningGubernur').value = data.nomor_rekening_gubernur || '';
+            document.getElementById('editNamaBankGubernur').value = data.nama_bank_gubernur || '';
+            document.getElementById('editPemilikRekeningGubernur').value = data.pemilik_rekening_gubernur || '';
+            document.getElementById('editTmt').value = data.tmt_mengajar || '';
+            document.getElementById('editStatus').value = data.status_aktif ? 'true' : 'false';
+            document.getElementById('editVerifikasi').value = data.status_verifikasi || 'Draft';
+            document.getElementById('editLembagaName').value = window.lembagaInfo?.nama || '';
+            document.getElementById('editJenisLembaga').value = window.lembagaInfo?.jenis_lembaga || 'LPQ';
+            hitungLamaMengabdi();
+
+            resetDokumen();
+            if (data.dokumen_kyc) {
+                try {
+                    const docs = typeof data.dokumen_kyc === 'string' ? JSON.parse(data.dokumen_kyc) : data.dokumen_kyc;
+                    if (docs.ktp) { dokUrls.ktp = docs.ktp; document.getElementById('dokumenKtpPreview').classList.add('visible'); document.getElementById('dokumenKtpName').textContent = docs.ktp.split('/').pop(); }
+                    if (docs.bupati) { dokUrls.bupati = docs.bupati; document.getElementById('dokumenBupatiPreview').classList.add('visible'); document.getElementById('dokumenBupatiName').textContent = docs.bupati.split('/').pop(); }
+                    if (docs.gubernur) { dokUrls.gubernur = docs.gubernur; document.getElementById('dokumenGubernurPreview').classList.add('visible'); document.getElementById('dokumenGubernurName').textContent = docs.gubernur.split('/').pop(); }
+                } catch (e) { console.error('Error parsing dokumen_kyc:', e); }
+            }
+
+            if (data.kabupaten_pengajar) {
+                const regency = regenciesData.find(r => r.name === data.kabupaten_pengajar);
+                if (regency) updateDomisiliStatus(regency.id);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('pendidikModal').classList.remove('active');
+            cPD = null;
+        }
+
+        // ============================================================
+        // ===== SAVE PENDIDIK (DIPERBAIKI TOTAL) =====
+        // ============================================================
+        async function savePendidik() {
+            if (isSaving) { showToast('Sedang memproses...', 'warning'); return; }
+
+            const id = document.getElementById('editId').value;
+            const isEdit = !!id;
+            const u = getUser();
+            const nik = document.getElementById('editNik').value.trim();
+            const nama = document.getElementById('editNama').value.trim();
+
+            if (!nik || !nama) { showToast('NIK dan Nama wajib!', 'error'); return; }
+            if (nik.length !== 16 || !/^\d+$/.test(nik)) { showToast('NIK harus 16 digit angka!', 'error'); return; }
+
+            // Cek NIK duplikat
+            const { data: ex } = await supabaseClient.from('pendidik').select('id').eq('nik', nik).maybeSingle();
+            if (ex && ex.id !== id) { showToast('NIK sudah terdaftar!', 'error'); return; }
+
+            const btn = document.getElementById('btnSave');
+            isSaving = true;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengajukan...';
+
+            // Ambil nilai dari dropdown wilayah (alamat tinggal pengajar)
+            const provinsiId = document.getElementById('editProvinsi').value;
+            const kabupatenId = document.getElementById('editKabupatenPengajar').value;
+            const kecamatanId = document.getElementById('editKecamatanPengajar').value;
+            const desaId = document.getElementById('editDesaPengajar').value;
+
+            const provinsiName = provinceMap[provinsiId] || '';
+            const kabupatenName = regencyMap[kabupatenId] || '';
+            const kecamatanName = districtMap[kecamatanId] || '';
+            const desaName = villageMap[desaId] || '';
+
+            if (!kabupatenName) { showToast('Kabupaten wajib dipilih!', 'error'); resetSaveBtn(btn); return; }
+            if (!kecamatanName) { showToast('Kecamatan wajib dipilih!', 'error'); resetSaveBtn(btn); return; }
+
+            // ========== AUTO-FILL DARI LEMBAGA OPERATOR ==========
+            const lembagaInfo = window.lembagaInfo || {};
+            console.log('=== LEMBAGA INFO SAAT SAVE ===', lembagaInfo);
+
+            if (!lembagaInfo.kecamatan_id) {
+                showToast('Data lembaga tidak lengkap (kecamatan kosong). Hubungi Admin.', 'error');
+                resetSaveBtn(btn);
+                return;
+            }
+
+            // ========== OBJEK DATA ==========
+            const d = {
+                // ===== IDENTITAS =====
+                nik: nik,
+                nama_lengkap: nama,
+                tempat_lahir: document.getElementById('editTempatLahir').value.trim() || null,
+                tanggal_lahir: document.getElementById('editTanggalLahir').value || null,
+                jenis_kelamin: document.getElementById('editJenisKelamin').value || null,
+                status_perkawinan: document.getElementById('editStatusPerkawinan').value.trim() || null,
+                ibu_kandung: document.getElementById('editIbuKandung').value.trim() || null,
+                pendidikan_terakhir: document.getElementById('editPendidikan').value.trim() || null,
+                alamat: document.getElementById('editAlamat').value.trim() || null,
+
+                // ===== ALAMAT PENGAJAR (manual) =====
+                provinsi: provinsiName || null,
+                kabupaten_pengajar: kabupatenName || null,
+                kecamatan_pengajar: kecamatanName || null,
+                desa_pengajar: desaName || null,
+
+                // ===== ALAMAT LEMBAGA (auto dari lembaga, teks) =====
+                kecamatan_lembaga: lembagaInfo.kecamatan || null,
+                desa_lembaga: lembagaInfo.desa || null,
+
+                // ===== KONTAK =====
+                no_hp: document.getElementById('editNoHp').value.trim() || null,
+                email: document.getElementById('editEmail').value.trim() || null,
+
+                // ===== REKENING =====
+                nomor_rekening_bupati: document.getElementById('editNomorRekeningBupati').value.trim() || null,
+                nama_bank_bupati: document.getElementById('editNamaBankBupati').value.trim() || null,
+                pemilik_rekening_bupati: document.getElementById('editPemilikRekeningBupati').value.trim() || null,
+                nomor_rekening_gubernur: document.getElementById('editNomorRekeningGubernur').value.trim() || null,
+                nama_bank_gubernur: document.getElementById('editNamaBankGubernur').value.trim() || null,
+                pemilik_rekening_gubernur: document.getElementById('editPemilikRekeningGubernur').value.trim() || null,
+
+                // ===== MENGAJAR =====
+                tmt_mengajar: document.getElementById('editTmt').value || null,
+                status_aktif: document.getElementById('editStatus').value === 'true',
+                status_verifikasi: 'Pending',
+
+                // ===== UUID (WAJIB sanitizeUUID!) =====
+                lembaga_id: sanitizeUUID(u?.lembaga_id),
+                kecamatan_lembaga_id: sanitizeUUID(lembagaInfo?.kecamatan_id),
+                desa_lembaga_id: sanitizeUUID(lembagaInfo?.desa_id),
+                kecamatan_pengajar_id: null,
+                desa_pengajar_id: null,
+
+                // ===== LAIN-LAIN =====
+                jenis_lembaga: lembagaInfo?.jenis_lembaga || 'LPQ',
+                nslp_lembaga: null,
+                dokumen_kyc: JSON.stringify({
+                    ktp: dokUrls.ktp || null,
+                    bupati: dokUrls.bupati || null,
+                    gubernur: dokUrls.gubernur || null
+                }),
+                updated_at: new Date().toISOString()
+            };
+
+            // Hitung lama mengabdi
+            if (d.tmt_mengajar) {
+                const tmt = new Date(d.tmt_mengajar);
+                const now = new Date();
+                let y = now.getFullYear() - tmt.getFullYear();
+                const m = now.getMonth() - tmt.getMonth();
+                if (m < 0 || (m === 0 && now.getDate() < tmt.getDate())) y--;
+                d.lama_mengabdi = Math.max(0, y);
+            }
+
+            // ========== DEBUG LOG ==========
+            console.log('=== DATA YANG DIKIRIM KE SUPABASE ===', d);
+            const uuidFields = ['lembaga_id', 'kecamatan_lembaga_id', 'desa_lembaga_id', 'kecamatan_pengajar_id', 'desa_pengajar_id'];
+            uuidFields.forEach(f => {
+                const val = d[f];
+                if (val !== null && val !== undefined && val !== '') {
+                    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                    if (!uuidRegex.test(String(val))) {
+                        console.error(`❌ Field ${f} BUKAN UUID valid:`, val);
+                    } else {
+                        console.log(`✅ Field ${f} valid:`, val);
+                    }
+                } else {
+                    console.log(`⚪ Field ${f} = null (aman)`);
+                }
+            });
+
+            try {
+                let err;
+                if (isEdit) {
+                    if (cPD && cPD.status_verifikasi === 'Diverifikasi') {
+                        throw new Error('Data sudah diverifikasi, tidak dapat diubah!');
+                    }
+                    if (cPD && cPD.status_verifikasi === 'Ditolak') {
+                        d.status_verifikasi = 'Pending';
+                        d.alasan_penolakan = null;
+                    }
+                    const { error } = await supabaseClient.from('pendidik').update(d).eq('id', id);
+                    err = error;
+                } else {
+                    d.created_at = new Date().toISOString();
+                    const { error } = await supabaseClient.from('pendidik').insert([d]);
+                    err = error;
+                }
+                if (err) throw err;
+                cache.clear();
+                showToast(isEdit ? 'Pengajuan berhasil diperbarui!' : 'Pengajuan berhasil dikirim!', 'success');
+                closeModal();
+                loadPendidik();
+            } catch (e) {
+                console.error('❌ Error saving:', e);
+                console.error('Detail error:', JSON.stringify(e, null, 2));
+                showToast('Gagal: ' + e.message, 'error');
+            } finally {
+                resetSaveBtn(btn);
+            }
+        }
+
+        function resetSaveBtn(btn) {
             isSaving = false;
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Ajukan';
         }
-    }
 
-    function refreshData() {
-        cache.clear();
-        loadPendidik();
-        showToast('Diperbarui', 'info');
-    }
+        function refreshData() {
+            cache.clear();
+            loadPendidik();
+            showToast('Diperbarui', 'info');
+        }
 
-    // ===== INIT =====
-    document.addEventListener('DOMContentLoaded', async () => {
-        ps = window.innerWidth < 768 ? 5 : 10;
-        if (!await checkAuth()) return;
-        updateDate();
-        await loadKecOptions();
-        loadPendidik();
-        
-        document.getElementById('searchInput').addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => applyFilter(), 500);
+        // ============================================================
+        // ===== INIT =====
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            ps = window.innerWidth < 768 ? 5 : 10;
+            if (!await checkAuth()) return;
+            updateDate();
+            await loadProvinces();
+            loadPendidik();
+
+            document.getElementById('searchInput').addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => applyFilter(), 500);
+            });
+
+            setInterval(updateDate, 60000);
         });
-        
-        document.getElementById('editKecamatanPengajar').addEventListener('change', function() {
-            loadDesaOptions(this.value, 'editDesaPengajar');
-        });
-        
-        setInterval(updateDate, 60000);
-    });
 
-    // ===== EXPOSE FUNCTIONS =====
-    window.applyFilter = applyFilter;
-    window.changePage = changePage;
-    window.refreshData = refreshData;
-    window.openAddModal = openAddModal;
-    window.closeModal = closeModal;
-    window.viewPendidik = viewPendidik;
-    window.editPendidik = editPendidik;
-    window.savePendidik = savePendidik;
-    window.showToast = showToast;
-    window.toggleSidebar = toggleSidebar;
-    window.handleLogout = handleLogout;
-    window.uploadDokumen = uploadDokumen;
-    window.removeDokumen = removeDokumen;
-</script>
+        // ============================================================
+        // ===== EXPOSE =====
+        // ============================================================
+        window.applyFilter = applyFilter;
+        window.changePage = changePage;
+        window.refreshData = refreshData;
+        window.openAddModal = openAddModal;
+        window.closeModal = closeModal;
+        window.viewPendidik = viewPendidik;
+        window.editPendidik = editPendidik;
+        window.savePendidik = savePendidik;
+        window.showToast = showToast;
+        window.toggleSidebar = toggleSidebar;
+        window.handleLogout = handleLogout;
+        window.uploadDokumen = uploadDokumen;
+        window.removeDokumen = removeDokumen;
+        window.onProvinsiChange = onProvinsiChange;
+        window.onKabupatenChange = onKabupatenChange;
+        window.onKecamatanChange = onKecamatanChange;
+        window.hitungLamaMengabdi = hitungLamaMengabdi;
+        window.sanitizeUUID = sanitizeUUID;
+    </script>
 </body>
 </html>
