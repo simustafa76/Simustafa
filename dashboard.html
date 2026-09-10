@@ -18,7 +18,6 @@
 
         :root {
             --sidebar-width: 250px;
-            --sidebar-collapsed: 0px;
             --header-height: 64px;
             --primary: #006400;
             --primary-light: #4CAF50;
@@ -33,13 +32,6 @@
             --bg-gray: #f0f4f0;
             --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             --card-shadow-hover: 0 8px 30px rgba(0, 100, 0, 0.15);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
@@ -66,16 +58,10 @@
             transform: translateX(0);
         }
 
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
+        .sidebar.collapsed { transform: translateX(-100%); }
 
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sidebar::-webkit-scrollbar-track {
-            background: transparent;
-        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 4px;
@@ -114,9 +100,7 @@
             letter-spacing: 0.5px;
         }
 
-        .sidebar-brand .brand-text h1 span {
-            color: var(--gold);
-        }
+        .sidebar-brand .brand-text h1 span { color: var(--gold); }
 
         .sidebar-brand .brand-text small {
             font-size: 0.55rem;
@@ -206,10 +190,7 @@
             flex-shrink: 0;
         }
 
-        .sidebar-footer .user-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .sidebar-footer .user-info { flex: 1; min-width: 0; }
 
         .sidebar-footer .user-info .name {
             font-size: 0.8rem;
@@ -256,9 +237,7 @@
             z-index: 999;
         }
 
-        .sidebar-overlay.active {
-            display: block;
-        }
+        .sidebar-overlay.active { display: block; }
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
@@ -268,12 +247,10 @@
             transition: margin-left 0.3s ease;
             display: flex;
             flex-direction: column;
-            padding: 12px 12px 12px 12px;
+            padding: 12px;
         }
 
-        .main-content.expanded {
-            margin-left: 0;
-        }
+        .main-content.expanded { margin-left: 0; }
 
         /* ===== HEADER ===== */
         .header {
@@ -330,10 +307,7 @@
             gap: 16px;
         }
 
-        .header-date {
-            font-size: 0.75rem;
-            color: #888;
-        }
+        .header-date { font-size: 0.75rem; color: #888; }
 
         .header-right .role-badge {
             background: var(--primary);
@@ -344,10 +318,7 @@
             font-weight: 600;
         }
 
-        .header-right .role-scope {
-            font-size: 0.6rem;
-            color: #888;
-        }
+        .header-right .role-scope { font-size: 0.6rem; color: #888; }
 
         .header-user {
             display: flex;
@@ -359,9 +330,7 @@
             transition: 0.2s;
         }
 
-        .header-user:hover {
-            background: var(--bg-gray);
-        }
+        .header-user:hover { background: var(--bg-gray); }
 
         .header-user .avatar {
             width: 30px;
@@ -418,9 +387,7 @@
             font-weight: 700;
         }
 
-        .welcome-section .welcome-text h2 span {
-            color: var(--gold);
-        }
+        .welcome-section .welcome-text h2 span { color: var(--gold); }
 
         .welcome-section .welcome-text p {
             font-size: 0.85rem;
@@ -446,9 +413,7 @@
             white-space: nowrap;
         }
 
-        .welcome-section .welcome-badge i {
-            color: var(--gold);
-        }
+        .welcome-section .welcome-badge i { color: var(--gold); }
 
         /* ===== FILTER INFO ===== */
         #filterInfo {
@@ -527,7 +492,7 @@
             line-height: 1.2;
         }
 
-        /* ===== SEBARAN PENDIDIK SECTION ===== */
+        /* ===== SEBARAN ===== */
         .sebaran-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -562,7 +527,6 @@
             color: var(--primary);
         }
 
-        /* Filter Button */
         .filter-group {
             display: flex;
             gap: 6px;
@@ -592,19 +556,6 @@
             border-color: var(--primary);
         }
 
-        .filter-btn .badge-filter {
-            background: rgba(255,255,255,0.2);
-            padding: 1px 6px;
-            border-radius: 10px;
-            font-size: 0.55rem;
-            margin-left: 4px;
-        }
-
-        .filter-btn.active .badge-filter {
-            background: rgba(255,255,255,0.25);
-        }
-
-        /* Donut Chart Container */
         .donut-container {
             display: flex;
             gap: 24px;
@@ -645,7 +596,6 @@
             font-weight: 500;
         }
 
-        /* Detail Info */
         .detail-info {
             flex: 1;
             min-width: 150px;
@@ -659,9 +609,7 @@
             border-bottom: 1px solid #f5f6f8;
         }
 
-        .detail-item:last-child {
-            border-bottom: none;
-        }
+        .detail-item:last-child { border-bottom: none; }
 
         .detail-item .left {
             display: flex;
@@ -695,7 +643,6 @@
             font-weight: 400;
         }
 
-        /* Filter Select */
         .filter-select-group {
             display: flex;
             gap: 8px;
@@ -725,6 +672,12 @@
 
         .filter-select-group select:hover {
             border-color: var(--primary-light);
+        }
+
+        .filter-select-group select:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+            color: #999;
         }
 
         .filter-select-group .btn-filter-clear {
@@ -763,11 +716,8 @@
             color: #888;
         }
 
-        .filter-active-tag i:hover {
-            color: var(--danger);
-        }
+        .filter-active-tag i:hover { color: var(--danger); }
 
-        /* Chart Wrapper */
         .chart-wrapper {
             position: relative;
             height: 220px;
@@ -829,9 +779,7 @@
             color: var(--primary);
         }
 
-        .kyc-card .kyc-header .title i {
-            color: #1976d2;
-        }
+        .kyc-card .kyc-header .title i { color: #1976d2; }
 
         .kyc-card .kyc-header .progress-info {
             display: flex;
@@ -885,9 +833,182 @@
         .kyc-stats-mini .stat-item .value.verified { color: #4CAF50; }
         .kyc-stats-mini .stat-item .value.rejected { color: #f44336; }
 
-        .kyc-table-wrapper {
-            overflow-x: auto;
+        /* ===== KYC SEARCH BAR ===== */
+        .kyc-search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            align-items: center;
         }
+
+        .search-input-wrapper {
+            flex: 1;
+            min-width: 240px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-wrapper > i.fa-search {
+            position: absolute;
+            left: 14px;
+            color: #999;
+            font-size: 0.85rem;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 10px 40px 10px 40px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            background: #fafbfa;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .search-input-wrapper input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.08);
+        }
+
+        .search-input-wrapper input::placeholder { color: #aaa; }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .clear-search-btn:hover {
+            color: var(--danger);
+            background: rgba(244, 67, 54, 0.08);
+        }
+
+        .status-filter-select {
+            padding: 10px 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            background: #fafbfa;
+            color: #555;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            min-width: 150px;
+        }
+
+        .status-filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .status-filter-select:hover { border-color: var(--primary-light); }
+
+        .btn-refresh {
+            padding: 10px 14px;
+            background: white;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-refresh:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-refresh.spinning i { animation: spin 0.8s linear infinite; }
+
+        .search-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: #e3f2fd;
+            border-left: 3px solid #1976d2;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 0.8rem;
+            color: #1565c0;
+            flex-wrap: wrap;
+        }
+
+        .search-info i { color: #1976d2; }
+
+        .clear-filter-link {
+            background: none;
+            border: none;
+            color: #1976d2;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+            padding: 4px 10px;
+            border-radius: 6px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .clear-filter-link:hover {
+            background: rgba(25, 118, 210, 0.1);
+            text-decoration: underline;
+        }
+
+        mark.search-highlight {
+            background: #fff59d;
+            color: inherit;
+            padding: 0 2px;
+            border-radius: 3px;
+            font-weight: 700;
+        }
+
+        .search-empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: #999;
+        }
+
+        .search-empty i {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        .search-empty .hint {
+            font-size: 0.75rem;
+            color: #bbb;
+            margin-top: 4px;
+        }
+
+        /* ===== KYC TABLE ===== */
+        .kyc-table-wrapper { overflow-x: auto; }
 
         .kyc-table-wrapper table {
             width: 100%;
@@ -915,13 +1036,8 @@
             cursor: pointer;
         }
 
-        .kyc-table-wrapper table tr.kyc-pending {
-            background: #fffde7;
-        }
-
-        .kyc-table-wrapper table tr.kyc-pending:hover {
-            background: #fff9c4;
-        }
+        .kyc-table-wrapper table tr.kyc-pending { background: #fffde7; }
+        .kyc-table-wrapper table tr.kyc-pending:hover { background: #fff9c4; }
 
         .kyc-status-badge {
             display: inline-flex;
@@ -1012,6 +1128,18 @@
             color: white;
         }
 
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover { background: #388e3c; }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover { background: #d32f2f; }
+
         .btn-sm {
             padding: 4px 10px;
             font-size: 0.7rem;
@@ -1056,9 +1184,7 @@
             margin: 0 auto;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* ===== MODAL ===== */
         .modal-overlay {
@@ -1074,9 +1200,7 @@
             align-items: center;
             padding: 20px;
         }
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal-container {
             background: white;
@@ -1118,9 +1242,7 @@
             cursor: pointer;
             padding: 0 8px;
         }
-        .modal-header .close-btn:hover {
-            color: #333;
-        }
+        .modal-header .close-btn:hover { color: #333; }
 
         .kyc-status-bar {
             display: flex;
@@ -1166,7 +1288,7 @@
 
         .kyc-tabs .tab-btn:hover {
             color: var(--primary);
-            background: var(--primary-bg);
+            background: #f8faf8;
         }
         .kyc-tabs .tab-btn.active {
             color: var(--primary);
@@ -1177,8 +1299,11 @@
             display: none;
             animation: fadeIn 0.25s ease;
         }
-        .kyc-tab-content.active {
-            display: block;
+        .kyc-tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .kyc-info-grid {
@@ -1201,9 +1326,7 @@
             font-weight: 600;
             font-size: 0.9rem;
         }
-        .kyc-info-grid .field.full {
-            grid-column: 1 / -1;
-        }
+        .kyc-info-grid .field.full { grid-column: 1 / -1; }
 
         .dokumen-preview {
             margin-top: 8px;
@@ -1284,62 +1407,32 @@
             padding-top: 16px;
             border-top: 1px solid #f0f2f5;
         }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .sidebar-overlay.active {
-                display: block;
-            }
-            .main-content {
-                margin-left: 0;
-            }
-            .header {
-                padding: 0 16px;
-            }
-            .header-left .page-title p {
-                display: none;
-            }
-            .header-date {
-                display: none;
-            }
-            .header-right .role-scope {
-                display: none;
-            }
-            .sebaran-section {
-                grid-template-columns: 1fr;
-            }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+            .main-content { margin-left: 0; }
+            .header { padding: 0 16px; }
+            .header-left .page-title p { display: none; }
+            .header-date { display: none; }
+            .header-right .role-scope { display: none; }
+            .sebaran-section { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
-            .header {
-                height: 56px;
-                padding: 0 12px;
-            }
-            .header-left .page-title h1 {
-                font-size: 0.9rem;
-            }
-            .header-user .user-name {
-                display: none;
-            }
-            .header-right .role-badge {
-                display: none;
-            }
+            .header { height: 56px; padding: 0 12px; }
+            .header-left .page-title h1 { font-size: 0.9rem; }
+            .header-user .user-name { display: none; }
+            .header-right .role-badge { display: none; }
             .welcome-section {
                 padding: 16px 20px;
                 flex-direction: column;
                 align-items: flex-start;
             }
-            .welcome-section .welcome-text h2 {
-                font-size: 1rem;
-            }
-            .welcome-section .welcome-text p {
-                font-size: 0.75rem;
-            }
+            .welcome-section .welcome-text h2 { font-size: 1rem; }
+            .welcome-section .welcome-text p { font-size: 0.75rem; }
             .welcome-section .welcome-badge {
                 font-size: 0.65rem;
                 padding: 4px 12px;
@@ -1348,124 +1441,58 @@
                 grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
                 gap: 10px;
             }
-            .stat-card {
-                padding: 14px 16px;
-                gap: 12px;
-            }
-            .stat-card .icon {
-                width: 40px;
-                height: 40px;
-                font-size: 1rem;
-            }
-            .stat-card .info .value {
-                font-size: 1.2rem;
-            }
-            .donut-wrapper {
-                width: 150px;
-                height: 150px;
-            }
-            .donut-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            .detail-info {
-                width: 100%;
-            }
-            .filter-select-group {
+            .stat-card { padding: 14px 16px; gap: 12px; }
+            .stat-card .icon { width: 40px; height: 40px; font-size: 1rem; }
+            .stat-card .info .value { font-size: 1.2rem; }
+            .donut-wrapper { width: 150px; height: 150px; }
+            .donut-container { flex-direction: column; align-items: center; }
+            .detail-info { width: 100%; }
+            .filter-select-group { flex-direction: column; align-items: stretch; }
+            .filter-select-group select { width: 100%; }
+            .chart-wrapper { height: 180px; }
+            .kyc-info-grid { grid-template-columns: 1fr; }
+            .kyc-status-bar { flex-direction: column; align-items: stretch; }
+            .kyc-stats-mini { grid-template-columns: repeat(2, 1fr); }
+            .dokumen-preview { max-height: 300px; }
+            .dokumen-preview iframe { height: 250px; }
+            .dokumen-preview img { max-height: 250px; }
+            .pagination-container { flex-direction: column; align-items: center; }
+            .kyc-search-bar {
                 flex-direction: column;
                 align-items: stretch;
             }
-            .filter-select-group select {
+            .search-input-wrapper,
+            .status-filter-select {
                 width: 100%;
             }
-            .chart-wrapper {
-                height: 180px;
+            .btn-refresh {
+                width: 100%;
+                justify-content: center;
             }
-            .kyc-info-grid {
-                grid-template-columns: 1fr;
-            }
-            .kyc-status-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .kyc-stats-mini {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .dokumen-preview {
-                max-height: 300px;
-            }
-            .dokumen-preview iframe {
-                height: 250px;
-            }
-            .dokumen-preview img {
-                max-height: 250px;
-            }
-            .pagination-container {
-                flex-direction: column;
-                align-items: center;
+            .clear-filter-link {
+                margin-left: 0;
+                margin-top: 4px;
             }
         }
 
         @media (max-width: 480px) {
-            .header-left .page-title h1 {
-                font-size: 0.8rem;
-            }
-            .header-left .sidebar-toggle {
-                font-size: 1rem;
-                padding: 2px 6px;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-            }
-            .stat-card {
-                padding: 10px 12px;
-                gap: 8px;
-            }
-            .stat-card .icon {
-                width: 32px;
-                height: 32px;
-                font-size: 0.8rem;
-            }
-            .stat-card .info .value {
-                font-size: 1rem;
-            }
-            .stat-card .info .label {
-                font-size: 0.55rem;
-            }
-            .donut-wrapper {
-                width: 130px;
-                height: 130px;
-            }
-            .donut-center-text .total-number {
-                font-size: 1.2rem;
-            }
-            .chart-wrapper {
-                height: 150px;
-            }
-            .chart-legend-custom {
-                gap: 10px;
-            }
-            .chart-legend-custom .legend-item {
-                font-size: 0.6rem;
-            }
-            .modal-container {
-                padding: 16px;
-                margin: 10px;
-            }
-            .kyc-card .kyc-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .dokumen-preview {
-                max-height: 200px;
-            }
-            .dokumen-preview iframe {
-                height: 180px;
-            }
-            .dokumen-preview img {
-                max-height: 180px;
-            }
+            .header-left .page-title h1 { font-size: 0.8rem; }
+            .header-left .sidebar-toggle { font-size: 1rem; padding: 2px 6px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .stat-card { padding: 10px 12px; gap: 8px; }
+            .stat-card .icon { width: 32px; height: 32px; font-size: 0.8rem; }
+            .stat-card .info .value { font-size: 1rem; }
+            .stat-card .info .label { font-size: 0.55rem; }
+            .donut-wrapper { width: 130px; height: 130px; }
+            .donut-center-text .total-number { font-size: 1.2rem; }
+            .chart-wrapper { height: 150px; }
+            .chart-legend-custom { gap: 10px; }
+            .chart-legend-custom .legend-item { font-size: 0.6rem; }
+            .modal-container { padding: 16px; margin: 10px; }
+            .kyc-card .kyc-header { flex-direction: column; align-items: stretch; }
+            .dokumen-preview { max-height: 200px; }
+            .dokumen-preview iframe { height: 180px; }
+            .dokumen-preview img { max-height: 180px; }
         }
     </style>
 </head>
@@ -1475,7 +1502,7 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="assets/logo-kemenag.png" alt="Logo" 
-                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3C/svg%3E'">
             <div class="brand-text">
                 <h1>SI-<span>MUSTAFA</span></h1>
                 <small>Kemenag Kab. Tegal</small>
@@ -1550,7 +1577,7 @@
                 <span class="header-date" id="currentDate"></span>
                 <span class="role-badge" id="headerRoleBadge">Admin</span>
                 <span class="role-scope" id="headerScope"></span>
-                <div class="header-user" onclick="showToast('Profile', 'info')">
+                <div class="header-user">
                     <div class="avatar" id="userAvatarSmall">A</div>
                     <span class="user-name" id="userNameSmall">Admin</span>
                 </div>
@@ -1653,14 +1680,14 @@
                             <div class="total-label">Total Pendidik</div>
                         </div>
                     </div>
-                    <div class="detail-info" id="detailInfo">
-                        <!-- Detail akan diisi oleh JavaScript -->
-                    </div>
+                    <div class="detail-info" id="detailInfo"></div>
                 </div>
-                <!-- Filter Area - AUTO FILTER tanpa tombol -->
                 <div class="filter-select-group">
                     <select id="filterKecamatan">
                         <option value="">Semua Kecamatan</option>
+                    </select>
+                    <select id="filterDesa">
+                        <option value="">Semua Desa</option>
                     </select>
                     <button class="btn-filter-clear" onclick="clearLocationFilter()">
                         <i class="fas fa-times"></i> Reset Filter
@@ -1739,6 +1766,40 @@
                 </div>
             </div>
 
+            <!-- ===== SEARCH & FILTER BAR ===== -->
+            <div class="kyc-search-bar">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input 
+                        type="text" 
+                        id="kycSearchInput" 
+                        placeholder="Cari nama, NIK, NSLP, atau lembaga..."
+                        autocomplete="off">
+                    <button class="clear-search-btn" id="kycClearSearch" style="display:none;" title="Bersihkan">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+                <select id="kycStatusFilter" class="status-filter-select">
+                    <option value="">Semua Status</option>
+                    <option value="Pending">⏳ Menunggu</option>
+                    <option value="Diverifikasi">✅ Terverifikasi</option>
+                    <option value="Ditolak">❌ Ditolak</option>
+                    <option value="Draft">📝 Draft</option>
+                </select>
+                <button class="btn-refresh" id="kycRefreshBtn" title="Refresh data">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+
+            <!-- Info hasil pencarian -->
+            <div id="kycSearchInfo" class="search-info" style="display:none;">
+                <i class="fas fa-filter"></i>
+                <span id="kycSearchInfoText"></span>
+                <button onclick="clearKycSearch()" class="clear-filter-link">
+                    <i class="fas fa-times"></i> Reset
+                </button>
+            </div>
+
             <div class="kyc-table-wrapper">
                 <table>
                     <thead>
@@ -1773,6 +1834,8 @@
                 </div>
             </div>
         </div>
+    </main>
+
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
 
@@ -1869,7 +1932,6 @@
                         <div class="field"><div class="label">Jenis Lembaga</div><div class="value" id="kycDetailJenisLembaga">-</div></div>
                         <div class="field"><div class="label">Kecamatan Lembaga</div><div class="value" id="kycDetailKecamatanLembaga">-</div></div>
                         <div class="field"><div class="label">Desa Lembaga</div><div class="value" id="kycDetailDesaLembaga">-</div></div>
-                        <div class="field"><div class="label">RT/RW</div><div class="value" id="kycDetailRtRw">-</div></div>
                         <div class="field"><div class="label">TMT Mengajar</div><div class="value" id="kycDetailTmt">-</div></div>
                         <div class="field full"><div class="label">Lama Mengabdi</div><div class="value" id="kycDetailLamaMengabdi">-</div></div>
                     </div>
@@ -1883,7 +1945,7 @@
                                 <i class="fas fa-id-card"></i> Kartu Tanda Penduduk (KTP)
                             </div>
                             <div style="display:flex;gap:6px;flex-shrink:0;">
-                                <button class="btn btn-primary btn-sm" onclick="previewDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
+                                <button class="btn btn-outline btn-sm" onclick="previewDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
                                     <i class="fas fa-eye"></i> Lihat
                                 </button>
                                 <button class="btn btn-outline btn-sm" onclick="downloadDokumen('ktp')" style="padding:4px 12px;font-size:0.7rem;">
@@ -1894,11 +1956,11 @@
                         <div style="margin-top:4px;font-size:0.8rem;color:#555;">
                             <span id="kycDokumenKtpName" style="font-weight:500;">Belum ada dokumen</span>
                         </div>
-                        <div class="dokumen-preview" id="dokumenKtpPreview" style="display:none;margin-top:8px;">
-                            <img id="dokumenKtpImg" src="" alt="KTP" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
-                            <iframe id="dokumenKtpPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
-                            <div class="empty" id="dokumenKtpEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
-                                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                        <div class="dokumen-preview" id="dokumenKtpPreview">
+                            <img id="dokumenKtpImg" src="" alt="KTP">
+                            <iframe id="dokumenKtpPdf" src=""></iframe>
+                            <div class="empty" id="dokumenKtpEmpty" style="display:none;">
+                                <i class="fas fa-file-image"></i>
                                 File tidak dapat ditampilkan
                             </div>
                         </div>
@@ -1911,7 +1973,7 @@
                                 <i class="fas fa-university"></i> Rekening Insentif Bupati
                             </div>
                             <div style="display:flex;gap:6px;flex-shrink:0;">
-                                <button class="btn btn-primary btn-sm" onclick="previewDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
+                                <button class="btn btn-outline btn-sm" onclick="previewDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
                                     <i class="fas fa-eye"></i> Lihat
                                 </button>
                                 <button class="btn btn-outline btn-sm" onclick="downloadDokumen('bupati')" style="padding:4px 12px;font-size:0.7rem;">
@@ -1922,11 +1984,11 @@
                         <div style="margin-top:4px;font-size:0.8rem;color:#555;">
                             <span id="kycDokumenBupatiName" style="font-weight:500;">Belum ada dokumen</span>
                         </div>
-                        <div class="dokumen-preview" id="dokumenBupatiPreview" style="display:none;margin-top:8px;">
-                            <img id="dokumenBupatiImg" src="" alt="Rekening Bupati" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
-                            <iframe id="dokumenBupatiPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
-                            <div class="empty" id="dokumenBupatiEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
-                                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                        <div class="dokumen-preview" id="dokumenBupatiPreview">
+                            <img id="dokumenBupatiImg" src="" alt="Rekening Bupati">
+                            <iframe id="dokumenBupatiPdf" src=""></iframe>
+                            <div class="empty" id="dokumenBupatiEmpty" style="display:none;">
+                                <i class="fas fa-file-image"></i>
                                 File tidak dapat ditampilkan
                             </div>
                         </div>
@@ -1939,7 +2001,7 @@
                                 <i class="fas fa-university"></i> Rekening Insentif Gubernur
                             </div>
                             <div style="display:flex;gap:6px;flex-shrink:0;">
-                                <button class="btn btn-primary btn-sm" onclick="previewDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
+                                <button class="btn btn-outline btn-sm" onclick="previewDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
                                     <i class="fas fa-eye"></i> Lihat
                                 </button>
                                 <button class="btn btn-outline btn-sm" onclick="downloadDokumen('gubernur')" style="padding:4px 12px;font-size:0.7rem;">
@@ -1950,11 +2012,11 @@
                         <div style="margin-top:4px;font-size:0.8rem;color:#555;">
                             <span id="kycDokumenGubernurName" style="font-weight:500;">Belum ada dokumen</span>
                         </div>
-                        <div class="dokumen-preview" id="dokumenGubernurPreview" style="display:none;margin-top:8px;">
-                            <img id="dokumenGubernurImg" src="" alt="Rekening Gubernur" style="width:100%;height:auto;max-height:350px;object-fit:contain;">
-                            <iframe id="dokumenGubernurPdf" src="" style="width:100%;height:350px;border:none;display:none;"></iframe>
-                            <div class="empty" id="dokumenGubernurEmpty" style="display:none;text-align:center;padding:20px;color:#888;">
-                                <i class="fas fa-file-image" style="font-size:2rem;display:block;margin-bottom:8px;color:#ccc;"></i>
+                        <div class="dokumen-preview" id="dokumenGubernurPreview">
+                            <img id="dokumenGubernurImg" src="" alt="Rekening Gubernur">
+                            <iframe id="dokumenGubernurPdf" src=""></iframe>
+                            <div class="empty" id="dokumenGubernurEmpty" style="display:none;">
+                                <i class="fas fa-file-image"></i>
                                 File tidak dapat ditampilkan
                             </div>
                         </div>
@@ -1990,7 +2052,7 @@
 // ===== CACHE MANAGER =====
 // ============================================================
 const CacheManager = {
-    CACHE_DURATION: 5 * 60 * 1000, // 5 menit
+    CACHE_DURATION: 15 * 60 * 1000,
     
     get(key) {
         try {
@@ -2002,30 +2064,18 @@ const CacheManager = {
                 return null;
             }
             return data;
-        } catch {
-            return null;
-        }
+        } catch { return null; }
     },
     
     set(key, data) {
         try {
-            localStorage.setItem(`cache_${key}`, JSON.stringify({
-                data,
-                timestamp: Date.now()
-            }));
-        } catch (e) {
-            console.warn('Cache set error:', e);
-        }
+            localStorage.setItem(`cache_${key}`, JSON.stringify({ data, timestamp: Date.now() }));
+        } catch (e) { console.warn('Cache set error:', e); }
     },
     
     clear(key) {
-        if (key) {
-            localStorage.removeItem(`cache_${key}`);
-        } else {
-            Object.keys(localStorage)
-                .filter(k => k.startsWith('cache_'))
-                .forEach(k => localStorage.removeItem(k));
-        }
+        if (key) localStorage.removeItem(`cache_${key}`);
+        else Object.keys(localStorage).filter(k => k.startsWith('cache_')).forEach(k => localStorage.removeItem(k));
     },
     
     isExpired(key) {
@@ -2034,19 +2084,16 @@ const CacheManager = {
         try {
             const { timestamp } = JSON.parse(cached);
             return Date.now() - timestamp > this.CACHE_DURATION;
-        } catch {
-            return true;
-        }
+        } catch { return true; }
     }
 };
 
 // ============================================================
-// ===== SIDEBAR FUNCTIONS =====
+// ===== SIDEBAR =====
 // ============================================================
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
-    
     if (sidebar) sidebar.classList.toggle('open');
     if (overlay) overlay.classList.toggle('active');
 }
@@ -2061,7 +2108,7 @@ window.addEventListener('resize', function() {
 });
 
 // ============================================================
-// ===== DASHBOARD + KYC =====
+// ===== GLOBAL STATE =====
 // ============================================================
 let currentKycPendidik = null;
 let currentKycTab = 'identitas';
@@ -2069,36 +2116,23 @@ let currentPage = 1;
 const ITEMS_PER_PAGE = 20;
 let totalKycData = 0;
 
-// ===== DOKUMEN VARIABLES =====
-let kycDokumen = {
-    ktp: null,
-    bupati: null,
-    gubernur: null
-};
+let kycDokumen = { ktp: null, bupati: null, gubernur: null };
 
-// ===== CHART VARIABLES =====
 let donutChartInstance = null;
 let barChartInstance = null;
 
-// ===== FILTER VARIABLES =====
 let currentFilter = {
-    jenis: 'all', // all, LPQ, MDT, PONPES
+    jenis: 'all',
     kecamatan_id: null,
     desa_id: null
 };
 
-// ===== DEBOUNCE =====
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+let kycSearchState = {
+    keyword: '',
+    status: ''
+};
+
+let autoRefreshTimer = null;
 
 // ============================================================
 // ===== TOAST =====
@@ -2111,30 +2145,30 @@ function showToast(message, type = 'info') {
     void toast.offsetWidth;
     toast.classList.add('show');
     clearTimeout(toast._timeout);
-    toast._timeout = setTimeout(() => {
-        toast.classList.remove('show');
-    }, 4000);
+    toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
 }
 
 // ============================================================
 // ===== DATE =====
 // ============================================================
 function updateDate() {
-    const el = document.getElementById('currentDate');
-    if (!el) return;
     const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    el.textContent = now.toLocaleDateString('id-ID', options);
-
+    const el = document.getElementById('currentDate');
+    if (el) {
+        el.textContent = now.toLocaleDateString('id-ID', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+    }
     const welcomeDate = document.getElementById('welcomeDate');
     if (welcomeDate) {
-        const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        welcomeDate.textContent = now.toLocaleDateString('id-ID', dateOptions);
+        welcomeDate.textContent = now.toLocaleDateString('id-ID', {
+            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+        });
     }
 }
 
 // ============================================================
-// ===== AUTH CHECK =====
+// ===== AUTH =====
 // ============================================================
 async function checkAuth() {
     try {
@@ -2168,7 +2202,6 @@ async function checkAuth() {
 
         updateHeaderUI(window.currentUser);
         updateWelcomeUI(window.currentUser);
-        
         return true;
         
     } catch (error) {
@@ -2178,12 +2211,10 @@ async function checkAuth() {
     }
 }
 
-function getUser() {
-    return window.currentUser || null;
-}
+function getUser() { return window.currentUser || null; }
 
 // ============================================================
-// ===== GET ROLE FILTER =====
+// ===== ROLE FILTER =====
 // ============================================================
 function getRoleFilter() {
     if (!window.currentUser) return {};
@@ -2191,11 +2222,7 @@ function getRoleFilter() {
     const role = user.role;
     const filter = {};
 
-    console.log('User role:', role, 'Kecamatan ID:', user.kecamatan_id, 'Lembaga ID:', user.lembaga_id);
-
-    if (role === 'super_admin' || role === 'admin_kab') {
-        return {};
-    }
+    if (role === 'super_admin' || role === 'admin_kab') return {};
 
     if (role === 'operator' && user.lembaga_id) {
         filter.lembaga_id = user.lembaga_id;
@@ -2209,15 +2236,10 @@ function getRoleFilter() {
 
     filter.kecamatan_id = user.kecamatan_id;
 
-    if (role === 'batko') {
-        filter.jenis_lembaga = 'LPQ';
-    } else if (role === 'fkdt') {
-        filter.jenis_lembaga = 'MDT';
-    } else if (role === 'ponpes') {
-        filter.jenis_lembaga = 'PONPES';
-    }
+    if (role === 'batko') filter.jenis_lembaga = 'LPQ';
+    else if (role === 'fkdt') filter.jenis_lembaga = 'MDT';
+    else if (role === 'ponpes') filter.jenis_lembaga = 'PONPES';
 
-    console.log('Filter yang dibuat:', filter);
     return filter;
 }
 
@@ -2227,12 +2249,6 @@ function getRoleFilter() {
 function updateHeaderUI(user) {
     if (!user) return;
     
-    const avatarEl = document.getElementById('userAvatar');
-    if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
-    
-    const nameEl = document.getElementById('userName');
-    if (nameEl) nameEl.textContent = user.name;
-    
     const roleNames = {
         'super_admin': 'Super Admin',
         'admin_kab': 'Admin Kabupaten',
@@ -2241,57 +2257,47 @@ function updateHeaderUI(user) {
         'ponpes': 'PONPES',
         'operator': 'Operator'
     };
-    const roleEl = document.getElementById('userRole');
-    if (roleEl) roleEl.textContent = roleNames[user.role] || user.role;
-
-    const avatarSmall = document.getElementById('userAvatarSmall');
-    if (avatarSmall) avatarSmall.textContent = user.name.charAt(0).toUpperCase();
+    const roleLabel = roleNames[user.role] || user.role;
     
-    const nameSmall = document.getElementById('userNameSmall');
-    if (nameSmall) nameSmall.textContent = user.name;
+    const setText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    };
     
-    const roleBadge = document.getElementById('headerRoleBadge');
-    if (roleBadge) roleBadge.textContent = roleNames[user.role] || user.role;
+    setText('userAvatar', user.name.charAt(0).toUpperCase());
+    setText('userName', user.name);
+    setText('userRole', roleLabel);
+    setText('userAvatarSmall', user.name.charAt(0).toUpperCase());
+    setText('userNameSmall', user.name);
+    setText('headerRoleBadge', roleLabel);
     
     const scopeEl = document.getElementById('headerScope');
-    if (scopeEl) {
-        if (user.role === 'super_admin' || user.role === 'admin_kab') {
-            scopeEl.textContent = '';
-        } else if (user.role === 'operator' && user.lembaga_id) {
-            supabaseClient
-                .from('lembaga')
-                .select('nama')
-                .eq('id', user.lembaga_id)
-                .single()
-                .then(({ data }) => {
-                    scopeEl.textContent = `🏫 ${data?.nama || 'Lembaga'}`;
-                })
-                .catch(err => console.error('Error fetching lembaga:', err));
-        } else if (user.kecamatan_id) {
-            supabaseClient
-                .from('master_kecamatan')
-                .select('nama')
-                .eq('id', user.kecamatan_id)
-                .single()
-                .then(({ data }) => {
-                    const jenis = {
-                        'batko': 'LPQ',
-                        'fkdt': 'MDT',
-                        'ponpes': 'PONPES'
-                    };
-                    scopeEl.textContent = `📍 ${data?.nama || 'Kecamatan'} • ${jenis[user.role] || ''}`;
-                })
-                .catch(err => console.error('Error fetching kecamatan:', err));
-        }
+    if (!scopeEl) return;
+    
+    if (user.role === 'operator' && user.lembaga_id) {
+        supabaseClient.from('lembaga').select('nama').eq('id', user.lembaga_id).single()
+            .then(({ data }) => { scopeEl.textContent = `🏫 ${data?.nama || 'Lembaga'}`; })
+            .catch(() => {});
+    } else if (user.kecamatan_id) {
+        supabaseClient.from('master_kecamatan').select('nama').eq('id', user.kecamatan_id).single()
+            .then(({ data }) => {
+                const jenis = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
+                scopeEl.textContent = `📍 ${data?.nama || 'Kecamatan'} • ${jenis[user.role] || ''}`;
+            })
+            .catch(() => {});
     }
 }
 
 function updateWelcomeUI(user) {
     if (!user) return;
     
-    const welcomeName = document.getElementById('welcomeName');
-    if (welcomeName) welcomeName.textContent = user.name;
+    const setText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    };
     
+    setText('welcomeName', user.name);
+
     const roleNames = {
         'super_admin': 'Super Admin SI-MUSTAFA',
         'admin_kab': 'Admin Kemenag Kabupaten Tegal',
@@ -2304,61 +2310,33 @@ function updateWelcomeUI(user) {
     let roleText = roleNames[user.role] || user.role;
     
     if (user.role === 'operator' && user.lembaga_id) {
-        supabaseClient
-            .from('lembaga')
-            .select('nama')
-            .eq('id', user.lembaga_id)
-            .single()
-            .then(({ data }) => {
-                const welcomeRole = document.getElementById('welcomeRole');
-                if (welcomeRole) {
-                    welcomeRole.textContent = `Operator ${data?.nama || 'Lembaga'}`;
-                }
-            })
-            .catch(() => {
-                const welcomeRole = document.getElementById('welcomeRole');
-                if (welcomeRole) welcomeRole.textContent = roleText;
-            });
+        supabaseClient.from('lembaga').select('nama').eq('id', user.lembaga_id).single()
+            .then(({ data }) => setText('welcomeRole', `Operator ${data?.nama || 'Lembaga'}`))
+            .catch(() => setText('welcomeRole', roleText));
     } else if (['batko', 'fkdt', 'ponpes'].includes(user.role) && user.kecamatan_id) {
-        supabaseClient
-            .from('master_kecamatan')
-            .select('nama')
-            .eq('id', user.kecamatan_id)
-            .single()
+        supabaseClient.from('master_kecamatan').select('nama').eq('id', user.kecamatan_id).single()
             .then(({ data }) => {
-                const jenis = {
-                    'batko': 'LPQ',
-                    'fkdt': 'MDT',
-                    'ponpes': 'PONPES'
-                };
-                const welcomeRole = document.getElementById('welcomeRole');
-                if (welcomeRole) {
-                    welcomeRole.textContent = `Admin ${jenis[user.role] || ''} ${data?.nama || 'Kecamatan'}`;
-                }
+                const jenis = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
+                setText('welcomeRole', `Admin ${jenis[user.role] || ''} ${data?.nama || 'Kecamatan'}`);
             })
-            .catch(() => {
-                const welcomeRole = document.getElementById('welcomeRole');
-                if (welcomeRole) welcomeRole.textContent = roleText;
-            });
+            .catch(() => setText('welcomeRole', roleText));
     } else {
-        const welcomeRole = document.getElementById('welcomeRole');
-        if (welcomeRole) welcomeRole.textContent = roleText;
+        setText('welcomeRole', roleText);
     }
 }
 
 // ============================================================
-// ===== HANDLE LOGOUT =====
+// ===== LOGOUT =====
 // ============================================================
 async function handleLogout() {
     if (!confirm('Apakah Anda yakin ingin keluar?')) return;
     try {
+        if (autoRefreshTimer) clearInterval(autoRefreshTimer);
         const { error } = await supabaseClient.auth.signOut();
         if (error) throw error;
         CacheManager.clear();
         showToast('Logout berhasil!', 'success');
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 1000);
+        setTimeout(() => window.location.href = 'index.html', 1000);
     } catch (e) {
         console.error('Logout error:', e);
         showToast('Gagal logout: ' + e.message, 'error');
@@ -2366,88 +2344,68 @@ async function handleLogout() {
 }
 
 // ============================================================
-// ===== BATCH FETCHING UTILITY =====
+// ===== BATCH FETCHER =====
 // ============================================================
 const BatchFetcher = {
-    async fetchAll(table, query = {}, batchSize = 1000, orderBy = 'id', ascending = true) {
+    async fetchAll(table, query = {}, batchSize = 1000, orderBy = 'id', ascending = true, countOnly = false) {
+        const selectCols = query.select || '*';
+        
+        if (countOnly) {
+            let q = supabaseClient.from(table).select('*', { count: 'exact', head: true });
+            q = this._applyFilters(q, query);
+            const { count, error } = await q;
+            if (error) throw error;
+            return count || 0;
+        }
+        
         let allData = [];
         let start = 0;
         let hasMore = true;
         
-        console.log(`[BatchFetcher] Mulai mengambil data dari tabel: ${table}`);
-        
         while (hasMore) {
-            try {
-                let supabaseQuery = supabaseClient
-                    .from(table)
-                    .select('*')
-                    .order(orderBy, { ascending })
-                    .range(start, start + batchSize - 1);
-                
-                if (query.filters) {
-                    Object.keys(query.filters).forEach(key => {
-                        const filter = query.filters[key];
-                        if (filter.operator === 'eq') {
-                            supabaseQuery = supabaseQuery.eq(key, filter.value);
-                        } else if (filter.operator === 'neq') {
-                            supabaseQuery = supabaseQuery.neq(key, filter.value);
-                        } else if (filter.operator === 'gt') {
-                            supabaseQuery = supabaseQuery.gt(key, filter.value);
-                        } else if (filter.operator === 'gte') {
-                            supabaseQuery = supabaseQuery.gte(key, filter.value);
-                        } else if (filter.operator === 'lt') {
-                            supabaseQuery = supabaseQuery.lt(key, filter.value);
-                        } else if (filter.operator === 'lte') {
-                            supabaseQuery = supabaseQuery.lte(key, filter.value);
-                        } else if (filter.operator === 'like') {
-                            supabaseQuery = supabaseQuery.like(key, filter.value);
-                        } else if (filter.operator === 'in') {
-                            supabaseQuery = supabaseQuery.in(key, filter.value);
-                        } else if (filter.operator === 'or') {
-                            supabaseQuery = supabaseQuery.or(filter.value);
-                        } else if (filter.operator === 'is') {
-                            supabaseQuery = supabaseQuery.is(key, filter.value);
-                        }
-                    });
-                }
-                
-                if (query.notNull) {
-                    Object.keys(query.notNull).forEach(key => {
-                        supabaseQuery = supabaseQuery.not(key, 'is', null);
-                    });
-                }
-                
-                const { data, error } = await supabaseQuery;
-                
-                if (error) {
-                    console.error(`[BatchFetcher] Error pada batch:`, error);
-                    throw error;
-                }
-                
-                if (!data || data.length === 0) {
-                    hasMore = false;
-                    break;
-                }
-                
-                allData = allData.concat(data);
-                console.log(`[BatchFetcher] Batch: ${data.length} data, Total: ${allData.length}`);
-                
-                start += batchSize;
-                
-                if (data.length < batchSize) {
-                    hasMore = false;
-                }
-                
-                await new Promise(resolve => setTimeout(resolve, 100));
-                
-            } catch (error) {
-                console.error('[BatchFetcher] Error:', error);
-                throw error;
-            }
+            let supabaseQuery = supabaseClient
+                .from(table)
+                .select(selectCols)
+                .order(orderBy, { ascending })
+                .range(start, start + batchSize - 1);
+            
+            supabaseQuery = this._applyFilters(supabaseQuery, query);
+            
+            const { data, error } = await supabaseQuery;
+            if (error) throw error;
+            if (!data || data.length === 0) break;
+            
+            allData = allData.concat(data);
+            
+            if (data.length < batchSize) hasMore = false;
+            else start += batchSize;
         }
         
-        console.log(`[BatchFetcher] Selesai! Total data: ${allData.length}`);
         return allData;
+    },
+    
+    _applyFilters(q, query) {
+        if (query.filters) {
+            Object.keys(query.filters).forEach(key => {
+                const f = query.filters[key];
+                const { operator, value } = f;
+                if (operator === 'eq') q = q.eq(key, value);
+                else if (operator === 'neq') q = q.neq(key, value);
+                else if (operator === 'gt') q = q.gt(key, value);
+                else if (operator === 'gte') q = q.gte(key, value);
+                else if (operator === 'lt') q = q.lt(key, value);
+                else if (operator === 'lte') q = q.lte(key, value);
+                else if (operator === 'like') q = q.like(key, value);
+                else if (operator === 'ilike') q = q.ilike(key, value);
+                else if (operator === 'in') q = q.in(key, value);
+                else if (operator === 'or') q = q.or(value);
+                else if (operator === 'is') q = q.is(key, value);
+            });
+        }
+        if (query.notNull) {
+            Object.keys(query.notNull).forEach(key => { q = q.not(key, 'is', null); });
+        }
+        return q;
     }
 };
 
@@ -2458,7 +2416,6 @@ async function loadDashboard(forceRefresh = false) {
     try {
         const user = getUser();
         const filter = getRoleFilter();
-        const cacheKey = `dashboard_${JSON.stringify(filter)}`;
 
         if (filter.restrict) {
             document.querySelector('.stats-grid').innerHTML = `
@@ -2470,59 +2427,32 @@ async function loadDashboard(forceRefresh = false) {
             return;
         }
 
+        const cacheKey = `dashboard_${user.id}_${JSON.stringify(filter)}`;
+        
         if (!forceRefresh) {
-            const cachedData = CacheManager.get(cacheKey);
-            if (cachedData) {
-                updateDashboardStats(cachedData);
+            const cached = CacheManager.get(cacheKey);
+            if (cached) {
+                updateDashboardStats(cached);
                 showFilterInfo(filter);
                 return;
             }
         }
 
-        // Build filters
-        const lembagaFilters = {};
-        const pendidikFilters = {};
-        const bantuanFilters = {};
-        
-        pendidikFilters.status_aktif = { operator: 'eq', value: true };
-        bantuanFilters.tahun_anggaran = { operator: 'eq', value: new Date().getFullYear() };
-        bantuanFilters.status = { operator: 'eq', value: 'cair' };
+        const { data, error } = await supabaseClient.rpc('get_dashboard_stats', {
+            p_kecamatan_id: filter.kecamatan_id || null,
+            p_lembaga_id: filter.lembaga_id || null,
+            p_jenis_lembaga: filter.jenis_lembaga || null
+        });
 
-        if (filter.lembaga_id) {
-            lembagaFilters.id = { operator: 'eq', value: filter.lembaga_id };
-            pendidikFilters.lembaga_id = { operator: 'eq', value: filter.lembaga_id };
-            bantuanFilters.lembaga_id = { operator: 'eq', value: filter.lembaga_id };
-        }
+        if (error) throw error;
 
-        if (filter.kecamatan_id) {
-            lembagaFilters.kecamatan_id = { operator: 'eq', value: filter.kecamatan_id };
-            pendidikFilters.kecamatan_lembaga_id = { operator: 'or', value: `kecamatan_lembaga_id.eq.${filter.kecamatan_id},kecamatan_pengajar_id.eq.${filter.kecamatan_id}` };
-            bantuanFilters.kecamatan_id = { operator: 'eq', value: filter.kecamatan_id };
-        }
-        
-        if (filter.jenis_lembaga) {
-            lembagaFilters.jenis_lembaga = { operator: 'eq', value: filter.jenis_lembaga };
-            pendidikFilters.jenis_lembaga = { operator: 'eq', value: filter.jenis_lembaga };
-            bantuanFilters.jenis_lembaga = { operator: 'eq', value: filter.jenis_lembaga };
-        }
-
-        const [kecamatanResult, kelurahanResult, lembagaResult, pendidikResult, bantuanResult] = await Promise.all([
-            supabaseClient.from('master_kecamatan').select('*', { count: 'exact', head: true }),
-            supabaseClient.from('master_kelurahan').select('*', { count: 'exact', head: true }),
-            BatchFetcher.fetchAll('lembaga', { filters: lembagaFilters }, 1000, 'id', true),
-            BatchFetcher.fetchAll('pendidik', { filters: pendidikFilters }, 1000, 'id', true),
-            BatchFetcher.fetchAll('bantuan', { filters: bantuanFilters }, 1000, 'id', true)
-        ]);
-
-        CacheManager.set('master_kecamatan', kecamatanResult.count || 0);
-        CacheManager.set('master_kelurahan', kelurahanResult.count || 0);
-
+        const row = Array.isArray(data) ? data[0] : data;
         const statsData = {
-            kecamatan: kecamatanResult.count || 0,
-            kelurahan: kelurahanResult.count || 0,
-            lembaga: lembagaResult.length || 0,
-            pendidik: pendidikResult.length || 0,
-            bantuan: bantuanResult.length || 0
+            kecamatan: Number(row?.total_kecamatan || 0),
+            kelurahan: Number(row?.total_kelurahan || 0),
+            lembaga: Number(row?.total_lembaga || 0),
+            pendidik: Number(row?.total_pendidik || 0),
+            bantuan: Number(row?.total_bantuan || 0)
         };
 
         CacheManager.set(cacheKey, statsData);
@@ -2536,11 +2466,15 @@ async function loadDashboard(forceRefresh = false) {
 }
 
 function updateDashboardStats(data) {
-    document.getElementById('totalKecamatan').textContent = data.kecamatan || 0;
-    document.getElementById('totalKelurahan').textContent = data.kelurahan || 0;
-    document.getElementById('totalLembaga').textContent = data.lembaga || 0;
-    document.getElementById('totalPendidik').textContent = data.pendidik || 0;
-    document.getElementById('totalBantuan').textContent = data.bantuan || 0;
+    const setText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    };
+    setText('totalKecamatan', data.kecamatan || 0);
+    setText('totalKelurahan', data.kelurahan || 0);
+    setText('totalLembaga', data.lembaga || 0);
+    setText('totalPendidik', data.pendidik || 0);
+    setText('totalBantuan', data.bantuan || 0);
 }
 
 function showFilterInfo(filter) {
@@ -2553,43 +2487,29 @@ function showFilterInfo(filter) {
     filterInfoEl.style.color = '#888';
 
     if (filter.lembaga_id) {
-        supabaseClient
-            .from('lembaga')
-            .select('nama, jenis_lembaga')
-            .eq('id', filter.lembaga_id)
-            .single()
+        supabaseClient.from('lembaga').select('nama, jenis_lembaga').eq('id', filter.lembaga_id).single()
             .then(({ data }) => {
                 infoText.textContent = `Menampilkan: ${data?.nama || 'Lembaga'} (${data?.jenis_lembaga || 'Semua'})`;
                 filterInfoEl.style.background = '#e8f5e9';
                 filterInfoEl.style.borderLeftColor = '#2e7d32';
                 filterInfoEl.style.color = '#2e7d32';
             })
-            .catch(() => {
-                infoText.textContent = 'Menampilkan data lembaga';
-            });
+            .catch(() => { infoText.textContent = 'Menampilkan data lembaga'; });
         return;
     }
 
     if (filter.kecamatan_id) {
-        supabaseClient
-            .from('master_kecamatan')
-            .select('nama')
-            .eq('id', filter.kecamatan_id)
-            .single()
+        supabaseClient.from('master_kecamatan').select('nama').eq('id', filter.kecamatan_id).single()
             .then(({ data }) => {
                 const jenisNames = { 'LPQ': 'LPQ (BADKO)', 'MDT': 'MDT (FKDT)', 'PONPES': 'PONPES' };
                 let text = `Menampilkan: Kecamatan ${data?.nama || ''}`;
-                if (filter.jenis_lembaga) {
-                    text += ` - ${jenisNames[filter.jenis_lembaga] || filter.jenis_lembaga}`;
-                }
+                if (filter.jenis_lembaga) text += ` - ${jenisNames[filter.jenis_lembaga] || filter.jenis_lembaga}`;
                 infoText.textContent = text;
                 filterInfoEl.style.background = '#e8f5e9';
                 filterInfoEl.style.borderLeftColor = '#2e7d32';
                 filterInfoEl.style.color = '#2e7d32';
             })
-            .catch(() => {
-                infoText.textContent = 'Menampilkan data dengan filter';
-            });
+            .catch(() => { infoText.textContent = 'Menampilkan data dengan filter'; });
         return;
     }
 
@@ -2597,13 +2517,13 @@ function showFilterInfo(filter) {
 }
 
 // ============================================================
-// ===== LOAD SEBARAN DATA =====
+// ===== LOAD SEBARAN =====
 // ============================================================
 async function loadSebaranData(forceRefresh = false) {
     try {
         const user = getUser();
         const roleFilter = getRoleFilter();
-        
+
         if (roleFilter.restrict) {
             document.querySelector('.sebaran-section').innerHTML = `
                 <div style="grid-column:1/-1;text-align:center;padding:40px;color:#f44336;">
@@ -2616,67 +2536,40 @@ async function loadSebaranData(forceRefresh = false) {
 
         await loadKecamatanDropdown();
 
-        const cacheKey = `sebaran_${JSON.stringify({...roleFilter, ...currentFilter})}`;
+        const effectiveKecamatanId = roleFilter.kecamatan_id || currentFilter.kecamatan_id || null;
+        const effectiveLembagaId   = roleFilter.lembaga_id || null;
+        const effectiveJenis       = roleFilter.jenis_lembaga || 
+                                     (currentFilter.jenis && currentFilter.jenis !== 'all' ? currentFilter.jenis : null);
+
+        const cacheKey = `sebaran_${user.id}_${JSON.stringify({
+            k: effectiveKecamatanId, l: effectiveLembagaId, j: effectiveJenis
+        })}`;
+
         let sebaranData = null;
+        if (!forceRefresh) sebaranData = CacheManager.get(cacheKey);
 
-        if (!forceRefresh) {
-            sebaranData = CacheManager.get(cacheKey);
-        }
+        if (!sebaranData) {
+            const { data, error } = await supabaseClient.rpc('get_sebaran_pendidik', {
+                p_kecamatan_id: effectiveKecamatanId,
+                p_lembaga_id: effectiveLembagaId,
+                p_jenis_lembaga: effectiveJenis
+            });
 
-        if (!sebaranData || forceRefresh) {
-            const filters = {};
-            const notNull = {};
-            
-            notNull.jenis_lembaga = true;
-            
-            if (roleFilter.lembaga_id) {
-                filters.lembaga_id = { operator: 'eq', value: roleFilter.lembaga_id };
-            }
+            if (error) throw error;
 
-            if (roleFilter.kecamatan_id) {
-                filters.kecamatan_lembaga_id = { operator: 'or', value: `kecamatan_lembaga_id.eq.${roleFilter.kecamatan_id},kecamatan_pengajar_id.eq.${roleFilter.kecamatan_id}` };
-            }
-
-            if (roleFilter.jenis_lembaga) {
-                filters.jenis_lembaga = { operator: 'eq', value: roleFilter.jenis_lembaga };
-            }
-
-            if (currentFilter.jenis && currentFilter.jenis !== 'all') {
-                filters.jenis_lembaga = { operator: 'eq', value: currentFilter.jenis };
-            }
-
-            if (currentFilter.kecamatan_id) {
-                filters.kecamatan_lembaga_id = { operator: 'or', value: `kecamatan_lembaga_id.eq.${currentFilter.kecamatan_id},kecamatan_pengajar_id.eq.${currentFilter.kecamatan_id}` };
-            }
-
-            if (currentFilter.desa_id) {
-                filters.desa_lembaga = { operator: 'or', value: `desa_lembaga.eq.${currentFilter.desa_id},desa_pengajar.eq.${currentFilter.desa_id}` };
-            }
-
-            filters.status_aktif = { operator: 'eq', value: true };
-
-            const result = await BatchFetcher.fetchAll('pendidik', {
-                filters,
-                notNull
-            }, 1000, 'id', true);
-
-            const data = result;
-            console.log(`[Sebaran] Total data pendidik aktif: ${data.length}`);
-
-            const lpq = (data || []).filter(d => d.jenis_lembaga === 'LPQ').length;
-            const mdt = (data || []).filter(d => d.jenis_lembaga === 'MDT').length;
-            const ponpes = (data || []).filter(d => d.jenis_lembaga === 'PONPES').length;
-            const lainnya = (data || []).filter(d => d.jenis_lembaga && !['LPQ', 'MDT', 'PONPES'].includes(d.jenis_lembaga)).length;
-            const total = lpq + mdt + ponpes + lainnya;
+            const rows = Array.isArray(data) ? data : [];
+            const lpq    = Number(rows.find(r => r.jenis === 'LPQ')?.jumlah || 0);
+            const mdt    = Number(rows.find(r => r.jenis === 'MDT')?.jumlah || 0);
+            const ponpes = Number(rows.find(r => r.jenis === 'PONPES')?.jumlah || 0);
+            const lain   = rows
+                .filter(r => !['LPQ','MDT','PONPES'].includes(r.jenis))
+                .reduce((s, r) => s + Number(r.jumlah || 0), 0);
 
             sebaranData = {
-                lpq,
-                mdt,
-                ponpes,
-                lainnya,
-                total,
+                lpq, mdt, ponpes, lainnya: lain,
+                total: lpq + mdt + ponpes + lain,
                 labels: ['LPQ', 'MDT', 'PONPES', 'Lainnya'],
-                values: [lpq, mdt, ponpes, lainnya],
+                values: [lpq, mdt, ponpes, lain],
                 colors: ['#4CAF50', '#2196F3', '#9C27B0', '#FF9800']
             };
 
@@ -2687,35 +2580,27 @@ async function loadSebaranData(forceRefresh = false) {
         updateDetailInfo(sebaranData);
         updateFilterTag();
 
-        if (currentFilter.kecamatan_id) {
-            await loadDesaDropdown(currentFilter.kecamatan_id);
-        }
-
     } catch (e) {
         console.error('Error loading sebaran data:', e);
         showToast('Gagal memuat data sebaran: ' + e.message, 'error');
     }
 }
 
-// ============================================================
-// ===== UPDATE SEBARAN CHARTS =====
-// ============================================================
 function updateSebaranCharts(data) {
     const total = data.total;
-    document.getElementById('donutTotal').textContent = total;
-    document.getElementById('barTotal').textContent = total;
+    const setText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    };
+    setText('donutTotal', total);
+    setText('barTotal', total);
 
+    const order = ['LPQ', 'MDT', 'PONPES', 'Lainnya'];
+    const colorMap = { 'LPQ': '#4CAF50', 'MDT': '#2196F3', 'PONPES': '#9C27B0', 'Lainnya': '#FF9800' };
+    
     const filteredLabels = [];
     const filteredValues = [];
     const filteredColors = [];
-    
-    const order = ['LPQ', 'MDT', 'PONPES', 'Lainnya'];
-    const colorMap = {
-        'LPQ': '#4CAF50',
-        'MDT': '#2196F3',
-        'PONPES': '#9C27B0',
-        'Lainnya': '#FF9800'
-    };
     
     order.forEach(label => {
         const index = data.labels.indexOf(label);
@@ -2726,75 +2611,42 @@ function updateSebaranCharts(data) {
         }
     });
 
-    // Donut Chart
     const donutCtx = document.getElementById('donutChart');
     if (donutCtx) {
-        if (donutChartInstance) {
-            donutChartInstance.destroy();
-        }
+        if (donutChartInstance) { donutChartInstance.destroy(); donutChartInstance = null; }
 
         if (filteredValues.length === 0) {
             donutChartInstance = new Chart(donutCtx, {
                 type: 'doughnut',
-                data: {
-                    labels: ['Tidak Ada Data'],
-                    datasets: [{
-                        data: [1],
-                        backgroundColor: ['#e0e0e0'],
-                        borderWidth: 0
-                    }]
-                },
+                data: { labels: ['Tidak Ada Data'], datasets: [{ data: [1], backgroundColor: ['#e0e0e0'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, cutout: '70%' }
+            });
+        } else {
+            donutChartInstance = new Chart(donutCtx, {
+                type: 'doughnut',
+                data: { labels: filteredLabels, datasets: [{ data: filteredValues, backgroundColor: filteredColors, borderWidth: 3, borderColor: '#fff' }] },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { enabled: false }
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
                     },
                     cutout: '70%'
                 }
             });
-            return;
         }
-
-        donutChartInstance = new Chart(donutCtx, {
-            type: 'doughnut',
-            data: {
-                labels: filteredLabels,
-                datasets: [{
-                    data: filteredValues,
-                    backgroundColor: filteredColors,
-                    borderWidth: 3,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                                return `${context.label}: ${context.parsed} (${percentage}%)`;
-                            }
-                        }
-                    }
-                },
-                cutout: '70%'
-            }
-        });
     }
 
-    // Bar Chart
     const barCtx = document.getElementById('barChart');
     if (barCtx) {
-        if (barChartInstance) {
-            barChartInstance.destroy();
-        }
+        if (barChartInstance) { barChartInstance.destroy(); barChartInstance = null; }
 
         const usedColors = filteredLabels.map(label => colorMap[label] || '#888');
 
@@ -2812,35 +2664,17 @@ function updateSebaranCharts(data) {
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1,
-                            font: { size: 10 }
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            font: { size: 11, weight: 'bold' }
-                        }
-                    }
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } },
+                    x: { ticks: { font: { size: 11, weight: 'bold' } } }
                 }
             }
         });
     }
 }
 
-// ============================================================
-// ===== UPDATE DETAIL INFO =====
-// ============================================================
 function updateDetailInfo(data) {
     const detailInfo = document.getElementById('detailInfo');
     if (!detailInfo) return;
@@ -2852,9 +2686,7 @@ function updateDetailInfo(data) {
         { label: 'PONPES', value: data.ponpes, color: '#9C27B0' }
     ];
     
-    if (data.lainnya && data.lainnya > 0) {
-        items.push({ label: 'Lainnya', value: data.lainnya, color: '#FF9800' });
-    }
+    if (data.lainnya > 0) items.push({ label: 'Lainnya', value: data.lainnya, color: '#FF9800' });
 
     detailInfo.innerHTML = items.map(item => {
         const percentage = total > 0 ? ((item.value / total) * 100).toFixed(1) : 0;
@@ -2894,65 +2726,61 @@ async function loadKecamatanDropdown() {
         const select = document.getElementById('filterKecamatan');
         if (!select) return;
 
-        // Hapus event listener lama untuk menghindari duplikasi
         const newSelect = select.cloneNode(true);
         select.parentNode.replaceChild(newSelect, select);
         const freshSelect = document.getElementById('filterKecamatan');
 
         const cached = CacheManager.get('master_kecamatan_list');
         let kecamatanData;
-
+        
         if (cached) {
             kecamatanData = cached;
         } else {
-            const result = await BatchFetcher.fetchAll('master_kecamatan', {}, 1000, 'nama', true);
-            kecamatanData = result;
+            const { data, error } = await supabaseClient.rpc('get_kecamatan_list');
+            if (error) {
+                console.warn('RPC get_kecamatan_list error, fallback:', error);
+                const fallback = await BatchFetcher.fetchAll('master_kecamatan', {
+                    select: 'id, nama'
+                }, 1000, 'nama', true);
+                kecamatanData = fallback;
+            } else {
+                kecamatanData = data || [];
+            }
             CacheManager.set('master_kecamatan_list', kecamatanData);
         }
 
         freshSelect.innerHTML = '<option value="">Semua Kecamatan</option>';
-        
         kecamatanData.forEach(k => {
             const option = document.createElement('option');
             option.value = k.id;
             option.textContent = k.nama;
-            if (currentFilter.kecamatan_id === k.id) {
-                option.selected = true;
-            }
+            if (currentFilter.kecamatan_id === k.id) option.selected = true;
             freshSelect.appendChild(option);
         });
 
-        // === AUTO FILTER: Event listener untuk perubahan kecamatan ===
         freshSelect.addEventListener('change', function() {
             const value = this.value;
             currentFilter.kecamatan_id = value || null;
-            currentFilter.desa_id = null; // Reset desa
+            currentFilter.desa_id = null;
             
-            // Reset dropdown desa
             const desaSelect = document.getElementById('filterDesa');
-            if (desaSelect) {
-                desaSelect.innerHTML = '<option value="">Semua Desa</option>';
-            }
+            if (desaSelect) desaSelect.innerHTML = '<option value="">Semua Desa</option>';
             
             if (value) {
-                loadDesaDropdown(value).then(() => {
-                    loadSebaranData(true);
-                    showToast(`Filter: Kecamatan ${this.options[this.selectedIndex].text}`, 'info');
-                });
+                loadDesaDropdown(value).then(() => loadSebaranData(true));
+                showToast(`Filter: Kecamatan ${this.options[this.selectedIndex].text}`, 'info');
             } else {
                 loadSebaranData(true);
                 showToast('Filter: Semua Kecamatan', 'info');
             }
         });
 
-        const user = getUser();
-        if (user && user.kecamatan_id && !currentFilter.kecamatan_id) {
-            const roleFilter = getRoleFilter();
-            if (roleFilter.kecamatan_id) {
-                currentFilter.kecamatan_id = roleFilter.kecamatan_id;
-                freshSelect.value = roleFilter.kecamatan_id;
-                await loadDesaDropdown(roleFilter.kecamatan_id);
-            }
+        const roleFilter = getRoleFilter();
+        if (roleFilter.kecamatan_id) {
+            if (!currentFilter.kecamatan_id) currentFilter.kecamatan_id = roleFilter.kecamatan_id;
+            freshSelect.value = roleFilter.kecamatan_id;
+            freshSelect.disabled = true;
+            await loadDesaDropdown(roleFilter.kecamatan_id);
         }
 
     } catch (e) {
@@ -2968,7 +2796,6 @@ async function loadDesaDropdown(kecamatanId) {
         const select = document.getElementById('filterDesa');
         if (!select) return;
 
-        // Hapus event listener lama
         const newSelect = select.cloneNode(true);
         select.parentNode.replaceChild(newSelect, select);
         const freshSelect = document.getElementById('filterDesa');
@@ -2985,35 +2812,37 @@ async function loadDesaDropdown(kecamatanId) {
         if (cached) {
             desaData = cached;
         } else {
-            const result = await BatchFetcher.fetchAll('master_kelurahan', {
-                filters: {
-                    kecamatan_id: { operator: 'eq', value: kecamatanId }
-                }
-            }, 1000, 'nama', true);
-            desaData = result;
+            const { data, error } = await supabaseClient.rpc('get_desa_list', {
+                p_kecamatan_id: kecamatanId
+            });
+            
+            if (error) {
+                console.warn('RPC get_desa_list error, fallback:', error);
+                desaData = await BatchFetcher.fetchAll('master_kelurahan', {
+                    select: 'id, nama',
+                    filters: { kecamatan_id: { operator: 'eq', value: kecamatanId } }
+                }, 1000, 'nama', true);
+            } else {
+                desaData = data || [];
+            }
             CacheManager.set(cacheKey, desaData);
         }
 
         freshSelect.innerHTML = '<option value="">Semua Desa</option>';
-        
         desaData.forEach(d => {
             const option = document.createElement('option');
             option.value = d.id;
             option.textContent = d.nama;
-            if (currentFilter.desa_id === d.id) {
-                option.selected = true;
-            }
+            if (currentFilter.desa_id === d.id) option.selected = true;
             freshSelect.appendChild(option);
         });
 
-        // === AUTO FILTER: Event listener untuk perubahan desa ===
         freshSelect.addEventListener('change', function() {
             const value = this.value;
             currentFilter.desa_id = value || null;
             loadSebaranData(true);
             if (value) {
-                const text = this.options[this.selectedIndex]?.text || 'Desa';
-                showToast(`Filter: Desa ${text}`, 'info');
+                showToast(`Filter: Desa ${this.options[this.selectedIndex]?.text || 'Desa'}`, 'info');
             } else {
                 showToast('Filter: Semua Desa', 'info');
             }
@@ -3025,15 +2854,13 @@ async function loadDesaDropdown(kecamatanId) {
 }
 
 // ============================================================
-// ===== FILTER FUNCTIONS =====
+// ===== FILTER ACTIONS =====
 // ============================================================
 function applyJenjangFilter(jenis) {
     currentFilter.jenis = jenis;
-    
     document.querySelectorAll('.filter-group .filter-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.filter === jenis);
     });
-    
     loadSebaranData(true);
     showToast(`Menampilkan data ${jenis === 'all' ? 'semua jenjang' : jenis}`, 'info');
 }
@@ -3046,9 +2873,7 @@ function clearLocationFilter() {
     const desaSelect = document.getElementById('filterDesa');
     
     if (kecSelect) kecSelect.value = '';
-    if (desaSelect) {
-        desaSelect.innerHTML = '<option value="">Semua Desa</option>';
-    }
+    if (desaSelect) desaSelect.innerHTML = '<option value="">Semua Desa</option>';
     
     loadSebaranData(true);
     showToast('Filter reset ke semua data', 'info');
@@ -3057,14 +2882,11 @@ function clearLocationFilter() {
 function updateFilterTag() {
     const tag = document.getElementById('activeFilterTag');
     const text = document.getElementById('activeFilterText');
-    
     if (!tag || !text) return;
     
     const parts = [];
     
-    if (currentFilter.jenis && currentFilter.jenis !== 'all') {
-        parts.push(currentFilter.jenis);
-    }
+    if (currentFilter.jenis && currentFilter.jenis !== 'all') parts.push(currentFilter.jenis);
     
     if (currentFilter.kecamatan_id) {
         const select = document.getElementById('filterKecamatan');
@@ -3088,163 +2910,110 @@ function updateFilterTag() {
 }
 
 // ============================================================
-// ===== LOAD KYC DATA =====
+// ===== LOAD KYC DATA (Pakai RPC Search) =====
 // ============================================================
 async function loadKYCData(page = 1, forceRefresh = false) {
     try {
         const user = getUser();
         const filter = getRoleFilter();
-        const cacheKey = `kyc_stats_${JSON.stringify(filter)}`;
-        let statsData = null;
 
-        if (!forceRefresh) {
+        if (filter.restrict) {
+            document.getElementById('kycTableBody').innerHTML = 
+                `<tr><td colspan="6" style="text-align:center;padding:20px;color:#f44336;">
+                    <i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+                    Anda tidak memiliki akses ke data ini
+                </td></tr>`;
+            return;
+        }
+
+        const hasSearch = !!(kycSearchState.keyword || kycSearchState.status);
+        const cacheKey = `kyc_stats_${user.id}_${JSON.stringify(filter)}`;
+        let statsData = null;
+        
+        if (!forceRefresh && !hasSearch) {
             statsData = CacheManager.get(cacheKey);
         }
 
-        if (!statsData || forceRefresh) {
-            let baseQuery = supabaseClient
-                .from('pendidik')
-                .select('*', { count: 'exact', head: true })
-                .not('dokumen_kyc', 'is', null);
+        // ===== STATS (dari RPC get_kyc_stats) =====
+        if (!statsData) {
+            const { data, error } = await supabaseClient.rpc('get_kyc_stats', {
+                p_kecamatan_id: filter.kecamatan_id || null,
+                p_lembaga_id: filter.lembaga_id || null,
+                p_jenis_lembaga: filter.jenis_lembaga || null
+            });
 
-            if (filter.restrict) {
-                document.getElementById('kycTableBody').innerHTML = 
-                    `<tr><td colspan="6" style="text-align:center;padding:20px;color:#f44336;">
-                        <i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                        Anda tidak memiliki akses ke data ini
-                    </td></tr>`;
-                return;
-            }
+            if (error) throw error;
 
-            if (filter.lembaga_id) {
-                baseQuery = baseQuery.eq('lembaga_id', filter.lembaga_id);
-            }
-
-            // PERBAIKAN: Hanya gunakan kecamatan_lembaga_id
-            if (filter.kecamatan_id) {
-                baseQuery = baseQuery.eq('kecamatan_lembaga_id', filter.kecamatan_id);
-            }
-
-            if (filter.jenis_lembaga) {
-                baseQuery = baseQuery.eq('jenis_lembaga', filter.jenis_lembaga);
-            }
-
-            const { count, error: countError } = await baseQuery;
-
-            if (countError) {
-                console.error('Error count KYC:', countError);
-                throw countError;
-            }
-
-            let statusQuery = supabaseClient
-                .from('pendidik')
-                .select('status_verifikasi')
-                .not('dokumen_kyc', 'is', null);
-
-            if (filter.lembaga_id) {
-                statusQuery = statusQuery.eq('lembaga_id', filter.lembaga_id);
-            }
-
-            // PERBAIKAN: Hanya gunakan kecamatan_lembaga_id
-            if (filter.kecamatan_id) {
-                statusQuery = statusQuery.eq('kecamatan_lembaga_id', filter.kecamatan_id);
-            }
-
-            if (filter.jenis_lembaga) {
-                statusQuery = statusQuery.eq('jenis_lembaga', filter.jenis_lembaga);
-            }
-
-            const { data: statusData, error: statusError } = await statusQuery;
-
-            if (statusError) {
-                console.error('Error status KYC:', statusError);
-                throw statusError;
-            }
-
-            const pending = (statusData || []).filter(d => 
-                d.status_verifikasi === 'Pending' || 
-                d.status_verifikasi === 'Draft' || 
-                !d.status_verifikasi
-            ).length;
-            
-            const verified = (statusData || []).filter(d => 
-                d.status_verifikasi === 'Diverifikasi'
-            ).length;
-            
-            const rejected = (statusData || []).filter(d => 
-                d.status_verifikasi === 'Ditolak'
-            ).length;
-
+            const row = Array.isArray(data) ? data[0] : data;
             statsData = {
-                total: count || 0,
-                pending,
-                verified,
-                rejected
+                total: Number(row?.total || 0),
+                pending: Number(row?.pending || 0) + Number(row?.draft || 0),
+                verified: Number(row?.verified || 0),
+                rejected: Number(row?.rejected || 0)
             };
-
-            CacheManager.set(cacheKey, statsData);
+            
+            if (!hasSearch) CacheManager.set(cacheKey, statsData);
         }
 
-        document.getElementById('kycTotal').textContent = statsData.total;
-        document.getElementById('kycPending').textContent = statsData.pending;
-        document.getElementById('kycVerified').textContent = statsData.verified;
-        document.getElementById('kycRejected').textContent = statsData.rejected;
-        document.getElementById('kycPendingCount').textContent = statsData.pending;
+        const setText = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        };
+        
+        setText('kycTotal', statsData.total);
+        setText('kycPending', statsData.pending);
+        setText('kycVerified', statsData.verified);
+        setText('kycRejected', statsData.rejected);
+        setText('kycPendingCount', statsData.pending);
 
         const progress = statsData.total > 0 ? ((statsData.verified / statsData.total) * 100) : 0;
-        document.getElementById('kycProgressText').textContent = `${Math.round(progress)}%`;
-        document.getElementById('kycProgressBar').style.width = `${Math.min(progress, 100)}%`;
+        setText('kycProgressText', `${Math.round(progress)}%`);
+        const progressBar = document.getElementById('kycProgressBar');
+        if (progressBar) progressBar.style.width = `${Math.min(progress, 100)}%`;
 
-        totalKycData = statsData.total;
-
+        // ===== DATA TABEL (dari RPC search_kyc_pendidik) =====
         const offset = (page - 1) * ITEMS_PER_PAGE;
+
+        const { data: rpcData, error: rpcError } = await supabaseClient.rpc('search_kyc_pendidik', {
+            p_keyword: kycSearchState.keyword ? kycSearchState.keyword.trim() : null,
+            p_status: kycSearchState.status || null,
+            p_kecamatan_id: filter.kecamatan_id || null,
+            p_lembaga_id: filter.lembaga_id || null,
+            p_jenis_lembaga: filter.jenis_lembaga || null,
+            p_limit: ITEMS_PER_PAGE,
+            p_offset: offset
+        });
+
+        if (rpcError) throw rpcError;
+
+        // Map hasil RPC ke format yang diharapkan renderKYCTable
+        const rows = Array.isArray(rpcData) ? rpcData : [];
+        const mapped = rows.map(row => ({
+            id: row.id,
+            nama_lengkap: row.nama_lengkap,
+            nik: row.nik,
+            nslp_lembaga: row.nslp_lembaga,
+            status_verifikasi: row.status_verifikasi,
+            updated_at: row.updated_at,
+            jenis_lembaga: row.jenis_lembaga,
+            lembaga_id: row.lembaga_id,
+            lembaga: row.lembaga_nama ? {
+                id: row.lembaga_id,
+                nama: row.lembaga_nama,
+                nslp: row.lembaga_nslp
+            } : null
+        }));
+
+        // Total count dari kolom total_count di baris pertama
+        const totalResults = rows.length > 0 ? Number(rows[0].total_count || 0) : 0;
+
+        renderKYCTable(mapped, kycSearchState.keyword);
+        renderPagination(page, totalResults, hasSearch);
         
-        let dataQuery = supabaseClient
-            .from('pendidik')
-            .select(`
-                id,
-                nama_lengkap,
-                nik,
-                nslp_lembaga,
-                status_verifikasi,
-                updated_at,
-                kecamatan_lembaga_id,
-                kecamatan_pengajar_id,
-                jenis_lembaga,
-                lembaga_id,
-                lembaga:lembaga_id (
-                    id,
-                    nama,
-                    nslp,
-                    jenis_lembaga
-                )
-            `)
-            .not('dokumen_kyc', 'is', null);
+        if (hasSearch) showKycSearchInfo();
+        else hideKycSearchInfo();
 
-        if (filter.lembaga_id) {
-            dataQuery = dataQuery.eq('lembaga_id', filter.lembaga_id);
-        }
-
-        // PERBAIKAN: Hanya gunakan kecamatan_lembaga_id
-        if (filter.kecamatan_id) {
-            dataQuery = dataQuery.eq('kecamatan_lembaga_id', filter.kecamatan_id);
-        }
-
-        if (filter.jenis_lembaga) {
-            dataQuery = dataQuery.eq('jenis_lembaga', filter.jenis_lembaga);
-        }
-
-        const { data, error } = await dataQuery
-            .order('updated_at', { ascending: false })
-            .range(offset, offset + ITEMS_PER_PAGE - 1);
-
-        if (error) {
-            console.error('Error data KYC:', error);
-            throw error;
-        }
-
-        renderKYCTable(data || []);
-        renderPagination(page, statsData.total);
+        totalKycData = totalResults;
 
     } catch (e) {
         console.error('Error loading KYC data:', e);
@@ -3254,47 +3023,71 @@ async function loadKYCData(page = 1, forceRefresh = false) {
             </td></tr>`;
     }
 }
+// ============================================================
+// ===== HELPER: ESCAPE HTML =====
+// ============================================================
+function escapeHtml(text) {
+    if (text === null || text === undefined) return '-';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+}
 
 // ============================================================
-// ===== RENDER KYC TABLE =====
+// ===== RENDER KYC TABLE (dengan Highlight) =====
 // ============================================================
-function renderKYCTable(data) {
+function renderKYCTable(data, keyword = '') {
     const tbody = document.getElementById('kycTableBody');
 
     if (!data || data.length === 0) {
+        const hasSearch = kycSearchState.keyword || kycSearchState.status;
         tbody.innerHTML = `
-            <tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">
-                <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                Tidak ada data KYC
+            <tr><td colspan="6">
+                <div class="search-empty">
+                    <i class="fas fa-${hasSearch ? 'search-minus' : 'inbox'}"></i>
+                    <div><strong>${hasSearch ? 'Tidak ada hasil' : 'Tidak ada data KYC'}</strong></div>
+                    <div class="hint">
+                        ${hasSearch 
+                            ? 'Coba ubah kata kunci atau reset filter' 
+                            : 'Belum ada pengajuan verifikasi dokumen'}
+                    </div>
+                    ${hasSearch ? `
+                        <button onclick="clearKycSearch()" class="btn btn-outline btn-sm" style="margin-top:12px;">
+                            <i class="fas fa-times"></i> Reset Pencarian
+                        </button>
+                    ` : ''}
+                </div>
             </td></tr>
         `;
         return;
     }
 
+    const highlight = (text) => {
+        if (!keyword || !text) return escapeHtml(text || '-');
+        const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escaped})`, 'gi');
+        return escapeHtml(text).replace(regex, '<mark class="search-highlight">$1</mark>');
+    };
+
     tbody.innerHTML = data.map(item => {
         let statusClass = 'draft';
         let statusText = 'Draft';
-        if (item.status_verifikasi === 'Diverifikasi') {
-            statusClass = 'verified';
-            statusText = '✅ Terverifikasi';
-        } else if (item.status_verifikasi === 'Pending') {
-            statusClass = 'pending';
-            statusText = '⏳ Menunggu';
-        } else if (item.status_verifikasi === 'Ditolak') {
-            statusClass = 'rejected';
-            statusText = '❌ Ditolak';
-        }
+        if (item.status_verifikasi === 'Diverifikasi') { statusClass = 'verified'; statusText = '✅ Terverifikasi'; }
+        else if (item.status_verifikasi === 'Pending') { statusClass = 'pending'; statusText = '⏳ Menunggu'; }
+        else if (item.status_verifikasi === 'Ditolak') { statusClass = 'rejected'; statusText = '❌ Ditolak'; }
 
-        const isPending = item.status_verifikasi === 'Pending' || item.status_verifikasi === 'Draft' || !item.status_verifikasi;
+        const isPending = item.status_verifikasi === 'Pending' || 
+                          item.status_verifikasi === 'Draft' || 
+                          !item.status_verifikasi;
 
         return `
             <tr onclick="openKycModal('${item.id}')" style="cursor:pointer;${isPending ? 'background:#fffde7;' : ''}">
-                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><strong>${item.nama_lengkap || '-'}</strong></td>
-                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${item.nik || '-'}</code></td>
-                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;">${item.lembaga?.nama || item.nslp_lembaga || '-'}</td>
-                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><span class="kyc-status-badge ${statusClass}">${statusText}</span></td>
-                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
-                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;text-align:center;">
+                <td><strong>${highlight(item.nama_lengkap)}</strong></td>
+                <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${highlight(item.nik)}</code></td>
+                <td>${highlight(item.lembaga?.nama || item.nslp_lembaga)}</td>
+                <td><span class="kyc-status-badge ${statusClass}">${statusText}</span></td>
+                <td style="font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
+                <td style="text-align:center;">
                     ${isPending ? `
                         <span class="badge" style="background:#ff9800;color:white;font-size:0.6rem;padding:2px 10px;border-radius:12px;">
                             <i class="fas fa-clock"></i> Perlu Verifikasi
@@ -3313,7 +3106,7 @@ function renderKYCTable(data) {
 // ============================================================
 // ===== PAGINATION =====
 // ============================================================
-function renderPagination(currentPage, total) {
+function renderPagination(currentPage, total, isSearchMode = false) {
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     const info = document.getElementById('paginationInfo');
     const prevBtn = document.getElementById('prevPageBtn');
@@ -3323,7 +3116,7 @@ function renderPagination(currentPage, total) {
     if (!info) return;
 
     if (total === 0) {
-        info.textContent = 'Tidak ada data';
+        info.textContent = isSearchMode ? 'Tidak ada hasil' : 'Tidak ada data';
         prevBtn.disabled = true;
         nextBtn.disabled = true;
         pageNumbers.innerHTML = '';
@@ -3332,10 +3125,10 @@ function renderPagination(currentPage, total) {
 
     const start = ((currentPage - 1) * ITEMS_PER_PAGE) + 1;
     const end = Math.min(currentPage * ITEMS_PER_PAGE, total);
-    info.textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+    info.textContent = `Menampilkan ${start}-${end} dari ${total} data${isSearchMode ? ' (hasil pencarian)' : ''}`;
 
     prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.disabled = currentPage === totalPages || totalPages <= 1;
 
     let pagesHtml = '';
     const maxVisible = 5;
@@ -3376,7 +3169,134 @@ function changePage(direction) {
 }
 
 // ============================================================
-// ===== KYC MODAL FUNCTIONS =====
+// ===== KYC SEARCH FUNCTIONS =====
+// ============================================================
+function debounce(fn, delay) {
+    let timer;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+const handleKycSearch = debounce(function(value) {
+    kycSearchState.keyword = value.trim();
+    currentPage = 1;
+    loadKYCData(1);
+}, 400);
+
+function handleKycStatusFilter(value) {
+    kycSearchState.status = value;
+    currentPage = 1;
+    loadKYCData(1);
+}
+
+function clearKycSearch() {
+    kycSearchState.keyword = '';
+    kycSearchState.status = '';
+    
+    const input = document.getElementById('kycSearchInput');
+    const select = document.getElementById('kycStatusFilter');
+    const clearBtn = document.getElementById('kycClearSearch');
+    
+    if (input) input.value = '';
+    if (select) select.value = '';
+    if (clearBtn) clearBtn.style.display = 'none';
+    
+    currentPage = 1;
+    loadKYCData(1);
+    hideKycSearchInfo();
+}
+
+function showKycSearchInfo() {
+    const info = document.getElementById('kycSearchInfo');
+    const text = document.getElementById('kycSearchInfoText');
+    if (!info || !text) return;
+    
+    const parts = [];
+    if (kycSearchState.keyword) {
+        parts.push(`kata kunci "<strong>${escapeHtml(kycSearchState.keyword)}</strong>"`);
+    }
+    if (kycSearchState.status) {
+        const statusLabel = {
+            'Pending': '⏳ Menunggu',
+            'Diverifikasi': '✅ Terverifikasi',
+            'Ditolak': '❌ Ditolak',
+            'Draft': '📝 Draft'
+        };
+        parts.push(`status ${statusLabel[kycSearchState.status] || kycSearchState.status}`);
+    }
+    
+    if (parts.length > 0) {
+        text.innerHTML = `Filter aktif: ${parts.join(' • ')}`;
+        info.style.display = 'flex';
+    } else {
+        info.style.display = 'none';
+    }
+}
+
+function hideKycSearchInfo() {
+    const info = document.getElementById('kycSearchInfo');
+    if (info) info.style.display = 'none';
+}
+
+function refreshKycData() {
+    const btn = document.getElementById('kycRefreshBtn');
+    if (btn) {
+        btn.classList.add('spinning');
+        setTimeout(() => btn.classList.remove('spinning'), 1000);
+    }
+    currentPage = 1;
+    CacheManager.clear(`kyc_stats_${getUser().id}_${JSON.stringify(getRoleFilter())}`);
+    loadKYCData(1, true);
+    showToast('Data KYC diperbarui', 'success');
+}
+
+function initKycSearchListeners() {
+    const input = document.getElementById('kycSearchInput');
+    const clearBtn = document.getElementById('kycClearSearch');
+    const select = document.getElementById('kycStatusFilter');
+    const refreshBtn = document.getElementById('kycRefreshBtn');
+    
+    if (input) {
+        input.addEventListener('input', function(e) {
+            const val = e.target.value;
+            if (clearBtn) clearBtn.style.display = val ? 'flex' : 'none';
+            handleKycSearch(val);
+        });
+        
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                kycSearchState.keyword = e.target.value.trim();
+                currentPage = 1;
+                loadKYCData(1);
+            }
+        });
+    }
+    
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            if (input) input.value = '';
+            kycSearchState.keyword = '';
+            clearBtn.style.display = 'none';
+            currentPage = 1;
+            loadKYCData(1);
+        });
+    }
+    
+    if (select) {
+        select.addEventListener('change', function(e) {
+            handleKycStatusFilter(e.target.value);
+        });
+    }
+    
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', refreshKycData);
+    }
+}
+
+// ============================================================
+// ===== KYC MODAL =====
 // ============================================================
 function switchKycTab(tab, btn) {
     currentKycTab = tab;
@@ -3389,236 +3309,61 @@ function switchKycTab(tab, btn) {
         target.style.display = 'block';
         target.classList.add('active');
     }
-    document.querySelectorAll('.kyc-tabs .tab-btn').forEach(b => {
-        b.classList.remove('active');
-    });
-    if (btn) {
-        btn.classList.add('active');
-    }
+    document.querySelectorAll('.kyc-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
 }
-
-async function openKycModal(pendidikId) {
-    try {
-        const { data, error } = await supabaseClient
-            .from('pendidik')
-            .select(`
-                *,
-                lembaga:lembaga_id (
-                    id,
-                    nama,
-                    nslp,
-                    jenis_lembaga,
-                    alamat,
-                    kecamatan,
-                    desa
-                )
-            `)
-            .eq('id', pendidikId)
-            .single();
-
-        if (error) throw error;
-
-        currentKycPendidik = data;
-
-        const fields = [
-            'kycDetailNama', 'kycDetailNik', 'kycDetailTempatLahir',
-            'kycDetailTanggalLahir', 'kycDetailJenisKelamin',
-            'kycDetailStatusPerkawinan', 'kycDetailIbuKandung',
-            'kycDetailPendidikan', 'kycDetailAlamat', 'kycDetailNoHp',
-            'kycDetailEmail'
-        ];
-        
-        const values = [
-            data.nama_lengkap, data.nik, data.tempat_lahir,
-            data.tanggal_lahir, data.jenis_kelamin,
-            data.status_perkawinan, data.ibu_kandung,
-            data.pendidikan_terakhir, data.alamat, data.no_hp,
-            data.email
-        ];
-
-        fields.forEach((id, index) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = values[index] || '-';
-        });
-
-        const rekFields = [
-            'kycDetailNomorRekeningBupati', 'kycDetailNamaBankBupati',
-            'kycDetailPemilikRekeningBupati', 'kycDetailNomorRekeningGubernur',
-            'kycDetailNamaBankGubernur', 'kycDetailPemilikRekeningGubernur'
-        ];
-        
-        const rekValues = [
-            data.nomor_rekening_bupati, data.nama_bank_bupati,
-            data.pemilik_rekening_bupati, data.nomor_rekening_gubernur,
-            data.nama_bank_gubernur, data.pemilik_rekening_gubernur
-        ];
-
-        rekFields.forEach((id, index) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = rekValues[index] || '-';
-        });
-
-        const lembaga = data.lembaga || {};
-        
-        const mengajarFields = {
-            'kycDetailLembaga': lembaga.nama || data.nslp_lembaga || '-',
-            'kycDetailNslpLembaga': lembaga.nslp || data.nslp_lembaga || '-',
-            'kycDetailJenisLembaga': lembaga.jenis_lembaga || data.jenis_lembaga || '-',
-            'kycDetailKecamatanLembaga': data.kecamatan_lembaga || '-',
-            'kycDetailDesaLembaga': data.desa_lembaga || '-',
-            'kycDetailRtRw': data.rt_rw_pengajar || '-',
-            'kycDetailKecamatanPengajar': data.kecamatan_pengajar || '-',
-            'kycDetailDesaPengajar': data.desa_pengajar || '-',
-            'kycDetailKabupatenPengajar': data.kabupaten_pengajar || 'Tegal',
-            'kycDetailTmt': data.tmt_mengajar || '-',
-            'kycDetailLamaMengabdi': data.lama_mengabdi ? data.lama_mengabdi + ' tahun' : '-'
-        };
-
-        Object.keys(mengajarFields).forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = mengajarFields[id];
-        });
-
-        let statusText = data.status_verifikasi || 'Draft';
-        let statusClass = 'draft';
-        if (statusText === 'Diverifikasi') { 
-            statusClass = 'verified'; 
-            statusText = '✅ Terverifikasi'; 
-        } else if (statusText === 'Pending') { 
-            statusClass = 'pending'; 
-            statusText = '⏳ Menunggu Verifikasi'; 
-        } else if (statusText === 'Ditolak') { 
-            statusClass = 'rejected'; 
-            statusText = '❌ Ditolak'; 
-        } else { 
-            statusText = '📝 Draft'; 
-        }
-        
-        const statusEl = document.getElementById('kycDetailStatus');
-        if (statusEl) statusEl.innerHTML = `<span class="kyc-status-badge ${statusClass}" style="font-size:0.9rem;padding:4px 14px;">${statusText}</span>`;
-
-        const aktifText = data.status_aktif ? 'Aktif' : 'Tidak Aktif';
-        const aktifEl = document.getElementById('kycDetailAktif');
-        if (aktifEl) aktifEl.innerHTML = `<span class="badge" style="padding:2px 12px;border-radius:12px;font-size:0.8rem;font-weight:600;background:${data.status_aktif ? '#e8f5e9' : '#ffebee'};color:${data.status_aktif ? '#2e7d32' : '#c62828'};">${aktifText}</span>`;
-
-        const tanggalEl = document.getElementById('kycDetailTanggal');
-        if (tanggalEl) tanggalEl.textContent = formatDate(data.updated_at);
-
-        kycDokumen = { ktp: null, bupati: null, gubernur: null };
-        document.querySelectorAll('.dokumen-preview').forEach(el => el.style.display = 'none');
-        
-        const ktpNameEl = document.getElementById('kycDokumenKtpName');
-        const bupatiNameEl = document.getElementById('kycDokumenBupatiName');
-        const gubernurNameEl = document.getElementById('kycDokumenGubernurName');
-        
-        if (ktpNameEl) ktpNameEl.textContent = 'Belum ada dokumen';
-        if (bupatiNameEl) bupatiNameEl.textContent = 'Belum ada dokumen';
-        if (gubernurNameEl) gubernurNameEl.textContent = 'Belum ada dokumen';
-
-        if (data.dokumen_kyc) {
-            try {
-                const docs = typeof data.dokumen_kyc === 'string' ? JSON.parse(data.dokumen_kyc) : data.dokumen_kyc;
-                
-                if (docs.ktp && ktpNameEl) {
-                    kycDokumen.ktp = docs.ktp;
-                    ktpNameEl.textContent = `📄 ${docs.ktp.split('/').pop() || 'KTP'}`;
-                }
-                if (docs.bupati && bupatiNameEl) {
-                    kycDokumen.bupati = docs.bupati;
-                    bupatiNameEl.textContent = `📄 ${docs.bupati.split('/').pop() || 'Rek Bupati'}`;
-                }
-                if (docs.gubernur && gubernurNameEl) {
-                    kycDokumen.gubernur = docs.gubernur;
-                    gubernurNameEl.textContent = `📄 ${docs.gubernur.split('/').pop() || 'Rek Gubernur'}`;
-                }
-            } catch (e) {
-                if (data.dokumen_kyc && ktpNameEl) {
-                    kycDokumen.ktp = data.dokumen_kyc;
-                    ktpNameEl.textContent = `📄 ${data.dokumen_kyc.split('/').pop() || 'Dokumen'}`;
-                }
-            }
-        }
-
-        const actionBox = document.getElementById('kycActionBox');
-        const isPending = data.status_verifikasi === 'Pending' || data.status_verifikasi === 'Draft' || !data.status_verifikasi;
-        
-        if (actionBox) {
-            if (isPending) {
-                actionBox.style.display = 'block';
-                const keteranganEl = document.getElementById('kycKeterangan');
-                if (keteranganEl) keteranganEl.value = '';
-            } else {
-                actionBox.style.display = 'none';
-            }
-        }
-
-        const pendidikIdEl = document.getElementById('kycPendidikId');
-        if (pendidikIdEl) pendidikIdEl.value = data.id;
-
-        switchKycTab('identitas', document.querySelector('.kyc-tabs .tab-btn'));
-
-        const modal = document.getElementById('kycModal');
-        if (modal) modal.classList.add('active');
-
-    } catch (e) {
-        console.error('Error opening KYC modal:', e);
-        showToast('Gagal memuat detail KYC: ' + e.message, 'error');
-    }
-}
-
 function closeKycModal() {
-    document.getElementById('kycModal').classList.remove('active');
+    const modal = document.getElementById('kycModal');
+    if (modal) modal.classList.remove('active');
     currentKycPendidik = null;
 }
 
 function previewDokumen(type) {
-    const url = kycDokumen[type];
-    if (!url) {
-        showToast('Tidak ada dokumen untuk dilihat', 'warning');
-        return;
-    }
+    try {
+        const url = kycDokumen[type];
+        if (!url) {
+            showToast('Tidak ada dokumen untuk dilihat', 'warning');
+            return;
+        }
 
-    const previewId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Preview`;
-    const imgId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Img`;
-    const pdfId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Pdf`;
-    const emptyId = `dokumen${type.charAt(0).toUpperCase() + type.slice(1)}Empty`;
+        const cap = type.charAt(0).toUpperCase() + type.slice(1);
+        const preview = document.getElementById(`dokumen${cap}Preview`);
+        const img = document.getElementById(`dokumen${cap}Img`);
+        const pdf = document.getElementById(`dokumen${cap}Pdf`);
+        const empty = document.getElementById(`dokumen${cap}Empty`);
 
-    const preview = document.getElementById(previewId);
-    const img = document.getElementById(imgId);
-    const pdf = document.getElementById(pdfId);
-    const empty = document.getElementById(emptyId);
+        if (!preview || !img || !pdf || !empty) return;
 
-    if (!preview || !img || !pdf || !empty) {
-        console.error('Preview elements not found for type:', type);
-        return;
-    }
+        img.style.display = 'none';
+        pdf.style.display = 'none';
+        empty.style.display = 'none';
+        preview.style.display = 'block';
 
-    img.style.display = 'none';
-    pdf.style.display = 'none';
-    empty.style.display = 'none';
-    preview.style.display = 'block';
-
-    const urlLower = url.toLowerCase();
-    
-    if (urlLower.endsWith('.pdf')) {
-        pdf.src = url;
-        pdf.style.display = 'block';
-    } else if (urlLower.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) {
-        img.src = url;
-        img.style.display = 'block';
-    } else {
-        img.src = url;
-        img.style.display = 'block';
-        img.onerror = function() {
-            img.style.display = 'none';
-            empty.style.display = 'block';
-            empty.innerHTML = `<i class="fas fa-file" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
-                File tidak dapat ditampilkan. 
-                <br><button class="btn btn-primary btn-sm" onclick="downloadDokumen('${type}')" style="margin-top:8px;">
-                    <i class="fas fa-download"></i> Download
-                </button>
-            `;
-        };
+        const urlLower = url.toLowerCase();
+        
+        if (urlLower.endsWith('.pdf')) {
+            pdf.src = url;
+            pdf.style.display = 'block';
+        } else if (urlLower.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) {
+            img.src = url;
+            img.style.display = 'block';
+        } else {
+            img.src = url;
+            img.style.display = 'block';
+            img.onerror = function() {
+                img.style.display = 'none';
+                empty.style.display = 'block';
+                empty.innerHTML = `<i class="fas fa-file" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+                    File tidak dapat ditampilkan.
+                    <br><button class="btn btn-outline btn-sm" onclick="downloadDokumen('${type}')" style="margin-top:8px;">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                `;
+            };
+        }
+    } catch (e) {
+        console.error('Preview error:', e);
+        showToast('Gagal menampilkan dokumen', 'error');
     }
 }
 
@@ -3649,10 +3394,7 @@ async function verifyKyc(action) {
             verified_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
-
-        if (keterangan) {
-            updateData.catatan_verifikasi = keterangan;
-        }
+        if (keterangan) updateData.catatan_verifikasi = keterangan;
 
         const { error } = await supabaseClient
             .from('pendidik')
@@ -3665,6 +3407,7 @@ async function verifyKyc(action) {
         
         showToast(`Verifikasi ${statusText} untuk ${currentKycPendidik.nama_lengkap} berhasil!`, 'success');
         closeKycModal();
+        
         await loadKYCData(currentPage, true);
         await loadDashboard(true);
         await loadSebaranData(true);
@@ -3672,6 +3415,149 @@ async function verifyKyc(action) {
     } catch (e) {
         console.error('Error verifying KYC:', e);
         showToast('Gagal verifikasi: ' + e.message, 'error');
+    }
+}
+
+async function openKycModal(pendidikId) {
+    try {
+        // ✅ HAPUS rt_rw_pengajar dari select
+        const { data, error } = await supabaseClient
+            .from('pendidik')
+            .select(`
+                id, nama_lengkap, nik, tempat_lahir, tanggal_lahir,
+                jenis_kelamin, status_perkawinan, ibu_kandung,
+                pendidikan_terakhir, alamat, alamat_lengkap, no_hp, email,
+                nomor_rekening_bupati, nama_bank_bupati, pemilik_rekening_bupati,
+                nomor_rekening_gubernur, nama_bank_gubernur, pemilik_rekening_gubernur,
+                kecamatan_lembaga, desa_lembaga, kecamatan_pengajar, desa_pengajar,
+                kabupaten_pengajar, tmt_mengajar, lama_mengabdi,
+                jenis_lembaga, nslp_lembaga,
+                status_verifikasi, status_aktif, updated_at,
+                dokumen_kyc,
+                lembaga:lembaga_id ( id, nama, nslp, jenis_lembaga, alamat, kecamatan, desa )
+            `)
+            .eq('id', pendidikId)
+            .single();
+
+        if (error) throw error;
+
+        currentKycPendidik = data;
+
+        const setText = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val || '-';
+        };
+
+        setText('kycDetailNama', data.nama_lengkap);
+        setText('kycDetailNik', data.nik);
+        setText('kycDetailTempatLahir', data.tempat_lahir);
+        setText('kycDetailTanggalLahir', data.tanggal_lahir);
+        setText('kycDetailJenisKelamin', data.jenis_kelamin);
+        setText('kycDetailStatusPerkawinan', data.status_perkawinan);
+        setText('kycDetailIbuKandung', data.ibu_kandung);
+        setText('kycDetailPendidikan', data.pendidikan_terakhir);
+        
+        // ✅ Pakai alamat_lengkap, fallback ke alamat
+        setText('kycDetailAlamat', data.alamat_lengkap || data.alamat);
+        
+        setText('kycDetailNoHp', data.no_hp);
+        setText('kycDetailEmail', data.email);
+
+        setText('kycDetailNomorRekeningBupati', data.nomor_rekening_bupati);
+        setText('kycDetailNamaBankBupati', data.nama_bank_bupati);
+        setText('kycDetailPemilikRekeningBupati', data.pemilik_rekening_bupati);
+        setText('kycDetailNomorRekeningGubernur', data.nomor_rekening_gubernur);
+        setText('kycDetailNamaBankGubernur', data.nama_bank_gubernur);
+        setText('kycDetailPemilikRekeningGubernur', data.pemilik_rekening_gubernur);
+
+        const lembaga = data.lembaga || {};
+        
+        setText('kycDetailLembaga', lembaga.nama || data.nslp_lembaga);
+        setText('kycDetailNslpLembaga', lembaga.nslp || data.nslp_lembaga);
+        setText('kycDetailJenisLembaga', lembaga.jenis_lembaga || data.jenis_lembaga);
+        setText('kycDetailKecamatanLembaga', data.kecamatan_lembaga);
+        setText('kycDetailDesaLembaga', data.desa_lembaga);
+        
+        // ✅ RT/RW: pakai '-' karena kolom tidak ada
+        setText('kycDetailRtRw', '-');
+        
+        setText('kycDetailKecamatanPengajar', data.kecamatan_pengajar);
+        setText('kycDetailDesaPengajar', data.desa_pengajar);
+        setText('kycDetailKabupatenPengajar', data.kabupaten_pengajar || 'Tegal');
+        setText('kycDetailTmt', data.tmt_mengajar);
+        setText('kycDetailLamaMengabdi', data.lama_mengabdi ? data.lama_mengabdi + ' tahun' : '-');
+
+        let statusText = data.status_verifikasi || 'Draft';
+        let statusClass = 'draft';
+        if (statusText === 'Diverifikasi') { statusClass = 'verified'; statusText = '✅ Terverifikasi'; }
+        else if (statusText === 'Pending') { statusClass = 'pending'; statusText = '⏳ Menunggu Verifikasi'; }
+        else if (statusText === 'Ditolak') { statusClass = 'rejected'; statusText = '❌ Ditolak'; }
+        else { statusText = '📝 Draft'; }
+        
+        const statusEl = document.getElementById('kycDetailStatus');
+        if (statusEl) statusEl.innerHTML = `<span class="kyc-status-badge ${statusClass}" style="font-size:0.9rem;padding:4px 14px;">${statusText}</span>`;
+
+        const aktifText = data.status_aktif ? 'Aktif' : 'Tidak Aktif';
+        const aktifEl = document.getElementById('kycDetailAktif');
+        if (aktifEl) aktifEl.innerHTML = `<span class="badge" style="padding:2px 12px;border-radius:12px;font-size:0.8rem;font-weight:600;background:${data.status_aktif ? '#e8f5e9' : '#ffebee'};color:${data.status_aktif ? '#2e7d32' : '#c62828'};">${aktifText}</span>`;
+
+        setText('kycDetailTanggal', formatDate(data.updated_at));
+
+        kycDokumen = { ktp: null, bupati: null, gubernur: null };
+        document.querySelectorAll('.dokumen-preview').forEach(el => el.style.display = 'none');
+        
+        setText('kycDokumenKtpName', 'Belum ada dokumen');
+        setText('kycDokumenBupatiName', 'Belum ada dokumen');
+        setText('kycDokumenGubernurName', 'Belum ada dokumen');
+
+        if (data.dokumen_kyc) {
+            try {
+                const docs = typeof data.dokumen_kyc === 'string' ? JSON.parse(data.dokumen_kyc) : data.dokumen_kyc;
+                
+                if (docs.ktp) {
+                    kycDokumen.ktp = docs.ktp;
+                    setText('kycDokumenKtpName', `📄 ${docs.ktp.split('/').pop() || 'KTP'}`);
+                }
+                if (docs.bupati) {
+                    kycDokumen.bupati = docs.bupati;
+                    setText('kycDokumenBupatiName', `📄 ${docs.bupati.split('/').pop() || 'Rek Bupati'}`);
+                }
+                if (docs.gubernur) {
+                    kycDokumen.gubernur = docs.gubernur;
+                    setText('kycDokumenGubernurName', `📄 ${docs.gubernur.split('/').pop() || 'Rek Gubernur'}`);
+                }
+            } catch (e) {
+                if (data.dokumen_kyc) {
+                    kycDokumen.ktp = data.dokumen_kyc;
+                    setText('kycDokumenKtpName', `📄 ${data.dokumen_kyc.split('/').pop() || 'Dokumen'}`);
+                }
+            }
+        }
+
+        const actionBox = document.getElementById('kycActionBox');
+        const isPending = data.status_verifikasi === 'Pending' || 
+                          data.status_verifikasi === 'Draft' || 
+                          !data.status_verifikasi;
+        
+        if (actionBox) {
+            actionBox.style.display = isPending ? 'block' : 'none';
+            if (isPending) {
+                const ket = document.getElementById('kycKeterangan');
+                if (ket) ket.value = '';
+            }
+        }
+
+        const idEl = document.getElementById('kycPendidikId');
+        if (idEl) idEl.value = data.id;
+
+        switchKycTab('identitas', document.querySelector('.kyc-tabs .tab-btn'));
+
+        const modal = document.getElementById('kycModal');
+        if (modal) modal.classList.add('active');
+
+    } catch (e) {
+        console.error('Error opening KYC modal:', e);
+        showToast('Gagal memuat detail KYC: ' + e.message, 'error');
     }
 }
 
@@ -3689,89 +3575,31 @@ function formatDate(dateStr) {
 }
 
 // ============================================================
-// ===== LOAD RECENT =====
+// ===== AUTO REFRESH =====
 // ============================================================
-async function loadRecent() {
-    try {
+function startAutoRefresh() {
+    if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+    
+    autoRefreshTimer = setInterval(() => {
+        if (document.hidden) return;
+        
         const user = getUser();
+        if (!user) return;
+        
         const filter = getRoleFilter();
         
-        if (filter.restrict) {
-            document.getElementById('recentTableBody').innerHTML = 
-                `<tr><td colspan="4" style="text-align:center;padding:20px;color:#f44336;">
-                    Anda tidak memiliki akses
-                </td></tr>`;
-            return;
-        }
+        const dashKey = `dashboard_${user.id}_${JSON.stringify(filter)}`;
+        if (CacheManager.isExpired(dashKey)) loadDashboard();
         
-        let query = supabaseClient
-            .from('pendidik')
-            .select('nama_lengkap, status_aktif, updated_at, nslp_lembaga, kecamatan_lembaga_id, kecamatan_pengajar_id, jenis_lembaga, lembaga_id')
-            .order('updated_at', { ascending: false })
-            .limit(5);
-
-        if (filter.lembaga_id) {
-            query = query.eq('lembaga_id', filter.lembaga_id);
-        }
-
-        if (filter.kecamatan_id) {
-            query = query.or(
-                `kecamatan_lembaga_id.eq.${filter.kecamatan_id},kecamatan_pengajar_id.eq.${filter.kecamatan_id}`
-            );
-        }
-
-        if (filter.jenis_lembaga) {
-            query = query.eq('jenis_lembaga', filter.jenis_lembaga);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-
-        const tbody = document.getElementById('recentTableBody');
-        if (!tbody) return;
+        const sebaranKey = `sebaran_${user.id}_${JSON.stringify({
+            k: filter.kecamatan_id, l: filter.lembaga_id, j: filter.jenis_lembaga
+        })}`;
+        if (CacheManager.isExpired(sebaranKey)) loadSebaranData();
         
-        if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Belum ada data</td></tr>`;
-            return;
-        }
-
-        tbody.innerHTML = data.map(item => `
-            <tr>
-                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;"><strong>${item.nama_lengkap || '-'}</strong></td>
-                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;">${item.nslp_lembaga || '-'}</td>
-                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;">
-                    <span class="badge" style="padding:2px 12px;border-radius:12px;font-size:0.7rem;font-weight:600;background:${item.status_aktif ? '#e8f5e9' : '#ffebee'};color:${item.status_aktif ? '#2e7d32' : '#c62828'};">
-                        ${item.status_aktif ? 'Aktif' : 'Tidak Aktif'}
-                    </span>
-                </td>
-                <td style="padding:8px 10px;border-bottom:1px solid #f5f6f8;font-size:0.7rem;color:#888;">${formatDate(item.updated_at)}</td>
-            </tr>
-        `).join('');
-    } catch (e) {
-        console.error('Error in loadRecent:', e);
-        const tbody = document.getElementById('recentTableBody');
-        if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#f44336;">Gagal memuat data terbaru</td></tr>`;
-        }
-    }
-}
-
-// ============================================================
-// ===== REFRESH =====
-// ============================================================
-let refreshTimeout;
-
-function refreshData() {
-    clearTimeout(refreshTimeout);
-    refreshTimeout = setTimeout(() => {
-        showToast('Memperbarui data...', 'info');
-        CacheManager.clear();
-        loadKYCData(1, true);
-        loadDashboard(true);
-        loadSebaranData(true);
-        loadRecent();
-    }, 500);
+        const kycKey = `kyc_stats_${user.id}_${JSON.stringify(filter)}`;
+        if (CacheManager.isExpired(kycKey)) loadKYCData(currentPage);
+        
+    }, 30 * 60 * 1000);
 }
 
 // ============================================================
@@ -3781,56 +3609,41 @@ document.addEventListener('DOMContentLoaded', async function() {
     await checkAuth();
     updateDate();
     
+    // Init search listeners SEBELUM load data
+    initKycSearchListeners();
+    
     await loadKYCData(1);
     await loadDashboard();
     await loadSebaranData();
-    await loadRecent();
 
-    const user = getUser();
+    // Nav count
     const filter = getRoleFilter();
-    
-    let pendidikNavQuery = supabaseClient
-        .from('pendidik')
-        .select('*', { count: 'exact', head: true })
-        .eq('status_aktif', true);
-
-    if (filter.lembaga_id) {
-        pendidikNavQuery = pendidikNavQuery.eq('lembaga_id', filter.lembaga_id);
-    }
-
-    if (filter.kecamatan_id) {
-        pendidikNavQuery = pendidikNavQuery.or(
-            `kecamatan_lembaga_id.eq.${filter.kecamatan_id},kecamatan_pengajar_id.eq.${filter.kecamatan_id}`
-        );
-    }
-
-    if (filter.jenis_lembaga) {
-        pendidikNavQuery = pendidikNavQuery.eq('jenis_lembaga', filter.jenis_lembaga);
-    }
-
     try {
-        const { count, error } = await pendidikNavQuery;
-        if (error) {
-            console.error('Error loading nav count:', error);
-        } else {
-            document.getElementById('navPendidikCount').textContent = count || 0;
-        }
+        const count = await BatchFetcher.fetchAll('pendidik', {
+            filters: {
+                status_aktif: { operator: 'eq', value: true },
+                ...(filter.lembaga_id ? { lembaga_id: { operator: 'eq', value: filter.lembaga_id } } : {}),
+                ...(filter.kecamatan_id ? { kecamatan_lembaga_id: { operator: 'eq', value: filter.kecamatan_id } } : {}),
+                ...(filter.jenis_lembaga ? { jenis_lembaga: { operator: 'eq', value: filter.jenis_lembaga } } : {})
+            }
+        }, 1000, 'id', true, true);
+        const el = document.getElementById('navPendidikCount');
+        if (el) el.textContent = count || 0;
     } catch (e) {
         console.error('Error in nav count:', e);
     }
     
     setInterval(updateDate, 60000);
-    setInterval(() => { 
-        loadKYCData(currentPage, true);
-        loadDashboard(true);
-        loadSebaranData(true);
-    }, 600000);
+    startAutoRefresh();
+});
+
+window.addEventListener('beforeunload', () => {
+    if (autoRefreshTimer) clearInterval(autoRefreshTimer);
 });
 
 // ============================================================
-// ===== EXPOSE =====
+// ===== EXPOSE TO WINDOW =====
 // ============================================================
-window.refreshData = refreshData;
 window.openKycModal = openKycModal;
 window.closeKycModal = closeKycModal;
 window.previewDokumen = previewDokumen;
@@ -3839,12 +3652,12 @@ window.verifyKyc = verifyKyc;
 window.switchKycTab = switchKycTab;
 window.showToast = showToast;
 window.handleLogout = handleLogout;
-window.getUser = getUser;
-window.getRoleFilter = getRoleFilter;
 window.toggleSidebar = toggleSidebar;
 window.changePage = changePage;
 window.applyJenjangFilter = applyJenjangFilter;
 window.clearLocationFilter = clearLocationFilter;
+window.clearKycSearch = clearKycSearch;
+window.refreshKycData = refreshKycData;
 </script>
 </body>
 </html>
