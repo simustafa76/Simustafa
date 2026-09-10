@@ -7,8 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ===== CSS SAMA SEPERTI SEBELUMNYA ===== */
-        /* (saya ringkas untuk menghemat space) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         :root {
             --sidebar-width: 250px;
@@ -473,7 +471,10 @@
                 <div class="search-bar">
                     <div class="search-input-wrapper">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="searchUserInput" placeholder="Cari pengguna... (nama, email, role)" oninput="filterUsers()">
+                        <input type="text" id="searchUserInput" 
+                               placeholder="Cari: nama, email, role, lembaga, NSLP, kecamatan..." 
+                               oninput="filterUsers()" 
+                               autocomplete="off">
                     </div>
                     <div class="search-filter">
                         <select id="searchRoleFilter" onchange="filterUsers()">
@@ -692,7 +693,8 @@
         let isProcessing = false;
         let editingUserId = null;
         let allUsersData = [];
-        let resetPasswordTarget = null; // Untuk menyimpan target reset password
+        let resetPasswordTarget = null;
+        let filterDebounceTimer = null;
 
         // ============================================================
         // ===== SIDEBAR & TOAST =====
@@ -1099,17 +1101,12 @@
         }
 
         // ============================================================
-        // ===== RESET PASSWORD (FIXED - Menggunakan RPC) =====
+        // ===== RESET PASSWORD =====
         // ============================================================
-        
-        /**
-         * Membuka modal reset password untuk user tertentu
-         */
         function openResetPasswordModal(userId) {
             const user = getUser();
             if (!user) return;
             
-            // Cari data user
             let userData = null;
             const users = document.querySelectorAll('.user-list-item');
             for (const el of users) {
@@ -1127,7 +1124,6 @@
             }
             
             if (!userData) {
-                // Ambil dari database
                 supabaseClient.from('users').select('id, name, email').eq('id', userId).single()
                     .then(({ data, error }) => {
                         if (error || !data) {
@@ -1157,10 +1153,6 @@
             document.getElementById('resetConfirmPassword').value = '';
         }
 
-        /**
-         * Konfirmasi dan jalankan reset password
-         * Menggunakan RPC function di Supabase
-         */
         async function confirmResetPassword() {
             if (!resetPasswordTarget) {
                 showToast('Tidak ada target reset password', 'error');
@@ -1170,7 +1162,6 @@
             const newPassword = document.getElementById('resetNewPassword').value.trim();
             const confirmPassword = document.getElementById('resetConfirmPassword').value.trim();
 
-            // Validasi
             if (!newPassword) {
                 showToast('Password baru tidak boleh kosong!', 'error');
                 return;
@@ -1184,7 +1175,6 @@
                 return;
             }
 
-            // Konfirmasi dari admin
             if (!confirm(`Yakin akan mereset password untuk ${resetPasswordTarget.name}?`)) {
                 return;
             }
@@ -1195,32 +1185,18 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
             try {
-                // === SOLUSI: Menggunakan RPC function ===
-                // Pastikan Anda sudah membuat fungsi RPC di Supabase SQL Editor
-                // dengan nama 'reset_user_password'
-                
                 const { data, error } = await supabaseClient.rpc('reset_user_password', {
                     target_user_id: resetPasswordTarget.id,
                     new_password: newPassword
                 });
 
                 if (error) {
-                    // Jika RPC gagal, coba alternatif: update langsung via auth admin
                     console.warn('RPC gagal, mencoba metode alternatif...', error);
-                    
-                    // Alternatif: Menggunakan auth admin API (perlu service_role key)
-                    // Catatan: Ini hanya bisa dilakukan dari backend atau Edge Function
-                    // Untuk frontend, kita akan gunakan pendekatan lain
-                    
                     throw new Error('Fungsi RPC tidak ditemukan. Silakan buat fungsi reset_user_password di Supabase SQL Editor.');
                 }
 
                 showToast(`Password untuk ${resetPasswordTarget.name} berhasil direset!`, 'success');
                 closeResetPasswordModal();
-                
-                // Optional: Kirim notifikasi ke user via email
-                // await sendPasswordResetEmail(resetPasswordTarget.email, newPassword);
-                
             } catch (e) {
                 console.error('Reset password error:', e);
                 showToast('Gagal reset password: ' + e.message, 'error');
@@ -1248,7 +1224,7 @@
         }
 
         // ============================================================
-        // ===== LOAD & RENDER USERS =====
+        // ===== LOAD & RENDER USERS (DIPERBAIKI) =====
         // ============================================================
         async function loadUsers() {
             const user = getUser();
@@ -1264,99 +1240,146 @@
                 }
                 const { data } = await q;
                 allUsersData = data || [];
+
+                // === Enrich data dengan nama lembaga & kecamatan ===
+                const kids = [...new Set(allUsersData.map(u => u.kecamatan_id).filter(Boolean))];
+                const lids = [...new Set(allUsersData.map(u => u.lembaga_id).filter(Boolean))];
+
+                const [kecRes, lemRes] = await Promise.all([
+                    kids.length ? supabaseClient.from('master_kecamatan').select('id, nama').in('id', kids) : Promise.resolve({ data: [] }),
+                    lids.length ? supabaseClient.from('lembaga').select('id, nama, nslp, jenis_lembaga').in('id', lids) : Promise.resolve({ data: [] })
+                ]);
+
+                const km = {}, lm = {};
+                (kecRes.data || []).forEach(k => km[k.id] = k.nama);
+                (lemRes.data || []).forEach(l => lm[l.id] = l);
+
+                allUsersData = allUsersData.map(u => ({
+                    ...u,
+                    _kecamatanNama: km[u.kecamatan_id] || '',
+                    _lembagaNama: lm[u.lembaga_id]?.nama || '',
+                    _lembagaNslp: lm[u.lembaga_id]?.nslp || '',
+                    _lembagaJenis: lm[u.lembaga_id]?.jenis_lembaga || ''
+                }));
+
                 renderUserList(allUsersData);
-            } catch (e) { document.getElementById('userList').innerHTML = `<div style="text-align:center;padding:30px;color:#f44336;">Gagal: ${e.message}</div>`; }
+            } catch (e) {
+                document.getElementById('userList').innerHTML = `<div style="text-align:center;padding:30px;color:#f44336;">Gagal: ${e.message}</div>`;
+            }
         }
 
         function renderUserList(users) {
             const container = document.getElementById('userList');
-            if (!users?.length) { 
-                container.innerHTML = '<div style="text-align:center;padding:30px;color:#999;">Tidak ada pengguna yang ditemukan</div>'; 
+            if (!users?.length) {
+                container.innerHTML = '<div style="text-align:center;padding:30px;color:#999;">Tidak ada pengguna yang ditemukan</div>';
                 document.getElementById('searchResultCount').innerHTML = 'Menampilkan <strong>0</strong> pengguna';
-                return; 
+                return;
             }
 
-            const kids = [...new Set(users.map(u => u.kecamatan_id).filter(Boolean))];
-            const lids = [...new Set(users.map(u => u.lembaga_id).filter(Boolean))];
-            
-            Promise.all([
-                kids.length ? supabaseClient.from('master_kecamatan').select('id, nama').in('id', kids) : Promise.resolve({ data: [] }),
-                lids.length ? supabaseClient.from('lembaga').select('id, nama').in('id', lids) : Promise.resolve({ data: [] })
-            ]).then(([kecData, lemData]) => {
-                const km = {}, lm = {};
-                (kecData.data || []).forEach(k => km[k.id] = k.nama);
-                (lemData.data || []).forEach(l => lm[l.id] = l.nama);
+            const rl = {
+                'super_admin': '🛡️ Super Admin',
+                'admin_kab': '🏛️ Admin Kab',
+                'batko': '📘 BADKO LPQ',
+                'fkdt': '📗 FKDT',
+                'ponpes': '📕 PONPES',
+                'operator': '📋 Operator'
+            };
 
-                const rl = { 
-                    'super_admin': '🛡️ Super Admin', 
-                    'admin_kab': '🏛️ Admin Kab', 
-                    'batko': '📘 BADKO LPQ',
-                    'fkdt': '📗 FKDT', 
-                    'ponpes': '📕 PONPES', 
-                    'operator': '📋 Operator' 
-                };
-                
-                container.innerHTML = users.map(u => {
-                    const act = u.active !== false;
-                    const displayRole = rl[u.role] || u.role;
-                    return `<div class="user-list-item">
-                        <div class="user-avatar-sm${act?'':' inactive-avatar'}">${(u.name||'U').charAt(0).toUpperCase()}</div>
-                        <div class="user-info"><div class="name${act?'':' inactive-name'}">${u.name||'-'}${act?'':' (Nonaktif)'}</div><div class="email">${u.email||'-'}</div>${u.role==='operator'?`<div class="email" style="color:var(--primary);">🏫 ${lm[u.lembaga_id]||'-'}</div>`:''}</div>
-                        <span class="user-role ${u.role||'viewer'}">${displayRole}</span>
-                        <span class="user-status ${act?'active':'inactive'}"></span>
-                        <div class="action-buttons">
-                            ${act ? `
-                                <button class="btn-icon warning" onclick="openEditModal('${u.id}')" title="Edit" data-user-id="${u.id}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-icon info" onclick="openResetPasswordModal('${u.id}')" title="Reset Password" data-user-id="${u.id}">
-                                    <i class="fas fa-key"></i>
-                                </button>
-                                <button class="btn-icon danger" onclick="deleteUser('${u.id}')" title="Nonaktifkan" data-user-id="${u.id}">
-                                    <i class="fas fa-ban"></i>
-                                </button>
-                            ` : `
-                                <button class="btn-icon success" onclick="reactivateUser('${u.id}')" title="Aktifkan kembali" data-user-id="${u.id}">
-                                    <i class="fas fa-check-circle"></i>
-                                </button>
-                            `}
-                        </div>
-                    </div>`;
-                }).join('');
-                
-                document.getElementById('searchResultCount').innerHTML = `Menampilkan <strong>${users.length}</strong> pengguna`;
-            });
+            container.innerHTML = users.map(u => {
+                const act = u.active !== false;
+                const displayRole = rl[u.role] || u.role;
+                const lembagaInfo = u.role === 'operator' && u._lembagaNama
+                    ? `<div class="email" style="color:var(--primary);">🏫 ${u._lembagaNama}${u._lembagaJenis ? ' ('+u._lembagaJenis+')' : ''}${u._lembagaNslp ? ' • NSLP: '+u._lembagaNslp : ''}</div>`
+                    : '';
+                return `<div class="user-list-item">
+                    <div class="user-avatar-sm${act?'':' inactive-avatar'}">${(u.name||'U').charAt(0).toUpperCase()}</div>
+                    <div class="user-info">
+                        <div class="name${act?'':' inactive-name'}">${u.name||'-'}${act?'':' (Nonaktif)'}</div>
+                        <div class="email">${u.email||'-'}</div>
+                        ${lembagaInfo}
+                    </div>
+                    <span class="user-role ${u.role||'viewer'}">${displayRole}</span>
+                    <span class="user-status ${act?'active':'inactive'}"></span>
+                    <div class="action-buttons">
+                        ${act ? `
+                            <button class="btn-icon warning" onclick="openEditModal('${u.id}')" title="Edit" data-user-id="${u.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-icon info" onclick="openResetPasswordModal('${u.id}')" title="Reset Password" data-user-id="${u.id}">
+                                <i class="fas fa-key"></i>
+                            </button>
+                            <button class="btn-icon danger" onclick="deleteUser('${u.id}')" title="Nonaktifkan" data-user-id="${u.id}">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                        ` : `
+                            <button class="btn-icon success" onclick="reactivateUser('${u.id}')" title="Aktifkan kembali" data-user-id="${u.id}">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                        `}
+                    </div>
+                </div>`;
+            }).join('');
+
+            document.getElementById('searchResultCount').innerHTML = `Menampilkan <strong>${users.length}</strong> pengguna`;
         }
 
         // ============================================================
-        // ===== FILTER USERS =====
+        // ===== FILTER USERS (DIPERBAIKI) =====
         // ============================================================
         function filterUsers() {
-            const searchQuery = document.getElementById('searchUserInput').value.toLowerCase().trim();
+            clearTimeout(filterDebounceTimer);
+            filterDebounceTimer = setTimeout(_doFilterUsers, 250);
+        }
+
+        function _doFilterUsers() {
+            const searchQuery = (document.getElementById('searchUserInput').value || '').toLowerCase().trim();
             const roleFilter = document.getElementById('searchRoleFilter').value;
             const statusFilter = document.getElementById('searchStatusFilter').value;
-            
-            let filtered = allUsersData;
-            
+
+            // Map role → teks display untuk pencarian
+            const roleSearchMap = {
+                'super_admin': 'super admin superadmin',
+                'admin_kab': 'admin kabupaten admin kab adminkab',
+                'batko': 'badko badko lpq batko',
+                'fkdt': 'fkdt fkdt mdt',
+                'ponpes': 'ponpes ponpes',
+                'operator': 'operator op'
+            };
+
+            let filtered = allUsersData.slice();
+
+            // === Filter teks pencarian ===
             if (searchQuery) {
+                const terms = searchQuery.split(/\s+/).filter(Boolean);
                 filtered = filtered.filter(u => {
-                    const name = (u.name || '').toLowerCase();
-                    const email = (u.email || '').toLowerCase();
-                    const role = (u.role || '').toLowerCase();
-                    return name.includes(searchQuery) || email.includes(searchQuery) || role.includes(searchQuery);
+                    const haystack = [
+                        u.name || '',
+                        u.email || '',
+                        u.role || '',
+                        roleSearchMap[u.role] || '',
+                        u._lembagaNama || '',
+                        u._lembagaNslp || '',
+                        u._lembagaJenis || '',
+                        u._kecamatanNama || '',
+                        u.active === false ? 'nonaktif inactive' : 'aktif active'
+                    ].join(' ').toLowerCase();
+
+                    return terms.every(t => haystack.includes(t));
                 });
             }
-            
+
+            // === Filter role ===
             if (roleFilter) {
                 filtered = filtered.filter(u => u.role === roleFilter);
             }
-            
+
+            // === Filter status ===
             if (statusFilter === 'active') {
                 filtered = filtered.filter(u => u.active !== false);
             } else if (statusFilter === 'inactive') {
                 filtered = filtered.filter(u => u.active === false);
             }
-            
+
             renderUserList(filtered);
         }
 
@@ -1364,7 +1387,7 @@
             document.getElementById('searchUserInput').value = '';
             document.getElementById('searchRoleFilter').value = '';
             document.getElementById('searchStatusFilter').value = '';
-            filterUsers();
+            _doFilterUsers();
             showToast('Pencarian direset', 'info');
         }
 
