@@ -1,0 +1,2487 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=yes">
+<title>SI-MUSTAFA - Operator Lembaga</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="js/supabase-client.js"></script>
+<style>
+:root{--p:#006400;--pl:#4CAF50;--pd:#0a2e1a;--g:#FFD700;--gd:#DAA520;--s:#4CAF50;--w:#FF9800;--d:#f44336;--i:#2196F3;--bg:#f0f4f0;--cs:0 4px 20px rgba(0,0,0,.08);--sw:250px;--hh:64px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+body{background:var(--bg);min-height:100vh;display:flex}
+.sidebar{width:var(--sw);height:100vh;position:fixed;top:0;left:0;background:linear-gradient(180deg,#0a2e1a 0%,#1a5a3a 100%);color:#fff;z-index:1000;transition:all .3s cubic-bezier(.4,0,.2,1);overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
+.sidebar.collapsed{transform:translateX(-100%)}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-track{background:transparent}.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:4px}
+.sidebar-brand{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);min-height:var(--hh);flex-shrink:0}
+.sidebar-brand img{width:36px;height:36px;border-radius:50%;object-fit:contain;background:rgba(255,255,255,.1);padding:4px;flex-shrink:0}
+.sidebar-brand .brand-text{display:flex;flex-direction:column;line-height:1.2}
+.sidebar-brand .brand-text h1{font-size:1rem;font-weight:700;color:#fff;letter-spacing:.5px}
+.sidebar-brand .brand-text h1 span{color:var(--g)}
+.sidebar-brand .brand-text small{font-size:.55rem;opacity:.7;font-weight:300}
+.sidebar-menu{flex:1;padding:12px 0;list-style:none}
+.sidebar-menu .menu-label{padding:8px 20px;font-size:.6rem;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.35);font-weight:600}
+.sidebar-menu .menu-item{display:flex;align-items:center;gap:14px;padding:10px 20px;color:rgba(255,255,255,.7);text-decoration:none;font-size:.85rem;font-weight:500;transition:all .25s ease;border-left:3px solid transparent;cursor:pointer}
+.sidebar-menu .menu-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.sidebar-menu .menu-item.active{background:rgba(255,255,255,.1);color:var(--g);border-left-color:var(--g)}
+.sidebar-menu .menu-item i{width:20px;font-size:1.1rem;text-align:center;flex-shrink:0}
+.sidebar-footer{padding:12px 20px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.sidebar-footer .avatar{width:36px;height:36px;border-radius:50%;background:var(--g);color:var(--pd);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0}
+.sidebar-footer .user-info{flex:1;min-width:0}
+.sidebar-footer .user-info .name{font-size:.8rem;font-weight:600;color:#fff}
+.sidebar-footer .user-info .role{font-size:.6rem;opacity:.6}
+.sidebar-footer .logout-btn{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:1rem;padding:4px 8px;transition:.2s;border-radius:6px}
+.sidebar-footer .logout-btn:hover{color:#ff6b6b;background:rgba(255,0,0,.1)}
+.sidebar-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:999}.sidebar-overlay.active{display:block}
+.main-content{margin-left:var(--sw);flex:1;min-height:100vh;transition:margin-left .3s ease;display:flex;flex-direction:column;padding:20px 40px 40px}
+.main-content.expanded{margin-left:0}
+.header{background:#fff;padding:0 40px;height:var(--hh);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e8ecf1;position:sticky;top:0;z-index:100;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.header-left{display:flex;align-items:center;gap:16px}
+.header-left .sidebar-toggle{background:none;border:none;font-size:1.3rem;color:var(--pd);cursor:pointer;padding:4px 8px;border-radius:6px;transition:.2s}
+.header-left .sidebar-toggle:hover{background:var(--bg);color:var(--p)}
+.header-left .page-title h1{font-size:1.1rem;font-weight:700;color:var(--pd)}
+.header-left .page-title p{font-size:.7rem;color:#888}
+.header-right{display:flex;align-items:center;gap:16px}
+.header-date{font-size:.75rem;color:#888}
+.header-right .role-badge{background:var(--p);color:#fff;padding:4px 14px;border-radius:20px;font-size:.65rem;font-weight:600}
+.header-right .role-scope{font-size:.6rem;color:#888}
+.header-user{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 10px;border-radius:8px;transition:.2s}
+.header-user:hover{background:var(--bg)}
+.header-user .avatar{width:30px;height:30px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem}
+.header-user .user-name{font-size:.8rem;font-weight:600;color:var(--pd)}
+.welcome-section{background:linear-gradient(135deg,#0a2e1a 0%,#1a5a3a 50%,#2e7d32 100%);border-radius:14px;padding:24px 36px;margin-bottom:24px;color:#fff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 8px 32px rgba(0,100,0,.3)}
+.welcome-section .welcome-text h2{font-size:1.3rem;font-weight:700}
+.welcome-section .welcome-text h2 span{color:var(--g)}
+.welcome-section .welcome-text p{font-size:.85rem;opacity:.85;margin-top:2px}
+.welcome-section .welcome-text p i{margin-right:6px;color:var(--g)}
+.welcome-section .welcome-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:8px 20px;font-size:.75rem;font-weight:500;display:flex;align-items:center;gap:8px}
+.stat-mini{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.stat-mini .stat-item{font-size:.85rem;color:#555;background:#fff;padding:10px 20px;border-radius:10px;box-shadow:var(--cs);border-left:3px solid var(--p)}
+.stat-mini .stat-item strong{color:var(--p);font-size:1.1rem}
+.stat-mini .stat-item:nth-child(2){border-left-color:var(--s)}.stat-mini .stat-item:nth-child(3){border-left-color:var(--d)}.stat-mini .stat-item:nth-child(4){border-left-color:var(--w)}.stat-mini .stat-item:nth-child(5){border-left-color:#ff9800}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+.stat-grid .stat-card{background:#fff;padding:14px 16px;border-radius:12px;text-align:center;box-shadow:var(--cs);border-top:3px solid var(--p)}
+.stat-grid .stat-card:nth-child(2){border-top-color:var(--s)}.stat-grid .stat-card:nth-child(3){border-top-color:var(--w)}.stat-grid .stat-card:nth-child(4){border-top-color:#7b1fa2}
+.stat-grid .stat-card .label{font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:.5px}
+.stat-grid .stat-card .value{font-size:1.5rem;font-weight:700;color:var(--pd)}
+.stat-grid .stat-card .value.green{color:var(--s)}.stat-grid .stat-card .value.orange{color:var(--w)}.stat-grid .stat-card .value.blue{color:#1976d2}.stat-grid .stat-card .value.purple{color:#7b1fa2}
+.filter-section{display:flex;flex-wrap:wrap;gap:12px;background:linear-gradient(135deg,#fff 0%,#f5faf5 100%);padding:16px 24px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.04);border:1px solid rgba(0,100,0,.08);margin-bottom:16px;align-items:flex-end}
+.filter-section .filter-item{flex:1;min-width:150px}
+.filter-section .filter-item label{display:block;font-size:.7rem;color:#888;margin-bottom:2px;font-weight:600}
+.filter-section .filter-item input,.filter-section .filter-item select{width:100%;padding:8px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:.85rem;background:#fff;transition:.2s}
+.filter-section .filter-item input:focus,.filter-section .filter-item select:focus{border-color:var(--p);outline:none;box-shadow:0 0 0 3px rgba(0,100,0,.08)}
+.filter-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.filter-actions .btn{white-space:nowrap}
+.card{background:#fff;border-radius:14px;padding:20px 24px;box-shadow:var(--cs)}
+.card .card-title{font-size:.85rem;font-weight:600;color:var(--pd)}
+.card .card-title i{margin-right:8px;color:var(--p)}
+.table-responsive{overflow-x:auto}
+.table-responsive table{width:100%;font-size:.85rem;border-collapse:collapse}
+.table-responsive table th{padding:10px 12px;text-align:left;background:#eaf0ea;color:#1b5e20;font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #c8e6c9;position:sticky;top:0}
+.table-responsive table tbody tr:nth-child(even){background:#f6faf6}
+.table-responsive table tbody tr:nth-child(odd){background:#fff}
+.table-responsive table tbody tr:hover{background:#e8f5e9;cursor:pointer;transition:background .2s}
+.table-responsive table td{padding:10px 12px;border-bottom:1px solid #f0f4f0;vertical-align:middle}
+.badge{padding:3px 14px;border-radius:20px;font-size:.7rem;font-weight:600;display:inline-block}
+.badge.active,.badge.verified,.badge.disetujui,.badge.cair{background:#e8f5e9;color:#2e7d32}
+.badge.inactive,.badge.rejected,.badge.ditolak,.badge.batal{background:#ffebee;color:#c62828}
+.badge.pending,.badge.diajukan,.badge.pengajuan_baru,.badge.proses_pencairan{background:#fff3e0;color:#e65100}
+.badge.draft,.badge.proses_verifikasi,.badge.disetujui2{background:#e3f2fd;color:#0d47a1}
+.badge.penerima_sebelumnya{background:#fce4ec;color:#880e4f}
+.badge.berlaku{background:#e8f5e9;color:#1b5e20}
+.badge-luar-daerah{background:#ff9800;color:#fff;font-size:.55rem;padding:2px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;margin-left:4px}
+.badge-lokal{background:#e8f5e9;color:#2e7d32;font-size:.55rem;padding:2px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;margin-left:4px}
+.badge-jenis-antar_lembaga{background:#e3f2fd;color:#0d47a1}
+.badge-jenis-antar_kecamatan{background:#f3e5f5;color:#4a148c}
+.badge-jenis-pensiun{background:#fff3e0;color:#e65100}
+.badge-jenis-berhenti{background:#ffebee;color:#c62828}
+.badge-jenis-meninggal{background:#212121;color:#fff}
+.badge-jenis-lpq{background:#e3f2fd;color:#0d47a1;font-size:.6rem;padding:1px 8px;border-radius:10px;margin-left:6px;display:inline-block}
+.badge-jenis-mdt{background:#f3e5f5;color:#4a148c;font-size:.6rem;padding:1px 8px;border-radius:10px;margin-left:6px;display:inline-block}
+.badge-jenis-ponpes{background:#fff3e0;color:#e65100;font-size:.6rem;padding:1px 8px;border-radius:10px;margin-left:6px;display:inline-block}
+.btn{padding:6px 14px;border:none;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s ease;display:inline-flex;align-items:center;gap:6px}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-outline{background:transparent;color:var(--p);border:1.5px solid var(--p)}.btn-outline:hover{background:var(--p);color:#fff}
+.btn-primary{background:var(--p);color:#fff}.btn-primary:hover{background:var(--pl)}
+.btn-success{background:var(--s);color:#fff}.btn-success:hover{background:#43a047}
+.btn-danger{background:var(--d);color:#fff}.btn-danger:hover{background:#d32f2f}
+.btn-warning{background:var(--w);color:#fff}.btn-warning:hover{background:#f57c00}
+.btn-info{background:var(--i);color:#fff}.btn-info:hover{background:#1976d2}
+.btn-sm{padding:4px 10px;font-size:.7rem}
+.btn-xs{padding:2px 8px;font-size:.65rem;border-radius:6px}
+.btn-large{padding:12px 24px;font-size:.9rem;border-radius:12px}
+.action-buttons{display:flex;gap:4px;flex-wrap:wrap}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);padding:12px 24px;border-radius:12px;color:#fff;font-weight:500;font-size:.85rem;box-shadow:0 8px 30px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:all .3s ease;max-width:90%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-success{background:var(--s)}.toast-error{background:var(--d)}.toast-info{background:var(--p)}.toast-warning{background:var(--w)}
+.spinner{width:32px;height:32px;border:3px solid #f0f2f5;border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+.spinner-sm{display:inline-block;width:16px;height:16px;border:2px solid #f0f2f5;border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;justify-content:center;align-items:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal-container{background:#fff;border-radius:16px;padding:28px 30px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #f0f2f5}
+.modal-header h2{font-size:1.2rem;color:var(--p);font-weight:700}
+.modal-header .close-btn{background:none;border:none;font-size:1.5rem;color:#888;cursor:pointer}
+.modal-body .form-group{margin-bottom:14px}
+.modal-body .form-group label{display:block;font-size:.75rem;font-weight:600;color:#555;margin-bottom:2px}
+.modal-body .form-group input,.modal-body .form-group select,.modal-body .form-group textarea{width:100%;padding:8px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:.9rem;background:#fafafa;transition:.2s}
+.modal-body .form-group input:focus,.modal-body .form-group select:focus,.modal-body .form-group textarea:focus{border-color:var(--p);outline:none;background:#fff}
+.modal-body .form-group textarea{resize:vertical;min-height:60px}
+.modal-body .form-group input:disabled,.modal-body .form-group select:disabled{background:#f5f5f5;color:#666;cursor:not-allowed}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #f0f2f5}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group.full-width{grid-column:1/-1}
+.section-title{font-size:.85rem;font-weight:700;color:var(--p);margin:16px 0 12px;padding-bottom:6px;border-bottom:2px solid #f0f2f5}
+.rekening-box{background:#f8f9fa;padding:12px;border-radius:8px;border:1px solid #e0e0e0;margin-bottom:8px}
+.rekening-box .rekening-title{font-size:.7rem;font-weight:700;color:var(--p);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.lembaga-readonly{background:#f5f5f5!important;color:#666!important;cursor:not-allowed!important;border-color:#e8e8e8!important}
+.lama-mengabdi-display{background:#f5f5f5;padding:8px 12px;border-radius:8px;border:2px solid #e8e8e8;color:#666;font-size:.9rem;min-height:40px;display:flex;align-items:center}
+.upload-preview{margin-top:6px;padding:6px 12px;background:#f8faf8;border-radius:6px;display:none;align-items:center;gap:8px;border:1px solid #e8e8e8}
+.upload-preview.visible{display:flex}
+.upload-preview .file-name{font-size:.8rem;font-weight:500;color:#333;flex:1}
+.info-box{background:#e3f2fd;border-left:4px solid var(--i);padding:12px 16px;border-radius:8px;margin-bottom:16px}
+.info-box i{color:var(--i);margin-right:8px}
+.info-box.warning{background:#fff3e0;border-left-color:var(--w)}
+.info-box.success{background:#e8f5e9;border-left-color:var(--s)}
+.info-box.error{background:#ffebee;border-left-color:var(--d)}
+.wilayah-info{font-size:.7rem;color:#888;margin-top:2px}
+.info-banner{background:#e3f2fd;border-left:4px solid #0d47a1;padding:12px 16px;border-radius:8px;margin-bottom:16px;display:flex;align-items:center;gap:12px;font-size:.85rem;color:#0d47a1}
+.info-banner i{font-size:1.2rem}
+.info-banner .highlight{font-weight:700;color:#0a2e1a}
+.status-badge-large{padding:8px 20px;border-radius:20px;font-size:.85rem;font-weight:700;display:inline-block;margin-bottom:12px}
+.searchable-select-wrapper{position:relative;width:100%}
+.searchable-select-wrapper input[type="text"]{width:100%;padding:8px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:.9rem;background:#fafafa;transition:.2s;cursor:pointer}
+.searchable-select-wrapper input[type="text"]:focus{border-color:var(--p);outline:none;background:#fff}
+.searchable-select-wrapper .dropdown-list{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:2px solid #e0e0e0;border-top:none;border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.searchable-select-wrapper .dropdown-list.open{display:block}
+.searchable-select-wrapper .dropdown-list .option-item{padding:8px 12px;cursor:pointer;font-size:.85rem;border-bottom:1px solid #f0f2f5;transition:.15s}
+.searchable-select-wrapper .dropdown-list .option-item:hover{background:#e8f5e9}
+.searchable-select-wrapper .dropdown-list .option-item.selected{background:#c8e6c9;font-weight:600}
+.searchable-select-wrapper .dropdown-list .option-item .sub-text{font-size:.7rem;color:#888;display:block}
+.searchable-select-wrapper .dropdown-list .no-result{padding:12px;text-align:center;color:#999;font-size:.85rem}
+.selected-info{background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:4px solid var(--p);margin-bottom:12px;display:none}
+.selected-info .info-label{font-size:.7rem;color:#888}
+.selected-info .info-value{font-weight:600;font-size:.95rem}
+.selected-info .info-sub{font-size:.8rem;color:#666}
+.hidden-field{display:none}.hidden-field.visible{display:block}
+mark.search-highlight{background:#ffeb3b;padding:0 2px;border-radius:2px;font-weight:600}
+.search-input-wrapper{display:flex;gap:8px;align-items:center;width:100%}
+.search-input-wrapper input{flex:1}
+.search-info{display:flex;align-items:center;gap:6px;font-size:.75rem;color:#666;white-space:nowrap;flex-shrink:0}
+.search-info .search-count{font-weight:600;color:var(--p);font-size:.7rem}
+.search-info .btn-clear-search{background:none;border:none;color:#999;cursor:pointer;font-size:.9rem;padding:2px 6px;border-radius:4px;transition:.2s}
+.search-info .btn-clear-search:hover{background:#f0f0f0;color:var(--d)}
+.setting-section{background:#fff;border-radius:14px;padding:20px 24px;box-shadow:var(--cs);margin-bottom:16px;border:1px solid rgba(0,100,0,.06)}
+.setting-section .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #f0f2f5;flex-wrap:wrap;gap:8px}
+.setting-section .section-title{font-size:.95rem;font-weight:600;color:var(--p);margin:0;padding:0;border:none}
+.setting-section .section-title i{margin-right:10px;color:var(--pl)}
+.setting-section .section-desc{font-size:.8rem;color:#888;margin-top:2px}
+.setting-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f5f6f8;gap:12px}
+.setting-item:last-child{border-bottom:none}
+.setting-item .item-label{font-size:.85rem;color:#333;flex:1;min-width:150px}
+.setting-item .item-label small{display:block;font-size:.7rem;color:#888;font-weight:400}
+.setting-item .item-control{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.setting-item .item-control input{padding:6px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:.85rem;background:#fff;transition:.2s;min-width:180px}
+.setting-item .item-control input:focus{border-color:var(--p);outline:none;box-shadow:0 0 0 3px rgba(0,100,0,.08)}
+.setting-item .item-control input[readonly]{background:#f5f5f5;color:#666;cursor:not-allowed}
+.lembaga-info-box{background:#f8faf8;border-radius:10px;padding:16px 20px;margin-bottom:12px;border-left:4px solid var(--p)}
+.lembaga-info-box .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.lembaga-info-box .info-item .label{font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.lembaga-info-box .info-item .value{font-size:.9rem;font-weight:600;color:var(--pd)}
+.backup-info{margin-top:12px;padding:12px 16px;background:#fff3e0;border-radius:10px;font-size:.8rem;color:#856404;border-left:3px solid var(--w)}
+.backup-info i{margin-right:8px}
+.page-loading{padding:60px 20px;text-align:center;color:#999}
+@media (max-width:992px){
+.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+.sidebar-overlay.active{display:block}
+.main-content{margin-left:0;padding:16px 20px 30px}
+.header{padding:0 20px}
+.header-left .page-title p{display:none}
+.header-date{display:none}
+.header-right .role-scope{display:none}
+.filter-section .filter-item{min-width:100%}
+.form-row,.modal-body .form-row{grid-template-columns:1fr}
+.table-responsive table{font-size:.75rem}
+.table-responsive table th,.table-responsive table td{padding:6px 8px}
+.setting-item{flex-direction:column;align-items:stretch;gap:8px}
+.setting-item .item-control input{min-width:100%}
+.lembaga-info-box .info-grid{grid-template-columns:1fr 1fr}
+.stat-grid{grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.welcome-section{padding:16px 20px;flex-direction:column;align-items:flex-start}
+}
+@media (max-width:480px){
+.header{padding:0 12px;height:56px}
+.header-left .page-title h1{font-size:.85rem}
+.header-user .user-name{display:none}
+.header-right .role-badge{display:none}
+.main-content{padding:12px 12px 20px}
+.stat-mini .stat-item{font-size:.7rem;padding:4px 10px}
+.card{padding:16px}
+.filter-section{padding:12px 16px}
+.modal-container{padding:16px;margin:10px}
+.welcome-section{padding:14px 16px}
+.table-responsive table{font-size:.7rem}
+.stat-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+.lembaga-info-box .info-grid{grid-template-columns:1fr}
+.btn-large{padding:10px 16px;font-size:.8rem}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <img src="assets/logo-kemenag.png" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22/%3E%3C/svg%3E'">
+    <div class="brand-text"><h1>SI-<span>MUSTAFA</span></h1><small>Kemenag Kab. Tegal</small></div>
+  </div>
+  <ul class="sidebar-menu">
+    <li class="menu-label">Menu Operator</li>
+    <li><a class="menu-item" data-route="#/dashboard" href="#/dashboard"><i class="fas fa-chart-pie"></i>Dashboard</a></li>
+    <li><a class="menu-item" data-route="#/pendidik" href="#/pendidik"><i class="fas fa-user-graduate"></i>Pendidik</a></li>
+    <li><a class="menu-item" data-route="#/bantuan" href="#/bantuan"><i class="fas fa-hand-holding-heart"></i>Bantuan</a></li>
+    <li><a class="menu-item" data-route="#/mutasi" href="#/mutasi"><i class="fas fa-exchange-alt"></i>Mutasi</a></li>
+    <li><a class="menu-item" data-route="#/pengaturan" href="#/pengaturan"><i class="fas fa-cog"></i>Pengaturan</a></li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="avatar" id="userAvatar">O</div>
+    <div class="user-info"><div class="name" id="userName">Operator</div><div class="role" id="userRole">Operator Lembaga</div></div>
+    <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i></button>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<main class="main-content" id="mainContent">
+  <header class="header">
+    <div class="header-left">
+      <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+      <div class="page-title"><h1 id="pageTitle">Dashboard Operator</h1><p id="pageSubtitle">Kelola data pendidik di lembaga Anda</p></div>
+    </div>
+    <div class="header-right">
+      <span class="header-date" id="currentDate"></span>
+      <span class="role-badge" id="headerRoleBadge">Operator</span>
+      <span class="role-scope" id="headerScope"></span>
+      <div class="header-user"><div class="avatar" id="userAvatarSmall">O</div><span class="user-name" id="userNameSmall">Operator</span></div>
+    </div>
+  </header>
+  <div id="viewContainer"><div class="page-loading"><div class="spinner"></div></div></div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====================================================================
+   SI-MUSTAFA OPERATOR — SPA
+   Routes: #/dashboard #/pendidik #/bantuan #/mutasi #/pengaturan
+   ==================================================================== */
+
+/* ---------- GLOBAL STATE ---------- */
+const App = {
+  user: null,
+  lembagaInfo: null,
+  cache: {
+    _s:{},
+    get(k,t=600000){const e=this._s[k];if(!e)return null;if(Date.now()-e.t>t){delete this._s[k];return null}return e.d},
+    set(k,d){this._s[k]={d,t:Date.now()}},
+    clear(){this._s={}}
+  },
+  currentView: null
+};
+
+const CLOUDINARY_CLOUD_NAME = 'ddrbmte6';
+const CLOUDINARY_UPLOAD_PRESET = 'simustafa_preset';
+const MAX_FILE_SIZE = 300;
+
+/* ---------- CORE UTILS ---------- */
+const $ = id => document.getElementById(id);
+const st = (id,v) => { const e=$(id); if(e) e.textContent=v; };
+function showToast(m,t='info'){
+  const e=$('toast'); if(!e){console.log(m);return;}
+  e.textContent=m; e.className=`toast toast-${t}`;
+  void e.offsetWidth; e.classList.add('show');
+  clearTimeout(e._to); e._to=setTimeout(()=>e.classList.remove('show'),4000);
+}
+function sanitizeUUID(v){
+  if(!v||v===''||v==='null'||v==='undefined') return null;
+  const r=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return r.test(String(v))?v:null;
+}
+/* Helper deteksi Kabupaten Tegal (case-insensitive, prefix-agnostic) */
+function isKabTegal(kab){
+  if(!kab) return false;
+  return String(kab).toLowerCase().includes('tegal');
+}
+function toggleSidebar(){
+  $('sidebar').classList.toggle('open');
+  $('sidebarOverlay').classList.toggle('active');
+}
+function updateDate(){
+  const n=new Date();
+  st('currentDate',n.toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'}));
+}
+function debounce(fn,ms){let t;return function(...a){clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)};}
+async function loadXLSX(){
+  if(window.XLSX) return window.XLSX;
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onload=()=>res(window.XLSX);
+    s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+/* ---------- AUTH ---------- */
+async function checkAuth(){
+  try{
+    const {data:{session}}=await supabaseClient.auth.getSession();
+    if(!session){location.href='index.html';return false;}
+    const {data:u}=await supabaseClient.from('users')
+      .select('id,name,email,role,kecamatan_id,lembaga_id,active')
+      .eq('id',session.user.id).single();
+    if(!u||!u.active||u.role!=='operator'||!u.lembaga_id){
+      await supabaseClient.auth.signOut();
+      location.href='index.html'; return false;
+    }
+    App.user={
+      id:u.id, name:u.name||session.user.email, email:session.user.email,
+      role:'operator', kecamatan_id:u.kecamatan_id, lembaga_id:u.lembaga_id
+    };
+    const {data:ld}=await supabaseClient.from('lembaga')
+      .select('*').eq('id',u.lembaga_id).single();
+    App.lembagaInfo=ld||{};
+    updateHeaderUI();
+    return true;
+  }catch(e){console.error('Auth error:',e);location.href='index.html';return false;}
+}
+function getUser(){return App.user;}
+function updateHeaderUI(){
+  const u=App.user; if(!u) return;
+  st('userAvatar',u.name.charAt(0).toUpperCase());
+  st('userName',u.name);
+  st('userAvatarSmall',u.name.charAt(0).toUpperCase());
+  st('userNameSmall',u.name);
+  if(App.lembagaInfo) st('headerScope','🏫 '+(App.lembagaInfo.nama||''));
+}
+async function handleLogout(){
+  if(!confirm('Yakin keluar?')) return;
+  await supabaseClient.auth.signOut();
+  App.cache.clear();
+  showToast('Logout berhasil!','success');
+  setTimeout(()=>location.href='index.html',1000);
+}
+
+/* ---------- ROUTER ---------- */
+const ROUTES = {
+  '#/dashboard':  { title:'Dashboard Operator', subtitle:'Ringkasan data lembaga Anda', view:()=>DashboardView },
+  '#/pendidik':   { title:'Data Pendidik',      subtitle:'Kelola data pendidik di lembaga Anda', view:()=>PendidikView },
+  '#/bantuan':    { title:'Bantuan & Insentif', subtitle:'Kelola bantuan di lembaga Anda', view:()=>BantuanView },
+  '#/mutasi':     { title:'Mutasi',             subtitle:'Proses pengajuan perpindahan pendidik', view:()=>MutasiView },
+  '#/pengaturan': { title:'Pengaturan',         subtitle:'Kelola profil lembaga dan akun Anda', view:()=>PengaturanView }
+};
+
+function navigate(){
+  const hash = location.hash && ROUTES[location.hash] ? location.hash : '#/dashboard';
+  const route = ROUTES[hash];
+  if(App.currentView && App.currentView.destroy) try{App.currentView.destroy();}catch(e){}
+  st('pageTitle', route.title);
+  st('pageSubtitle', route.subtitle);
+  document.querySelectorAll('.sidebar-menu .menu-item').forEach(el=>{
+    el.classList.toggle('active', el.dataset.route===hash);
+  });
+  const v = route.view();
+  App.currentView = v;
+  $('viewContainer').innerHTML = v.template();
+  if(v.init) v.init();
+}
+
+/* ---------- SHARED HELPERS ---------- */
+function welcomeHTML(){
+  const u=App.user; const l=App.lembagaInfo;
+  return `<div class="welcome-section">
+    <div class="welcome-text"><h2>Selamat datang, <span>${u?.name||'Operator'}</span> 👋</h2>
+    <p><i class="fas fa-building"></i> <span>Operator ${l?.nama||'Lembaga'}</span></p></div>
+    <div class="welcome-badge"><i class="fas fa-calendar-alt"></i><span id="welcomeDate">${new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</span></div>
+  </div>`;
+}
+function tableSpinner(cols){return `<tr><td colspan="${cols}" style="text-align:center;padding:30px;"><div class="spinner"></div></td></tr>`;}
+function tableEmpty(cols,msg='📭 Belum ada data'){return `<tr><td colspan="${cols}" style="text-align:center;padding:30px;color:#999;">${msg}</td></tr>`;}
+function tableError(cols,msg){return `<tr><td colspan="${cols}" style="text-align:center;padding:30px;color:#f44336;">Gagal: ${msg}</td></tr>`;}
+function paginationHTML(){return `<div style="display:flex;justify-content:center;align-items:center;gap:16px;padding-top:12px;border-top:1px solid #f0f2f5;margin-top:12px;">
+  <button class="btn btn-outline btn-sm" id="prevPage"><i class="fas fa-chevron-left"></i></button>
+  <span id="pageInfo">Halaman 1</span>
+  <button class="btn btn-outline btn-sm" id="nextPage"><i class="fas fa-chevron-right"></i></button>
+</div>`;}
+function fmtRupiah(v){return v?(+v).toLocaleString('id-ID'):'0';}
+function formatTanggal(d){if(!d)return '-';try{return new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return d;}}
+function highlightText(text,search){
+  if(!search||!text) return text||'-';
+  const esc=search.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const re=new RegExp(`(${esc})`,'gi');
+  const safe=String(text).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  return safe.replace(re,'<mark class="search-highlight">$1</mark>');
+}
+
+/* ====================================================================
+   VIEW 1: DASHBOARD
+   ==================================================================== */
+const DashboardView = {
+  state:{cp:1,ps:10,td:0,f:{search:'',status:'all',verifikasi:'all',domisili:'all'},searchTimeout:null},
+  template(){
+    return `${welcomeHTML()}
+    <div class="stat-mini">
+      <div class="stat-item">Total: <strong id="totalPendidik">0</strong></div>
+      <div class="stat-item">Aktif: <strong id="totalAktif">0</strong></div>
+      <div class="stat-item">Nonaktif: <strong id="totalNonaktif">0</strong></div>
+      <div class="stat-item">Pending: <strong id="totalPending">0</strong></div>
+      <div class="stat-item">🌍 Luar Kab.: <strong id="totalLuarDaerah">0</strong></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-item" style="flex:2;"><label><i class="fas fa-search"></i> Cari</label><input type="text" id="searchInput" placeholder="Nama atau NIK..."></div>
+      <div class="filter-item"><label>Status</label><select id="statusFilter"><option value="all">Semua</option><option value="active">Aktif</option><option value="inactive">Tidak Aktif</option></select></div>
+      <div class="filter-item"><label>Verifikasi</label><select id="verifikasiFilter"><option value="all">Semua</option><option value="Draft">Draft</option><option value="Pending">Pending</option><option value="Diverifikasi">Diverifikasi</option><option value="Ditolak">Ditolak</option></select></div>
+      <div class="filter-item"><label>Domisili</label><select id="domisiliFilter"><option value="all">Semua</option><option value="lokal">Dalam Kab. Tegal</option><option value="luar">Luar Kab. Tegal</option></select></div>
+      <div class="filter-actions">
+        <button class="btn btn-success" id="btnAdd"><i class="fas fa-plus"></i> Ajukan Baru</button>
+        <button class="btn btn-outline" id="btnRefresh"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+        <div class="card-title"><i class="fas fa-list"></i>Daftar Pendidik <small id="totalData">0 data</small></div>
+      </div>
+      <div class="table-responsive">
+        <table><thead><tr><th>No</th><th>NIK</th><th>Nama</th><th>Status</th><th>Verifikasi</th><th>Domisili</th><th>Aksi</th></tr></thead>
+        <tbody id="tbody">${tableSpinner(7)}</tbody></table>
+      </div>
+      ${paginationHTML()}
+    </div>
+    <div id="modalContainer"></div>`;
+  },
+  init(){
+    const s=this.state;
+    $('searchInput').addEventListener('input',debounce(()=>this.applyFilter(),500));
+    $('statusFilter').addEventListener('change',()=>this.applyFilter());
+    $('verifikasiFilter').addEventListener('change',()=>this.applyFilter());
+    $('domisiliFilter').addEventListener('change',()=>this.applyFilter());
+    $('btnAdd').addEventListener('click',()=>DashboardModal.openAdd(this));
+    $('btnRefresh').addEventListener('click',()=>{App.cache.clear();this.load();showToast('Diperbarui','info');});
+    $('prevPage').addEventListener('click',()=>this.changePage(-1));
+    $('nextPage').addEventListener('click',()=>this.changePage(1));
+    this.load();
+  },
+  destroy(){
+    if(this.state.searchTimeout) clearTimeout(this.state.searchTimeout);
+    if(DashboardModal._close) DashboardModal.close();
+  },
+  applyFilter(){
+    const s=this.state;
+    s.f.search=$('searchInput').value.trim();
+    s.f.status=$('statusFilter').value;
+    s.f.verifikasi=$('verifikasiFilter').value;
+    s.f.domisili=$('domisiliFilter').value;
+    s.cp=1; this.load();
+  },
+  async load(){
+    const s=this.state, u=App.user;
+    if(!u?.lembaga_id) return;
+    try{
+      let q=supabaseClient.from('pendidik').select('*',{count:'exact'}).eq('lembaga_id',u.lembaga_id);
+      if(s.f.search) q=q.or(`nik.ilike.%${s.f.search}%,nama_lengkap.ilike.%${s.f.search}%`);
+      if(s.f.status==='active') q=q.eq('status_aktif',true);
+      else if(s.f.status==='inactive') q=q.eq('status_aktif',false);
+      if(s.f.verifikasi!=='all') q=q.eq('status_verifikasi',s.f.verifikasi);
+      if(s.f.domisili==='lokal') q=q.ilike('kabupaten_pengajar','%tegal%');
+      else if(s.f.domisili==='luar') q=q.not('kabupaten_pengajar','ilike','%tegal%');
+      const from=(s.cp-1)*s.ps;
+      const {data,count}=await q.order('nama_lengkap',{ascending:true}).range(from,from+s.ps-1);
+      s.td=count||0;
+      this.render(data||[]);
+      this.updatePagination();
+      this.loadStats();
+    }catch(e){$('tbody').innerHTML=tableError(7,e.message);}
+  },
+  render(data){
+    const s=this.state, t=$('tbody');
+    st('totalData',`${s.td} data`);
+    if(!data.length){t.innerHTML=tableEmpty(7,'📭 Belum ada pendidik');return;}
+    const start=(s.cp-1)*s.ps;
+    t.innerHTML=data.map((i,n)=>{
+      const sb=i.status_aktif?'active':'inactive', stxt=i.status_aktif?'Aktif':'Tidak Aktif';
+      const vmap={'Draft':'draft','Pending':'pending','Diverifikasi':'verified','Ditolak':'rejected'};
+      const vb=vmap[i.status_verifikasi]||'draft', vtxt=i.status_verifikasi||'Draft';
+      const kabRaw=i.kabupaten_pengajar;
+      const kabDisplay=(kabRaw||'-').replace(/^(KABUPATEN|KOTA)\s+/i,'').trim()||'-';
+      const dom = !kabRaw
+        ? `<span style="color:#999;">-</span>`
+        : (isKabTegal(kabRaw)
+            ? `<span class="badge-lokal"><i class="fas fa-home"></i> ${kabDisplay}</span>`
+            : `<span class="badge-luar-daerah"><i class="fas fa-map-pin"></i> ${kabDisplay}</span>`);
+      const dis=i.status_verifikasi==='Diverifikasi'?'disabled':'';
+      return `<tr><td>${start+n+1}</td>
+        <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:.7rem;">${i.nik||'-'}</code></td>
+        <td><strong>${i.nama_lengkap||'-'}</strong></td>
+        <td><span class="badge ${sb}">${stxt}</span></td>
+        <td><span class="badge ${vb}">${vtxt}</span></td>
+        <td>${dom}</td>
+        <td><div class="action-buttons">
+          <button class="btn btn-info btn-xs" data-act="view" data-id="${i.id}"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-warning btn-xs" data-act="edit" data-id="${i.id}" ${dis}><i class="fas fa-edit"></i></button>
+        </div></td></tr>`;
+    }).join('');
+    t.querySelectorAll('[data-act]').forEach(b=>{
+      b.addEventListener('click',e=>{
+        const id=b.dataset.id;
+        if(b.dataset.act==='view') DashboardModal.openView(this,id);
+        else DashboardModal.openEdit(this,id);
+      });
+    });
+  },
+  async loadStats(){
+    const u=App.user; if(!u?.lembaga_id) return;
+    try{
+      const {data}=await supabaseClient.from('pendidik').select('status_aktif,status_verifikasi,kabupaten_pengajar').eq('lembaga_id',u.lembaga_id);
+      const d=data||[];
+      st('totalPendidik',d.length);
+      st('totalAktif',d.filter(x=>x.status_aktif===true).length);
+      st('totalNonaktif',d.filter(x=>x.status_aktif===false).length);
+      st('totalPending',d.filter(x=>x.status_verifikasi==='Pending'||x.status_verifikasi==='Draft').length);
+      st('totalLuarDaerah',d.filter(x=>x.kabupaten_pengajar&&!isKabTegal(x.kabupaten_pengajar)).length);
+    }catch(e){console.error(e);}
+  },
+  updatePagination(){
+    const s=this.state, tp=Math.ceil(s.td/s.ps);
+    st('pageInfo',`Halaman ${s.cp} dari ${tp||1}`);
+    $('prevPage').disabled=s.cp<=1;
+    $('nextPage').disabled=s.cp>=tp;
+  },
+  changePage(d){
+    const s=this.state, tp=Math.ceil(s.td/s.ps), np=s.cp+d;
+    if(np<1||np>tp) return;
+    s.cp=np; this.load();
+  }
+};
+
+/* ---------- Dashboard Modal ---------- */
+const DashboardModal = {
+  _close:false,
+  _state:{provincesData:[],regenciesData:[],districtsData:[],villagesData:[],provinceMap:{},regencyMap:{},districtMap:{},villageMap:{},dokUrls:{ktp:'',bupati:'',gubernur:''},editing:null,saving:false,view:null},
+  _closeModal(){
+    const m=$('pendidikModal'); if(m) m.remove();
+    this._close=true;
+  },
+  _input(id){const e=$(id);return e?e.value:'';},
+  _set(id,v){const e=$(id);if(e)e.value=v==null?'':v;},
+  async openAdd(view){
+    const u=App.user;
+    if(!u?.lembaga_id){showToast('Lembaga tidak ditemukan!','error');return;}
+    this._close=false; this._state.view=view;
+    this._state.editing=null;
+    this._state.dokUrls={ktp:'',bupati:'',gubernur:''};
+    this._render('Ajukan Pendidik Baru',false);
+    await this._loadProvinces();
+    $('editProvinsi').value='';
+    const jt=this._state.provincesData.find(p=>p.name==='Jawa Tengah');
+    if(jt){$('editProvinsi').value=jt.id; await this._onProvinsiChange();}
+  },
+  async openView(view,id){
+    this._close=false; this._state.view=view;
+    const {data}=await supabaseClient.from('pendidik').select('*').eq('id',id).single();
+    if(!data){showToast('Tidak ditemukan','error');return;}
+    this._state.editing=data;
+    this._render('Detail Pendidik',true);
+    await this._loadProvinces();
+    await this._fill(data);
+    this._disableInputs(true);
+    $('btnSave').style.display='none';
+    this._showVerifyInfo(data);
+  },
+  async openEdit(view,id){
+    this._close=false; this._state.view=view;
+    const {data}=await supabaseClient.from('pendidik').select('*').eq('id',id).single();
+    if(!data){showToast('Tidak ditemukan','error');return;}
+    if(data.status_verifikasi==='Diverifikasi'){showToast('Data sudah diverifikasi, tidak dapat diedit!','warning');return;}
+    this._state.editing=data;
+    this._render('Edit Pengajuan',false);
+    await this._loadProvinces();
+    await this._fill(data);
+    $('btnSave').innerHTML='<i class="fas fa-paper-plane"></i> Update Pengajuan';
+    this._showVerifyInfo(data);
+  },
+  _render(title,readonly){
+    const html=`<div class="modal-overlay active" id="pendidikModal"><div class="modal-container">
+      <div class="modal-header"><h2 id="modalTitle">${title}</h2><button class="close-btn" id="btnCloseModal"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="editId"><input type="hidden" id="editLembagaId">
+        <div id="verificationInfo" style="display:none;"></div>
+        <div class="section-title"><i class="fas fa-id-card"></i> Identitas</div>
+        <div class="form-row">
+          <div class="form-group"><label>NIK <span style="color:red;">*</span></label><input type="text" id="editNik" maxlength="16"></div>
+          <div class="form-group"><label>Nama <span style="color:red;">*</span></label><input type="text" id="editNama"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Tempat Lahir</label><input type="text" id="editTempatLahir"></div>
+          <div class="form-group"><label>Tanggal Lahir</label><input type="date" id="editTanggalLahir"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Jenis Kelamin</label><select id="editJenisKelamin"><option value="">Pilih</option><option value="LAKI-LAKI">Laki-laki</option><option value="PEREMPUAN">Perempuan</option></select></div>
+          <div class="form-group"><label>Status Perkawinan</label><input type="text" id="editStatusPerkawinan"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Ibu Kandung</label><input type="text" id="editIbuKandung"></div>
+          <div class="form-group"><label>Pendidikan</label><input type="text" id="editPendidikan"></div>
+        </div>
+        <div class="section-title"><i class="fas fa-map-marker-alt"></i> Alamat Tempat Tinggal</div>
+        <div class="form-group full-width"><label>Alamat</label><input type="text" id="editAlamat"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Provinsi</label><select id="editProvinsi"><option value="">-- Pilih Provinsi --</option></select><div class="wilayah-info" id="provinsiInfo"></div></div>
+          <div class="form-group"><label>Kabupaten</label><select id="editKabupatenPengajar"><option value="">-- Pilih Kabupaten --</option></select><div class="wilayah-info" id="kabupatenInfo"></div></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Kecamatan</label><select id="editKecamatanPengajar"><option value="">-- Pilih Kecamatan --</option></select><div class="wilayah-info" id="kecamatanInfo"></div></div>
+          <div class="form-group"><label>Desa</label><select id="editDesaPengajar"><option value="">-- Pilih Desa --</option></select><div class="wilayah-info" id="desaInfo"></div></div>
+        </div>
+        <div class="form-group full-width" id="domisiliStatusGroup" style="display:none;"><label>Status Domisili</label><div id="domisiliStatusDisplay" style="padding:8px 12px;border-radius:8px;border:2px solid #e0e0e0;font-weight:600;"></div></div>
+        <div class="section-title"><i class="fas fa-phone"></i> Kontak</div>
+        <div class="form-row">
+          <div class="form-group"><label>No. HP</label><input type="text" id="editNoHp"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="editEmail"></div>
+        </div>
+        <div class="section-title"><i class="fas fa-university"></i> Rekening Bupati</div>
+        <div class="rekening-box"><div class="rekening-title">Rekening 1 - Bupati</div>
+          <div class="form-row">
+            <div class="form-group"><label>No Rekening</label><input type="text" id="editNomorRekeningBupati"></div>
+            <div class="form-group"><label>Bank</label><input type="text" id="editNamaBankBupati"></div>
+          </div>
+          <div class="form-group full-width"><label>Pemilik</label><input type="text" id="editPemilikRekeningBupati"></div>
+        </div>
+        <div class="section-title"><i class="fas fa-university"></i> Rekening Gubernur</div>
+        <div class="rekening-box"><div class="rekening-title">Rekening 2 - Gubernur</div>
+          <div class="form-row">
+            <div class="form-group"><label>No Rekening</label><input type="text" id="editNomorRekeningGubernur"></div>
+            <div class="form-group"><label>Bank</label><input type="text" id="editNamaBankGubernur"></div>
+          </div>
+          <div class="form-group full-width"><label>Pemilik</label><input type="text" id="editPemilikRekeningGubernur"></div>
+        </div>
+        <div class="section-title"><i class="fas fa-chalkboard-teacher"></i> Mengajar</div>
+        <div class="form-row">
+          <div class="form-group"><label>TMT</label><input type="date" id="editTmt"></div>
+          <div class="form-group"><label>Lama Mengabdi</label><div class="lama-mengabdi-display" id="lamaMengabdiDisplay">0 Tahun</div><input type="hidden" id="editLamaMengabdi" value="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Lembaga</label><input type="text" id="editLembagaName" class="lembaga-readonly" readonly></div>
+          <div class="form-group"><label>Jenis</label><select id="editJenisLembaga" disabled><option value="LPQ">LPQ</option><option value="MDT">MDT</option><option value="PONPES">PONPES</option></select></div>
+        </div>
+        <div class="section-title"><i class="fas fa-file-alt"></i> Dokumen KYC</div>
+        <div class="form-group full-width"><label>KTP</label><input type="file" id="editDokumenKtp" accept=".pdf,.jpg,.jpeg,.png"><div class="upload-preview" id="dokumenKtpPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenKtpName"></span><button type="button" class="btn btn-outline btn-sm" data-rmdoc="ktp" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
+        <div class="form-group full-width"><label>Rek Bupati</label><input type="file" id="editDokumenBupati" accept=".pdf,.jpg,.jpeg,.png"><div class="upload-preview" id="dokumenBupatiPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenBupatiName"></span><button type="button" class="btn btn-outline btn-sm" data-rmdoc="bupati" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
+        <div class="form-group full-width"><label>Rek Gubernur</label><input type="file" id="editDokumenGubernur" accept=".pdf,.jpg,.jpeg,.png"><div class="upload-preview" id="dokumenGubernurPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenGubernurName"></span><button type="button" class="btn btn-outline btn-sm" data-rmdoc="gubernur" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
+        <div class="section-title"><i class="fas fa-info-circle"></i> Status & Verifikasi</div>
+        <div class="form-row">
+          <div class="form-group"><label>Status Keaktifan</label><select id="editStatus"><option value="true">Aktif</option><option value="false">Tidak Aktif</option></select></div>
+          <div class="form-group"><label>Status Verifikasi</label><select id="editVerifikasi" disabled><option value="Draft">Draft</option><option value="Pending">Pending</option><option value="Diverifikasi">Diverifikasi</option><option value="Ditolak">Ditolak</option></select><small style="color:#888;font-size:.65rem;">Verifikasi dilakukan oleh Admin Kecamatan</small></div>
+        </div>
+        <div class="form-row" id="alasanPenolakanRow" style="display:none;"><div class="form-group full-width"><label>Alasan Penolakan</label><textarea id="editAlasanPenolakan" disabled style="background:#f5f5f5;"></textarea></div></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="btnCloseFooter">Tutup</button>
+        <button class="btn btn-success" id="btnSave"><i class="fas fa-paper-plane"></i> Ajukan</button>
+      </div>
+    </div></div>`;
+    $('modalContainer').innerHTML=html;
+    $('btnCloseModal').addEventListener('click',()=>this._closeModal());
+    $('btnCloseFooter').addEventListener('click',()=>this._closeModal());
+    $('btnSave').addEventListener('click',()=>this._save());
+    $('editProvinsi').addEventListener('change',()=>this._onProvinsiChange());
+    $('editKabupatenPengajar').addEventListener('change',()=>this._onKabupatenChange());
+    $('editKecamatanPengajar').addEventListener('change',()=>this._onKecamatanChange());
+    $('editTmt').addEventListener('change',()=>this._hitungLama());
+    ['ktp','bupati','gubernur'].forEach(t=>{
+      $('editDokumen'+t.charAt(0).toUpperCase()+t.slice(1)).addEventListener('change',e=>this._upload(e.target,t));
+    });
+    document.querySelectorAll('[data-rmdoc]').forEach(b=>b.addEventListener('click',()=>this._removeDoc(b.dataset.rmdoc)));
+    $('editLembagaName').value=App.lembagaInfo?.nama||'';
+    $('editJenisLembaga').value=App.lembagaInfo?.jenis_lembaga||'LPQ';
+  },
+  _disableInputs(dis){
+    document.querySelectorAll('#pendidikModal .modal-body input,#pendidikModal .modal-body select,#pendidikModal .modal-body textarea').forEach(e=>{
+      if(['editLembagaName','editJenisLembaga','editVerifikasi','editAlasanPenolakan'].includes(e.id)) return;
+      e.disabled=dis;
+    });
+  },
+  async _loadProvinces(){
+    const c=App.cache.get('provinces_data');
+    if(c){this._state.provincesData=c;return;}
+    try{
+      const r=await fetch('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json');
+      const d=await r.json();
+      this._state.provincesData=d;
+      App.cache.set('provinces_data',d);
+      const s=$('editProvinsi');
+      s.innerHTML='<option value="">-- Pilih Provinsi --</option>';
+      d.forEach(p=>s.innerHTML+=`<option value="${p.id}">${p.name}</option>`);
+      st('provinsiInfo',`${d.length} provinsi`);
+    }catch(e){showToast('Gagal memuat provinsi','error');}
+  },
+  async _onProvinsiChange(){
+    const pid=$('editProvinsi').value;
+    $('editKabupatenPengajar').innerHTML='<option value="">-- Pilih Kabupaten --</option>';
+    $('editKecamatanPengajar').innerHTML='<option value="">-- Pilih Kecamatan --</option>';
+    $('editDesaPengajar').innerHTML='<option value="">-- Pilih Desa --</option>';
+    st('kabupatenInfo','');st('kecamatanInfo','');st('desaInfo','');
+    $('domisiliStatusGroup').style.display='none';
+    if(!pid){st('kabupatenInfo','Pilih provinsi dulu');return;}
+    try{
+      const ck='regencies_'+pid, c=App.cache.get(ck);
+      const d=c||await (await fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${pid}.json`)).json();
+      if(!c)App.cache.set(ck,d);
+      this._state.regenciesData=d;
+      const s=$('editKabupatenPengajar');
+      s.innerHTML='<option value="">-- Pilih Kabupaten --</option>';
+      d.forEach(r=>s.innerHTML+=`<option value="${r.id}">${r.name}</option>`);
+      st('kabupatenInfo',`${d.length} kabupaten`);
+    }catch(e){showToast('Gagal muat kabupaten','error');}
+  },
+  async _onKabupatenChange(){
+    const kid=$('editKabupatenPengajar').value;
+    $('editKecamatanPengajar').innerHTML='<option value="">-- Pilih Kecamatan --</option>';
+    $('editDesaPengajar').innerHTML='<option value="">-- Pilih Desa --</option>';
+    st('kecamatanInfo','');st('desaInfo','');
+    if(!kid){st('kecamatanInfo','Pilih kabupaten dulu');this._updateDomisili('');return;}
+    this._updateDomisili(kid);
+    try{
+      const ck='districts_'+kid, c=App.cache.get(ck);
+      const d=c||await (await fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/districts/${kid}.json`)).json();
+      if(!c)App.cache.set(ck,d);
+      this._state.districtsData=d;
+      const s=$('editKecamatanPengajar');
+      s.innerHTML='<option value="">-- Pilih Kecamatan --</option>';
+      d.forEach(x=>s.innerHTML+=`<option value="${x.id}">${x.name}</option>`);
+      st('kecamatanInfo',`${d.length} kecamatan`);
+    }catch(e){showToast('Gagal muat kecamatan','error');}
+  },
+  async _onKecamatanChange(){
+    const kid=$('editKecamatanPengajar').value;
+    $('editDesaPengajar').innerHTML='<option value="">-- Pilih Desa --</option>';
+    st('desaInfo','');
+    if(!kid){st('desaInfo','Pilih kecamatan dulu');return;}
+    try{
+      const ck='villages_'+kid, c=App.cache.get(ck);
+      const d=c||await (await fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/villages/${kid}.json`)).json();
+      if(!c)App.cache.set(ck,d);
+      this._state.villagesData=d;
+      const s=$('editDesaPengajar');
+      s.innerHTML='<option value="">-- Pilih Desa --</option>';
+      d.forEach(v=>s.innerHTML+=`<option value="${v.id}">${v.name}</option>`);
+      st('desaInfo',`${d.length} desa`);
+    }catch(e){showToast('Gagal muat desa','error');}
+  },
+  _updateDomisili(kid){
+    const g=$('domisiliStatusGroup'), d=$('domisiliStatusDisplay');
+    if(!kid){g.style.display='none';return;}
+    const sel=$('editKabupatenPengajar');
+    const name=sel.options[sel.selectedIndex]?.text||'';
+    const isTegal=isKabTegal(name);
+    g.style.display='block';
+    d.innerHTML=isTegal?`<span style="color:#2e7d32;"><i class="fas fa-home"></i> Dalam Kabupaten Tegal</span>`:`<span style="color:#e65100;"><i class="fas fa-map-pin"></i> Luar Kabupaten Tegal</span>`;
+    d.style.background=isTegal?'#e8f5e9':'#fff3e0';
+    d.style.borderColor=isTegal?'#a5d6a7':'#ffcc80';
+  },
+  _hitungLama(){
+    const t=$('editTmt').value;
+    if(!t){st('lamaMengabdiDisplay','0 Tahun');$('editLamaMengabdi').value='0';return;}
+    const td=new Date(t),n=new Date();
+    let y=n.getFullYear()-td.getFullYear();
+    const m=n.getMonth()-td.getMonth();
+    if(m<0||(m===0&&n.getDate()<td.getDate())) y--;
+    const l=Math.max(0,y);
+    st('lamaMengabdiDisplay',`${l} Tahun`);
+    $('editLamaMengabdi').value=l;
+  },
+  async _upload(input,type){
+    const file=input.files[0]; if(!file) return;
+    if(file.size>10*1024*1024){showToast('File terlalu besar! Maks 10MB','error');input.value='';return;}
+    showToast('Memproses file...','info');
+    try{
+      let up=file;
+      if(file.type.startsWith('image/')) up=await this._compress(file,MAX_FILE_SIZE);
+      const fd=new FormData();
+      fd.append('file',up);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);
+      const r=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`,{method:'POST',body:fd});
+      const d=await r.json();
+      if(d.error) throw new Error(d.error.message);
+      this._state.dokUrls[type]=d.secure_url;
+      $('dokumen'+type.charAt(0).toUpperCase()+type.slice(1)+'Preview').classList.add('visible');
+      $('dokumen'+type.charAt(0).toUpperCase()+type.slice(1)+'Name').textContent=file.name;
+      showToast('Berhasil upload!','success');
+    }catch(e){showToast('Gagal: '+e.message,'error');input.value='';}
+  },
+  _compress(file,targetKB=300){
+    return new Promise(res=>{
+      if(file.size<=targetKB*1024){res(file);return;}
+      const r=new FileReader();
+      r.onload=e=>{
+        const img=new Image();
+        img.onload=()=>{
+          let w=img.width,h=img.height;const mx=1000;
+          if(w>mx||h>mx){const ra=Math.min(mx/w,mx/h);w=Math.round(w*ra);h=Math.round(h*ra);}
+          const c=document.createElement('canvas');c.width=w;c.height=h;
+          c.getContext('2d').drawImage(img,0,0,w,h);
+          const qs=[0.8,0.6,0.4,0.2,0.1];
+          const tryQ=i=>{
+            c.toBlob(b=>{
+              if(!b){res(file);return;}
+              const f=new File([b],file.name.replace(/\.[^.]+$/,'.jpg'),{type:'image/jpeg'});
+              if(f.size<=targetKB*1024||i===qs.length-1) res(f);
+              else tryQ(i+1);
+            },'image/jpeg',qs[i]);
+          };
+          tryQ(0);
+        };
+        img.onerror=()=>res(file);
+        img.src=e.target.result;
+      };
+      r.onerror=()=>res(file);
+      r.readAsDataURL(file);
+    });
+  },
+  _removeDoc(type){
+    this._state.dokUrls[type]='';
+    $('dokumen'+type.charAt(0).toUpperCase()+type.slice(1)+'Preview').classList.remove('visible');
+    $('editDokumen'+type.charAt(0).toUpperCase()+type.slice(1)).value='';
+    showToast('Dokumen dihapus','info');
+  },
+  async _fill(data){
+    this._set('editId',data.id);
+    this._set('editLembagaId',data.lembaga_id);
+    this._set('editNik',data.nik);this._set('editNama',data.nama_lengkap);
+    this._set('editTempatLahir',data.tempat_lahir);this._set('editTanggalLahir',data.tanggal_lahir);
+    this._set('editJenisKelamin',data.jenis_kelamin);this._set('editStatusPerkawinan',data.status_perkawinan);
+    this._set('editIbuKandung',data.ibu_kandung);this._set('editPendidikan',data.pendidikan_terakhir);
+    this._set('editAlamat',data.alamat);this._set('editNoHp',data.no_hp);this._set('editEmail',data.email);
+    this._set('editNomorRekeningBupati',data.nomor_rekening_bupati);this._set('editNamaBankBupati',data.nama_bank_bupati);
+    this._set('editPemilikRekeningBupati',data.pemilik_rekening_bupati);
+    this._set('editNomorRekeningGubernur',data.nomor_rekening_gubernur);this._set('editNamaBankGubernur',data.nama_bank_gubernur);
+    this._set('editPemilikRekeningGubernur',data.pemilik_rekening_gubernur);
+    this._set('editTmt',data.tmt_mengajar);
+    this._set('editStatus',data.status_aktif?'true':'false');
+    this._set('editVerifikasi',data.status_verifikasi||'Draft');
+    this._hitungLama();
+    const provNama=data.provinsi||'Jawa Tengah';
+    const prov=this._state.provincesData.find(p=>p.name===provNama);
+    if(prov){
+      $('editProvinsi').value=prov.id;
+      await this._onProvinsiChange();
+      if(data.kabupaten_pengajar){
+        const reg=this._state.regenciesData.find(r=>{
+          const cleaned=(r.name||'').replace(/^(KABUPATEN|KOTA)\s+/i,'').trim();
+          return cleaned.toLowerCase()===String(data.kabupaten_pengajar).toLowerCase()||
+                 (r.name||'').toLowerCase()===String(data.kabupaten_pengajar).toLowerCase();
+        });
+        if(reg){
+          $('editKabupatenPengajar').value=reg.id;
+          await this._onKabupatenChange();
+          if(data.kecamatan_pengajar){
+            const dist=this._state.districtsData.find(d=>d.name===data.kecamatan_pengajar);
+            if(dist){
+              $('editKecamatanPengajar').value=dist.id;
+              await this._onKecamatanChange();
+              if(data.desa_pengajar){
+                const vil=this._state.villagesData.find(v=>v.name===data.desa_pengajar);
+                if(vil) $('editDesaPengajar').value=vil.id;
+              }
+            }
+          }
+        }
+      }
+    }
+    this._state.dokUrls={ktp:'',bupati:'',gubernur:''};
+    if(data.dokumen_kyc){
+      try{
+        const docs=typeof data.dokumen_kyc==='string'?JSON.parse(data.dokumen_kyc):data.dokumen_kyc;
+        ['ktp','bupati','gubernur'].forEach(t=>{
+          if(docs[t]){
+            this._state.dokUrls[t]=docs[t];
+            $('dokumen'+t.charAt(0).toUpperCase()+t.slice(1)+'Preview').classList.add('visible');
+            $('dokumen'+t.charAt(0).toUpperCase()+t.slice(1)+'Name').textContent=docs[t].split('/').pop();
+          }
+        });
+      }catch(e){}
+    }
+  },
+  _showVerifyInfo(data){
+    const el=$('verificationInfo');el.style.display='block';
+    if(data.status_verifikasi==='Diverifikasi'){
+      el.className='info-box success';
+      el.innerHTML=`<i class="fas fa-check-circle"></i> <strong>✅ Telah Diverifikasi</strong>`;
+    }else if(data.status_verifikasi==='Ditolak'){
+      el.className='info-box error';
+      el.innerHTML=`<i class="fas fa-times-circle"></i> <strong>❌ Ditolak</strong> - ${data.alasan_penolakan||'-'}`;
+      $('alasanPenolakanRow').style.display='flex';
+      $('editAlasanPenolakan').value=data.alasan_penolakan||'';
+    }else if(data.status_verifikasi==='Pending'){
+      el.className='info-box warning';
+      el.innerHTML=`<i class="fas fa-clock"></i> <strong>⏳ Menunggu Verifikasi</strong>`;
+    }else{
+      el.className='info-box';
+      el.innerHTML=`<i class="fas fa-file"></i> <strong>📝 Draft</strong>`;
+    }
+  },
+  async _save(){
+    if(this._state.saving){showToast('Sedang memproses...','warning');return;}
+    const u=App.user, id=$('editId').value, isEdit=!!id;
+    const nik=$('editNik').value.trim(), nama=$('editNama').value.trim();
+    if(!nik||!nama){showToast('NIK dan Nama wajib!','error');return;}
+    if(nik.length!==16||!/^\d+$/.test(nik)){showToast('NIK harus 16 digit angka!','error');return;}
+    const {data:ex}=await supabaseClient.from('pendidik').select('id').eq('nik',nik).maybeSingle();
+    if(ex&&ex.id!==id){showToast('NIK sudah terdaftar!','error');return;}
+    const btn=$('btnSave');this._state.saving=true;btn.disabled=true;
+    btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Mengajukan...';
+    const pv=$('editProvinsi'),kb=$('editKabupatenPengajar'),kc=$('editKecamatanPengajar'),ds=$('editDesaPengajar');
+    const provNama=(pv.options[pv.selectedIndex]?.text||null)?.replace(/^(PROVINSI|PROV\.?)\s+/i,'').trim()||null;
+    let   kabNama=(kb.options[kb.selectedIndex]?.text||null);
+    if(kabNama) kabNama=kabNama.replace(/^(KABUPATEN|KOTA|KAB\.?)\s+/i,'').trim();
+    const kecNama=kc.options[kc.selectedIndex]?.text||null;
+    const desNama=ds.options[ds.selectedIndex]?.text||null;
+    if(!kabNama){showToast('Kabupaten wajib dipilih!','error');this._resetBtn(btn);return;}
+    if(!kecNama){showToast('Kecamatan wajib dipilih!','error');this._resetBtn(btn);return;}
+    const li=App.lembagaInfo||{};
+    if(!li.kecamatan_id){showToast('Data lembaga tidak lengkap','error');this._resetBtn(btn);return;}
+    const d={
+      nik,nama_lengkap:nama,
+      tempat_lahir:$('editTempatLahir').value.trim()||null,
+      tanggal_lahir:$('editTanggalLahir').value||null,
+      jenis_kelamin:$('editJenisKelamin').value||null,
+      status_perkawinan:$('editStatusPerkawinan').value.trim()||null,
+      ibu_kandung:$('editIbuKandung').value.trim()||null,
+      pendidikan_terakhir:$('editPendidikan').value.trim()||null,
+      alamat:$('editAlamat').value.trim()||null,
+      provinsi:provNama||null,
+      kabupaten_pengajar:kabNama||null,
+      kecamatan_pengajar:kecNama||null,
+      desa_pengajar:desNama||null,
+      kecamatan_lembaga:li.kecamatan||null,
+      desa_lembaga:li.desa||null,
+      no_hp:$('editNoHp').value.trim()||null,
+      email:$('editEmail').value.trim()||null,
+      nomor_rekening_bupati:$('editNomorRekeningBupati').value.trim()||null,
+      nama_bank_bupati:$('editNamaBankBupati').value.trim()||null,
+      pemilik_rekening_bupati:$('editPemilikRekeningBupati').value.trim()||null,
+      nomor_rekening_gubernur:$('editNomorRekeningGubernur').value.trim()||null,
+      nama_bank_gubernur:$('editNamaBankGubernur').value.trim()||null,
+      pemilik_rekening_gubernur:$('editPemilikRekeningGubernur').value.trim()||null,
+      tmt_mengajar:$('editTmt').value||null,
+      status_aktif:$('editStatus').value==='true',
+      status_verifikasi:'Pending',
+      lembaga_id:sanitizeUUID(u?.lembaga_id),
+      kecamatan_lembaga_id:sanitizeUUID(li?.kecamatan_id),
+      desa_lembaga_id:sanitizeUUID(li?.desa_id),
+      kecamatan_pengajar_id:null, desa_pengajar_id:null,
+      jenis_lembaga:li?.jenis_lembaga||'LPQ',
+      nslp_lembaga:null,
+      dokumen_kyc:JSON.stringify(this._state.dokUrls),
+      updated_at:new Date().toISOString()
+    };
+    if(d.tmt_mengajar){
+      const t=new Date(d.tmt_mengajar),n=new Date();
+      let y=n.getFullYear()-t.getFullYear();
+      const m=n.getMonth()-t.getMonth();
+      if(m<0||(m===0&&n.getDate()<t.getDate())) y--;
+      d.lama_mengabdi=Math.max(0,y);
+    }
+    try{
+      let err;
+      if(isEdit){
+        if(this._state.editing?.status_verifikasi==='Diverifikasi') throw new Error('Data sudah diverifikasi!');
+        if(this._state.editing?.status_verifikasi==='Ditolak'){d.status_verifikasi='Pending';d.alasan_penolakan=null;}
+        const {error}=await supabaseClient.from('pendidik').update(d).eq('id',id);err=error;
+      }else{
+        d.created_at=new Date().toISOString();
+        const {error}=await supabaseClient.from('pendidik').insert([d]);err=error;
+      }
+      if(err) throw err;
+      App.cache.clear();
+      showToast(isEdit?'Pengajuan diperbarui!':'Pengajuan dikirim!','success');
+      this._closeModal();
+      DashboardView.load();
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+    finally{this._resetBtn(btn);}
+  },
+  _resetBtn(btn){this._state.saving=false;btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Ajukan';}
+};
+
+/* ====================================================================
+   VIEW 2: PENDIDIK
+   ==================================================================== */
+const PendidikView = {
+  state:{cp:1,ps:50,td:0,f:{search:'',status:'all',verifikasi:'all'},searchTimeout:null,xlsxBusy:false},
+  template(){
+    return `${welcomeHTML()}
+    <div class="stat-mini">
+      <div class="stat-item">Total: <strong id="totalPendidikStat">0</strong></div>
+      <div class="stat-item">Aktif: <strong id="totalAktif">0</strong></div>
+      <div class="stat-item">Nonaktif: <strong id="totalNonaktif">0</strong></div>
+      <div class="stat-item">Verifikasi: <strong id="totalPending">0</strong></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-item" style="flex:2;"><label><i class="fas fa-search"></i> Cari</label><input type="text" id="searchInput" placeholder="Nama atau NIK..."></div>
+      <div class="filter-item"><label>Status</label><select id="statusFilter"><option value="all">Semua</option><option value="active">Aktif</option><option value="inactive">Tidak Aktif</option></select></div>
+      <div class="filter-item"><label>Verifikasi</label><select id="verifikasiFilter"><option value="all">Semua</option><option value="Diverifikasi">Terverifikasi</option><option value="Pending">Menunggu</option><option value="Draft">Draft</option></select></div>
+      <div class="filter-actions">
+        <button class="btn btn-success" id="btnAdd"><i class="fas fa-plus"></i> Tambah</button>
+        <button class="btn btn-outline" id="btnImport"><i class="fas fa-file-import"></i> Import</button>
+        <button class="btn btn-primary" id="btnExport"><i class="fas fa-file-excel"></i> Export</button>
+        <button class="btn btn-outline" id="btnReset"><i class="fas fa-undo"></i> Reset</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+        <div class="card-title"><i class="fas fa-list"></i>Daftar Pendidik <small id="totalData">0 data</small></div>
+        <button class="btn btn-outline btn-sm" id="btnRefresh"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+      <div class="table-responsive"><table><thead><tr><th>No</th><th>NIK</th><th>Nama</th><th>Status</th><th>Verifikasi</th><th>Aksi</th></tr></thead>
+      <tbody id="tbody">${tableSpinner(6)}</tbody></table></div>
+      ${paginationHTML()}
+    </div>
+    <div id="modalContainer"></div>`;
+  },
+  init(){
+    $('searchInput').addEventListener('input',debounce(()=>this.applyFilter(),500));
+    $('statusFilter').addEventListener('change',()=>this.applyFilter());
+    $('verifikasiFilter').addEventListener('change',()=>this.applyFilter());
+    $('btnAdd').addEventListener('click',()=>PendidikModal.openAdd(this));
+    $('btnImport').addEventListener('click',()=>PendidikModal.openImport(this));
+    $('btnExport').addEventListener('click',()=>this.exportData());
+    $('btnReset').addEventListener('click',()=>this.resetFilter());
+    $('btnRefresh').addEventListener('click',()=>{App.cache.clear();this.load();showToast('Diperbarui','info');});
+    $('prevPage').addEventListener('click',()=>this.changePage(-1));
+    $('nextPage').addEventListener('click',()=>this.changePage(1));
+    this.load();
+  },
+  destroy(){
+    if(this.state.searchTimeout) clearTimeout(this.state.searchTimeout);
+    PendidikModal._close();
+  },
+  applyFilter(){
+    this.state.f.search=$('searchInput').value.trim();
+    this.state.f.status=$('statusFilter').value;
+    this.state.f.verifikasi=$('verifikasiFilter').value;
+    this.state.cp=1; this.load();
+  },
+  resetFilter(){
+    $('searchInput').value='';$('statusFilter').value='all';$('verifikasiFilter').value='all';
+    this.state.f={search:'',status:'all',verifikasi:'all'};
+    this.state.cp=1; this.load();
+  },
+  async load(){
+    const s=this.state, u=App.user;
+    if(!u?.lembaga_id) return;
+    try{
+      let q=supabaseClient.from('pendidik').select('*',{count:'exact'}).eq('lembaga_id',u.lembaga_id);
+      if(s.f.search) q=q.or(`nik.ilike.%${s.f.search}%,nama_lengkap.ilike.%${s.f.search}%`);
+      if(s.f.status==='active') q=q.eq('status_aktif',true);
+      else if(s.f.status==='inactive') q=q.eq('status_aktif',false);
+      if(s.f.verifikasi!=='all') q=q.eq('status_verifikasi',s.f.verifikasi);
+      const from=(s.cp-1)*s.ps;
+      const {data,count}=await q.order('nama_lengkap',{ascending:true}).range(from,from+s.ps-1);
+      s.td=count||0;
+      this.render(data||[]);
+      this.updatePagination();
+      this.loadStats();
+    }catch(e){$('tbody').innerHTML=tableError(6,e.message);}
+  },
+  render(data){
+    const s=this.state, t=$('tbody');
+    st('totalData',`${s.td} data`);
+    if(!data.length){t.innerHTML=tableEmpty(6,'📭 Belum ada pendidik');return;}
+    const start=(s.cp-1)*s.ps;
+    t.innerHTML=data.map((i,n)=>{
+      const sb=i.status_aktif?'active':'inactive',stxt=i.status_aktif?'Aktif':'Tidak Aktif';
+      let vb='inactive',vt='Draft';
+      if(i.status_verifikasi==='Diverifikasi'){vb='active';vt='✓ Terverifikasi';}
+      else if(i.status_verifikasi==='Pending'){vb='pending';vt='⏳ Pending';}
+      else if(i.status_verifikasi==='Ditolak'){vb='rejected';vt='✗ Ditolak';}
+      return `<tr><td>${start+n+1}</td>
+        <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:.7rem;">${i.nik||'-'}</code></td>
+        <td><strong>${i.nama_lengkap||'-'}</strong></td>
+        <td><span class="badge ${sb}">${stxt}</span></td>
+        <td><span class="badge ${vb}" style="font-size:.65rem;">${vt}</span></td>
+        <td><div class="action-buttons">
+          <button class="btn btn-info btn-xs" data-act="view" data-id="${i.id}"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-warning btn-xs" data-act="edit" data-id="${i.id}"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger btn-xs" data-act="del" data-id="${i.id}"><i class="fas fa-trash"></i></button>
+        </div></td></tr>`;
+    }).join('');
+    t.querySelectorAll('[data-act]').forEach(b=>{
+      b.addEventListener('click',e=>{
+        e.stopPropagation();
+        const id=b.dataset.id,a=b.dataset.act;
+        if(a==='view') PendidikModal.openView(this,id);
+        else if(a==='edit') PendidikModal.openEdit(this,id);
+        else if(a==='del') this.deleteRow(id);
+      });
+    });
+  },
+  async deleteRow(id){
+    if(!confirm('Yakin hapus pendidik ini?')) return;
+    try{
+      const {error}=await supabaseClient.from('pendidik').delete().eq('id',id);
+      if(error) throw error;
+      App.cache.clear();
+      showToast('Dihapus','success');
+      this.load();
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+  },
+  async loadStats(){
+    const u=App.user; if(!u?.lembaga_id) return;
+    const {data}=await supabaseClient.from('pendidik').select('status_aktif,status_verifikasi').eq('lembaga_id',u.lembaga_id);
+    const d=data||[];
+    st('totalPendidikStat',d.length);
+    st('totalAktif',d.filter(x=>x.status_aktif).length);
+    st('totalNonaktif',d.filter(x=>!x.status_aktif).length);
+    st('totalPending',d.filter(x=>['Draft','Pending'].includes(x.status_verifikasi)).length);
+  },
+  updatePagination(){
+    const s=this.state, tp=Math.ceil(s.td/s.ps);
+    st('pageInfo',`Halaman ${s.cp} dari ${tp||1}`);
+    $('prevPage').disabled=s.cp<=1;
+    $('nextPage').disabled=s.cp>=tp;
+  },
+  changePage(d){
+    const s=this.state,tp=Math.ceil(s.td/s.ps),np=s.cp+d;
+    if(np<1||np>tp) return;
+    s.cp=np; this.load();
+  },
+  async exportData(){
+    if(this.state.xlsxBusy) return;
+    this.state.xlsxBusy=true;
+    try{
+      showToast('Memuat modul Excel...','info');
+      await loadXLSX();
+      const u=App.user;
+      const {data}=await supabaseClient.from('pendidik').select('*').eq('lembaga_id',u.lembaga_id).order('nama_lengkap');
+      if(!data||!data.length){showToast('Tidak ada data','warning');return;}
+      const h=['NIK','Nama Lengkap','Tempat Lahir','Tanggal Lahir','Jenis Kelamin','Status Perkawinan','Ibu Kandung','Pendidikan','Alamat','No HP','Email','No Rek Bupati','Bank Bupati','Pemilik Rek Bupati','No Rek Gubernur','Bank Gubernur','Pemilik Rek Gubernur','TMT','Lama Mengabdi','Lembaga','Jenis','Status','Verifikasi'];
+      const rows=data.map(i=>[i.nik,i.nama_lengkap,i.tempat_lahir,i.tanggal_lahir,i.jenis_kelamin,i.status_perkawinan,i.ibu_kandung,i.pendidikan_terakhir,i.alamat,i.no_hp,i.email,i.nomor_rekening_bupati,i.nama_bank_bupati,i.pemilik_rekening_bupati,i.nomor_rekening_gubernur,i.nama_bank_gubernur,i.pemilik_rekening_gubernur,i.tmt_mengajar,i.lama_mengabdi,App.lembagaInfo?.nama||'',i.jenis_lembaga||'LPQ',i.status_aktif?'Aktif':'Tidak Aktif',i.status_verifikasi||'Draft']);
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h,...rows]),'Pendidik');
+      XLSX.writeFile(wb,`data_pendidik_${new Date().toISOString().split('T')[0]}.xlsx`);
+      showToast(`Export ${data.length} data`,'success');
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+    finally{this.state.xlsxBusy=false;}
+  }
+};
+
+/* ---------- Pendidik Modal ---------- */
+const PendidikModal = {
+  _state:{editing:null,view:null,saving:false,dokUrls:{ktp:'',bupati:'',gubernur:''},kecOptions:[]},
+  _close(){const m=$('pendidikModal2');if(m)m.remove();},
+  _set(id,v){const e=$(id);if(e)e.value=v==null?'':v;},
+  async _loadKec(){
+    const c=App.cache.get('kec_options',3600000);
+    if(c){this._state.kecOptions=c;return;}
+    const {data}=await supabaseClient.from('master_kecamatan').select('id,nama').order('nama');
+    App.cache.set('kec_options',data||[]);
+    this._state.kecOptions=data||[];
+  },
+  async _loadDesa(kid,tid){
+    const s=$(tid);if(!s)return;
+    s.innerHTML='<option value="">-- Pilih --</option>';
+    if(!kid) return;
+    const ck='desa_'+kid, c=App.cache.get(ck,3600000);
+    let d=c;
+    if(!c){
+      const {data}=await supabaseClient.from('master_kelurahan').select('id,nama').eq('kecamatan_id',kid).order('nama');
+      d=data||[]; App.cache.set(ck,d);
+    }
+    d.forEach(i=>s.innerHTML+=`<option value="${i.id}">${i.nama}</option>`);
+  },
+  _render(title,readonly){
+    const html=`<div class="modal-overlay active" id="pendidikModal2"><div class="modal-container">
+      <div class="modal-header"><h2 id="modalTitle">${title}</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="editId2">
+        <div class="section-title"><i class="fas fa-id-card"></i> Identitas</div>
+        <div class="form-row">
+          <div class="form-group"><label>NIK <span style="color:red;">*</span></label><input type="text" id="editNik" maxlength="16"></div>
+          <div class="form-group"><label>Nama <span style="color:red;">*</span></label><input type="text" id="editNama"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Tempat Lahir</label><input type="text" id="editTempatLahir"></div>
+          <div class="form-group"><label>Tanggal Lahir</label><input type="date" id="editTanggalLahir"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Jenis Kelamin</label><select id="editJenisKelamin"><option value="">Pilih</option><option value="LAKI-LAKI">Laki-laki</option><option value="PEREMPUAN">Perempuan</option></select></div>
+          <div class="form-group"><label>Status Perkawinan</label><input type="text" id="editStatusPerkawinan"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Ibu Kandung</label><input type="text" id="editIbuKandung"></div>
+          <div class="form-group"><label>Pendidikan</label><input type="text" id="editPendidikan"></div>
+        </div>
+        <div class="section-title"><i class="fas fa-map-marker-alt"></i> Alamat</div>
+        <div class="form-group full-width"><label>Alamat</label><input type="text" id="editAlamat"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Desa</label><select id="editDesaPengajar2"><option value="">-- Pilih --</option></select></div>
+          <div class="form-group"><label>Kecamatan</label><select id="editKecamatanPengajar2"><option value="">-- Pilih --</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Kabupaten</label><input type="text" id="editKabupatenPengajar" value="Tegal"></div>
+          <div class="form-group"><label>Provinsi</label><input type="text" id="editProvinsi" value="Jawa Tengah"></div>
+        </div>
+        <div class="section-title"><i class="fas fa-phone"></i> Kontak</div>
+        <div class="form-row">
+          <div class="form-group"><label>No. HP</label><input type="text" id="editNoHp"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="editEmail"></div>
+        </div>
+        <div class="section-title"><i class="fas fa-university"></i> Rekening Bupati</div>
+        <div class="rekening-box"><div class="rekening-title">Rekening 1 - Bupati</div>
+          <div class="form-row">
+            <div class="form-group"><label>No Rekening</label><input type="text" id="editNomorRekeningBupati"></div>
+            <div class="form-group"><label>Bank</label><input type="text" id="editNamaBankBupati"></div>
+          </div>
+          <div class="form-group full-width"><label>Pemilik</label><input type="text" id="editPemilikRekeningBupati"></div>
+        </div>
+        <div class="section-title"><i class="fas fa-university"></i> Rekening Gubernur</div>
+        <div class="rekening-box"><div class="rekening-title">Rekening 2 - Gubernur</div>
+          <div class="form-row">
+            <div class="form-group"><label>No Rekening</label><input type="text" id="editNomorRekeningGubernur"></div>
+            <div class="form-group"><label>Bank</label><input type="text" id="editNamaBankGubernur"></div>
+          </div>
+          <div class="form-group full-width"><label>Pemilik</label><input type="text" id="editPemilikRekeningGubernur"></div>
+        </div>
+        <div class="section-title"><i class="fas fa-chalkboard-teacher"></i> Mengajar</div>
+        <div class="form-row">
+          <div class="form-group"><label>TMT</label><input type="date" id="editTmt"></div>
+          <div class="form-group"><label>Lama Mengabdi</label><div class="lama-mengabdi-display" id="lamaMengabdiDisplay">0 Tahun</div><input type="hidden" id="editLamaMengabdi" value="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Lembaga</label><input type="text" id="editLembagaName" class="lembaga-readonly" readonly></div>
+          <div class="form-group"><label>Jenis</label><select id="editJenisLembaga2"><option value="LPQ">LPQ</option><option value="MDT">MDT</option><option value="PONPES">PONPES</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Status</label><select id="editStatus"><option value="true">Aktif</option><option value="false">Tidak Aktif</option></select></div>
+          <div class="form-group"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close>Tutup</button>
+        <button class="btn btn-success" id="btnSave2"><i class="fas fa-save"></i> Simpan</button>
+      </div>
+    </div></div>`;
+    $('modalContainer').innerHTML=html;
+    document.querySelectorAll('#pendidikModal2 [data-close]').forEach(b=>b.addEventListener('click',()=>this._close()));
+    $('editKecamatanPengajar2').addEventListener('change',e=>this._loadDesa(e.target.value,'editDesaPengajar2'));
+    $('editTmt').addEventListener('change',()=>this._hitungLama());
+    $('btnSave2').addEventListener('click',()=>this._save());
+    $('editLembagaName').value=App.lembagaInfo?.nama||'';
+    $('editJenisLembaga2').value=App.lembagaInfo?.jenis_lembaga||'LPQ';
+  },
+  _hitungLama(){
+    const t=$('editTmt').value;
+    if(!t){st('lamaMengabdiDisplay','0 Tahun');$('editLamaMengabdi').value='0';return;}
+    const td=new Date(t),n=new Date();
+    let y=n.getFullYear()-td.getFullYear();
+    const m=n.getMonth()-td.getMonth();
+    if(m<0||(m===0&&n.getDate()<td.getDate())) y--;
+    const l=Math.max(0,y);
+    st('lamaMengabdiDisplay',`${l} Tahun`);
+    $('editLamaMengabdi').value=l;
+  },
+  async openAdd(view){
+    this._state.editing=null;this._state.view=view;
+    await this._loadKec();
+    this._render('Tambah Pendidik',false);
+    const s=$('editKecamatanPengajar2');
+    this._state.kecOptions.forEach(k=>s.innerHTML+=`<option value="${k.id}">${k.nama}</option>`);
+    if(App.lembagaInfo?.kecamatan_id) s.value=App.lembagaInfo.kecamatan_id;
+    this._hitungLama();
+  },
+  async openView(view,id){
+    this._state.view=view;
+    const {data}=await supabaseClient.from('pendidik').select('*').eq('id',id).single();
+    if(!data){showToast('Tidak ditemukan','error');return;}
+    this._state.editing=data;
+    await this._loadKec();
+    this._render('Detail Pendidik',true);
+    const s=$('editKecamatanPengajar2');
+    this._state.kecOptions.forEach(k=>s.innerHTML+=`<option value="${k.id}">${k.nama}</option>`);
+    await this._fill(data);
+    this._disable(true);
+    $('btnSave2').style.display='none';
+  },
+  async openEdit(view,id){
+    this._state.view=view;
+    const {data}=await supabaseClient.from('pendidik').select('*').eq('id',id).single();
+    if(!data){showToast('Tidak ditemukan','error');return;}
+    this._state.editing=data;
+    await this._loadKec();
+    this._render('Edit Pendidik',false);
+    const s=$('editKecamatanPengajar2');
+    this._state.kecOptions.forEach(k=>s.innerHTML+=`<option value="${k.id}">${k.nama}</option>`);
+    await this._fill(data);
+    $('btnSave2').innerHTML='<i class="fas fa-save"></i> Simpan';
+  },
+  _disable(dis){
+    document.querySelectorAll('#pendidikModal2 .modal-body input,#pendidikModal2 .modal-body select,#pendidikModal2 .modal-body textarea').forEach(e=>{
+      if(['editLembagaName'].includes(e.id)) return;
+      e.disabled=dis;
+    });
+  },
+  async _fill(data){
+    this._set('editId2',data.id);
+    ['nik','nama_lengkap','tempat_lahir','tanggal_lahir','jenis_kelamin','status_perkawinan','ibu_kandung','pendidikan_terakhir','alamat','no_hp','email','nomor_rekening_bupati','nama_bank_bupati','pemilik_rekening_bupati','nomor_rekening_gubernur','nama_bank_gubernur','pemilik_rekening_gubernur','tmt_mengajar'].forEach(k=>{
+      const map={nik:'editNik',nama_lengkap:'editNama',tempat_lahir:'editTempatLahir',tanggal_lahir:'editTanggalLahir',jenis_kelamin:'editJenisKelamin',status_perkawinan:'editStatusPerkawinan',ibu_kandung:'editIbuKandung',pendidikan_terakhir:'editPendidikan',alamat:'editAlamat',no_hp:'editNoHp',email:'editEmail',nomor_rekening_bupati:'editNomorRekeningBupati',nama_bank_bupati:'editNamaBankBupati',pemilik_rekening_bupati:'editPemilikRekeningBupati',nomor_rekening_gubernur:'editNomorRekeningGubernur',nama_bank_gubernur:'editNamaBankGubernur',pemilik_rekening_gubernur:'editPemilikRekeningGubernur',tmt_mengajar:'editTmt'};
+      this._set(map[k],data[k]);
+    });
+    this._set('editKabupatenPengajar',data.kabupaten_pengajar||'Tegal');
+    this._set('editProvinsi',data.provinsi||'Jawa Tengah');
+    this._set('editStatus',data.status_aktif?'true':'false');
+    const kid=data.kecamatan_pengajar_id||data.kecamatan_lembaga_id||'';
+    if(kid){$('editKecamatanPengajar2').value=kid;await this._loadDesa(kid,'editDesaPengajar2');}
+    const did=data.desa_pengajar_id||data.desa_lembaga_id||'';
+    if(did) $('editDesaPengajar2').value=did;
+    this._hitungLama();
+  },
+  async _save(){
+    if(this._state.saving){showToast('Sedang memproses...','warning');return;}
+    const id=$('editId2').value, isEdit=!!id;
+    const nik=$('editNik').value.trim(), nama=$('editNama').value.trim();
+    if(!nik||nik.length!==16||!/^\d+$/.test(nik)){showToast('NIK 16 digit angka!','error');return;}
+    if(!nama){showToast('Nama wajib!','error');return;}
+    const {data:ex}=await supabaseClient.from('pendidik').select('id').eq('nik',nik).maybeSingle();
+    if(ex&&ex.id!==id){showToast('NIK sudah terdaftar!','error');return;}
+    const btn=$('btnSave2');this._state.saving=true;btn.disabled=true;
+    btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+    const kid=$('editKecamatanPengajar2').value, did=$('editDesaPengajar2').value;
+    let kn='',dn='';
+    if(kid){const {data}=await supabaseClient.from('master_kecamatan').select('nama').eq('id',kid).single();kn=data?.nama||'';}
+    if(did){const {data}=await supabaseClient.from('master_kelurahan').select('nama').eq('id',did).single();dn=data?.nama||'';}
+    const d={
+      nik,nama_lengkap:nama,
+      tempat_lahir:$('editTempatLahir').value.trim(),
+      tanggal_lahir:$('editTanggalLahir').value||null,
+      jenis_kelamin:$('editJenisKelamin').value,
+      status_perkawinan:$('editStatusPerkawinan').value.trim(),
+      ibu_kandung:$('editIbuKandung').value.trim(),
+      pendidikan_terakhir:$('editPendidikan').value.trim(),
+      alamat:$('editAlamat').value.trim(),
+      desa_pengajar:dn, desa_pengajar_id:did||null,
+      kecamatan_pengajar:kn, kecamatan_pengajar_id:kid||null,
+      kabupaten_pengajar:$('editKabupatenPengajar').value.trim()||'Tegal',
+      provinsi:$('editProvinsi').value.trim()||'Jawa Tengah',
+      no_hp:$('editNoHp').value.trim(),email:$('editEmail').value.trim(),
+      nomor_rekening_bupati:$('editNomorRekeningBupati').value.trim(),
+      nama_bank_bupati:$('editNamaBankBupati').value.trim(),
+      pemilik_rekening_bupati:$('editPemilikRekeningBupati').value.trim(),
+      nomor_rekening_gubernur:$('editNomorRekeningGubernur').value.trim(),
+      nama_bank_gubernur:$('editNamaBankGubernur').value.trim(),
+      pemilik_rekening_gubernur:$('editPemilikRekeningGubernur').value.trim(),
+      tmt_mengajar:$('editTmt').value||null,
+      lama_mengabdi:parseInt($('editLamaMengabdi').value)||0,
+      lembaga_id:App.user.lembaga_id,
+      nslp_lembaga:App.lembagaInfo?.nslp||'',
+      jenis_lembaga:$('editJenisLembaga2').value,
+      status_aktif:$('editStatus').value==='true',
+      dokumen_kyc:JSON.stringify(this._state.dokUrls),
+      updated_at:new Date().toISOString()
+    };
+    if(!isEdit){d.created_at=new Date().toISOString();d.status_verifikasi='Draft';}
+    try{
+      let err;
+      if(isEdit){const {error}=await supabaseClient.from('pendidik').update(d).eq('id',id);err=error;}
+      else{const {error}=await supabaseClient.from('pendidik').insert([d]);err=error;}
+      if(err) throw err;
+      App.cache.clear();
+      showToast(isEdit?'Berhasil diperbarui!':'Berhasil ditambahkan!','success');
+      this._close();
+      PendidikView.load();
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+    finally{this._state.saving=false;btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> Simpan';}
+  },
+  openImport(view){
+    $('modalContainer').innerHTML=`<div class="modal-overlay active" id="pendidikModal2"><div class="modal-container" style="max-width:450px;">
+      <div class="modal-header"><h2>Import Excel</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <p style="font-size:.9rem;color:#666;margin-bottom:12px;">Upload file Excel (.xlsx)</p>
+        <div style="margin-bottom:12px;"><button class="btn btn-outline" id="btnTpl"><i class="fas fa-download"></i> Download Template</button></div>
+        <input type="file" id="fileImport" accept=".xlsx,.xls" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:8px;">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close>Batal</button>
+        <button class="btn btn-success" id="btnDoImport"><i class="fas fa-upload"></i> Upload</button>
+      </div>
+    </div></div>`;
+    document.querySelectorAll('#pendidikModal2 [data-close]').forEach(b=>b.addEventListener('click',()=>this._close()));
+    $('btnTpl').addEventListener('click',()=>this._template());
+    $('btnDoImport').addEventListener('click',()=>this._import());
+  },
+  async _template(){
+    await loadXLSX();
+    const h=['NIK','Nama Lengkap','Tempat Lahir','Tanggal Lahir','Jenis Kelamin','Status Perkawinan','Ibu Kandung','Pendidikan Terakhir','Alamat','No HP','Email','No Rek Bupati','Bank Bupati','Pemilik Rek Bupati','No Rek Gubernur','Bank Gubernur','Pemilik Rek Gubernur','TMT Mengajar','Lama Mengabdi','Lembaga','Jenis Lembaga','Status'];
+    const r=['3328123401234567','Ahmad Fauzi','Tegal','1990-01-15','LAKI-LAKI','Menikah','Siti Aminah','S1','Jl. Merdeka No. 5','08123456789','ahmad@email.com','1234567890','BRI','Ahmad Fauzi','0987654321','BNI','Ahmad Fauzi','2020-07-01','3','MDT Al-Falah','MDT','Aktif'];
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h,r]),'Template');
+    XLSX.writeFile(wb,'template_pendidik.xlsx');
+    showToast('Template diunduh','success');
+  },
+  async _import(){
+    const f=$('fileImport').files[0];
+    if(!f){showToast('Pilih file!','error');return;}
+    const btn=$('btnDoImport');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+    showToast('Memuat modul Excel...','info');
+    try{
+      await loadXLSX();
+      const buf=await f.arrayBuffer();
+      const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
+      const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+      if(!json.length){showToast('File kosong!','error');return;}
+      const {data:kecData}=await supabaseClient.from('master_kecamatan').select('id,nama');
+      const km={};kecData.forEach(k=>km[k.nama.toLowerCase()]=k.id);
+      const {data:desaData}=await supabaseClient.from('master_kelurahan').select('id,nama,kecamatan_id');
+      const dm={};desaData.forEach(d=>dm[d.nama.toLowerCase()]=d);
+      let s=0,fc=0;
+      for(const row of json){
+        try{
+          const nik=row['NIK']?.toString().replace(/\D/g,'')||'';
+          if(!nik||nik.length!==16){fc++;continue;}
+          const nama=row['Nama Lengkap']||'';
+          if(!nama){fc++;continue;}
+          const kn=(row['Kecamatan Pengajar']||'').toLowerCase();
+          const dn=(row['Desa Pengajar']||'').toLowerCase();
+          let kid=km[kn]||null,did=null;
+          if(dn&&dm[dn]){const de=dm[dn];if(!kid||de.kecamatan_id===kid){did=de.id;if(!kid)kid=de.kecamatan_id;}}
+          const status=row['Status']||'Aktif';
+          const {error}=await supabaseClient.from('pendidik').insert([{
+            nik,nama_lengkap:nama,
+            tempat_lahir:row['Tempat Lahir']||'',
+            tanggal_lahir:this._parseDate(row['Tanggal Lahir']),
+            jenis_kelamin:(row['Jenis Kelamin']||'').toUpperCase().includes('LAKI')?'LAKI-LAKI':'PEREMPUAN',
+            status_perkawinan:row['Status Perkawinan']||'',
+            ibu_kandung:row['Ibu Kandung']||'',
+            pendidikan_terakhir:row['Pendidikan Terakhir']||'',
+            alamat:row['Alamat']||'',
+            no_hp:row['No HP']?.toString()||'',
+            email:row['Email']||'',
+            nomor_rekening_bupati:row['No Rek Bupati']?.toString()||'',
+            nama_bank_bupati:row['Bank Bupati']||'',
+            pemilik_rekening_bupati:row['Pemilik Rek Bupati']||'',
+            nomor_rekening_gubernur:row['No Rek Gubernur']?.toString()||'',
+            nama_bank_gubernur:row['Bank Gubernur']||'',
+            pemilik_rekening_gubernur:row['Pemilik Rek Gubernur']||'',
+            desa_pengajar_id:did,kecamatan_pengajar_id:kid,
+            kabupaten_pengajar:row['Kabupaten Pengajar']||'Tegal',
+            provinsi:row['Provinsi']||'Jawa Tengah',
+            tmt_mengajar:this._parseDate(row['TMT Mengajar']),
+            lama_mengabdi:parseInt(row['Lama Mengabdi'])||0,
+            lembaga_id:App.user.lembaga_id,
+            nslp_lembaga:App.lembagaInfo?.nslp||'',
+            jenis_lembaga:this._mapJenjang(row['Jenis Lembaga']),
+            status_aktif:status.toLowerCase()==='aktif',
+            status_verifikasi:'Draft',
+            created_at:new Date().toISOString(),
+            updated_at:new Date().toISOString()
+          }]);
+          if(error) throw error;
+          s++;
+        }catch(e){fc++;}
+      }
+      App.cache.clear();
+      showToast(`Import: ${s} berhasil, ${fc} gagal`,s>0?'success':'error');
+      this._close();
+      PendidikView.load();
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+    finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-upload"></i> Upload';}
+  },
+  _parseDate(d){
+    if(!d)return null;
+    if(typeof d==='number'){const e=new Date((d-25569)*86400*1000);return isNaN(e)?null:e.toISOString().split('T')[0];}
+    if(typeof d==='string'){
+      const c=d.trim();
+      if(c.includes('/')){const p=c.split('/');if(p.length===3)return `${p[2].length===2?'20'+p[2]:p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;}
+      if(c.match(/^\d{4}-\d{2}-\d{2}$/))return c;
+    }
+    return null;
+  },
+  _mapJenjang(v){
+    const m={'MADIN':'MDT','MDT_ULA':'MDT','MDT_WUSTHA':'MDT','MDT_ULYA':'MDT','TPQ':'LPQ','TQA':'LPQ','TKQ':'LPQ','PAUDQU':'LPQ','RTQ':'LPQ','SALAF':'PONPES','PDF':'PONPES','SPM':'PONPES','PKPPS':'PONPES','LPQ':'LPQ','MDT':'MDT','PONPES':'PONPES'};
+    return m[v]||'LPQ';
+  }
+};
+
+/* ====================================================================
+   VIEW 3: BANTUAN
+   ==================================================================== */
+const BantuanView = {
+  state:{cp:1,ps:10,td:0,f:{jenis:'all',status:'all',tahun:'all'},saving:false,importing:false},
+  template(){
+    return `${welcomeHTML()}
+    <div class="stat-grid">
+      <div class="stat-card"><div class="label">Total</div><div class="value" id="totalBantuan">0</div></div>
+      <div class="stat-card"><div class="label">Cair</div><div class="value green" id="totalCair">0</div></div>
+      <div class="stat-card"><div class="label">Proses</div><div class="value orange" id="totalProses">0</div></div>
+      <div class="stat-card"><div class="label">Nominal</div><div class="value purple" id="totalNominal">Rp 0</div></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-item"><label>Jenis</label><select id="filterJenis"><option value="all">Semua</option><option value="kabupaten">Kabupaten</option><option value="provinsi">Provinsi</option><option value="kemenag">Kemenag</option><option value="lainnya">Lainnya</option></select></div>
+      <div class="filter-item"><label>Status</label><select id="filterStatus"><option value="all">Semua</option><option value="pengajuan_baru">Pengajuan Baru</option><option value="penerima_sebelumnya">Penerima Sebelumnya</option><option value="proses_verifikasi">Verifikasi</option><option value="disetujui">Disetujui</option><option value="proses_pencairan">Pencairan</option><option value="cair">Cair</option><option value="batal">Batal</option></select></div>
+      <div class="filter-item"><label>Tahun</label><select id="filterTahun"><option value="all">Semua</option></select></div>
+      <div class="filter-actions">
+        <button class="btn btn-outline" id="btnReset"><i class="fas fa-undo"></i> Reset</button>
+        <button class="btn btn-success" id="btnAdd"><i class="fas fa-plus"></i> Tambah</button>
+        <button class="btn btn-primary" id="btnImport"><i class="fas fa-file-import"></i> Import</button>
+        <button class="btn btn-primary" id="btnGen"><i class="fas fa-users"></i> Generate</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+        <div class="card-title"><i class="fas fa-list"></i>Daftar Bantuan <small id="totalData">0 data</small></div>
+        <button class="btn btn-outline btn-sm" id="btnRefresh"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+      <div class="table-responsive"><table><thead><tr><th>No</th><th>Pendidik</th><th>Jenis</th><th>Nominal</th><th>Tahun</th><th>Status</th><th>Aksi</th></tr></thead>
+      <tbody id="tbody">${tableSpinner(7)}</tbody></table></div>
+      ${paginationHTML()}
+    </div>
+    <div id="modalContainer"></div>`;
+  },
+  init(){
+    ['filterJenis','filterStatus','filterTahun'].forEach(id=>$(id).addEventListener('change',()=>this.applyFilter()));
+    $('btnReset').addEventListener('click',()=>this.resetFilter());
+    $('btnAdd').addEventListener('click',()=>BantuanModal.openAdd(this));
+    $('btnImport').addEventListener('click',()=>BantuanModal.openImport(this));
+    $('btnGen').addEventListener('click',()=>this.generateCalon());
+    $('btnRefresh').addEventListener('click',()=>{App.cache.clear();this.load();showToast('Diperbarui','info');});
+    $('prevPage').addEventListener('click',()=>this.changePage(-1));
+    $('nextPage').addEventListener('click',()=>this.changePage(1));
+    this.loadTahunFilter().then(()=>this.load());
+  },
+  destroy(){BantuanModal._close();},
+  applyFilter(){
+    this.state.f.jenis=$('filterJenis').value;
+    this.state.f.status=$('filterStatus').value;
+    this.state.f.tahun=$('filterTahun').value;
+    this.state.cp=1; this.load();
+  },
+  resetFilter(){
+    $('filterJenis').value='all';$('filterStatus').value='all';$('filterTahun').value='all';
+    this.state.f={jenis:'all',status:'all',tahun:'all'};
+    this.state.cp=1; this.load();
+  },
+  async load(){
+    const s=this.state,u=App.user;
+    if(!u?.lembaga_id) return;
+    try{
+      const {data:pd}=await supabaseClient.from('pendidik').select('id').eq('lembaga_id',u.lembaga_id);
+      const ids=(pd||[]).map(p=>p.id);
+      if(!ids.length){$('tbody').innerHTML=tableEmpty(7,'📭 Belum ada pendidik');st('totalData','0 data');return;}
+      let q=supabaseClient.from('bantuan').select('*,pendidik(nama_lengkap,nik)',{count:'exact'}).in('pendidik_id',ids);
+      if(s.f.jenis!=='all') q=q.eq('jenis',s.f.jenis);
+      if(s.f.status!=='all') q=q.eq('status',s.f.status);
+      if(s.f.tahun!=='all') q=q.eq('tahun_anggaran',parseInt(s.f.tahun));
+      const from=(s.cp-1)*s.ps;
+      const {data,count}=await q.order('created_at',{ascending:false}).range(from,from+s.ps-1);
+      s.td=count||0;
+      this.render(data||[]);
+      this.updatePagination();
+      this.loadStats(ids);
+    }catch(e){$('tbody').innerHTML=tableError(7,e.message);}
+  },
+  render(data){
+    const s=this.state,t=$('tbody');
+    st('totalData',`${s.td} data`);
+    if(!data.length){t.innerHTML=tableEmpty(7,'📭 Belum ada data');return;}
+    const SL={pengajuan_baru:'Pengajuan Baru',penerima_sebelumnya:'Penerima Sebelumnya',proses_verifikasi:'Proses Verifikasi',disetujui:'Disetujui',proses_pencairan:'Proses Pencairan',cair:'Cair',batal:'Batal'};
+    const SC={pengajuan_baru:'pending',penerima_sebelumnya:'penerima_sebelumnya',proses_verifikasi:'draft',disetujui:'active',proses_pencairan:'pending',cair:'cair',batal:'batal'};
+    const start=(s.cp-1)*s.ps;
+    t.innerHTML=data.map((i,n)=>`<tr>
+      <td>${start+n+1}</td>
+      <td><strong>${i.pendidik?.nama_lengkap||'-'}</strong><br><small>${i.pendidik?.nik||''}</small></td>
+      <td><span class="badge active">${(i.jenis||'-').charAt(0).toUpperCase()+(i.jenis||'').slice(1)}</span></td>
+      <td><strong>Rp ${fmtRupiah(i.nominal)}</strong></td>
+      <td>${i.tahun_anggaran||'-'}</td>
+      <td><span class="badge ${SC[i.status]||'pending'}">${SL[i.status]||i.status}</span></td>
+      <td><div class="action-buttons">
+        <button class="btn btn-info btn-xs" data-act="view" data-id="${i.id}"><i class="fas fa-eye"></i></button>
+        <button class="btn btn-danger btn-xs" data-act="del" data-id="${i.id}"><i class="fas fa-trash"></i></button>
+      </div></td></tr>`).join('');
+    t.querySelectorAll('[data-act]').forEach(b=>{
+      b.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(b.dataset.act==='view') BantuanModal.openView(this,b.dataset.id);
+        else this.deleteRow(b.dataset.id);
+      });
+    });
+  },
+  async deleteRow(id){
+    if(!confirm('Yakin hapus?')) return;
+    try{
+      const {error}=await supabaseClient.from('bantuan').delete().eq('id',id);
+      if(error) throw error;
+      App.cache.clear();showToast('Dihapus','success');this.load();
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+  },
+  async loadStats(ids){
+    if(!ids||!ids.length) return;
+    const {data}=await supabaseClient.from('bantuan').select('status,nominal').in('pendidik_id',ids);
+    const d=data||[];
+    st('totalBantuan',d.length);
+    st('totalCair',d.filter(x=>x.status==='cair').length);
+    st('totalProses',d.filter(x=>['pengajuan_baru','penerima_sebelumnya','proses_verifikasi','disetujui','proses_pencairan'].includes(x.status)).length);
+    st('totalNominal','Rp '+fmtRupiah(d.filter(x=>x.status==='cair').reduce((s,x)=>s+(x.nominal||0),0)));
+  },
+  async loadTahunFilter(){
+    const u=App.user;if(!u?.lembaga_id) return;
+    const {data:pd}=await supabaseClient.from('pendidik').select('id').eq('lembaga_id',u.lembaga_id);
+    const ids=(pd||[]).map(p=>p.id);
+    if(!ids.length) return;
+    const {data}=await supabaseClient.from('bantuan').select('tahun_anggaran').in('pendidik_id',ids).order('tahun_anggaran',{ascending:false});
+    const ts=new Set();(data||[]).forEach(d=>{if(d.tahun_anggaran) ts.add(d.tahun_anggaran);});
+    const sel=$('filterTahun');
+    sel.innerHTML='<option value="all">Semua Tahun</option>';
+    ts.forEach(y=>sel.innerHTML+=`<option value="${y}">${y}</option>`);
+  },
+  updatePagination(){
+    const s=this.state,tp=Math.ceil(s.td/s.ps);
+    st('pageInfo',`Halaman ${s.cp} dari ${tp||1}`);
+    $('prevPage').disabled=s.cp<=1;
+    $('nextPage').disabled=s.cp>=tp;
+  },
+  changePage(d){
+    const s=this.state,tp=Math.ceil(s.td/s.ps),np=s.cp+d;
+    if(np<1||np>tp) return;
+    s.cp=np; this.load();
+  },
+  async generateCalon(){
+    const u=App.user;if(!u?.lembaga_id){showToast('Lembaga tidak ditemukan','error');return;}
+    showToast('Mencari calon...','info');
+    try{
+      const twoY=new Date();twoY.setFullYear(twoY.getFullYear()-2);
+      const ds=twoY.toISOString().split('T')[0];
+      const {data}=await supabaseClient.from('pendidik').select('id,nama_lengkap,nik,tmt_mengajar').eq('lembaga_id',u.lembaga_id).eq('status_aktif',true).lte('tmt_mengajar',ds);
+      const rows=(data||[]).map(i=>`<tr>
+        <td style="padding:6px 8px;">${i.nama_lengkap||'-'}</td>
+        <td style="padding:6px 8px;">${i.nik||'-'}</td>
+        <td style="padding:6px 8px;">${i.tmt_mengajar||'-'}</td>
+        <td style="padding:6px 8px;"><button class="btn btn-success btn-sm" data-calon="${i.id}" data-nama="${i.nama_lengkap}" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-plus"></i> Tambah</button></td>
+      </tr>`).join('') || `<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Tidak ada calon.</td></tr>`;
+      $('modalContainer').innerHTML=`<div class="modal-overlay active" id="calonModal"><div class="modal-container" style="max-width:600px;">
+        <div class="modal-header"><h2>Calon Penerima</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+          <p style="font-size:.85rem;color:#666;margin-bottom:12px;">Pendidik aktif ≥ 2 tahun mengajar.</p>
+          <div style="max-height:300px;overflow-y:auto;"><table style="width:100%;font-size:.8rem;border-collapse:collapse;">
+            <thead><tr style="background:#f8fafc;"><th>Nama</th><th>NIK</th><th>TMT</th><th>Aksi</th></tr></thead>
+            <tbody>${rows}</tbody></table></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline" data-close>Tutup</button></div>
+      </div></div>`;
+      document.querySelectorAll('#calonModal [data-close]').forEach(b=>b.addEventListener('click',()=>{$('calonModal').remove();}));
+      document.querySelectorAll('#calonModal [data-calon]').forEach(b=>b.addEventListener('click',()=>{
+        const id=b.dataset.calon, nama=b.dataset.nama;
+        $('calonModal').remove();
+        BantuanModal.openAdd(BantuanView,id);
+        showToast(`Memilih ${nama}`,'info');
+      }));
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+  }
+};
+
+/* ---------- Bantuan Modal ---------- */
+const BantuanModal = {
+  _state:{po:[],saving:false},
+  _close(){const m=$('bantuanModal2');if(m)m.remove();},
+  async _loadPendidik(){
+    const u=App.user;if(!u?.lembaga_id) return;
+    const {data}=await supabaseClient.from('pendidik').select('id,nik,nama_lengkap').eq('lembaga_id',u.lembaga_id).eq('status_aktif',true).order('nama_lengkap');
+    this._state.po=data||[];
+  },
+  async openAdd(view,preselectId){
+    await this._loadPendidik();
+    const opts=this._state.po.map(p=>`<option value="${p.id}" ${preselectId===p.id?'selected':''}>${p.nama_lengkap} (${p.nik})</option>`).join('');
+    $('modalContainer').innerHTML=`<div class="modal-overlay active" id="bantuanModal2"><div class="modal-container" style="max-width:550px;">
+      <div class="modal-header"><h2>Tambah Bantuan</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="bId">
+        <div class="form-group"><label>Pendidik <span style="color:red;">*</span></label><select id="bPid"><option value="">-- Pilih --</option>${opts}</select></div>
+        <div class="form-group"><label>Jenis <span style="color:red;">*</span></label><select id="bJenis"><option value="kabupaten">Kabupaten</option><option value="provinsi">Provinsi</option><option value="kemenag">Kemenag</option><option value="lainnya">Lainnya</option></select></div>
+        <div class="form-group"><label>Nominal (Rp) <span style="color:red;">*</span></label><input type="number" id="bNominal" min="0" step="1000"></div>
+        <div class="form-group"><label>Tahun <span style="color:red;">*</span></label><input type="number" id="bTahun" value="${new Date().getFullYear()}" min="2000" max="2099"></div>
+        <div class="form-group"><label>Status</label><select id="bStatus"><option value="pengajuan_baru">Pengajuan Baru</option><option value="penerima_sebelumnya">Penerima Sebelumnya</option></select></div>
+        <div class="form-group"><label>Keterangan</label><textarea id="bKet"></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close>Batal</button>
+        <button class="btn btn-success" id="bSave"><i class="fas fa-save"></i> Simpan</button>
+      </div>
+    </div></div>`;
+    document.querySelectorAll('#bantuanModal2 [data-close]').forEach(b=>b.addEventListener('click',()=>this._close()));
+    $('bSave').addEventListener('click',()=>this._save());
+    this._state.saving=false;
+  },
+  async openView(view,id){
+    const {data}=await supabaseClient.from('bantuan').select('*').eq('id',id).single();
+    if(!data){showToast('Tidak ditemukan','error');return;}
+    await this._loadPendidik();
+    const opts=this._state.po.map(p=>`<option value="${p.id}" ${data.pendidik_id===p.id?'selected':''}>${p.nama_lengkap} (${p.nik})</option>`).join('');
+    const SL={pengajuan_baru:'Pengajuan Baru',penerima_sebelumnya:'Penerima Sebelumnya',proses_verifikasi:'Proses Verifikasi',disetujui:'Disetujui',proses_pencairan:'Proses Pencairan',cair:'Cair',batal:'Batal'};
+    $('modalContainer').innerHTML=`<div class="modal-overlay active" id="bantuanModal2"><div class="modal-container" style="max-width:550px;">
+      <div class="modal-header"><h2>Detail Bantuan</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div style="text-align:center;margin-bottom:16px;"><span class="status-badge-large badge-${data.status}">Status: ${SL[data.status]||data.status}</span></div>
+        <div class="form-group"><label>Pendidik</label><select disabled>${opts}</select></div>
+        <div class="form-group"><label>Jenis</label><input type="text" value="${(data.jenis||'').charAt(0).toUpperCase()+(data.jenis||'').slice(1)}" disabled></div>
+        <div class="form-group"><label>Nominal</label><input type="text" value="Rp ${fmtRupiah(data.nominal)}" disabled></div>
+        <div class="form-group"><label>Tahun</label><input type="text" value="${data.tahun_anggaran||'-'}" disabled></div>
+        <div class="form-group"><label>Keterangan</label><textarea disabled>${data.keterangan||'-'}</textarea></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline" data-close>Tutup</button></div>
+    </div></div>`;
+    document.querySelectorAll('#bantuanModal2 [data-close]').forEach(b=>b.addEventListener('click',()=>this._close()));
+  },
+  async _save(){
+    if(this._state.saving){showToast('Sedang memproses...','warning');return;}
+    const pid=$('bPid').value,jenis=$('bJenis').value,nominal=parseFloat($('bNominal').value),tahun=parseInt($('bTahun').value),status=$('bStatus').value,ket=$('bKet').value.trim();
+    if(!pid){showToast('Pilih pendidik!','error');return;}
+    if(!nominal||nominal<=0){showToast('Nominal > 0!','error');return;}
+    if(!tahun||tahun<2000||tahun>2099){showToast('Tahun tidak valid!','error');return;}
+    const u=App.user;
+    const {data:pc}=await supabaseClient.from('pendidik').select('id').eq('id',pid).eq('lembaga_id',u.lembaga_id).single();
+    if(!pc){showToast('Pendidik tidak di lembaga Anda!','error');return;}
+    const btn=$('bSave');this._state.saving=true;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+    const d={pendidik_id:pid,jenis,nominal,tahun_anggaran:tahun,status,keterangan:ket,updated_at:new Date().toISOString(),created_at:new Date().toISOString()};
+    try{
+      const {error}=await supabaseClient.from('bantuan').insert([d]);
+      if(error) throw error;
+      App.cache.clear();showToast('Berhasil ditambahkan!','success');
+      this._close();
+      BantuanView.loadTahunFilter().then(()=>BantuanView.load());
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+    finally{this._state.saving=false;btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> Simpan';}
+  },
+  openImport(view){
+    $('modalContainer').innerHTML=`<div class="modal-overlay active" id="bantuanModal2"><div class="modal-container" style="max-width:450px;">
+      <div class="modal-header"><h2>Import Bantuan</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <p style="font-size:.9rem;color:#666;margin-bottom:12px;">Upload Excel (.xlsx)</p>
+        <div style="margin-bottom:12px;"><button class="btn btn-outline" id="bTpl"><i class="fas fa-download"></i> Template</button></div>
+        <input type="file" id="bFile" accept=".xlsx,.xls" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:8px;">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close>Batal</button>
+        <button class="btn btn-success" id="bDoImport"><i class="fas fa-upload"></i> Upload</button>
+      </div>
+    </div></div>`;
+    document.querySelectorAll('#bantuanModal2 [data-close]').forEach(b=>b.addEventListener('click',()=>this._close()));
+    $('bTpl').addEventListener('click',()=>this._template());
+    $('bDoImport').addEventListener('click',()=>this._import());
+  },
+  async _template(){
+    await loadXLSX();
+    const h=['NIK','Jenis Bantuan','Nominal','Tahun','Status','Keterangan'];
+    const r=['3328123401234567','kabupaten','500000','2026','pengajuan_baru',''];
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h,r]),'Template');
+    XLSX.writeFile(wb,'template_bantuan.xlsx');
+    showToast('Template diunduh','success');
+  },
+  async _import(){
+    const f=$('bFile').files[0];
+    if(!f){showToast('Pilih file!','error');return;}
+    const btn=$('bDoImport');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+    try{
+      await loadXLSX();
+      const buf=await f.arrayBuffer();
+      const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
+      const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+      if(!json.length){showToast('File kosong!','error');return;}
+      const u=App.user;
+      const {data:pd}=await supabaseClient.from('pendidik').select('id,nik,nama_lengkap').eq('lembaga_id',u.lembaga_id);
+      const nm={},nn={};(pd||[]).forEach(p=>{nm[p.nik]=p.id;nn[p.nama_lengkap]=p.id;});
+      let s=0,fc=0;
+      const vs=['pengajuan_baru','penerima_sebelumnya','proses_verifikasi','disetujui','proses_pencairan','cair','batal'];
+      for(const row of json){
+        try{
+          const nk=row['NIK']?.toString().trim()||'',nma=row['Nama Pendidik']||row['Nama']||'',pid=nm[nk]||nn[nma];
+          if(!pid){fc++;continue;}
+          const nominal=parseFloat(row['Nominal'])||0;
+          if(nominal<=0){fc++;continue;}
+          const st=row['Status']?.toLowerCase()||'pengajuan_baru';
+          const {error}=await supabaseClient.from('bantuan').insert([{
+            pendidik_id:pid,jenis:row['Jenis Bantuan']||'kabupaten',nominal,
+            tahun_anggaran:parseInt(row['Tahun'])||new Date().getFullYear(),
+            status:vs.includes(st)?st:'pengajuan_baru',
+            keterangan:row['Keterangan']||'',
+            created_at:new Date().toISOString(),updated_at:new Date().toISOString()
+          }]);
+          if(error) throw error;
+          s++;
+        }catch(e){fc++;}
+      }
+      App.cache.clear();
+      showToast(`Import: ${s} berhasil, ${fc} gagal`,s>0?'success':'error');
+      this._close();
+      BantuanView.loadTahunFilter().then(()=>BantuanView.load());
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+    finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-upload"></i> Upload';}
+  }
+};
+
+/* ====================================================================
+   VIEW 4: MUTASI
+   ==================================================================== */
+const MutasiView = {
+  state:{cp:1,ps:10,td:0,searchTimeout:null,allPendidik:[],allLembaga:[],selectedPendidik:null,did:null},
+  template(){
+    return `${welcomeHTML()}
+    <div class="info-banner"><i class="fas fa-info-circle"></i><div><strong>Informasi:</strong> Ajukan mutasi untuk pendidik di lembaga Anda. Status <span class="highlight">"Diajukan"</span> menunggu persetujuan admin.</div></div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="label">Total</div><div class="value" id="totalMutasi">0</div></div>
+      <div class="stat-card"><div class="label">Menunggu</div><div class="value orange" id="totalMenunggu">0</div></div>
+      <div class="stat-card"><div class="label">Disetujui</div><div class="value blue" id="totalDisetujui">0</div></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-item" style="flex:2;">
+        <label><i class="fas fa-search"></i> Cari</label>
+        <div class="search-input-wrapper">
+          <input type="text" id="searchInput" placeholder="Cari nomor, nama, atau NIK...">
+          <div class="search-info">
+            <span class="search-count" id="searchCount"></span>
+            <button class="btn-clear-search" id="btnClearSearch" style="display:none;" title="Hapus"><i class="fas fa-times-circle"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-item" style="flex:0.5;"><label><i class="fas fa-filter"></i> Status</label><select id="filterStatus"><option value="all">Semua</option><option value="diajukan">Diajukan</option><option value="disetujui">Disetujui</option><option value="berlaku">Berlaku</option><option value="ditolak">Ditolak</option></select></div>
+      <div class="filter-actions"><button class="btn btn-outline" id="btnReset"><i class="fas fa-undo"></i> Reset</button></div>
+    </div>
+    <div style="margin-bottom:16px;"><button class="btn btn-success btn-large" id="btnAjukan" style="width:100%;justify-content:center;"><i class="fas fa-plus-circle" style="font-size:1.2rem;"></i> Ajukan Mutasi Pendidik</button></div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+        <div class="card-title"><i class="fas fa-list"></i>Riwayat Pengajuan <small id="totalData">0 data</small></div>
+        <button class="btn btn-outline btn-sm" id="btnRefresh"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+      <div class="table-responsive"><table><thead><tr><th>No</th><th>Nomor</th><th>Pendidik</th><th>Tujuan</th><th>Jenis</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+      <tbody id="tbody">${tableSpinner(8)}</tbody></table></div>
+      ${paginationHTML()}
+    </div>
+    <div id="modalContainer"></div>`;
+  },
+  init(){
+    $('searchInput').addEventListener('input',debounce(()=>{this.applyFilter();},500));
+    $('filterStatus').addEventListener('change',()=>this.applyFilter());
+    $('btnReset').addEventListener('click',()=>this.resetFilter());
+    $('btnAjukan').addEventListener('click',()=>MutasiModal.openAjukan(this));
+    $('btnRefresh').addEventListener('click',()=>{App.cache.clear();this.loadOptions().then(()=>this.load());showToast('Diperbarui','info');});
+    $('btnClearSearch').addEventListener('click',()=>{$('searchInput').value='';this.applyFilter();});
+    $('prevPage').addEventListener('click',()=>this.changePage(-1));
+    $('nextPage').addEventListener('click',()=>this.changePage(1));
+    this.loadOptions().then(()=>this.load());
+  },
+  destroy(){MutasiModal._close();},
+  applyFilter(){this.state.cp=1;this.load();},
+  resetFilter(){$('searchInput').value='';$('filterStatus').value='all';this.state.cp=1;this.load();},
+  async loadOptions(){
+    const u=App.user;if(!u?.lembaga_id) return;
+    const [pd,lb]=await Promise.all([
+      supabaseClient.from('pendidik').select('id,nik,nama_lengkap,lembaga_id').eq('status_aktif',true).eq('lembaga_id',u.lembaga_id).order('nama_lengkap'),
+      supabaseClient.from('lembaga').select('id,nama,jenis_lembaga,kecamatan_id').eq('status_aktif',true).order('nama')
+    ]);
+    this.state.allPendidik=pd.data||[];
+    let list=(lb.data||[]).filter(l=>l.id!==u.lembaga_id);
+    this.state.allLembaga=list;
+  },
+  async load(){
+    const u=App.user;if(!u?.lembaga_id) return;
+    const s=this.state;
+    try{
+      let q=supabaseClient.from('mutasi').select(`*,pendidik:pendidik_id(id,nik,nama_lengkap),dari_lembaga:dari_lembaga_id(id,nama,jenis_lembaga),ke_lembaga:ke_lembaga_id(id,nama,jenis_lembaga),diajukan_oleh_user:diajukan_oleh(id,name)`,{count:'exact'}).eq('dari_lembaga_id',u.lembaga_id);
+      const sv=$('searchInput')?.value?.trim()||'';
+      if(sv) q=q.ilike('nomor_mutasi',`%${sv}%`);
+      const sf=$('filterStatus').value;
+      if(sf!=='all') q=q.eq('status',sf);
+      const from=(s.cp-1)*s.ps;
+      const {data,count}=await q.order('created_at',{ascending:false}).range(from,from+s.ps-1);
+      let list=data||[];
+      if(sv){
+        const sl=sv.toLowerCase();
+        list=list.filter(i=>(i.nomor_mutasi||'').toLowerCase().includes(sl)||(i.pendidik?.nama_lengkap||'').toLowerCase().includes(sl)||(i.pendidik?.nik||'').includes(sl));
+      }
+      s.td=count||0;
+      this.render(list);
+      this.updatePagination();
+      this.loadStats();
+      this.updateSearchInfo(list.length);
+    }catch(e){$('tbody').innerHTML=tableError(8,e.message);}
+  },
+  render(data){
+    const s=this.state,t=$('tbody');
+    st('totalData',`${s.td} data`);
+    if(!data.length){t.innerHTML=tableEmpty(8,'📭 Belum ada pengajuan');return;}
+    const sm={diajukan:{c:'pending',l:'Diajukan'},disetujui:{c:'active',l:'Disetujui'},berlaku:{c:'berlaku',l:'Berlaku'},ditolak:{c:'rejected',l:'Ditolak'}};
+    const jm={antar_lembaga:'Antar Lembaga',antar_kecamatan:'Antar Kecamatan',pensiun:'Pensiun',berhenti:'Berhenti',meninggal:'Meninggal'};
+    const jc={antar_lembaga:'badge-jenis-antar_lembaga',antar_kecamatan:'badge-jenis-antar_kecamatan',pensiun:'badge-jenis-pensiun',berhenti:'badge-jenis-berhenti',meninggal:'badge-jenis-meninggal'};
+    const sv=$('searchInput')?.value||'';
+    const start=(s.cp-1)*s.ps;
+    t.innerHTML=data.map((i,n)=>{
+      const st=sm[i.status]||sm.diajukan;
+      const j=jm[i.jenis_mutasi]||i.jenis_mutasi;
+      const c=jc[i.jenis_mutasi]||'badge-jenis-antar_lembaga';
+      const canCancel=i.status==='diajukan';
+      return `<tr>
+        <td>${start+n+1}</td>
+        <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:.7rem;">${highlightText(i.nomor_mutasi||'-',sv)}</code></td>
+        <td><strong>${highlightText(i.pendidik?.nama_lengkap||'-',sv)}</strong><br><small>${highlightText(i.pendidik?.nik||'',sv)}</small></td>
+        <td>${highlightText(i.ke_lembaga?.nama||'-',sv)}</td>
+        <td><span class="badge ${c}">${j}</span></td>
+        <td>${formatTanggal(i.tanggal_mutasi)}</td>
+        <td><span class="badge ${st.c}">${st.l}</span></td>
+        <td><div class="action-buttons">
+          <button class="btn btn-outline btn-xs" data-act="view" data-id="${i.id}"><i class="fas fa-eye"></i></button>
+          ${canCancel?`<button class="btn btn-danger btn-xs" data-act="cancel" data-id="${i.id}"><i class="fas fa-times"></i></button>`:''}
+        </div></td></tr>`;
+    }).join('');
+    t.querySelectorAll('[data-act]').forEach(b=>{
+      b.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(b.dataset.act==='view') this.viewDetail(b.dataset.id);
+        else this.cancelById(b.dataset.id);
+      });
+    });
+  },
+  async loadStats(){
+    const u=App.user;if(!u?.lembaga_id) return;
+    const {data}=await supabaseClient.from('mutasi').select('status').eq('dari_lembaga_id',u.lembaga_id);
+    const d=data||[];
+    st('totalMutasi',d.length);
+    st('totalMenunggu',d.filter(x=>x.status==='diajukan').length);
+    st('totalDisetujui',d.filter(x=>['disetujui','berlaku'].includes(x.status)).length);
+  },
+  updateSearchInfo(found){
+    const sv=$('searchInput').value.trim();
+    const cnt=$('searchCount'), clr=$('btnClearSearch');
+    if(sv){clr.style.display='inline-flex';cnt.textContent=`${found} dari ${this.state.td} hasil`;}
+    else{clr.style.display='none';cnt.textContent='';}
+  },
+  updatePagination(){
+    const s=this.state,tp=Math.ceil(s.td/s.ps);
+    st('pageInfo',`Halaman ${s.cp} dari ${tp||1}`);
+    $('prevPage').disabled=s.cp<=1;
+    $('nextPage').disabled=s.cp>=tp;
+  },
+  changePage(d){
+    const s=this.state,tp=Math.ceil(s.td/s.ps),np=s.cp+d;
+    if(np<1||np>tp) return;
+    s.cp=np; this.load();
+  },
+  async viewDetail(id){
+    this.state.did=id;
+    const {data}=await supabaseClient.from('mutasi').select(`*,pendidik:pendidik_id(id,nik,nama_lengkap),dari_lembaga:dari_lembaga_id(id,nama,jenis_lembaga),ke_lembaga:ke_lembaga_id(id,nama,jenis_lembaga),diajukan_oleh_user:diajukan_oleh(id,name),disetujui_oleh_user:disetujui_oleh(id,name)`).eq('id',id).single();
+    if(!data){showToast('Tidak ditemukan','error');return;}
+    const sm={diajukan:'Diajukan',disetujui:'Disetujui',berlaku:'Berlaku',ditolak:'Ditolak'};
+    const jm={antar_lembaga:'Antar Lembaga',antar_kecamatan:'Antar Kecamatan',pensiun:'Pensiun',berhenti:'Berhenti',meninggal:'Meninggal'};
+    $('modalContainer').innerHTML=`<div class="modal-overlay active" id="detailModal2"><div class="modal-container" style="max-width:650px;">
+      <div class="modal-header"><h2><i class="fas fa-exchange-alt"></i> Detail Mutasi</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="grid-column:1/-1;background:#e8f5e9;padding:12px 16px;border-radius:8px;border-left:4px solid #2e7d32;">
+            <div style="font-size:.7rem;color:#888;">Nomor</div>
+            <div style="font-weight:700;font-size:1.1rem;">${data.nomor_mutasi||'-'}</div>
+          </div>
+          <div style="grid-column:1/-1;background:#f8faf8;padding:12px 16px;border-radius:8px;">
+            <div style="font-size:.7rem;">Pendidik</div>
+            <div style="font-weight:600;">${data.pendidik?.nama_lengkap||'-'}</div>
+            <div style="font-size:.8rem;color:#888;">NIK: ${data.pendidik?.nik||'-'}</div>
+          </div>
+          <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #e65100;">
+            <div style="font-size:.7rem;">Asal</div>
+            <div>${data.dari_lembaga?.nama||'-'}</div>
+            <div style="font-size:.7rem;color:#888;">${data.dari_lembaga?.jenis_lembaga||''}</div>
+          </div>
+          <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #0d47a1;">
+            <div style="font-size:.7rem;">Tujuan</div>
+            <div>${data.ke_lembaga?.nama||'-'}</div>
+            <div style="font-size:.7rem;color:#888;">${data.ke_lembaga?.jenis_lembaga||''}</div>
+          </div>
+          <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:.7rem;">Jenis</div><div>${jm[data.jenis_mutasi]||data.jenis_mutasi}</div></div>
+          <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:.7rem;">Tanggal</div><div>${formatTanggal(data.tanggal_mutasi)}</div></div>
+          <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:.7rem;">Alasan</div><div>${data.alasan_mutasi||'-'}</div></div>
+          <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:.7rem;">Status</div><div><span class="badge ${data.status}">${sm[data.status]||data.status}</span></div></div>
+          ${data.keterangan?`<div style="grid-column:1/-1;background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:.7rem;">Keterangan</div><div>${data.keterangan}</div></div>`:''}
+          ${data.diajukan_oleh_user?`<div style="grid-column:1/-1;background:#f8faf8;padding:6px 12px;border-radius:6px;font-size:.75rem;color:#888;">Diajukan oleh: ${data.diajukan_oleh_user?.name||'-'}</div>`:''}
+          ${data.disetujui_oleh_user?`<div style="grid-column:1/-1;background:#f8faf8;padding:6px 12px;border-radius:6px;font-size:.75rem;color:#888;">Disetujui oleh: ${data.disetujui_oleh_user?.name||'-'} pada ${formatTanggal(data.disetujui_pada)}</div>`:''}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close>Tutup</button>
+        ${data.status==='diajukan'?`<button class="btn btn-danger" id="btnCancelModal"><i class="fas fa-times-circle"></i> Batalkan</button>`:''}
+      </div>
+    </div></div>`;
+    document.querySelectorAll('#detailModal2 [data-close]').forEach(b=>b.addEventListener('click',()=>{$('detailModal2').remove();this.state.did=null;}));
+    if(data.status==='diajukan') $('btnCancelModal').addEventListener('click',()=>this.cancelById(id));
+  },
+  async cancelById(id){
+    if(!confirm('Yakin batalkan pengajuan ini?')) return;
+    try{
+      const {error}=await supabaseClient.from('mutasi').update({status:'ditolak',updated_at:new Date().toISOString()}).eq('id',id);
+      if(error) throw error;
+      showToast('Pengajuan dibatalkan','success');
+      $('detailModal2')?.remove();
+      this.load();
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+  }
+};
+
+/* ---------- Mutasi Modal ---------- */
+const MutasiModal = {
+  _state:{selectedPendidik:null,asalId:''},
+  _close(){const m=$('mutasiModal2');if(m)m.remove();},
+  openAjukan(view){
+    const u=App.user;if(!u?.lembaga_id){showToast('Belum terdaftar di lembaga','error');return;}
+    this._state.selectedPendidik=null;this._state.asalId='';
+    $('modalContainer').innerHTML=`<div class="modal-overlay active" id="mutasiModal2"><div class="modal-container" style="max-width:650px;">
+      <div class="modal-header"><h2><i class="fas fa-paper-plane"></i> Ajukan Mutasi</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="selected-info" id="selectedInfo">
+          <div class="info-label">Pendidik Terpilih</div>
+          <div class="info-value" id="selectedNama">-</div>
+          <div class="info-sub" id="selectedNik">NIK: -</div>
+          <div class="info-sub" id="selectedLembagaAsal">Lembaga: -</div>
+        </div>
+        <div class="form-group"><label>Pendidik <span style="color:red;">*</span></label>
+          <div class="searchable-select-wrapper" id="psWrap">
+            <input type="text" id="pendidikSearchInput" placeholder="Cari pendidik (nama atau NIK)..." autocomplete="off">
+            <div class="dropdown-list" id="pendidikDropdown"></div>
+            <input type="hidden" id="mPid">
+          </div>
+        </div>
+        <div class="form-group"><label>Asal <span style="color:red;">*</span></label>
+          <input type="text" id="mLembagaAsal" readonly placeholder="Pilih pendidik dulu" style="background:#f5f5f5;cursor:not-allowed;">
+          <input type="hidden" id="mAsalId">
+        </div>
+        <div class="form-group"><label>Tujuan <span style="color:red;">*</span></label>
+          <div class="searchable-select-wrapper" id="tsWrap">
+            <input type="text" id="tujuanSearchInput" placeholder="Cari lembaga tujuan..." autocomplete="off">
+            <div class="dropdown-list" id="tujuanDropdown"></div>
+            <input type="hidden" id="mTujuanId">
+          </div>
+          <div style="font-size:.7rem;color:#888;margin-top:4px;"><i class="fas fa-info-circle"></i> Dapat memilih lintas jenis lembaga (LPQ ↔ MDT ↔ PONPES)</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Jenis <span style="color:red;">*</span></label><select id="mJenis"><option value="antar_lembaga">Antar Lembaga</option><option value="antar_kecamatan">Antar Kecamatan</option><option value="pensiun">Pensiun</option><option value="berhenti">Berhenti</option><option value="meninggal">Meninggal</option></select></div>
+          <div class="form-group"><label>Tanggal <span style="color:red;">*</span></label><input type="date" id="mTanggal" value="${new Date().toISOString().split('T')[0]}"></div>
+        </div>
+        <div class="form-group"><label>Alasan <span style="color:red;">*</span></label>
+          <select id="mAlasan">
+            <option value="">-- Pilih --</option>
+            <option value="permohonan">Permohonan</option>
+            <option value="pemerataan">Pemerataan</option>
+            <option value="kebutuhan_organisasi">Kebutuhan Organisasi</option>
+            <option value="mutasi_masuk">Mutasi Masuk</option>
+            <option value="mutasi_keluar">Mutasi Keluar</option>
+            <option value="peningkatan_kompetensi">Peningkatan Kompetensi</option>
+            <option value="lainnya">Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group hidden-field" id="alasanLainGroup"><label>Alasan Lainnya <span style="color:red;">*</span></label><input type="text" id="mAlasanLain"></div>
+        <div class="form-group"><label>Keterangan</label><textarea id="mKet" placeholder="Opsional"></textarea></div>
+        <div class="form-group" style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #FF9800;">
+          <label style="color:#666;">Status</label>
+          <div style="font-weight:600;color:#FF9800;"><i class="fas fa-clock"></i> Akan diajukan sebagai "Diajukan"</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close>Batal</button>
+        <button class="btn btn-success" id="mSave"><i class="fas fa-paper-plane"></i> Ajukan</button>
+      </div>
+    </div></div>`;
+    document.querySelectorAll('#mutasiModal2 [data-close]').forEach(b=>b.addEventListener('click',()=>this._close()));
+    $('pendidikSearchInput').addEventListener('input',e=>this._renderPendidik(e.target.value));
+    $('pendidikSearchInput').addEventListener('focus',e=>this._renderPendidik(e.target.value));
+    $('tujuanSearchInput').addEventListener('input',e=>this._renderTujuan(e.target.value));
+    $('tujuanSearchInput').addEventListener('focus',e=>this._renderTujuan(e.target.value));
+    $('mAlasan').addEventListener('change',()=>this._toggleAlasan());
+    $('mSave').addEventListener('click',()=>this._save(view));
+    document.addEventListener('click',this._docClick=this._docClick.bind(this));
+  },
+  _docClick(e){
+    if(!e.target.closest('#psWrap')) $('pendidikDropdown')?.classList.remove('open');
+    if(!e.target.closest('#tsWrap')) $('tujuanDropdown')?.classList.remove('open');
+  },
+  _renderPendidik(filter=''){
+    const dd=$('pendidikDropdown');if(!dd) return;
+    const s=filter.toLowerCase().trim();
+    let list=MutasiView.state.allPendidik;
+    if(s) list=list.filter(p=>p.nama_lengkap.toLowerCase().includes(s)||p.nik.includes(s));
+    if(!list.length){dd.innerHTML=`<div class="no-result">😕 Tidak ada pendidik</div>`;dd.classList.add('open');return;}
+    dd.innerHTML=list.map(p=>`<div class="option-item" data-pid="${p.id}">
+      <strong>${highlightText(p.nama_lengkap,filter)}</strong>
+      <span class="sub-text">NIK: ${highlightText(p.nik,filter)}</span>
+    </div>`).join('');
+    dd.querySelectorAll('[data-pid]').forEach(el=>el.addEventListener('click',()=>this._selectPendidik(el.dataset.pid)));
+    dd.classList.add('open');
+  },
+  _selectPendidik(id){
+    const p=MutasiView.state.allPendidik.find(x=>x.id===id);if(!p) return;
+    this._state.selectedPendidik=p;
+    $('mPid').value=id;
+    $('pendidikSearchInput').value=p.nama_lengkap+' ('+p.nik+')';
+    $('pendidikDropdown').classList.remove('open');
+    $('selectedInfo').style.display='block';
+    $('selectedNama').textContent=p.nama_lengkap;
+    $('selectedNik').textContent='NIK: '+p.nik;
+    const lb=MutasiView.state.allLembaga.find(l=>l.id===p.lembaga_id)||{nama:App.lembagaInfo?.nama,jenis_lembaga:App.lembagaInfo?.jenis_lembaga,id:App.user.lembaga_id};
+    $('mLembagaAsal').value=(lb.nama||'')+' ('+(lb.jenis_lembaga||'')+')';
+    $('mAsalId').value=lb.id||'';
+    this._state.asalId=lb.id||'';
+    $('selectedLembagaAsal').textContent='Lembaga: '+(lb.nama||'-');
+    $('mTujuanId').value='';
+    $('tujuanSearchInput').value='';
+  },
+  _renderTujuan(filter=''){
+    const dd=$('tujuanDropdown');if(!dd) return;
+    const s=filter.toLowerCase().trim();
+    let list=MutasiView.state.allLembaga.filter(l=>l.id!==this._state.asalId);
+    if(s) list=list.filter(l=>l.nama.toLowerCase().includes(s)||(l.jenis_lembaga||'').toLowerCase().includes(s));
+    if(!list.length){dd.innerHTML=`<div class="no-result">😕 Tidak ada lembaga</div>`;dd.classList.add('open');return;}
+    dd.innerHTML=list.map(l=>{
+      const j=(l.jenis_lembaga||'').toLowerCase();
+      const jc=j?`badge-jenis-${j}`:'';
+      return `<div class="option-item" data-lid="${l.id}">
+        <strong>${highlightText(l.nama,filter)}</strong>
+        <span class="sub-text">Jenis: ${highlightText(l.jenis_lembaga||'',filter)}</span>
+        ${j?`<span class="badge-jenis ${jc}">${l.jenis_lembaga}</span>`:''}
+      </div>`;
+    }).join('');
+    dd.querySelectorAll('[data-lid]').forEach(el=>el.addEventListener('click',()=>{
+      const l=MutasiView.state.allLembaga.find(x=>x.id===el.dataset.lid);
+      if(l){$('mTujuanId').value=l.id;$('tujuanSearchInput').value=l.nama+' ('+l.jenis_lembaga+')';dd.classList.remove('open');}
+    }));
+    dd.classList.add('open');
+  },
+  _toggleAlasan(){
+    const v=$('mAlasan').value, g=$('alasanLainGroup');
+    if(v==='lainnya') g.classList.add('visible');
+    else{g.classList.remove('visible');$('mAlasanLain').value='';}
+  },
+async _generateNomorMutasi(){
+  const n=new Date();
+  const y=n.getFullYear();
+  const m=String(n.getMonth()+1).padStart(2,'0');
+  const prefix=`MUT/${y}/${m}/`;
+  const {data}=await supabaseClient
+    .from('mutasi')
+    .select('nomor_mutasi')
+    .like('nomor_mutasi',`${prefix}%`)
+    .order('nomor_mutasi',{ascending:false})
+    .limit(1);
+  let seq=1;
+  if(data&&data.length){
+    const last=data[0].nomor_mutasi||'';
+    const match=last.match(/\/(\d+)\s*$/);
+    if(match) seq=parseInt(match[1],10)+1;
+  }
+  return `${prefix}${String(seq).padStart(3,'0')}`;
+},
+
+async _save(view){
+  const pid=$('mPid').value, did=$('mAsalId').value, kid=$('mTujuanId').value;
+  const jenis=$('mJenis').value, tgl=$('mTanggal').value, alasanSel=$('mAlasan').value;
+  const alasanLain=$('mAlasanLain').value.trim(), ket=$('mKet').value.trim();
+  if(!pid||!did||!kid||!tgl||!alasanSel){showToast('Semua field wajib diisi!','error');return;}
+  if(did===kid){showToast('Asal dan tujuan tidak boleh sama!','error');return;}
+  if(alasanSel==='lainnya'&&!alasanLain){showToast('Isi alasan lainnya!','error');return;}
+  const alasan=alasanSel==='lainnya'?alasanLain:alasanSel;
+  const btn=$('mSave');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+
+  const baseData={
+    pendidik_id:pid,dari_lembaga_id:did,ke_lembaga_id:kid,
+    jenis_mutasi:jenis,tanggal_mutasi:tgl,alasan_mutasi:alasan,keterangan:ket,
+    status:'diajukan',diajukan_oleh:App.user.id,
+    updated_at:new Date().toISOString()
+  };
+
+  let lastErr=null;
+  // Retry maks 5x untuk handle race condition (2 user simpan bersamaan)
+  for(let attempt=0;attempt<5;attempt++){
+    try{
+      const nomor=await this._generateNomorMutasi();
+      const {error}=await supabaseClient.from('mutasi').insert([{
+        ...baseData, nomor_mutasi:nomor,
+        created_at:new Date().toISOString()
+      }]);
+      if(error){
+        // Jika duplicate key → coba nomor berikutnya
+        if(/duplicate|unique|23505/i.test(error.message||'')){
+          lastErr=error;
+          await new Promise(r=>setTimeout(r,150)); // jeda kecil sebelum retry
+          continue;
+        }
+        throw error;
+      }
+      // Sukses
+      App.cache.clear();
+      showToast('Pengajuan berhasil dikirim!','success');
+      this._close();
+      view.load();
+      btn.disabled=false;
+      btn.innerHTML='<i class="fas fa-paper-plane"></i> Ajukan';
+      return;
+    }catch(e){
+      lastErr=e;
+    }
+  }
+
+  // Kalau semua percobaan gagal
+  showToast('Gagal: '+(lastErr?.message||'Tidak dapat generate nomor unik'),'error');
+  btn.disabled=false;
+  btn.innerHTML='<i class="fas fa-paper-plane"></i> Ajukan';
+}
+};
+
+/* ====================================================================
+   VIEW 5: PENGATURAN
+   ==================================================================== */
+const PengaturanView = {
+  state:{savingPass:false,savingLembaga:false},
+  template(){
+    const l=App.lembagaInfo||{};
+    const u=App.user||{};
+    return `${welcomeHTML()}
+    <div class="setting-section">
+      <div class="section-header">
+        <div><div class="section-title"><i class="fas fa-building"></i>Profil Lembaga</div><div class="section-desc">Informasi lembaga tempat Anda bertugas</div></div>
+        <button class="btn btn-primary" id="btnEditLembaga"><i class="fas fa-edit"></i> Edit</button>
+      </div>
+      <div class="lembaga-info-box"><div class="info-grid">
+        <div class="info-item"><div class="label">Nama</div><div class="value">${l.nama||'-'}</div></div>
+        <div class="info-item"><div class="label">Jenis</div><div class="value">${l.jenis_lembaga||'-'}</div></div>
+        <div class="info-item"><div class="label">NSLP</div><div class="value">${l.nslp||'-'}</div></div>
+        <div class="info-item"><div class="label">Pimpinan</div><div class="value">${l.pimpinan||'-'}</div></div>
+        <div class="info-item"><div class="label">Alamat</div><div class="value">${l.alamat||'-'}</div></div>
+        <div class="info-item"><div class="label">Kecamatan</div><div class="value">${l.kecamatan||'-'}</div></div>
+        <div class="info-item"><div class="label">Desa</div><div class="value">${l.desa||'-'}</div></div>
+        <div class="info-item"><div class="label">No. HP</div><div class="value">${l.no_hp||'-'}</div></div>
+        <div class="info-item"><div class="label">Email</div><div class="value">${l.email||'-'}</div></div>
+      </div></div>
+      <button class="btn btn-outline btn-sm" id="btnRefreshLembaga"><i class="fas fa-sync"></i> Refresh</button>
+    </div>
+    <div class="setting-section">
+      <div class="section-header"><div><div class="section-title"><i class="fas fa-user-shield"></i>Akun & Keamanan</div><div class="section-desc">Kelola akun dan keamanan data Anda</div></div></div>
+      <div class="setting-item"><div class="item-label">Nama<small>Nama yang terdaftar di sistem</small></div>
+        <div class="item-control"><input type="text" id="userNameInput" value="${u.name||''}"><button class="btn btn-primary" id="btnUpdateName"><i class="fas fa-save"></i> Update</button></div></div>
+      <div class="setting-item"><div class="item-label">Email<small>Tidak dapat diubah</small></div>
+        <div class="item-control"><input type="email" id="userEmailInput" value="${u.email||''}" readonly></div></div>
+      <div class="setting-item"><div class="item-label">Password<small>Perbarui password akun Anda</small></div>
+        <div class="item-control"><button class="btn btn-primary" id="btnChangePass"><i class="fas fa-key"></i> Ganti</button></div></div>
+      <div class="setting-item"><div class="item-label">Logout Semua<small>Keluar dari semua perangkat</small></div>
+        <div class="item-control"><button class="btn btn-danger" id="btnLogoutAll"><i class="fas fa-sign-out-alt"></i> Logout</button></div></div>
+    </div>
+    <div class="setting-section">
+      <div class="section-header"><div><div class="section-title"><i class="fas fa-database"></i>Data & Backup</div><div class="section-desc">Kelola data dan backup lembaga Anda</div></div></div>
+      <div class="setting-item"><div class="item-label">Export Pendidik<small>Download data pendidik</small></div>
+        <div class="item-control"><button class="btn btn-primary" id="btnExport"><i class="fas fa-file-excel"></i> Export</button></div></div>
+      <div class="setting-item"><div class="item-label">Backup Data<small>Backup semua data lembaga</small></div>
+        <div class="item-control"><button class="btn btn-primary" id="btnBackup"><i class="fas fa-download"></i> Backup</button></div></div>
+      <div class="backup-info"><i class="fas fa-info-circle"></i> Backup terakhir: <strong id="lastBackup">Belum pernah</strong></div>
+    </div>
+    <div id="modalContainer"></div>`;
+  },
+  init(){
+    $('btnEditLembaga').addEventListener('click',()=>this.openEditLembaga());
+    $('btnRefreshLembaga').addEventListener('click',()=>this.refreshLembaga());
+    $('btnUpdateName').addEventListener('click',()=>this.updateName());
+    $('btnChangePass').addEventListener('click',()=>this.openPassword());
+    $('btnLogoutAll').addEventListener('click',()=>this.logoutAll());
+    $('btnExport').addEventListener('click',()=>this.exportData());
+    $('btnBackup').addEventListener('click',()=>this.backup());
+  },
+  destroy(){const m=$('pengaturanModal');if(m)m.remove();},
+  async refreshLembaga(){
+    const {data}=await supabaseClient.from('lembaga').select('*').eq('id',App.user.lembaga_id).single();
+    App.lembagaInfo=data;
+    showToast('Data diperbarui','success');
+    navigate();
+  },
+  async updateName(){
+    const nm=$('userNameInput').value.trim();
+    if(!nm){showToast('Nama tidak boleh kosong!','error');return;}
+    try{
+      await supabaseClient.from('users').update({name:nm,updated_at:new Date().toISOString()}).eq('id',App.user.id);
+      App.user.name=nm;
+      updateHeaderUI();
+      showToast('Nama diperbarui!','success');
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+  },
+  openPassword(){
+    $('modalContainer').innerHTML=`<div class="modal-overlay active" id="pengaturanModal"><div class="modal-container" style="max-width:550px;">
+      <div class="modal-header"><h2><i class="fas fa-key"></i> Ganti Password</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>Password Lama</label><input type="password" id="oldPass" autocomplete="current-password"></div>
+        <div class="form-group"><label>Password Baru</label><input type="password" id="newPass" autocomplete="new-password"><small style="color:#888;font-size:.7rem;">Min 6 karakter</small></div>
+        <div class="form-group"><label>Konfirmasi</label><input type="password" id="confPass" autocomplete="new-password"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close>Batal</button>
+        <button class="btn btn-success" id="btnDoPass"><i class="fas fa-save"></i> Simpan</button>
+      </div>
+    </div></div>`;
+    document.querySelectorAll('#pengaturanModal [data-close]').forEach(b=>b.addEventListener('click',()=>$('pengaturanModal').remove()));
+    $('btnDoPass').addEventListener('click',()=>this._changePass());
+  },
+  async _changePass(){
+    if(this.state.savingPass){showToast('Sedang memproses...','warning');return;}
+    const op=$('oldPass').value,np=$('newPass').value,cp=$('confPass').value;
+    if(!op||!np||!cp){showToast('Semua field harus diisi!','error');return;}
+    if(np.length<6){showToast('Min 6 karakter!','error');return;}
+    if(np!==cp){showToast('Password tidak cocok!','error');return;}
+    const btn=$('btnDoPass');this.state.savingPass=true;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+    try{
+      const {error:se}=await supabaseClient.auth.signInWithPassword({email:App.user.email,password:op});
+      if(se) throw new Error('Password lama salah!');
+      const {error}=await supabaseClient.auth.updateUser({password:np});
+      if(error) throw error;
+      showToast('Password berhasil diubah!','success');
+      $('pengaturanModal').remove();
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+    finally{this.state.savingPass=false;btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> Simpan';}
+  },
+  async logoutAll(){
+    if(!confirm('Logout semua perangkat?')) return;
+    await supabaseClient.auth.signOut();
+    location.href='index.html';
+  },
+  async openEditLembaga(){
+    const l=App.lembagaInfo||{};
+    const cd=App.cache.get('kec_options',3600000);
+    const kecs=cd||(await supabaseClient.from('master_kecamatan').select('id,nama').order('nama')).data||[];
+    if(!cd) App.cache.set('kec_options',kecs);
+    const kOpts=kecs.map(k=>`<option value="${k.id}" ${k.id===l.kecamatan_id?'selected':''}>${k.nama}</option>`).join('');
+    $('modalContainer').innerHTML=`<div class="modal-overlay active" id="pengaturanModal"><div class="modal-container" style="max-width:550px;">
+      <div class="modal-header"><h2><i class="fas fa-building"></i> Edit Profil</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>Nama <span style="color:red;">*</span></label><input type="text" id="lNama" value="${l.nama||''}"></div>
+        <div class="form-group"><label>Jenis</label><select id="lJenis"><option value="LPQ" ${l.jenis_lembaga==='LPQ'?'selected':''}>LPQ</option><option value="MDT" ${l.jenis_lembaga==='MDT'?'selected':''}>MDT</option><option value="PONPES" ${l.jenis_lembaga==='PONPES'?'selected':''}>PONPES</option></select></div>
+        <div class="form-row">
+          <div class="form-group"><label>NSLP</label><input type="text" id="lNslp" value="${l.nslp||''}"></div>
+          <div class="form-group"><label>Pimpinan</label><input type="text" id="lPimpinan" value="${l.pimpinan||''}"></div>
+        </div>
+        <div class="form-group"><label>Alamat</label><textarea id="lAlamat" rows="2">${l.alamat||''}</textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Kecamatan</label><select id="lKec"><option value="">-- Pilih --</option>${kOpts}</select></div>
+          <div class="form-group"><label>Desa</label><select id="lDesa"><option value="">-- Pilih --</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>No. HP</label><input type="text" id="lHp" value="${l.no_hp||''}"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="lEmail" value="${l.email||''}"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Kabupaten</label><input type="text" id="lKab" value="${l.kabupaten||'Tegal'}"></div>
+          <div class="form-group"><label>Provinsi</label><input type="text" id="lProv" value="${l.provinsi||'Jawa Tengah'}"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close>Batal</button>
+        <button class="btn btn-success" id="btnSaveLembaga"><i class="fas fa-save"></i> Simpan</button>
+      </div>
+    </div></div>`;
+    document.querySelectorAll('#pengaturanModal [data-close]').forEach(b=>b.addEventListener('click',()=>$('pengaturanModal').remove()));
+    $('lKec').addEventListener('change',e=>this._loadDesaModal(e.target.value));
+    if(l.kecamatan_id) await this._loadDesaModal(l.kecamatan_id,l.desa_id);
+    $('btnSaveLembaga').addEventListener('click',()=>this._saveLembaga());
+    this.state.savingLembaga=false;
+  },
+  async _loadDesaModal(kid,preselect){
+    const s=$('lDesa');if(!s) return;
+    s.innerHTML='<option value="">-- Pilih --</option>';
+    if(!kid) return;
+    const ck='desa_'+kid,c=App.cache.get(ck,3600000);
+    let d=c;
+    if(!c){d=(await supabaseClient.from('master_kelurahan').select('id,nama').eq('kecamatan_id',kid).order('nama')).data||[];App.cache.set(ck,d);}
+    d.forEach(i=>s.innerHTML+=`<option value="${i.id}" ${i.id===preselect?'selected':''}>${i.nama}</option>`);
+  },
+  async _saveLembaga(){
+    if(this.state.savingLembaga){showToast('Sedang memproses...','warning');return;}
+    const nama=$('lNama').value.trim();
+    if(!nama){showToast('Nama wajib!','error');return;}
+    const btn=$('btnSaveLembaga');this.state.savingLembaga=true;
+    btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+    const kid=$('lKec').value,did=$('lDesa').value;
+    let kn='',dn='';
+    if(kid){kn=(await supabaseClient.from('master_kecamatan').select('nama').eq('id',kid).single()).data?.nama||'';}
+    if(did){dn=(await supabaseClient.from('master_kelurahan').select('nama').eq('id',did).single()).data?.nama||'';}
+    const d={
+      nama,jenis_lembaga:$('lJenis').value,
+      nslp:$('lNslp').value.trim(),pimpinan:$('lPimpinan').value.trim(),
+      alamat:$('lAlamat').value.trim(),
+      kecamatan_id:kid||null,desa_id:did||null,kecamatan:kn,desa:dn,
+      kabupaten:$('lKab').value.trim()||'Tegal',provinsi:$('lProv').value.trim()||'Jawa Tengah',
+      no_hp:$('lHp').value.trim(),email:$('lEmail').value.trim(),
+      updated_at:new Date().toISOString()
+    };
+    try{
+      const {error}=await supabaseClient.from('lembaga').update(d).eq('id',App.user.lembaga_id);
+      if(error) throw error;
+      App.cache.clear();
+      showToast('Profil diperbarui!','success');
+      $('pengaturanModal').remove();
+      await this.refreshLembaga();
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+    finally{this.state.savingLembaga=false;btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> Simpan';}
+  },
+  async exportData(){
+    try{
+      showToast('Memuat modul Excel...','info');
+      await loadXLSX();
+      const {data}=await supabaseClient.from('pendidik').select('*').eq('lembaga_id',App.user.lembaga_id).order('nama_lengkap');
+      if(!data||!data.length){showToast('Tidak ada data','warning');return;}
+      const h=['NIK','Nama','Tempat Lahir','Tanggal Lahir','JK','Status Kawin','Ibu Kandung','Pendidikan','Alamat','No HP','Email','Rek Bupati','Bank Bupati','Pemilik Bupati','Rek Gubernur','Bank Gubernur','Pemilik Gubernur','TMT','Lama Mengabdi','Jenis','Status','Verifikasi'];
+      const rows=data.map(i=>[i.nik,i.nama_lengkap,i.tempat_lahir,i.tanggal_lahir,i.jenis_kelamin,i.status_perkawinan,i.ibu_kandung,i.pendidikan_terakhir,i.alamat,i.no_hp,i.email,i.nomor_rekening_bupati,i.nama_bank_bupati,i.pemilik_rekening_bupati,i.nomor_rekening_gubernur,i.nama_bank_gubernur,i.pemilik_rekening_gubernur,i.tmt_mengajar,i.lama_mengabdi,i.jenis_lembaga||'LPQ',i.status_aktif?'Aktif':'Tidak Aktif',i.status_verifikasi||'Draft']);
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h,...rows]),'Pendidik');
+      XLSX.writeFile(wb,`data_pendidik_${new Date().toISOString().split('T')[0]}.xlsx`);
+      showToast(`Export ${data.length} data`,'success');
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+  },
+  async backup(){
+    const btn=$('btnBackup');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Backup...';
+    try{
+      const tables=['pendidik','bantuan'];
+      const bd={lembaga_id:App.user.lembaga_id,data:{}};
+      for(const t of tables){
+        const {data}=await supabaseClient.from(t).select('*').eq('lembaga_id',App.user.lembaga_id);
+        bd.data[t]=data||[];
+      }
+      bd.tanggal=new Date().toISOString();
+      bd.total_pendidik=bd.data.pendidik?.length||0;
+      bd.total_bantuan=bd.data.bantuan?.length||0;
+      const json=JSON.stringify(bd,null,2);
+      const blob=new Blob([json],{type:'application/json'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download=`backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      st('lastBackup',new Date().toLocaleString('id-ID'));
+      showToast(`Backup: ${bd.total_pendidik} pendidik, ${bd.total_bantuan} bantuan`,'success');
+    }catch(e){showToast('Gagal: '+e.message,'error');}
+    finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-download"></i> Backup';}
+  }
+};
+
+/* ====================================================================
+   INIT
+   ==================================================================== */
+document.addEventListener('DOMContentLoaded',async ()=>{
+  if(!await checkAuth()) return;
+  updateDate();
+  window.addEventListener('hashchange',navigate);
+  navigate();
+  setInterval(updateDate,60000);
+  window.addEventListener('resize',()=>{
+    if(window.innerWidth>992){
+      $('sidebar').classList.remove('open');
+      $('sidebarOverlay').classList.remove('active');
+    }
+  });
+});
+</script>
+</body>
+</html>
