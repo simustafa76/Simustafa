@@ -183,7 +183,7 @@
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <img src="assets/logo-kemenag.png" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22%3E%EF%B7%B2%3C/text%3E%3C/svg%3E'">
+            <img src="assets/logo-kemenag.png" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpolygon points=%2250,5 61,35 93,35 68,53 79,83 50,65 21,83 32,53 7,35 39,35%22 fill=%22%23FFD700%22 stroke=%22%23DAA520%22 stroke-width=%222%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%223%22/%3E%3C/svg%3E'">
             <div class="brand-text"><h1>SI-<span>MUSTAFA</span></h1><small>Kemenag Kab. Tegal</small></div>
         </div>
         <ul class="sidebar-menu">
@@ -254,10 +254,8 @@
 
     <div class="toast" id="toast"></div>
 
-    <!-- MODAL FILTER -->
     <div class="modal-overlay" id="filterModal"><div class="modal-container" style="max-width:500px;"><div class="modal-header"><h2><i class="fas fa-sliders-h"></i> Filter</h2><button class="close-btn" onclick="closeFilterModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="form-group"><label>Status</label><select id="filterStatus" onchange="applyFilterFromModal()"><option value="all">Semua</option><option value="diajukan">Diajukan</option><option value="disetujui">Disetujui</option><option value="berlaku">Berlaku</option><option value="ditolak">Ditolak</option></select></div><div class="form-group"><label>Jenis Mutasi</label><select id="filterJenis" onchange="applyFilterFromModal()"><option value="all">Semua</option><option value="antar_lembaga">Antar Lembaga</option><option value="antar_kecamatan">Antar Kecamatan</option><option value="pensiun">Pensiun</option><option value="berhenti">Berhenti</option><option value="meninggal">Meninggal</option></select></div><div class="form-group"><label>Tanggal</label><input type="date" id="filterTanggal" onchange="applyFilterFromModal()"></div><div style="display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:2px solid #f0f2f5;"><button class="btn btn-outline" onclick="resetFilterModal()" style="flex:1;"><i class="fas fa-undo"></i> Reset</button><button class="btn btn-primary" onclick="applyFilterFromModal()" style="flex:1;"><i class="fas fa-check"></i> Terapkan</button></div></div></div></div>
 
-    <!-- MODAL TAMBAH / EDIT -->
     <div class="modal-overlay" id="mutasiModal"><div class="modal-container"><div class="modal-header"><h2 id="modalTitle">Tambah Mutasi</h2><button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body">
         <input type="hidden" id="editId">
         
@@ -272,9 +270,7 @@
             <label>Pendidik <span style="color:red;">*</span></label>
             <div class="searchable-select-wrapper" id="pendidikSelectWrapper">
                 <input type="text" id="pendidikSearchInput" placeholder="Cari pendidik (nama atau NIK)..." autocomplete="off">
-                <div class="dropdown-list" id="pendidikDropdown">
-                    <div class="dropdown-loading">Memuat data...</div>
-                </div>
+                <div class="dropdown-list" id="pendidikDropdown"><div class="dropdown-loading">Memuat data...</div></div>
                 <input type="hidden" id="editPendidikId">
             </div>
         </div>
@@ -289,9 +285,7 @@
             <label>Tujuan <span style="color:red;">*</span></label>
             <div class="searchable-select-wrapper" id="tujuanSelectWrapper">
                 <input type="text" id="tujuanSearchInput" placeholder="Cari lembaga tujuan..." autocomplete="off">
-                <div class="dropdown-list" id="tujuanDropdown">
-                    <div class="dropdown-loading">Memuat data...</div>
-                </div>
+                <div class="dropdown-list" id="tujuanDropdown"><div class="dropdown-loading">Memuat data...</div></div>
                 <input type="hidden" id="editLembagaTujuanId">
             </div>
         </div>
@@ -354,7 +348,6 @@
 
     </div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal()">Batal</button><button class="btn btn-success" id="btnSaveMutasi" onclick="saveMutasi()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
 
-    <!-- MODAL DETAIL -->
     <div class="modal-overlay" id="detailModal"><div class="modal-container"><div class="modal-header"><h2><i class="fas fa-exchange-alt"></i> Detail Mutasi</h2><button class="close-btn" onclick="closeDetailModal()"><i class="fas fa-times"></i></button></div><div class="modal-body" id="detailBody"></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeDetailModal()">Tutup</button></div></div></div>
 
     <script src="js/supabase-client.js"></script>
@@ -366,8 +359,7 @@
         // ============================================================
         const dataCache = {
             _store: {},
-            get(k, t = 1800000) { const e = this._store[k]; if (!e) return null; if (Date.now() - e.t > t) { delete this
-                        ._store[k]; return null } return e.d },
+            get(k, t = 1800000) { const e = this._store[k]; if (!e) return null; if (Date.now() - e.t > t) { delete this._store[k]; return null } return e.d },
             set(k, d) { this._store[k] = { d, t: Date.now() } },
             clear(k) { k ? delete this._store[k] : this._store = {} }
         };
@@ -375,187 +367,49 @@
         // ============================================================
         // ===== VARIABLES =====
         // ============================================================
-        let currentPage = 1,
-            pageSize = 10,
-            totalData = 0,
+        let currentPage = 1, pageSize = 10, totalData = 0,
             currentFilter = { search: '', status: 'all', jenis: 'all', tanggal: '' },
-            allPendidik = [],
-            allLembaga = [],
-            searchTimeout,
-            isSaving = false,
-            selectedPendidik = null;
+            allPendidik = [], allLembaga = [], searchTimeout, isSaving = false, selectedPendidik = null;
 
-        let pendidikPage = 1,
-            pendidikTotal = 0,
-            pendidikSearch = '',
-            pendidikPageSize = 20;
-        let tujuanPage = 1,
-            tujuanTotal = 0,
-            tujuanSearch = '',
-            tujuanPageSize = 20;
+        let pendidikPage = 1, pendidikTotal = 0, pendidikSearch = '', pendidikPageSize = 20;
+        let tujuanPage = 1, tujuanTotal = 0, tujuanSearch = '', tujuanPageSize = 20;
 
         // ============================================================
         // ===== SIDEBAR =====
         // ============================================================
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('sidebarOverlay').classList.toggle('active')
-        }
-        window.addEventListener('resize', () => { if (window.innerWidth > 992) { document.getElementById('sidebar').classList
-                    .remove('open');
-                document.getElementById('sidebarOverlay').classList.remove('active') } });
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active') }
+        window.addEventListener('resize', () => { if (window.innerWidth > 992) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('active') } });
 
         // ============================================================
         // ===== TOAST =====
         // ============================================================
-        function showToast(m, t = 'info') {
-            const e = document.getElementById('toast');
-            if (!e) { alert(m); return }
-            e.textContent = m;
-            e.className = `toast toast-${t}`;
-            void e.offsetWidth;
-            e.classList.add('show');
-            clearTimeout(e._timeout);
-            e._timeout = setTimeout(() => e.classList.remove('show'), 4000)
-        }
+        function showToast(m, t = 'info') { const e = document.getElementById('toast'); if (!e) { alert(m); return } e.textContent = m; e.className = `toast toast-${t}`; void e.offsetWidth; e.classList.add('show'); clearTimeout(e._timeout); e._timeout = setTimeout(() => e.classList.remove('show'), 4000) }
 
         // ============================================================
         // ===== DATE =====
         // ============================================================
-        function updateDate() {
-            const e = document.getElementById('currentDate');
-            if (!e) return;
-            const n = new Date();
-            e.textContent = n.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long',
-                day: 'numeric' });
-            const d = document.getElementById('welcomeDate');
-            if (d) d.textContent = n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long',
-                    year: 'numeric' })
-        }
+        function updateDate() { const e = document.getElementById('currentDate'); if (!e) return; const n = new Date(); e.textContent = n.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); const d = document.getElementById('welcomeDate'); if (d) d.textContent = n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) }
 
         // ============================================================
         // ===== AUTH =====
         // ============================================================
-        async function checkAuth() {
-            try {
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
-                if (error || !session) { window.location.href = 'index.html'; return false }
-                const { data: u, error: ue } = await supabaseClient.from('users')
-                    .select('id,name,email,role,kecamatan_id,lembaga_id,active')
-                    .eq('id', session.user.id).single();
-                if (ue || !u || !u.active) { await supabaseClient.auth.signOut();
-                    window.location.href = 'index.html'; return false }
-                window.currentUser = {
-                    id: u.id,
-                    name: u.name || session.user.email,
-                    email: session.user.email,
-                    role: u.role || 'operator',
-                    kecamatan_id: u.kecamatan_id,
-                    lembaga_id: u.lembaga_id
-                };
-                updateHeaderUI(window.currentUser);
-                updateWelcomeUI(window.currentUser);
-                return true
-            } catch (e) { window.location.href = 'index.html'; return false }
-        }
-
+        async function checkAuth() { try { const { data: { session }, error } = await supabaseClient.auth.getSession(); if (error || !session) { window.location.href = 'index.html'; return false } const { data: u, error: ue } = await supabaseClient.from('users').select('id,name,email,role,kecamatan_id,lembaga_id,active').eq('id', session.user.id).single(); if (ue || !u || !u.active) { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; return false } window.currentUser = { id: u.id, name: u.name || session.user.email, email: session.user.email, role: u.role || 'operator', kecamatan_id: u.kecamatan_id, lembaga_id: u.lembaga_id }; updateHeaderUI(window.currentUser); updateWelcomeUI(window.currentUser); return true } catch (e) { window.location.href = 'index.html'; return false } }
         function getUser() { return window.currentUser || null }
-
-        function getRoleFilter() {
-            const u = getUser();
-            if (!u) return {};
-            if (u.role === 'super_admin' || u.role === 'admin_kab') return {};
-            if (!u.kecamatan_id) return { restrict: true };
-            const f = { kecamatan_id: u.kecamatan_id };
-            if (u.role === 'batko') f.jenis_lembaga = 'LPQ';
-            else if (u.role === 'fkdt') f.jenis_lembaga = 'MDT';
-            else if (u.role === 'ponpes') f.jenis_lembaga = 'PONPES';
-            return f
-        }
-
-        function updateHeaderUI(u) {
-            if (!u) return;
-            const rn = { 'super_admin': 'Super Admin', 'admin_kab': 'Admin Kabupaten', 'batko': 'BATKO', 'fkdt': 'FKDT',
-                'ponpes': 'PONPES', 'operator': 'Operator' };
-            document.getElementById('userAvatar').textContent = u.name.charAt(0).toUpperCase();
-            document.getElementById('userName').textContent = u.name;
-            document.getElementById('userRole').textContent = rn[u.role] || u.role;
-            document.getElementById('userAvatarSmall').textContent = u.name.charAt(0).toUpperCase();
-            document.getElementById('userNameSmall').textContent = u.name;
-            document.getElementById('headerRoleBadge').textContent = rn[u.role] || u.role
-        }
-
-        function updateWelcomeUI(u) {
-            if (!u) return;
-            document.getElementById('welcomeName').textContent = u.name;
-            const rn = { 'super_admin': 'Super Admin SI-MUSTAFA', 'admin_kab': 'Admin Kemenag Kabupaten Tegal',
-                'batko': 'Admin BATKO', 'fkdt': 'Admin FKDT', 'ponpes': 'Admin PONPES', 'operator': 'Operator Lembaga' };
-            document.getElementById('welcomeRole').textContent = rn[u.role] || u.role
-        }
-
-        async function handleLogout() {
-            if (!confirm('Yakin keluar?')) return;
-            await supabaseClient.auth.signOut();
-            dataCache.clear();
-            showToast('Logout berhasil!', 'success');
-            setTimeout(() => window.location.href = 'index.html', 1000)
-        }
+        function getRoleFilter() { const u = getUser(); if (!u) return {}; if (u.role === 'super_admin' || u.role === 'admin_kab') return {}; if (!u.kecamatan_id) return { restrict: true }; const f = { kecamatan_id: u.kecamatan_id }; if (u.role === 'batko') f.jenis_lembaga = 'LPQ'; else if (u.role === 'fkdt') f.jenis_lembaga = 'MDT'; else if (u.role === 'ponpes') f.jenis_lembaga = 'PONPES'; return f }
+        function updateHeaderUI(u) { if (!u) return; const rn = { 'super_admin': 'Super Admin', 'admin_kab': 'Admin Kabupaten', 'batko': 'BATKO', 'fkdt': 'FKDT', 'ponpes': 'PONPES', 'operator': 'Operator' }; document.getElementById('userAvatar').textContent = u.name.charAt(0).toUpperCase(); document.getElementById('userName').textContent = u.name; document.getElementById('userRole').textContent = rn[u.role] || u.role; document.getElementById('userAvatarSmall').textContent = u.name.charAt(0).toUpperCase(); document.getElementById('userNameSmall').textContent = u.name; document.getElementById('headerRoleBadge').textContent = rn[u.role] || u.role }
+        function updateWelcomeUI(u) { if (!u) return; document.getElementById('welcomeName').textContent = u.name; const rn = { 'super_admin': 'Super Admin SI-MUSTAFA', 'admin_kab': 'Admin Kemenag Kabupaten Tegal', 'batko': 'Admin BATKO', 'fkdt': 'Admin FKDT', 'ponpes': 'Admin PONPES', 'operator': 'Operator Lembaga' }; document.getElementById('welcomeRole').textContent = rn[u.role] || u.role }
+        async function handleLogout() { if (!confirm('Yakin keluar?')) return; await supabaseClient.auth.signOut(); dataCache.clear(); showToast('Logout berhasil!', 'success'); setTimeout(() => window.location.href = 'index.html', 1000) }
 
         // ============================================================
         // ===== FILTER FUNCTIONS =====
         // ============================================================
-        function openFilterModal() {
-            document.getElementById('filterStatus').value = currentFilter.status || 'all';
-            document.getElementById('filterJenis').value = currentFilter.jenis || 'all';
-            document.getElementById('filterTanggal').value = currentFilter.tanggal || '';
-            document.getElementById('filterModal').classList.add('active')
-        }
-
+        function openFilterModal() { document.getElementById('filterStatus').value = currentFilter.status || 'all'; document.getElementById('filterJenis').value = currentFilter.jenis || 'all'; document.getElementById('filterTanggal').value = currentFilter.tanggal || ''; document.getElementById('filterModal').classList.add('active') }
         function closeFilterModal() { document.getElementById('filterModal').classList.remove('active') }
-
-        function applyFilterFromModal() {
-            currentFilter.status = document.getElementById('filterStatus').value;
-            currentFilter.jenis = document.getElementById('filterJenis').value;
-            currentFilter.tanggal = document.getElementById('filterTanggal').value;
-            currentPage = 1;
-            closeFilterModal();
-            updateFilterBadge();
-            loadMutasi();
-            showToast('Filter diterapkan', 'success')
-        }
-
-        function resetFilterModal() {
-            document.getElementById('filterStatus').value = 'all';
-            document.getElementById('filterJenis').value = 'all';
-            document.getElementById('filterTanggal').value = ''
-        }
-
-        function resetFilter() {
-            currentFilter = { search: '', status: 'all', jenis: 'all', tanggal: '' };
-            document.getElementById('searchInput').value = '';
-            currentPage = 1;
-            resetFilterModal();
-            updateFilterBadge();
-            updateSearchInfo(0);
-            loadMutasi();
-            showToast('Filter direset', 'info')
-        }
-
-        function applyFilter() {
-            currentFilter.search = document.getElementById('searchInput').value.trim();
-            currentPage = 1;
-            updateFilterBadge();
-            loadMutasi()
-        }
-
-        function updateFilterBadge() {
-            const b = document.getElementById('filterActiveBadge'),
-                f = document.getElementById('btnFilter'),
-                h = currentFilter.status !== 'all' || currentFilter.jenis !== 'all' ||
-                currentFilter.tanggal !== '' || currentFilter.search !== '';
-            b.style.display = h ? 'inline' : 'none';
-            h ? f.classList.add('btn-filter-active') : f.classList.remove('btn-filter-active')
-        }
+        function applyFilterFromModal() { currentFilter.status = document.getElementById('filterStatus').value; currentFilter.jenis = document.getElementById('filterJenis').value; currentFilter.tanggal = document.getElementById('filterTanggal').value; currentPage = 1; closeFilterModal(); updateFilterBadge(); loadMutasi(); showToast('Filter diterapkan', 'success') }
+        function resetFilterModal() { document.getElementById('filterStatus').value = 'all'; document.getElementById('filterJenis').value = 'all'; document.getElementById('filterTanggal').value = '' }
+        function resetFilter() { currentFilter = { search: '', status: 'all', jenis: 'all', tanggal: '' }; document.getElementById('searchInput').value = ''; currentPage = 1; resetFilterModal(); updateFilterBadge(); updateSearchInfo(0); loadMutasi(); showToast('Filter direset', 'info') }
+        function applyFilter() { currentFilter.search = document.getElementById('searchInput').value.trim(); currentPage = 1; updateFilterBadge(); loadMutasi() }
+        function updateFilterBadge() { const b = document.getElementById('filterActiveBadge'), f = document.getElementById('btnFilter'), h = currentFilter.status !== 'all' || currentFilter.jenis !== 'all' || currentFilter.tanggal !== '' || currentFilter.search !== ''; b.style.display = h ? 'inline' : 'none'; h ? f.classList.add('btn-filter-active') : f.classList.remove('btn-filter-active') }
 
         // ============================================================
         // ===== SEARCH FUNCTIONS =====
@@ -565,28 +419,12 @@
             const clearBtn = document.getElementById('btnClearSearch');
             if (currentFilter.search) {
                 clearBtn.style.display = 'inline-flex';
-                if (foundCount !== undefined && totalData > 0) {
-                    countEl.textContent = `${foundCount} dari ${totalData} hasil`;
-                } else if (foundCount !== undefined) {
-                    countEl.textContent = `${foundCount} hasil`;
-                } else {
-                    countEl.textContent = 'Mencari...';
-                }
-            } else {
-                clearBtn.style.display = 'none';
-                countEl.textContent = '';
-            }
+                if (foundCount !== undefined && totalData > 0) countEl.textContent = `${foundCount} dari ${totalData} hasil`;
+                else if (foundCount !== undefined) countEl.textContent = `${foundCount} hasil`;
+                else countEl.textContent = 'Mencari...';
+            } else { clearBtn.style.display = 'none'; countEl.textContent = ''; }
         }
-
-        function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            currentFilter.search = '';
-            currentPage = 1;
-            updateFilterBadge();
-            updateSearchInfo(0);
-            loadMutasi();
-            showToast('Pencarian dihapus', 'info')
-        }
+        function clearSearch() { document.getElementById('searchInput').value = ''; currentFilter.search = ''; currentPage = 1; updateFilterBadge(); updateSearchInfo(0); loadMutasi(); showToast('Pencarian dihapus', 'info') }
 
         // ============================================================
         // ===== HIGHLIGHT TEXT =====
@@ -596,244 +434,131 @@
             const searchEscaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`(${searchEscaped})`, 'gi');
             const escaped = String(text).replace(/[&<>"']/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                if (m === '"') return '&quot;';
-                if (m === "'") return '&#039;';
-                return m;
+                if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; if (m === "'") return '&#039;'; return m;
             });
             return escaped.replace(regex, '<mark class="search-highlight">$1</mark>');
         }
 
         // ============================================================
-        // ===== SEARCHABLE SELECT FUNCTIONS =====
+        // ===== SEARCHABLE SELECT =====
         // ============================================================
         async function loadPendidikDropdown(page = 1, search = '') {
             const dropdown = document.getElementById('pendidikDropdown');
             dropdown.innerHTML = `<div class="dropdown-loading"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>`;
             dropdown.classList.add('open');
-
             try {
-                const u = getUser(),
-                    f = getRoleFilter();
-                let q = supabaseClient.from('pendidik')
-                    .select('id,nik,nama_lengkap,lembaga_id', { count: 'exact' })
-                    .eq('status_aktif', true);
-
+                const u = getUser(), f = getRoleFilter();
+                let q = supabaseClient.from('pendidik').select('id,nik,nama_lengkap,lembaga_id', { count: 'exact' }).eq('status_aktif', true);
                 if (f.kecamatan_id) q = q.eq('kecamatan_lembaga_id', f.kecamatan_id);
                 if (f.jenis_lembaga) q = q.eq('jenis_lembaga', f.jenis_lembaga);
-
-                if (search.trim()) {
-                    const s = search.trim();
-                    q = q.or(`nama_lengkap.ilike.%${s}%,nik.ilike.%${s}%`);
-                }
-
+                if (search.trim()) { const s = search.trim(); q = q.or(`nama_lengkap.ilike.%${s}%,nik.ilike.%${s}%`); }
                 const from = (page - 1) * pendidikPageSize;
-                const { data, count, error } = await q
-                    .order('nama_lengkap')
-                    .range(from, from + pendidikPageSize - 1);
-
+                const { data, count, error } = await q.order('nama_lengkap').range(from, from + pendidikPageSize - 1);
                 if (error) throw error;
-
                 pendidikTotal = count || 0;
                 const totalPages = Math.ceil(pendidikTotal / pendidikPageSize);
-
-                if (!data || !data.length) {
-                    dropdown.innerHTML = `<div class="no-result">😕 Tidak ada pendidik ditemukan</div>`;
-                    return;
-                }
-
+                if (!data || !data.length) { dropdown.innerHTML = `<div class="no-result">😕 Tidak ada pendidik ditemukan</div>`; return; }
                 const lembagaIds = [...new Set(data.map(p => p.lembaga_id).filter(Boolean))];
                 let lembagaMap = {};
                 if (lembagaIds.length) {
-                    const { data: lembagaData } = await supabaseClient.from('lembaga')
-                        .select('id,nama,jenis_lembaga')
-                        .in('id', lembagaIds);
+                    const { data: lembagaData } = await supabaseClient.from('lembaga').select('id,nama,jenis_lembaga').in('id', lembagaIds);
                     lembagaMap = Object.fromEntries((lembagaData || []).map(l => [l.id, l]));
                 }
-
                 const selectedId = document.getElementById('editPendidikId').value;
-
                 dropdown.innerHTML = data.map(p => {
                     const lembaga = lembagaMap[p.lembaga_id];
                     const lembagaNama = lembaga?.nama || 'Belum punya lembaga';
                     const jenisLabel = lembaga?.jenis_lembaga || '';
                     const jenisClass = jenisLabel ? `badge-jenis-${jenisLabel.toLowerCase()}` : '';
                     const selected = p.id === selectedId ? 'selected' : '';
-                    return `<div class="option-item ${selected}" data-id="${p.id}" onclick="selectPendidik('${p.id}')">
-                        <strong>${highlightText(p.nama_lengkap, search)}</strong>
-                        <span class="sub-text">NIK: ${highlightText(p.nik, search)} | Lembaga: ${highlightText(lembagaNama, search)}</span>
-                        ${jenisLabel ? `<span class="badge-jenis ${jenisClass}">${jenisLabel}</span>` : ''}
-                    </div>`;
+                    return `<div class="option-item ${selected}" data-id="${p.id}" onclick="selectPendidik('${p.id}')"><strong>${highlightText(p.nama_lengkap, search)}</strong><span class="sub-text">NIK: ${highlightText(p.nik, search)} | Lembaga: ${highlightText(lembagaNama, search)}</span>${jenisLabel ? `<span class="badge-jenis ${jenisClass}">${jenisLabel}</span>` : ''}</div>`;
                 }).join('');
-
                 if (totalPages > 1) {
-                    dropdown.innerHTML += `
-                        <div class="dropdown-pagination">
-                            <button class="btn-page" onclick="event.stopPropagation();changePendidikPage(-1)" ${page <= 1 ? 'disabled' : ''}>
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <span class="page-info">${page} / ${totalPages}</span>
-                            <button class="btn-page" onclick="event.stopPropagation();changePendidikPage(1)" ${page >= totalPages ? 'disabled' : ''}>
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    `;
+                    dropdown.innerHTML += `<div class="dropdown-pagination"><button class="btn-page" onclick="event.stopPropagation();changePendidikPage(-1)" ${page <= 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button><span class="page-info">${page} / ${totalPages}</span><button class="btn-page" onclick="event.stopPropagation();changePendidikPage(1)" ${page >= totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button></div>`;
                 }
-
                 pendidikPage = page;
                 pendidikSearch = search;
-
-            } catch (e) {
-                console.error(e);
-                dropdown.innerHTML = `<div class="no-result">❌ Gagal memuat data</div>`;
-            }
+            } catch (e) { console.error(e); dropdown.innerHTML = `<div class="no-result">❌ Gagal memuat data</div>`; }
         }
 
-        function changePendidikPage(delta) {
-            const newPage = pendidikPage + delta;
-            const totalPages = Math.ceil(pendidikTotal / pendidikPageSize);
-            if (newPage < 1 || newPage > totalPages) return;
-            loadPendidikDropdown(newPage, pendidikSearch);
-        }
+        function changePendidikPage(delta) { const newPage = pendidikPage + delta; const totalPages = Math.ceil(pendidikTotal / pendidikPageSize); if (newPage < 1 || newPage > totalPages) return; loadPendidikDropdown(newPage, pendidikSearch); }
 
         async function loadTujuanDropdown(page = 1, search = '') {
             const dropdown = document.getElementById('tujuanDropdown');
             const asalId = document.getElementById('editLembagaAsalId').value;
-            
             dropdown.innerHTML = `<div class="dropdown-loading"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>`;
             dropdown.classList.add('open');
-
             try {
-                let q = supabaseClient.from('lembaga')
-                    .select('id,nama,jenis_lembaga', { count: 'exact' })
-                    .eq('status_aktif', true);
-
-                if (search.trim()) {
-                    const s = search.trim();
-                    q = q.ilike('nama', `%${s}%`);
-                }
-
+                let q = supabaseClient.from('lembaga').select('id,nama,jenis_lembaga', { count: 'exact' }).eq('status_aktif', true);
+                if (search.trim()) { const s = search.trim(); q = q.ilike('nama', `%${s}%`); }
                 const from = (page - 1) * tujuanPageSize;
-                const { data, count, error } = await q
-                    .order('nama')
-                    .range(from, from + tujuanPageSize - 1);
-
+                const { data, count, error } = await q.order('nama').range(from, from + tujuanPageSize - 1);
                 if (error) throw error;
-
                 let filtered = data || [];
-                if (asalId) {
-                    filtered = filtered.filter(l => l.id !== asalId);
-                }
-
+                if (asalId) filtered = filtered.filter(l => l.id !== asalId);
                 tujuanTotal = count || 0;
                 const totalPages = Math.ceil(tujuanTotal / tujuanPageSize);
                 const selectedId = document.getElementById('editLembagaTujuanId').value;
-
                 if (!filtered.length) {
                     const msg = asalId ? '😕 Tidak ada lembaga tujuan (asal sudah dipilih)' : '😕 Tidak ada lembaga ditemukan';
                     dropdown.innerHTML = `<div class="no-result">${msg}</div>`;
                     return;
                 }
-
                 dropdown.innerHTML = filtered.map(l => {
                     const jenisLabel = l.jenis_lembaga || '';
                     const jenisClass = jenisLabel ? `badge-jenis-${jenisLabel.toLowerCase()}` : '';
                     const selected = l.id === selectedId ? 'selected' : '';
-                    return `<div class="option-item ${selected}" data-id="${l.id}" onclick="selectTujuan('${l.id}')">
-                        <strong>${highlightText(l.nama, search)}</strong>
-                        <span class="sub-text">Jenis: ${highlightText(jenisLabel, search)}</span>
-                        ${jenisLabel ? `<span class="badge-jenis ${jenisClass}">${jenisLabel}</span>` : ''}
-                    </div>`;
+                    return `<div class="option-item ${selected}" data-id="${l.id}" onclick="selectTujuan('${l.id}')"><strong>${highlightText(l.nama, search)}</strong><span class="sub-text">Jenis: ${highlightText(jenisLabel, search)}</span>${jenisLabel ? `<span class="badge-jenis ${jenisClass}">${jenisLabel}</span>` : ''}</div>`;
                 }).join('');
-
                 if (totalPages > 1) {
-                    dropdown.innerHTML += `
-                        <div class="dropdown-pagination">
-                            <button class="btn-page" onclick="event.stopPropagation();changeTujuanPage(-1)" ${page <= 1 ? 'disabled' : ''}>
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <span class="page-info">${page} / ${totalPages}</span>
-                            <button class="btn-page" onclick="event.stopPropagation();changeTujuanPage(1)" ${page >= totalPages ? 'disabled' : ''}>
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    `;
+                    dropdown.innerHTML += `<div class="dropdown-pagination"><button class="btn-page" onclick="event.stopPropagation();changeTujuanPage(-1)" ${page <= 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button><span class="page-info">${page} / ${totalPages}</span><button class="btn-page" onclick="event.stopPropagation();changeTujuanPage(1)" ${page >= totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button></div>`;
                 }
-
                 tujuanPage = page;
                 tujuanSearch = search;
-
-            } catch (e) {
-                console.error(e);
-                dropdown.innerHTML = `<div class="no-result">❌ Gagal memuat data</div>`;
-            }
+            } catch (e) { console.error(e); dropdown.innerHTML = `<div class="no-result">❌ Gagal memuat data</div>`; }
         }
 
-        function changeTujuanPage(delta) {
-            const newPage = tujuanPage + delta;
-            const totalPages = Math.ceil(tujuanTotal / tujuanPageSize);
-            if (newPage < 1 || newPage > totalPages) return;
-            loadTujuanDropdown(newPage, tujuanSearch);
-        }
+        function changeTujuanPage(delta) { const newPage = tujuanPage + delta; const totalPages = Math.ceil(tujuanTotal / tujuanPageSize); if (newPage < 1 || newPage > totalPages) return; loadTujuanDropdown(newPage, tujuanSearch); }
 
         // ============================================================
         // ===== SELECT FUNCTIONS =====
         // ============================================================
         function selectPendidik(id) {
-            supabaseClient.from('pendidik').select('*, lembaga:lembaga_id(id,nama,jenis_lembaga)')
-                .eq('id', id).single().then(({ data }) => {
-                    if (data) {
-                        selectedPendidik = data;
-                        document.getElementById('editPendidikId').value = id;
-                        document.getElementById('pendidikSearchInput').value = data.nama_lengkap + ' (' + data.nik + ')';
-                        document.getElementById('pendidikDropdown').classList.remove('open');
-
-                        document.getElementById('selectedInfo').style.display = 'block';
-                        document.getElementById('selectedNama').textContent = data.nama_lengkap;
-                        document.getElementById('selectedNik').textContent = 'NIK: ' + data.nik;
-
-                        if (data.lembaga) {
-                            document.getElementById('editLembagaAsal').value = data.lembaga.nama + ' (' + data.lembaga.jenis_lembaga + ')';
-                            document.getElementById('editLembagaAsalId').value = data.lembaga.id;
-                            document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: ' + data.lembaga.nama;
-                        } else {
-                            document.getElementById('editLembagaAsal').value = 'Pendidik belum memiliki lembaga';
-                            document.getElementById('editLembagaAsalId').value = '';
-                            document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: -';
-                        }
-
-                        document.getElementById('editLembagaTujuanId').value = '';
-                        document.getElementById('tujuanSearchInput').value = '';
-                        tujuanPage = 1;
-                        tujuanSearch = '';
-                        loadTujuanDropdown(1, '');
+            supabaseClient.from('pendidik').select('*, lembaga:lembaga_id(id,nama,jenis_lembaga)').eq('id', id).single().then(({ data }) => {
+                if (data) {
+                    selectedPendidik = data;
+                    document.getElementById('editPendidikId').value = id;
+                    document.getElementById('pendidikSearchInput').value = data.nama_lengkap + ' (' + data.nik + ')';
+                    document.getElementById('pendidikDropdown').classList.remove('open');
+                    document.getElementById('selectedInfo').style.display = 'block';
+                    document.getElementById('selectedNama').textContent = data.nama_lengkap;
+                    document.getElementById('selectedNik').textContent = 'NIK: ' + data.nik;
+                    if (data.lembaga) {
+                        document.getElementById('editLembagaAsal').value = data.lembaga.nama + ' (' + data.lembaga.jenis_lembaga + ')';
+                        document.getElementById('editLembagaAsalId').value = data.lembaga.id;
+                        document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: ' + data.lembaga.nama;
+                    } else {
+                        document.getElementById('editLembagaAsal').value = 'Pendidik belum memiliki lembaga';
+                        document.getElementById('editLembagaAsalId').value = '';
+                        document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: -';
                     }
-                });
+                    document.getElementById('editLembagaTujuanId').value = '';
+                    document.getElementById('tujuanSearchInput').value = '';
+                    tujuanPage = 1;
+                    tujuanSearch = '';
+                    loadTujuanDropdown(1, '');
+                }
+            });
         }
 
         function selectTujuan(id) {
             const items = document.querySelectorAll('#tujuanDropdown .option-item');
             let lembaga = null;
             for (const item of items) {
-                if (item.dataset.id === id) {
-                    const nama = item.querySelector('strong')?.textContent || '';
-                    lembaga = { id, nama };
-                    break;
-                }
+                if (item.dataset.id === id) { const nama = item.querySelector('strong')?.textContent || ''; lembaga = { id, nama }; break; }
             }
-
-            if (!lembaga) {
-                const found = allLembaga.find(l => l.id === id);
-                if (found) lembaga = found;
-            }
-
-            if (!lembaga) {
-                showToast('Lembaga tidak ditemukan', 'error');
-                return;
-            }
-
+            if (!lembaga) { const found = allLembaga.find(l => l.id === id); if (found) lembaga = found; }
+            if (!lembaga) { showToast('Lembaga tidak ditemukan', 'error'); return; }
             document.getElementById('editLembagaTujuanId').value = id;
             document.getElementById('tujuanSearchInput').value = lembaga.nama;
             document.getElementById('tujuanDropdown').classList.remove('open');
@@ -844,10 +569,8 @@
         // ============================================================
         async function loadPendidikOptions() {
             try {
-                const u = getUser(),
-                    f = getRoleFilter();
-                let q = supabaseClient.from('pendidik').select('id,nik,nama_lengkap,lembaga_id')
-                    .eq('status_aktif', true).order('nama_lengkap');
+                const u = getUser(), f = getRoleFilter();
+                let q = supabaseClient.from('pendidik').select('id,nik,nama_lengkap,lembaga_id').eq('status_aktif', true).order('nama_lengkap');
                 if (f.kecamatan_id) q = q.eq('kecamatan_lembaga_id', f.kecamatan_id);
                 if (f.jenis_lembaga) q = q.eq('jenis_lembaga', f.jenis_lembaga);
                 const { data } = await q.limit(1000);
@@ -859,10 +582,8 @@
             const c = dataCache.get('lembaga_active', 600000);
             if (c) { allLembaga = c; return }
             try {
-                const u = getUser(),
-                    f = getRoleFilter();
-                let q = supabaseClient.from('lembaga').select('id,nama,jenis_lembaga')
-                    .eq('status_aktif', true).order('nama');
+                const u = getUser(), f = getRoleFilter();
+                let q = supabaseClient.from('lembaga').select('id,nama,jenis_lembaga').eq('status_aktif', true).order('nama');
                 if (f.kecamatan_id) q = q.eq('kecamatan_id', f.kecamatan_id);
                 if (f.jenis_lembaga) q = q.eq('jenis_lembaga', f.jenis_lembaga);
                 const { data } = await q;
@@ -872,23 +593,25 @@
         }
 
         function toggleAlasanLainnya() {
-            const s = document.getElementById('editAlasan'),
-                g = document.getElementById('alasanLainnyaGroup');
-            if (s.value === 'lainnya') { g.classList.add('visible');
-                document.getElementById('editAlasanLainnya').required = true } else { g.classList.remove('visible');
-                document.getElementById('editAlasanLainnya').required = false;
-                document.getElementById('editAlasanLainnya').value = '' }
+            const s = document.getElementById('editAlasan'), g = document.getElementById('alasanLainnyaGroup');
+            if (s.value === 'lainnya') { g.classList.add('visible'); document.getElementById('editAlasanLainnya').required = true }
+            else { g.classList.remove('visible'); document.getElementById('editAlasanLainnya').required = false; document.getElementById('editAlasanLainnya').value = '' }
         }
 
+        // ============================================================
+        // ===== GENERATE NOMOR MUTASI (dengan retry anti-duplikat) =====
+        // ============================================================
         async function generateNomorMutasi() {
-            try {
-                const n = new Date(),
-                    y = n.getFullYear(),
-                    m = String(n.getMonth() + 1).padStart(2, '0');
-                const { count } = await supabaseClient.from('mutasi').select('*', { count: 'exact', head: true })
-                    .gte('created_at', `${y}-${m}-01`).lte('created_at', `${y}-${m}-31`);
-                return `MUT/${y}/${m}/${String((count||0)+1).padStart(3,'0')}`
-            } catch (e) { const n = new Date(); return `MUT/${n.getFullYear()}/${String(n.getMonth()+1).padStart(2,'0')}/001` }
+            const n = new Date(), y = n.getFullYear(), m = String(n.getMonth() + 1).padStart(2, '0');
+            const prefix = `MUT/${y}/${m}/`;
+            const { data } = await supabaseClient.from('mutasi').select('nomor_mutasi').like('nomor_mutasi', `${prefix}%`).order('nomor_mutasi', { ascending: false }).limit(1);
+            let seq = 1;
+            if (data && data.length) {
+                const last = data[0].nomor_mutasi || '';
+                const match = last.match(/\/(\d+)\s*$/);
+                if (match) seq = parseInt(match[1], 10) + 1;
+            }
+            return `${prefix}${String(seq).padStart(3, '0')}`;
         }
 
         // ============================================================
@@ -896,14 +619,9 @@
         // ============================================================
         async function refreshPendidikCount() {
             try {
-                const { count } = await supabaseClient
-                    .from('pendidik')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status_aktif', true);
+                const { count } = await supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true);
                 document.getElementById('navPendidikCount').textContent = count || 0;
-            } catch (e) {
-                console.error('Error refreshing count:', e);
-            }
+            } catch (e) { console.error('Error refreshing count:', e); }
         }
 
         // ============================================================
@@ -911,48 +629,28 @@
         // ============================================================
         async function loadMutasi() {
             try {
-                const u = getUser(),
-                    f = getRoleFilter();
-
+                const u = getUser(), f = getRoleFilter();
                 let q = supabaseClient.from('mutasi').select(`
-                        *,
-                        pendidik:pendidik_id(id,nik,nama_lengkap),
+                        *, pendidik:pendidik_id(id,nik,nama_lengkap),
                         dari_lembaga:dari_lembaga_id(id,nama,jenis_lembaga),
                         ke_lembaga:ke_lembaga_id(id,nama,jenis_lembaga),
                         diajukan_oleh_user:diajukan_oleh(id,name),
                         disetujui_oleh_user:disetujui_oleh(id,name)
                     `, { count: 'exact' });
-
-                if (f.restrict) {
-                    document.getElementById('mutasiTableBody').innerHTML =
-                        '<tr><td colspan="9" style="text-align:center;padding:30px;color:#f44336;">🔒 Akses ditolak</td></tr>';
-                    return
-                }
-
+                if (f.restrict) { document.getElementById('mutasiTableBody').innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#f44336;">🔒 Akses ditolak</td></tr>'; return }
                 if (f.kecamatan_id) {
-                    const { data: pids } = await supabaseClient.from('pendidik').select('id')
-                        .eq('kecamatan_lembaga_id', f.kecamatan_id);
+                    const { data: pids } = await supabaseClient.from('pendidik').select('id').eq('kecamatan_lembaga_id', f.kecamatan_id);
                     const ids = (pids || []).map(p => p.id);
                     if (ids.length) q = q.in('pendidik_id', ids);
-                    else { document.getElementById('mutasiTableBody').innerHTML =
-                            '<tr><td colspan="9" style="text-align:center;padding:30px;color:#999;">Belum ada data</td></tr>'; return }
+                    else { document.getElementById('mutasiTableBody').innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#999;">Belum ada data</td></tr>'; return }
                 }
-
-                if (currentFilter.search) {
-                    const searchTerm = currentFilter.search.trim();
-                    q = q.ilike('nomor_mutasi', `%${searchTerm}%`);
-                }
-
+                if (currentFilter.search) { const searchTerm = currentFilter.search.trim(); q = q.ilike('nomor_mutasi', `%${searchTerm}%`); }
                 if (currentFilter.status !== 'all') q = q.eq('status', currentFilter.status);
                 if (currentFilter.jenis !== 'all') q = q.eq('jenis_mutasi', currentFilter.jenis);
                 if (currentFilter.tanggal) q = q.eq('tanggal_mutasi', currentFilter.tanggal);
-
                 const from = (currentPage - 1) * pageSize;
-                const { data, count, error } = await q.order('created_at', { ascending: false })
-                    .range(from, from + pageSize - 1);
-
+                const { data, count, error } = await q.order('created_at', { ascending: false }).range(from, from + pageSize - 1);
                 if (error) throw error;
-
                 let filtered = data || [];
                 if (currentFilter.search) {
                     const sl = currentFilter.search.trim().toLowerCase();
@@ -964,21 +662,15 @@
                         (i.ke_lembaga?.nama || '').toLowerCase().includes(sl)
                     );
                 }
-
-                totalData = (currentFilter.search && !/^\d+$/.test(currentFilter.search.trim())) ?
-                    filtered.length :
-                    count || 0;
-
+                totalData = (currentFilter.search && !/^\d+$/.test(currentFilter.search.trim())) ? filtered.length : count || 0;
                 renderTable(filtered);
                 updatePagination();
-                loadStats();
                 updateSearchInfo(filtered.length);
-
-                document.getElementById('btnTambah').style.display = u?.role === 'operator' ? 'none' : 'inline-flex'
+                // ✅ loadStats() TIDAK dipanggil di sini — dipanggil terpisah
+                document.getElementById('btnTambah').style.display = u?.role === 'operator' ? 'none' : 'inline-flex';
             } catch (e) {
                 console.error(e);
-                document.getElementById('mutasiTableBody').innerHTML =
-                    `<tr><td colspan="9" style="text-align:center;padding:30px;color:#f44336;">Gagal: ${e.message}</td></tr>`
+                document.getElementById('mutasiTableBody').innerHTML = `<tr><td colspan="9" style="text-align:center;padding:30px;color:#f44336;">Gagal: ${e.message}</td></tr>`;
             }
         }
 
@@ -988,94 +680,46 @@
         function renderTable(data) {
             const t = document.getElementById('mutasiTableBody');
             document.getElementById('totalData').textContent = `${totalData} data`;
-            if (!data || !data.length) {
-                t.innerHTML =
-                    '<tr><td colspan="9" style="text-align:center;padding:30px;color:#999;">📥 Belum ada data mutasi</td></tr>';
-                return
-            }
+            if (!data || !data.length) { t.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#999;">📥 Belum ada data mutasi</td></tr>'; return }
             const start = (currentPage - 1) * pageSize,
-                sm = { 'diajukan': { class: 'badge-diajukan', label: 'Diajukan' },
-                    'disetujui': { class: 'badge-disetujui', label: 'Disetujui' },
-                    'berlaku': { class: 'badge-berlaku', label: 'Berlaku' },
-                    'ditolak': { class: 'badge-ditolak', label: 'Ditolak' } },
-                jm = { 'antar_lembaga': 'Antar Lembaga', 'antar_kecamatan': 'Antar Kecamatan', 'pensiun': 'Pensiun',
-                    'berhenti': 'Berhenti', 'meninggal': 'Meninggal' },
-                jc = { 'antar_lembaga': 'badge-jenis-antar_lembaga', 'antar_kecamatan': 'badge-jenis-antar_kecamatan',
-                    'pensiun': 'badge-jenis-pensiun', 'berhenti': 'badge-jenis-berhenti',
-                    'meninggal': 'badge-jenis-meninggal' },
+                sm = { 'diajukan': { class: 'badge-diajukan', label: 'Diajukan' }, 'disetujui': { class: 'badge-disetujui', label: 'Disetujui' }, 'berlaku': { class: 'badge-berlaku', label: 'Berlaku' }, 'ditolak': { class: 'badge-ditolak', label: 'Ditolak' } },
+                jm = { 'antar_lembaga': 'Antar Lembaga', 'antar_kecamatan': 'Antar Kecamatan', 'pensiun': 'Pensiun', 'berhenti': 'Berhenti', 'meninggal': 'Meninggal' },
+                jc = { 'antar_lembaga': 'badge-jenis-antar_lembaga', 'antar_kecamatan': 'badge-jenis-antar_kecamatan', 'pensiun': 'badge-jenis-pensiun', 'berhenti': 'badge-jenis-berhenti', 'meninggal': 'badge-jenis-meninggal' },
                 searchTerm = currentFilter.search || '',
                 currentUser = getUser();
 
             t.innerHTML = data.map((i, n) => {
-                const s = sm[i.status] || sm['diajukan'],
-                    j = jm[i.jenis_mutasi] || i.jenis_mutasi,
-                    c = jc[i.jenis_mutasi] || 'badge-jenis-antar_lembaga';
-                
+                const s = sm[i.status] || sm['diajukan'], j = jm[i.jenis_mutasi] || i.jenis_mutasi, c = jc[i.jenis_mutasi] || 'badge-jenis-antar_lembaga';
                 const canApprove = ['super_admin', 'admin_kab'].includes(currentUser?.role);
-                const canEdit = ['super_admin', 'admin_kab'].includes(currentUser?.role) || 
-                               (currentUser?.id === i.diajukan_oleh);
-                
+                const canEdit = ['super_admin', 'admin_kab'].includes(currentUser?.role) || (currentUser?.id === i.diajukan_oleh);
                 let statusButtons = '';
                 if (canApprove && i.status === 'diajukan') {
-                    statusButtons = `
-                        <button class="btn btn-success btn-sm" onclick="event.stopPropagation();updateStatus('${i.id}','disetujui')" title="Setujui">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();updateStatus('${i.id}','ditolak')" title="Tolak">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    `;
+                    statusButtons = `<button class="btn btn-success btn-sm" onclick="event.stopPropagation();updateStatus('${i.id}','disetujui')" title="Setujui"><i class="fas fa-check"></i></button><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();updateStatus('${i.id}','ditolak')" title="Tolak"><i class="fas fa-times"></i></button>`;
                 } else if (canApprove && i.status === 'disetujui') {
-                    statusButtons = `
-                        <button class="btn btn-success btn-sm" onclick="event.stopPropagation();updateStatus('${i.id}','berlaku')" title="Berlakukan">
-                            <i class="fas fa-check-double"></i>
-                        </button>
-                    `;
+                    statusButtons = `<button class="btn btn-success btn-sm" onclick="event.stopPropagation();updateStatus('${i.id}','berlaku')" title="Berlakukan"><i class="fas fa-check-double"></i></button>`;
                 }
-
-                return `<tr onclick="viewDetail('${i.id}')" style="cursor:pointer;">
-                    <td>${start+n+1}</td>
-                    <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${highlightText(i.nomor_mutasi||'-', searchTerm)}</code></td>
-                    <td><strong>${highlightText(i.pendidik?.nama_lengkap||'-', searchTerm)}</strong><br><small>${highlightText(i.pendidik?.nik||'', searchTerm)}</small></td>
-                    <td>${highlightText(i.dari_lembaga?.nama||'-', searchTerm)}</td>
-                    <td>${highlightText(i.ke_lembaga?.nama||'-', searchTerm)}</td>
-                    <td><span class="badge ${c}">${j}</span></td>
-                    <td>${formatTanggal(i.tanggal_mutasi)}</td>
-                    <td><span class="badge ${s.class}">${s.label}</span></td>
-                    <td style="min-width:120px;">
-                        <div style="display:flex;gap:4px;flex-wrap:wrap;">
-                            ${statusButtons}
-                            <button class="btn btn-edit btn-sm" onclick="event.stopPropagation();editMutasi('${i.id}')" title="Edit" ${canEdit ? '' : 'disabled'}>
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            ${['super_admin','admin_kab'].includes(currentUser?.role)?`<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteMutasi('${i.id}')" title="Hapus"><i class="fas fa-trash"></i></button>`:''}
-                        </div>
-                    </td>
-                </tr>`
-            }).join('')
+                return `<tr onclick="viewDetail('${i.id}')" style="cursor:pointer;"><td>${start+n+1}</td><td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${highlightText(i.nomor_mutasi||'-', searchTerm)}</code></td><td><strong>${highlightText(i.pendidik?.nama_lengkap||'-', searchTerm)}</strong><br><small>${highlightText(i.pendidik?.nik||'', searchTerm)}</small></td><td>${highlightText(i.dari_lembaga?.nama||'-', searchTerm)}</td><td>${highlightText(i.ke_lembaga?.nama||'-', searchTerm)}</td><td><span class="badge ${c}">${j}</span></td><td>${formatTanggal(i.tanggal_mutasi)}</td><td><span class="badge ${s.class}">${s.label}</span></td><td style="min-width:120px;"><div style="display:flex;gap:4px;flex-wrap:wrap;">${statusButtons}<button class="btn btn-edit btn-sm" onclick="event.stopPropagation();editMutasi('${i.id}')" title="Edit" ${canEdit ? '' : 'disabled'}><i class="fas fa-edit"></i></button>${['super_admin','admin_kab'].includes(currentUser?.role)?`<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteMutasi('${i.id}')" title="Hapus"><i class="fas fa-trash"></i></button>`:''}</div></td></tr>`;
+            }).join('');
         }
 
         // ============================================================
-        // ===== STATS =====
+        // ===== STATS (PAKAI RPC — HEMAT EGRESS) =====
         // ============================================================
         async function loadStats() {
             try {
-                const u = getUser(),
-                    f = getRoleFilter();
-                let q = supabaseClient.from('mutasi').select('status');
-                if (f.kecamatan_id) {
-                    const { data: pids } = await supabaseClient.from('pendidik').select('id')
-                        .eq('kecamatan_lembaga_id', f.kecamatan_id);
-                    const ids = (pids || []).map(p => p.id);
-                    if (ids.length) q = q.in('pendidik_id', ids)
-                }
-                const { data } = await q;
-                const all = data || [];
-                document.getElementById('totalMutasi').textContent = all.length;
-                document.getElementById('totalDiajukan').textContent = all.filter(d => d.status === 'diajukan').length;
-                document.getElementById('totalDisetujui').textContent = all.filter(d => d.status === 'disetujui').length;
-                document.getElementById('totalDitolak').textContent = all.filter(d => d.status === 'ditolak').length
-            } catch (e) { console.error(e) }
+                const f = getRoleFilter();
+                // ✅ RPC hemat: hitung 5 status di server, bukan full scan
+                const { data, error } = await supabaseClient.rpc('get_mutasi_stats', {
+                    p_kecamatan_id: f.kecamatan_id || null,
+                    p_jenis_lembaga: f.jenis_lembaga || null
+                });
+                if (error) throw error;
+                const r = Array.isArray(data) ? data[0] : data;
+                document.getElementById('totalMutasi').textContent = r?.total || 0;
+                document.getElementById('totalDiajukan').textContent = r?.diajukan || 0;
+                document.getElementById('totalDisetujui').textContent = r?.disetujui || 0;
+                document.getElementById('totalDitolak').textContent = r?.ditolak || 0;
+            } catch (e) { console.error('Stats error:', e) }
         }
 
         // ============================================================
@@ -1085,15 +729,13 @@
             const t = Math.ceil(totalData / pageSize);
             document.getElementById('pageInfo').textContent = `Halaman ${currentPage} dari ${t||1}`;
             document.getElementById('prevPage').disabled = currentPage <= 1;
-            document.getElementById('nextPage').disabled = currentPage >= t
+            document.getElementById('nextPage').disabled = currentPage >= t;
         }
-
         function changePage(d) {
-            const t = Math.ceil(totalData / pageSize),
-                n = currentPage + d;
+            const t = Math.ceil(totalData / pageSize), n = currentPage + d;
             if (n < 1 || n > t) return;
             currentPage = n;
-            loadMutasi()
+            loadMutasi();
         }
 
         // ============================================================
@@ -1102,7 +744,6 @@
         function openAddModal() {
             document.getElementById('modalTitle').textContent = 'Tambah Mutasi Pendidik';
             document.getElementById('editId').value = '';
-            
             selectedPendidik = null;
             document.getElementById('editPendidikId').value = '';
             document.getElementById('pendidikSearchInput').value = '';
@@ -1121,18 +762,10 @@
             document.getElementById('btnSaveMutasi').disabled = false;
             document.getElementById('btnSaveMutasi').innerHTML = '<i class="fas fa-save"></i> Simpan';
             isSaving = false;
-
-            pendidikPage = 1;
-            pendidikSearch = '';
-            tujuanPage = 1;
-            tujuanSearch = '';
-
-            loadPendidikOptions().then(() => {
-                loadPendidikDropdown(1, '');
-                loadTujuanDropdown(1, '');
-            });
-
-            document.getElementById('mutasiModal').classList.add('active')
+            pendidikPage = 1; pendidikSearch = '';
+            tujuanPage = 1; tujuanSearch = '';
+            loadPendidikOptions().then(() => { loadPendidikDropdown(1, ''); loadTujuanDropdown(1, ''); });
+            document.getElementById('mutasiModal').classList.add('active');
         }
 
         function closeModal() {
@@ -1140,7 +773,7 @@
             document.getElementById('alasanLainnyaGroup').classList.remove('visible');
             document.getElementById('pendidikDropdown').classList.remove('open');
             document.getElementById('tujuanDropdown').classList.remove('open');
-            isSaving = false
+            isSaving = false;
         }
 
         // ============================================================
@@ -1148,7 +781,6 @@
         // ============================================================
         async function saveMutasi() {
             if (isSaving) { showToast('Sedang memproses...', 'warning'); return }
-            
             const id = document.getElementById('editId').value;
             const pid = document.getElementById('editPendidikId').value;
             const did = document.getElementById('editLembagaAsalId').value;
@@ -1159,96 +791,63 @@
             const alasanLain = document.getElementById('editAlasanLainnya').value.trim();
             const ket = document.getElementById('editKeterangan').value.trim();
             const status = document.getElementById('editStatus').value;
-
-            if (!pid || !did || !kid || !tgl || !alasanSel) {
-                showToast('Semua field wajib diisi!', 'error');
-                return
-            }
-            if (did === kid) {
-                showToast('Asal dan tujuan tidak boleh sama!', 'error');
-                return
-            }
-            if (alasanSel === 'lainnya' && !alasanLain) {
-                showToast('Isi alasan lainnya!', 'error');
-                return
-            }
-
+            if (!pid || !did || !kid || !tgl || !alasanSel) { showToast('Semua field wajib diisi!', 'error'); return }
+            if (did === kid) { showToast('Asal dan tujuan tidak boleh sama!', 'error'); return }
+            if (alasanSel === 'lainnya' && !alasanLain) { showToast('Isi alasan lainnya!', 'error'); return }
             const alasan = alasanSel === 'lainnya' ? alasanLain : alasanSel;
             const u = getUser();
             const btn = document.getElementById('btnSaveMutasi');
-            
             isSaving = true;
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-
             const now = new Date().toISOString();
-            const d = {
-                pendidik_id: pid,
-                dari_lembaga_id: did,
-                ke_lembaga_id: kid,
-                jenis_mutasi: jenis,
-                tanggal_mutasi: tgl,
-                alasan_mutasi: alasan,
-                keterangan: ket || null,
-                status: status,
-                updated_at: now
-            };
-
+            const d = { pendidik_id: pid, dari_lembaga_id: did, ke_lembaga_id: kid, jenis_mutasi: jenis, tanggal_mutasi: tgl, alasan_mutasi: alasan, keterangan: ket || null, status: status, updated_at: now };
             try {
                 let err;
-                let savedId = id;
-                
                 if (id) {
-                    if (status === 'disetujui' || status === 'berlaku') {
-                        d.disetujui_oleh = u.id;
-                        d.disetujui_pada = now;
-                    }
+                    if (status === 'disetujui' || status === 'berlaku') { d.disetujui_oleh = u.id; d.disetujui_pada = now; }
                     const { error } = await supabaseClient.from('mutasi').update(d).eq('id', id);
                     err = error;
-                    savedId = id;
                 } else {
-                    d.nomor_mutasi = await generateNomorMutasi();
-                    d.diajukan_oleh = u.id;
-                    d.created_at = now;
-                    const { data: inserted, error } = await supabaseClient.from('mutasi').insert([d]).select();
-                    err = error;
-                    if (inserted && inserted.length > 0) {
-                        savedId = inserted[0].id;
+                    // ✅ Retry logic untuk hindari duplicate nomor_mutasi
+                    let inserted = false;
+                    let lastErr = null;
+                    for (let attempt = 0; attempt < 5; attempt++) {
+                        try {
+                            const nomor = await generateNomorMutasi();
+                            const dInsert = { ...d, nomor_mutasi: nomor, diajukan_oleh: u.id, created_at: now };
+                            const { data: ins, error: insErr } = await supabaseClient.from('mutasi').insert([dInsert]).select();
+                            if (insErr) {
+                                const isDup = insErr.code === '23505' || /duplicate|unique/i.test(insErr.message || '');
+                                if (isDup) { lastErr = insErr; await new Promise(r => setTimeout(r, 150)); continue; }
+                                throw insErr;
+                            }
+                            inserted = true;
+                            err = null;
+                            break;
+                        } catch (e) { lastErr = e; }
                     }
+                    if (!inserted) throw (lastErr || new Error('Gagal generate nomor unik'));
                 }
                 if (err) throw err;
 
-                // JIKA STATUS BERLAKU, UPDATE DATA PENDIDIK
+                // Jika status berlaku → update data pendidik
                 if (status === 'berlaku') {
                     const upData = { updated_at: now };
-                    
-                    if (['pensiun', 'berhenti', 'meninggal'].includes(jenis)) {
-                        upData.status_aktif = false;
-                    } else {
+                    if (['pensiun', 'berhenti', 'meninggal'].includes(jenis)) { upData.status_aktif = false; }
+                    else {
                         upData.lembaga_id = kid;
-                        // Update kecamatan dari lembaga tujuan
-                        const { data: lembagaTujuan } = await supabaseClient
-                            .from('lembaga')
-                            .select('kecamatan_id')
-                            .eq('id', kid)
-                            .single();
-                        if (lembagaTujuan?.kecamatan_id) {
-                            upData.kecamatan_lembaga_id = lembagaTujuan.kecamatan_id;
-                        }
+                        const { data: lembagaTujuan } = await supabaseClient.from('lembaga').select('kecamatan_id').eq('id', kid).single();
+                        if (lembagaTujuan?.kecamatan_id) upData.kecamatan_lembaga_id = lembagaTujuan.kecamatan_id;
                     }
-                    
-                    await supabaseClient
-                        .from('pendidik')
-                        .update(upData)
-                        .eq('id', pid);
+                    await supabaseClient.from('pendidik').update(upData).eq('id', pid);
                 }
-
                 showToast(id ? 'Mutasi berhasil diperbarui!' : 'Mutasi berhasil ditambahkan!', 'success');
                 closeModal();
                 loadMutasi();
+                loadStats();
                 loadPendidikOptions();
                 refreshPendidikCount();
-                
             } catch (e) {
                 console.error(e);
                 showToast('Gagal: ' + e.message, 'error');
@@ -1263,77 +862,30 @@
         // ===== UPDATE STATUS =====
         // ============================================================
         async function updateStatus(id, newStatus) {
-            const statusLabels = {
-                'disetujui': 'menyetujui',
-                'ditolak': 'menolak',
-                'berlaku': 'memberlakukan'
-            };
-            
+            const statusLabels = { 'disetujui': 'menyetujui', 'ditolak': 'menolak', 'berlaku': 'memberlakukan' };
             if (!confirm(`Yakin ${statusLabels[newStatus] || 'mengubah status'} mutasi ini?`)) return;
-            
             try {
                 const u = getUser();
                 const now = new Date().toISOString();
-                
-                // AMBIL DATA MUTASI LENGKAP
-                const { data: mutasi, error: getError } = await supabaseClient
-                    .from('mutasi')
-                    .select('*, pendidik:pendidik_id(*)')
-                    .eq('id', id)
-                    .single();
-                    
+                const { data: mutasi, error: getError } = await supabaseClient.from('mutasi').select('*, pendidik:pendidik_id(*)').eq('id', id).single();
                 if (getError) throw getError;
-                if (!mutasi) {
-                    showToast('Data mutasi tidak ditemukan', 'error');
-                    return;
-                }
-                
-                const updateData = {
-                    status: newStatus,
-                    updated_at: now
-                };
-                
-                if (newStatus === 'disetujui' || newStatus === 'berlaku') {
-                    updateData.disetujui_oleh = u.id;
-                    updateData.disetujui_pada = now;
-                }
-                
-                const { error } = await supabaseClient
-                    .from('mutasi')
-                    .update(updateData)
-                    .eq('id', id);
-                    
+                if (!mutasi) { showToast('Data mutasi tidak ditemukan', 'error'); return; }
+                const updateData = { status: newStatus, updated_at: now };
+                if (newStatus === 'disetujui' || newStatus === 'berlaku') { updateData.disetujui_oleh = u.id; updateData.disetujui_pada = now; }
+                const { error } = await supabaseClient.from('mutasi').update(updateData).eq('id', id);
                 if (error) throw error;
-                
-                // JIKA STATUS BERLAKU, UPDATE DATA PENDIDIK
                 if (newStatus === 'berlaku') {
                     const upData = { updated_at: now };
-                    
                     if (['pensiun', 'berhenti', 'meninggal'].includes(mutasi.jenis_mutasi)) {
                         upData.status_aktif = false;
                         showToast(`Pendidik ${mutasi.pendidik?.nama_lengkap || ''} dinonaktifkan (${mutasi.jenis_mutasi})`, 'info');
                     } else {
                         upData.lembaga_id = mutasi.ke_lembaga_id;
-                        
-                        // Update kecamatan dari lembaga tujuan
-                        const { data: lembagaTujuan } = await supabaseClient
-                            .from('lembaga')
-                            .select('kecamatan_id')
-                            .eq('id', mutasi.ke_lembaga_id)
-                            .single();
-                            
-                        if (lembagaTujuan?.kecamatan_id) {
-                            upData.kecamatan_lembaga_id = lembagaTujuan.kecamatan_id;
-                        }
-                        
+                        const { data: lembagaTujuan } = await supabaseClient.from('lembaga').select('kecamatan_id').eq('id', mutasi.ke_lembaga_id).single();
+                        if (lembagaTujuan?.kecamatan_id) upData.kecamatan_lembaga_id = lembagaTujuan.kecamatan_id;
                         showToast(`Pendidik ${mutasi.pendidik?.nama_lengkap || ''} dipindahkan ke lembaga tujuan`, 'success');
                     }
-                    
-                    const { error: updatePendidikError } = await supabaseClient
-                        .from('pendidik')
-                        .update(upData)
-                        .eq('id', mutasi.pendidik_id);
-                        
+                    const { error: updatePendidikError } = await supabaseClient.from('pendidik').update(upData).eq('id', mutasi.pendidik_id);
                     if (updatePendidikError) {
                         console.error('Error updating pendidik:', updatePendidikError);
                         showToast('Status berhasil diubah, tapi gagal update data pendidik: ' + updatePendidikError.message, 'warning');
@@ -1343,11 +895,9 @@
                 } else {
                     showToast(`Status berhasil diubah menjadi ${statusLabels[newStatus] || newStatus}!`, 'success');
                 }
-                
                 loadMutasi();
                 loadStats();
                 refreshPendidikCount();
-                
             } catch (e) {
                 console.error(e);
                 showToast('Gagal mengubah status: ' + e.message, 'error');
@@ -1359,21 +909,11 @@
         // ============================================================
         async function editMutasi(id) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('mutasi')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-                    
+                const { data, error } = await supabaseClient.from('mutasi').select('*').eq('id', id).single();
                 if (error) throw error;
-                if (!data) {
-                    showToast('Data mutasi tidak ditemukan', 'error');
-                    return;
-                }
-                
+                if (!data) { showToast('Data mutasi tidak ditemukan', 'error'); return; }
                 document.getElementById('modalTitle').textContent = 'Edit Mutasi Pendidik';
                 document.getElementById('editId').value = data.id;
-                
                 document.getElementById('editPendidikId').value = data.pendidik_id;
                 document.getElementById('editLembagaAsalId').value = data.dari_lembaga_id;
                 document.getElementById('editLembagaTujuanId').value = data.ke_lembaga_id;
@@ -1381,63 +921,37 @@
                 document.getElementById('editTanggal').value = data.tanggal_mutasi;
                 document.getElementById('editStatus').value = data.status;
                 document.getElementById('editKeterangan').value = data.keterangan || '';
-                
-                const alasanOptions = ['permohonan', 'pemerataan', 'kebutuhan_organisasi', 
-                                       'mutasi_masuk', 'mutasi_keluar', 'peningkatan_kompetensi', 'lainnya'];
+                const alasanOptions = ['permohonan', 'pemerataan', 'kebutuhan_organisasi', 'mutasi_masuk', 'mutasi_keluar', 'peningkatan_kompetensi', 'lainnya'];
                 if (alasanOptions.includes(data.alasan_mutasi)) {
                     document.getElementById('editAlasan').value = data.alasan_mutasi;
-                    if (data.alasan_mutasi === 'lainnya') {
-                        document.getElementById('alasanLainnyaGroup').classList.add('visible');
-                    }
+                    if (data.alasan_mutasi === 'lainnya') { document.getElementById('alasanLainnyaGroup').classList.add('visible'); }
                 } else {
                     document.getElementById('editAlasan').value = 'lainnya';
                     document.getElementById('alasanLainnyaGroup').classList.add('visible');
                     document.getElementById('editAlasanLainnya').value = data.alasan_mutasi || '';
                 }
-                
-                const { data: pendidik } = await supabaseClient
-                    .from('pendidik')
-                    .select('*, lembaga:lembaga_id(id,nama,jenis_lembaga)')
-                    .eq('id', data.pendidik_id)
-                    .single();
-                    
+                const { data: pendidik } = await supabaseClient.from('pendidik').select('*, lembaga:lembaga_id(id,nama,jenis_lembaga)').eq('id', data.pendidik_id).single();
                 if (pendidik) {
                     selectedPendidik = pendidik;
                     document.getElementById('selectedInfo').style.display = 'block';
                     document.getElementById('selectedNama').textContent = pendidik.nama_lengkap;
                     document.getElementById('selectedNik').textContent = 'NIK: ' + pendidik.nik;
-                    
                     if (pendidik.lembaga) {
                         document.getElementById('editLembagaAsal').value = pendidik.lembaga.nama + ' (' + pendidik.lembaga.jenis_lembaga + ')';
                         document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: ' + pendidik.lembaga.nama;
                     }
                 }
-                
-                const { data: tujuan } = await supabaseClient
-                    .from('lembaga')
-                    .select('id,nama,jenis_lembaga')
-                    .eq('id', data.ke_lembaga_id)
-                    .single();
-                    
-                if (tujuan) {
-                    document.getElementById('tujuanSearchInput').value = tujuan.nama;
-                }
-                
-                pendidikPage = 1;
-                pendidikSearch = '';
-                tujuanPage = 1;
-                tujuanSearch = '';
-                
+                const { data: tujuan } = await supabaseClient.from('lembaga').select('id,nama,jenis_lembaga').eq('id', data.ke_lembaga_id).single();
+                if (tujuan) { document.getElementById('tujuanSearchInput').value = tujuan.nama; }
+                pendidikPage = 1; pendidikSearch = '';
+                tujuanPage = 1; tujuanSearch = '';
                 await loadPendidikOptions();
                 loadPendidikDropdown(1, '');
                 loadTujuanDropdown(1, '');
-                
                 document.getElementById('btnSaveMutasi').disabled = false;
                 document.getElementById('btnSaveMutasi').innerHTML = '<i class="fas fa-save"></i> Update';
                 isSaving = false;
-                
                 document.getElementById('mutasiModal').classList.add('active');
-                
             } catch (e) {
                 console.error(e);
                 showToast('Gagal memuat data: ' + e.message, 'error');
@@ -1450,8 +964,7 @@
         async function viewDetail(id) {
             try {
                 const { data } = await supabaseClient.from('mutasi').select(`
-                        *,
-                        pendidik:pendidik_id(id,nik,nama_lengkap),
+                        *, pendidik:pendidik_id(id,nik,nama_lengkap),
                         dari_lembaga:dari_lembaga_id(id,nama,jenis_lembaga),
                         ke_lembaga:ke_lembaga_id(id,nama,jenis_lembaga),
                         diajukan_oleh_user:diajukan_oleh(id,name),
@@ -1459,50 +972,22 @@
                     `).eq('id', id).single();
                 if (!data) { showToast('Data tidak ditemukan', 'error'); return }
                 const sm = { diajukan: 'Diajukan', disetujui: 'Disetujui', berlaku: 'Berlaku', ditolak: 'Ditolak' },
-                    jm = { antar_lembaga: 'Antar Lembaga', antar_kecamatan: 'Antar Kecamatan', pensiun: 'Pensiun',
-                        berhenti: 'Berhenti', meninggal: 'Meninggal' };
+                    jm = { antar_lembaga: 'Antar Lembaga', antar_kecamatan: 'Antar Kecamatan', pensiun: 'Pensiun', berhenti: 'Berhenti', meninggal: 'Meninggal' };
                 document.getElementById('detailBody').innerHTML = `
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                        <div style="grid-column:1/-1;background:#e8f5e9;padding:12px 16px;border-radius:8px;border-left:4px solid #2e7d32;">
-                            <div style="font-size:0.7rem;color:#888;">Nomor Mutasi</div>
-                            <div style="font-weight:700;font-size:1.1rem;">${data.nomor_mutasi||'-'}</div>
-                        </div>
-                        <div style="grid-column:1/-1;background:#f8faf8;padding:12px 16px;border-radius:8px;">
-                            <div style="font-size:0.7rem;color:#888;">Pendidik</div>
-                            <div style="font-weight:600;">${data.pendidik?.nama_lengkap||'-'}</div>
-                            <div style="font-size:0.8rem;color:#888;">NIK: ${data.pendidik?.nik||'-'}</div>
-                        </div>
-                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #e65100;">
-                            <div style="font-size:0.7rem;color:#888;">Asal</div>
-                            <div style="font-weight:600;">${data.dari_lembaga?.nama||'-'}</div>
-                            <div style="font-size:0.7rem;color:#888;">${data.dari_lembaga?.jenis_lembaga||''}</div>
-                        </div>
-                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #0d47a1;">
-                            <div style="font-size:0.7rem;color:#888;">Tujuan</div>
-                            <div style="font-weight:600;">${data.ke_lembaga?.nama||'-'}</div>
-                            <div style="font-size:0.7rem;color:#888;">${data.ke_lembaga?.jenis_lembaga||''}</div>
-                        </div>
-                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;">
-                            <div style="font-size:0.7rem;">Jenis</div>
-                            <div>${jm[data.jenis_mutasi]||data.jenis_mutasi}</div>
-                        </div>
-                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;">
-                            <div style="font-size:0.7rem;">Tanggal</div>
-                            <div>${formatTanggal(data.tanggal_mutasi)}</div>
-                        </div>
-                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;">
-                            <div style="font-size:0.7rem;">Alasan</div>
-                            <div>${data.alasan_mutasi||'-'}</div>
-                        </div>
-                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;">
-                            <div style="font-size:0.7rem;">Status</div>
-                            <div><span class="badge ${data.status}">${sm[data.status]||data.status}</span></div>
-                        </div>
+                        <div style="grid-column:1/-1;background:#e8f5e9;padding:12px 16px;border-radius:8px;border-left:4px solid #2e7d32;"><div style="font-size:0.7rem;color:#888;">Nomor Mutasi</div><div style="font-weight:700;font-size:1.1rem;">${data.nomor_mutasi||'-'}</div></div>
+                        <div style="grid-column:1/-1;background:#f8faf8;padding:12px 16px;border-radius:8px;"><div style="font-size:0.7rem;color:#888;">Pendidik</div><div style="font-weight:600;">${data.pendidik?.nama_lengkap||'-'}</div><div style="font-size:0.8rem;color:#888;">NIK: ${data.pendidik?.nik||'-'}</div></div>
+                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #e65100;"><div style="font-size:0.7rem;color:#888;">Asal</div><div style="font-weight:600;">${data.dari_lembaga?.nama||'-'}</div><div style="font-size:0.7rem;color:#888;">${data.dari_lembaga?.jenis_lembaga||''}</div></div>
+                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #0d47a1;"><div style="font-size:0.7rem;color:#888;">Tujuan</div><div style="font-weight:600;">${data.ke_lembaga?.nama||'-'}</div><div style="font-size:0.7rem;color:#888;">${data.ke_lembaga?.jenis_lembaga||''}</div></div>
+                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:0.7rem;">Jenis</div><div>${jm[data.jenis_mutasi]||data.jenis_mutasi}</div></div>
+                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:0.7rem;">Tanggal</div><div>${formatTanggal(data.tanggal_mutasi)}</div></div>
+                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:0.7rem;">Alasan</div><div>${data.alasan_mutasi||'-'}</div></div>
+                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:0.7rem;">Status</div><div><span class="badge ${data.status}">${sm[data.status]||data.status}</span></div></div>
                         ${data.keterangan?`<div style="grid-column:1/-1;background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:0.7rem;">Keterangan</div><div>${data.keterangan}</div></div>`:''}
                         ${data.diajukan_oleh_user?`<div style="grid-column:1/-1;background:#f8faf8;padding:6px 12px;border-radius:6px;font-size:0.75rem;color:#888;">Diajukan oleh: ${data.diajukan_oleh_user?.name||'-'}</div>`:''}
                         ${data.disetujui_oleh_user?`<div style="grid-column:1/-1;background:#f8faf8;padding:6px 12px;border-radius:6px;font-size:0.75rem;color:#888;">Disetujui oleh: ${data.disetujui_oleh_user?.name||'-'} pada ${formatTanggal(data.disetujui_pada)}</div>`:''}
                     </div>`;
-                document.getElementById('detailModal').classList.add('active')
+                document.getElementById('detailModal').classList.add('active');
             } catch (e) { showToast('Gagal: ' + e.message, 'error') }
         }
 
@@ -1516,17 +1001,13 @@
             try {
                 await supabaseClient.from('mutasi').delete().eq('id', id);
                 showToast('Mutasi dihapus', 'success');
-                loadMutasi()
+                loadMutasi();
+                loadStats();
             } catch (e) { showToast('Gagal: ' + e.message, 'error') }
         }
 
-        function formatTanggal(d) { if (!d) return '-'; try { return new Date(d).toLocaleDateString('id-ID', { day: '2-digit',
-                    month: 'short', year: 'numeric' }) } catch { return d } }
-
-        function refreshData() { dataCache.clear();
-            showToast('Memperbarui...', 'info');
-            loadMutasi();
-            refreshPendidikCount(); }
+        function formatTanggal(d) { if (!d) return '-'; try { return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) } catch { return d } }
+        function refreshData() { dataCache.clear(); showToast('Memperbarui...', 'info'); loadMutasi(); loadStats(); refreshPendidikCount(); }
 
         // ============================================================
         // ===== EVENT LISTENERS =====
@@ -1538,76 +1019,52 @@
             await loadPendidikOptions();
             await loadLembagaOptions();
             loadMutasi();
+            loadStats();
             updateFilterBadge();
             refreshPendidikCount();
 
             document.getElementById('searchInput').addEventListener('input', function() {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => applyFilter(), 500)
+                searchTimeout = setTimeout(() => applyFilter(), 500);
             });
 
             let pendidikSearchTimeout;
             document.getElementById('pendidikSearchInput').addEventListener('input', function() {
                 clearTimeout(pendidikSearchTimeout);
                 const val = this.value;
-                pendidikSearchTimeout = setTimeout(() => {
-                    pendidikPage = 1;
-                    loadPendidikDropdown(1, val);
-                }, 300);
+                pendidikSearchTimeout = setTimeout(() => { pendidikPage = 1; loadPendidikDropdown(1, val); }, 300);
             });
             document.getElementById('pendidikSearchInput').addEventListener('focus', function() {
-                if (!this.value) {
-                    loadPendidikDropdown(1, '');
-                } else {
-                    // Jangan reload jika sudah ada data
-                }
+                if (!this.value) { loadPendidikDropdown(1, ''); }
                 const dropdown = document.getElementById('pendidikDropdown');
-                if (dropdown.innerHTML.includes('Memuat')) {
-                    loadPendidikDropdown(pendidikPage, this.value);
-                }
+                if (dropdown.innerHTML.includes('Memuat')) { loadPendidikDropdown(pendidikPage, this.value); }
                 dropdown.classList.add('open');
             });
             document.getElementById('pendidikSearchInput').addEventListener('blur', function() {
-                setTimeout(() => {
-                    document.getElementById('pendidikDropdown').classList.remove('open');
-                }, 200);
+                setTimeout(() => { document.getElementById('pendidikDropdown').classList.remove('open'); }, 200);
             });
 
             let tujuanSearchTimeout;
             document.getElementById('tujuanSearchInput').addEventListener('input', function() {
                 clearTimeout(tujuanSearchTimeout);
                 const val = this.value;
-                tujuanSearchTimeout = setTimeout(() => {
-                    tujuanPage = 1;
-                    loadTujuanDropdown(1, val);
-                }, 300);
+                tujuanSearchTimeout = setTimeout(() => { tujuanPage = 1; loadTujuanDropdown(1, val); }, 300);
             });
             document.getElementById('tujuanSearchInput').addEventListener('focus', function() {
-                if (!this.value) {
-                    loadTujuanDropdown(1, '');
-                }
+                if (!this.value) { loadTujuanDropdown(1, ''); }
                 const dropdown = document.getElementById('tujuanDropdown');
-                if (dropdown.innerHTML.includes('Memuat')) {
-                    loadTujuanDropdown(tujuanPage, this.value);
-                }
+                if (dropdown.innerHTML.includes('Memuat')) { loadTujuanDropdown(tujuanPage, this.value); }
                 dropdown.classList.add('open');
             });
             document.getElementById('tujuanSearchInput').addEventListener('blur', function() {
-                setTimeout(() => {
-                    document.getElementById('tujuanDropdown').classList.remove('open');
-                }, 200);
+                setTimeout(() => { document.getElementById('tujuanDropdown').classList.remove('open'); }, 200);
             });
 
             document.addEventListener('click', function(e) {
-                if (!e.target.closest('#pendidikSelectWrapper')) {
-                    document.getElementById('pendidikDropdown').classList.remove('open');
-                }
-                if (!e.target.closest('#tujuanSelectWrapper')) {
-                    document.getElementById('tujuanDropdown').classList.remove('open');
-                }
+                if (!e.target.closest('#pendidikSelectWrapper')) { document.getElementById('pendidikDropdown').classList.remove('open'); }
+                if (!e.target.closest('#tujuanSelectWrapper')) { document.getElementById('tujuanDropdown').classList.remove('open'); }
             });
-
-            setInterval(updateDate, 60000)
+            setInterval(updateDate, 60000);
         });
 
         // ============================================================

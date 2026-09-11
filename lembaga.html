@@ -9,9 +9,7 @@
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        /* ===== RESET & VARIABLES ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-
         :root {
             --sidebar-width: 250px;
             --header-height: 64px;
@@ -28,202 +26,42 @@
             --bg-gray: #f0f4f0;
             --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
-
         body { background: var(--bg-gray); min-height: 100vh; display: flex; }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            position: fixed;
-            top: 0; left: 0;
-            background: linear-gradient(180deg, #0a2e1a 0%, #1a5a3a 100%);
-            color: white;
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            transform: translateX(0);
-        }
-
+        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; top: 0; left: 0; background: linear-gradient(180deg, #0a2e1a 0%, #1a5a3a 100%); color: white; z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; transform: translateX(0); }
         .sidebar.collapsed { transform: translateX(-100%); }
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
-
-        .sidebar-brand {
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            min-height: var(--header-height);
-            flex-shrink: 0;
-        }
-
-        .sidebar-brand img {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            object-fit: contain;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 4px;
-            flex-shrink: 0;
-        }
-
+        .sidebar-brand { padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); min-height: var(--header-height); flex-shrink: 0; }
+        .sidebar-brand img { width: 36px; height: 36px; border-radius: 50%; object-fit: contain; background: rgba(255, 255, 255, 0.1); padding: 4px; flex-shrink: 0; }
         .sidebar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
         .sidebar-brand .brand-text h1 { font-size: 1rem; font-weight: 700; color: white; letter-spacing: 0.5px; }
         .sidebar-brand .brand-text h1 span { color: var(--gold); }
         .sidebar-brand .brand-text small { font-size: 0.55rem; opacity: 0.7; font-weight: 300; }
-
         .sidebar-menu { flex: 1; padding: 12px 0; list-style: none; }
-        .sidebar-menu .menu-label {
-            padding: 8px 20px;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255, 255, 255, 0.35);
-            font-weight: 600;
-        }
-
-        .sidebar-menu .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 10px 20px;
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.25s ease;
-            border-left: 3px solid transparent;
-            cursor: pointer;
-        }
-
+        .sidebar-menu .menu-label { padding: 8px 20px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255, 255, 255, 0.35); font-weight: 600; }
+        .sidebar-menu .menu-item { display: flex; align-items: center; gap: 14px; padding: 10px 20px; color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.25s ease; border-left: 3px solid transparent; cursor: pointer; }
         .sidebar-menu .menu-item:hover { background: rgba(255, 255, 255, 0.08); color: white; }
         .sidebar-menu .menu-item.active { background: rgba(255, 255, 255, 0.1); color: var(--gold); border-left-color: var(--gold); }
         .sidebar-menu .menu-item i { width: 20px; font-size: 1.1rem; text-align: center; flex-shrink: 0; }
-        .sidebar-menu .menu-item .badge {
-            margin-left: auto;
-            background: var(--danger);
-            color: white;
-            font-size: 0.55rem;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 10px;
-            min-width: 18px;
-            text-align: center;
-        }
-
-        .sidebar-footer {
-            padding: 12px 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .sidebar-footer .avatar {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            background: var(--gold);
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
-
+        .sidebar-menu .menu-item .badge { margin-left: auto; background: var(--danger); color: white; font-size: 0.55rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; min-width: 18px; text-align: center; }
+        .sidebar-footer { padding: 12px 20px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .sidebar-footer .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--gold); color: var(--primary-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
         .sidebar-footer .user-info { flex: 1; min-width: 0; }
-        .sidebar-footer .user-info .name {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sidebar-footer .user-info .role {
-            font-size: 0.6rem;
-            opacity: 0.6;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sidebar-footer .logout-btn {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 4px 8px;
-            transition: 0.2s;
-            border-radius: 6px;
-        }
-
+        .sidebar-footer .user-info .name { font-size: 0.8rem; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-footer .user-info .role { font-size: 0.6rem; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-footer .logout-btn { background: none; border: none; color: rgba(255, 255, 255, 0.5); cursor: pointer; font-size: 1rem; padding: 4px 8px; transition: 0.2s; border-radius: 6px; }
         .sidebar-footer .logout-btn:hover { color: #ff6b6b; background: rgba(255, 0, 0, 0.1); }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 999; }
         .sidebar-overlay.active { display: block; }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 40px 40px 40px;
-        }
-
+        .main-content { margin-left: var(--sidebar-width); flex: 1; min-height: 100vh; transition: margin-left 0.3s ease; display: flex; flex-direction: column; padding: 20px 40px 40px 40px; }
         .main-content.expanded { margin-left: 0; }
-
-        /* ===== HEADER ===== */
-        .header {
-            background: white;
-            padding: 0 40px;
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #e8ecf1;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
+        .header { background: white; padding: 0 40px; height: var(--header-height); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e8ecf1; position: sticky; top: 0; z-index: 100; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
         .header-left { display: flex; align-items: center; gap: 16px; }
-        .header-left .sidebar-toggle {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            color: var(--primary-dark);
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 6px;
-            transition: 0.2s;
-        }
-
+        .header-left .sidebar-toggle { background: none; border: none; font-size: 1.3rem; color: var(--primary-dark); cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; }
         .header-left .sidebar-toggle:hover { background: var(--bg-gray); color: var(--primary); }
         .header-left .page-title h1 { font-size: 1.1rem; font-weight: 700; color: var(--primary-dark); }
         .header-left .page-title p { font-size: 0.7rem; color: #888; }
-
         .header-right { display: flex; align-items: center; gap: 16px; }
         .header-date { font-size: 0.75rem; color: #888; }
         .header-right .role-badge { background: var(--primary); color: white; padding: 4px 14px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
@@ -234,184 +72,52 @@
         .header-user .user-name { font-size: 0.8rem; font-weight: 600; color: var(--primary-dark); }
         .logout-btn-header { background: none; border: none; color: #999; cursor: pointer; font-size: 1rem; padding: 4px 8px; transition: 0.2s; border-radius: 6px; }
         .logout-btn-header:hover { color: var(--danger); background: rgba(244, 67, 54, 0.08); }
-
-        /* ===== WELCOME ===== */
-        .welcome-section {
-            background: linear-gradient(135deg, #0a2e1a 0%, #1a5a3a 50%, #2e7d32 100%);
-            border-radius: 14px;
-            padding: 24px 36px;
-            margin-bottom: 24px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            box-shadow: 0 8px 32px rgba(0, 100, 0, 0.3);
-        }
-
+        .welcome-section { background: linear-gradient(135deg, #0a2e1a 0%, #1a5a3a 50%, #2e7d32 100%); border-radius: 14px; padding: 24px 36px; margin-bottom: 24px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 8px 32px rgba(0, 100, 0, 0.3); }
         .welcome-section .welcome-text h2 { font-size: 1.3rem; font-weight: 700; }
         .welcome-section .welcome-text h2 span { color: var(--gold); }
         .welcome-section .welcome-text p { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
         .welcome-section .welcome-text p i { margin-right: 6px; color: var(--gold); }
-        .welcome-section .welcome-badge {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            padding: 8px 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-        }
-
+        .welcome-section .welcome-badge { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 10px; padding: 8px 20px; font-size: 0.75rem; font-weight: 500; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
         .welcome-section .welcome-badge i { color: var(--gold); }
-
-        /* ===== STATS ===== */
-        .stat-mini {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .stat-mini .stat-item {
-            font-size: 0.85rem;
-            color: #555;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: var(--card-shadow);
-            border-left: 3px solid var(--primary);
-        }
-
+        .stat-mini { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+        .stat-mini .stat-item { font-size: 0.85rem; color: #555; background: white; padding: 10px 20px; border-radius: 10px; box-shadow: var(--card-shadow); border-left: 3px solid var(--primary); }
         .stat-mini .stat-item strong { color: var(--primary); font-size: 1.1rem; }
         .stat-mini .stat-item:nth-child(2) { border-left-color: #7b1fa2; }
         .stat-mini .stat-item:nth-child(3) { border-left-color: #00897b; }
         .stat-mini .stat-item:nth-child(4) { border-left-color: #f9a825; }
-
-        /* ===== FILTER ===== */
-        .filter-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            background: linear-gradient(135deg, #ffffff 0%, #f5faf5 100%);
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 100, 0, 0.08);
-            margin-bottom: 16px;
-            align-items: flex-end;
-            position: relative;
-        }
-
+        .filter-section { display: flex; flex-wrap: wrap; gap: 12px; background: linear-gradient(135deg, #ffffff 0%, #f5faf5 100%); padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); border: 1px solid rgba(0, 100, 0, 0.08); margin-bottom: 16px; align-items: flex-end; position: relative; }
         .filter-section .filter-item { flex: 1; min-width: 180px; }
         .filter-section .filter-item label { display: block; font-size: 0.7rem; color: #888; margin-bottom: 2px; font-weight: 600; }
-        .filter-section .filter-item input {
-            width: 100%;
-            padding: 8px 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            background: white;
-            transition: 0.2s;
-        }
-
-        .filter-section .filter-item input:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.08);
-        }
-
+        .filter-section .filter-item input { width: 100%; padding: 8px 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.85rem; background: white; transition: 0.2s; }
+        .filter-section .filter-item input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.08); }
         .filter-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .filter-actions .btn { white-space: nowrap; }
-
         .badge-filter-active { animation: pulse-dot 1.5s ease-in-out infinite; }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .btn-filter-active { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
         .btn-filter-active i { color: white !important; }
-
-        .role-badge-filter {
-            background: var(--primary);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-right: 8px;
-        }
-
-        /* Search info */
-        .search-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.75rem;
-            color: #666;
-        }
+        .role-badge-filter { background: var(--primary); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-right: 8px; }
+        .search-info { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: #666; }
         .search-info .search-count { font-weight: 600; color: var(--primary); }
-        .search-info .btn-clear-search {
-            background: none;
-            border: none;
-            color: #999;
-            cursor: pointer;
-            font-size: 0.8rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            transition: 0.2s;
-        }
+        .search-info .btn-clear-search { background: none; border: none; color: #999; cursor: pointer; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; transition: 0.2s; }
         .search-info .btn-clear-search:hover { background: #f0f0f0; color: var(--danger); }
-
-        mark.search-highlight {
-            background: #ffeb3b;
-            padding: 0 2px;
-            border-radius: 2px;
-            font-weight: 600;
-        }
-
-        /* ===== CARD ===== */
-        .card {
-            background: white;
-            border-radius: 14px;
-            padding: 20px 24px;
-            box-shadow: var(--card-shadow);
-        }
-
+        mark.search-highlight { background: #ffeb3b; padding: 0 2px; border-radius: 2px; font-weight: 600; }
+        .card { background: white; border-radius: 14px; padding: 20px 24px; box-shadow: var(--card-shadow); }
         .card .card-title { font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); }
         .card .card-title i { margin-right: 8px; color: var(--primary); }
-
         .table-responsive { overflow-x: auto; }
         .table-responsive table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
-        .table-responsive table th {
-            padding: 10px 12px;
-            text-align: left;
-            background: #eaf0ea;
-            color: #1b5e20;
-            font-weight: 700;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #c8e6c9;
-            position: sticky;
-            top: 0;
-        }
-
+        .table-responsive table th { padding: 10px 12px; text-align: left; background: #eaf0ea; color: #1b5e20; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #c8e6c9; position: sticky; top: 0; }
         .table-responsive table tbody tr:nth-child(even) { background: #f6faf6; }
         .table-responsive table tbody tr:nth-child(odd) { background: #ffffff; }
         .table-responsive table tbody tr:hover { background: #e8f5e9; cursor: pointer; transition: background 0.2s ease; }
         .table-responsive table td { padding: 10px 12px; border-bottom: 1px solid #f0f4f0; vertical-align: middle; }
-
         .badge { padding: 3px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .badge.active { background: #e8f5e9; color: #2e7d32; }
         .badge.inactive { background: #ffebee; color: #c62828; }
         .badge.lpq { background: #e8f5e9; color: #2e7d32; }
         .badge.mdt { background: #e3f2fd; color: #1565c0; }
         .badge.ponpes { background: #f3e5f5; color: #7b1fa2; }
-
-        /* ===== BUTTONS ===== */
         .btn { padding: 6px 14px; border: none; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
@@ -423,156 +129,33 @@
         .btn-danger { background: var(--danger); color: white; }
         .btn-danger:hover { background: #d32f2f; }
         .btn-sm { padding: 4px 10px; font-size: 0.7rem; }
-
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            padding: 12px 24px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            font-size: 0.85rem;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-            z-index: 9999;
-            opacity: 0;
-            transition: all 0.3s ease;
-            max-width: 90%;
-        }
-
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); padding: 12px 24px; border-radius: 12px; color: white; font-weight: 500; font-size: 0.85rem; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); z-index: 9999; opacity: 0; transition: all 0.3s ease; max-width: 90%; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast-success { background: var(--success); }
         .toast-error { background: var(--danger); }
         .toast-info { background: var(--primary); }
         .toast-warning { background: var(--warning); }
-
         .spinner { width: 32px; height: 32px; border: 3px solid #f0f2f5; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        .spinner-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 4000;
-            justify-content: center;
-            align-items: center;
-        }
-
+        .spinner-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 4000; justify-content: center; align-items: center; }
         .spinner-overlay.active { display: flex; }
-
-        .spinner-box {
-            background: white;
-            padding: 30px 40px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .spinner-box .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 12px;
-        }
-
+        .spinner-box { background: white; padding: 30px 40px; border-radius: 12px; text-align: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
+        .spinner-box .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 12px; }
         .spinner-box p { margin: 0; color: #555; font-size: 0.9rem; }
-
-        /* ===== MODAL ===== */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
         .modal-overlay.active { display: flex; }
-
-        .modal-container {
-            background: white;
-            border-radius: 16px;
-            padding: 28px 30px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: fadeInModal 0.25s ease;
-        }
-
-        @keyframes fadeInModal {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f0f2f5;
-        }
-
+        .modal-container { background: white; border-radius: 16px; padding: 28px 30px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: fadeInModal 0.25s ease; }
+        @keyframes fadeInModal { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #f0f2f5; }
         .modal-header h2 { font-size: 1.2rem; color: var(--primary); font-weight: 700; }
-        .modal-header .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #888;
-            cursor: pointer;
-            padding: 0 8px;
-        }
-
+        .modal-header .close-btn { background: none; border: none; font-size: 1.5rem; color: #888; cursor: pointer; padding: 0 8px; }
         .modal-header .close-btn:hover { color: #333; }
-
         .modal-body .form-group { margin-bottom: 14px; }
         .modal-body .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #555; margin-bottom: 2px; }
-        .modal-body .form-group input,
-        .modal-body .form-group select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            background: #fafafa;
-            transition: 0.2s;
-        }
-
-        .modal-body .form-group input:focus,
-        .modal-body .form-group select:focus {
-            border-color: var(--primary);
-            outline: none;
-            background: white;
-        }
-
-        .modal-body .form-group input:disabled,
-        .modal-body .form-group select:disabled {
-            background: #f5f5f5;
-            color: #666;
-            cursor: not-allowed;
-            border-color: #e8e8e8;
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 1px solid #f0f2f5;
-        }
-
-        /* ===== RESPONSIVE ===== */
+        .modal-body .form-group input, .modal-body .form-group select { width: 100%; padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.9rem; background: #fafafa; transition: 0.2s; }
+        .modal-body .form-group input:focus, .modal-body .form-group select:focus { border-color: var(--primary); outline: none; background: white; }
+        .modal-body .form-group input:disabled, .modal-body .form-group select:disabled { background: #f5f5f5; color: #666; cursor: not-allowed; border-color: #e8e8e8; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f2f5; }
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
@@ -593,11 +176,9 @@
             .welcome-section .welcome-text p { font-size: 0.75rem; }
             .welcome-section .welcome-badge { font-size: 0.65rem; padding: 4px 12px; }
             .table-responsive table { font-size: 0.75rem; }
-            .table-responsive table th,
-            .table-responsive table td { padding: 6px 8px; }
+            .table-responsive table th, .table-responsive table td { padding: 6px 8px; }
             .search-info { font-size: 0.65rem; }
         }
-
         @media (max-width: 480px) {
             .header { padding: 0 12px; height: 56px; }
             .header-left .page-title h1 { font-size: 0.85rem; }
@@ -613,8 +194,7 @@
             .welcome-section { padding: 14px 16px; }
             .welcome-section .welcome-text h2 { font-size: 0.9rem; }
             .table-responsive table { font-size: 0.7rem; }
-            .table-responsive table th,
-            .table-responsive table td { padding: 4px 6px; }
+            .table-responsive table th, .table-responsive table td { padding: 4px 6px; }
             .filter-actions .btn { font-size: 0.6rem; padding: 4px 8px; }
         }
     </style>
@@ -756,7 +336,6 @@
         </div>
     </div>
 
-    <!-- MODAL FILTER -->
     <div class="modal-overlay" id="filterModal">
         <div class="modal-container" style="max-width:500px;">
             <div class="modal-header">
@@ -805,7 +384,6 @@
         </div>
     </div>
 
-    <!-- MODAL DETAIL / EDIT -->
     <div class="modal-overlay" id="lembagaModal">
         <div class="modal-container">
             <div class="modal-header">
@@ -896,7 +474,6 @@
         </div>
     </div>
 
-    <!-- MODAL IMPORT -->
     <div id="importModal" class="modal-overlay">
         <div class="modal-container" style="max-width:450px;">
             <div class="modal-header">
@@ -926,7 +503,7 @@
 
 <script>
     // ============================================================
-    // ===== CACHE MANAGER (LOCALSTORAGE) =====
+    // ===== CACHE MANAGER =====
     // ============================================================
     const CacheManager = {
         CACHE_DURATION: 15 * 60 * 1000,
@@ -935,29 +512,16 @@
                 const cached = localStorage.getItem(`cache_lembaga_${key}`);
                 if (!cached) return null;
                 const { data, timestamp } = JSON.parse(cached);
-                if (Date.now() - timestamp > this.CACHE_DURATION) {
-                    localStorage.removeItem(`cache_lembaga_${key}`);
-                    return null;
-                }
+                if (Date.now() - timestamp > this.CACHE_DURATION) { localStorage.removeItem(`cache_lembaga_${key}`); return null; }
                 return data;
             } catch { return null; }
         },
-        set(key, data) {
-            try {
-                localStorage.setItem(`cache_lembaga_${key}`, JSON.stringify({ data, timestamp: Date.now() }));
-            } catch (e) { console.warn('Cache set error:', e); }
-        },
-        clear(key) {
-            if (key) localStorage.removeItem(`cache_lembaga_${key}`);
-            else Object.keys(localStorage).filter(k => k.startsWith('cache_lembaga_')).forEach(k => localStorage.removeItem(k));
-        },
+        set(key, data) { try { localStorage.setItem(`cache_lembaga_${key}`, JSON.stringify({ data, timestamp: Date.now() })); } catch (e) { console.warn('Cache set error:', e); } },
+        clear(key) { if (key) localStorage.removeItem(`cache_lembaga_${key}`); else Object.keys(localStorage).filter(k => k.startsWith('cache_lembaga_')).forEach(k => localStorage.removeItem(k)); },
         isExpired(key) {
             const cached = localStorage.getItem(`cache_lembaga_${key}`);
             if (!cached) return true;
-            try {
-                const { timestamp } = JSON.parse(cached);
-                return Date.now() - timestamp > this.CACHE_DURATION;
-            } catch { return true; }
+            try { const { timestamp } = JSON.parse(cached); return Date.now() - timestamp > this.CACHE_DURATION; } catch { return true; }
         }
     };
 
@@ -982,7 +546,6 @@
         sidebar.classList.toggle('open');
         overlay.classList.toggle('active');
     }
-
     window.addEventListener('resize', function() {
         if (window.innerWidth > 992) {
             document.getElementById('sidebar').classList.remove('open');
@@ -1013,9 +576,7 @@
         const now = new Date();
         el.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         const welcomeDate = document.getElementById('welcomeDate');
-        if (welcomeDate) {
-            welcomeDate.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        }
+        if (welcomeDate) welcomeDate.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     }
 
     // ============================================================
@@ -1025,36 +586,21 @@
         try {
             const { data: { session }, error } = await supabaseClient.auth.getSession();
             if (error || !session) { window.location.href = 'index.html'; return false; }
-
-            const { data: userData, error: userError } = await supabaseClient
-                .from('users')
-                .select('id, name, email, role, kecamatan_id, lembaga_id, active')
-                .eq('id', session.user.id)
-                .single();
-
+            const { data: userData, error: userError } = await supabaseClient.from('users')
+                .select('id, name, email, role, kecamatan_id, lembaga_id, active').eq('id', session.user.id).single();
             if (userError || !userData || !userData.active) {
                 await supabaseClient.auth.signOut();
                 window.location.href = 'index.html';
                 return false;
             }
-
             window.currentUser = {
-                id: userData.id,
-                name: userData.name || session.user.email,
-                email: session.user.email,
-                role: userData.role || 'operator',
-                kecamatan_id: userData.kecamatan_id,
-                lembaga_id: userData.lembaga_id
+                id: userData.id, name: userData.name || session.user.email, email: session.user.email,
+                role: userData.role || 'operator', kecamatan_id: userData.kecamatan_id, lembaga_id: userData.lembaga_id
             };
-
             updateHeaderUI(window.currentUser);
             updateWelcomeUI(window.currentUser);
             return true;
-        } catch (error) {
-            console.error('Auth check error:', error);
-            window.location.href = 'index.html';
-            return false;
-        }
+        } catch (error) { console.error('Auth check error:', error); window.location.href = 'index.html'; return false; }
     }
 
     function getUser() { return window.currentUser || null; }
@@ -1064,20 +610,13 @@
         const user = window.currentUser;
         const role = user.role;
         const filter = {};
-
         if (role === 'super_admin' || role === 'admin_kab') return {};
-
-        if (role === 'operator' && user.lembaga_id) {
-            return { lembaga_id: user.lembaga_id, restrict: true };
-        }
-
+        if (role === 'operator' && user.lembaga_id) return { lembaga_id: user.lembaga_id, restrict: true };
         if (!user.kecamatan_id) return { restrict: true };
-
         filter.kecamatan_id = user.kecamatan_id;
         if (role === 'batko') filter.jenis_lembaga = 'LPQ';
         else if (role === 'fkdt') filter.jenis_lembaga = 'MDT';
         else if (role === 'ponpes') filter.jenis_lembaga = 'PONPES';
-
         return filter;
     }
 
@@ -1087,7 +626,6 @@
     function updateHeaderUI(user) {
         if (!user) return;
         const roleNames = { 'super_admin': 'Super Admin', 'admin_kab': 'Admin Kabupaten', 'batko': 'BATKO', 'fkdt': 'FKDT', 'ponpes': 'PONPES', 'operator': 'Operator' };
-
         const setT = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
         setT('userAvatar', user.name.charAt(0).toUpperCase());
         setT('userName', user.name);
@@ -1095,18 +633,12 @@
         setT('userAvatarSmall', user.name.charAt(0).toUpperCase());
         setT('userNameSmall', user.name);
         setT('headerRoleBadge', roleNames[user.role] || user.role);
-
         const scopeEl = document.getElementById('headerScope');
         if (!scopeEl) return;
-
-        if (user.role === 'super_admin' || user.role === 'admin_kab') {
-            scopeEl.textContent = '';
-        } else if (user.kecamatan_id) {
+        if (user.role === 'super_admin' || user.role === 'admin_kab') { scopeEl.textContent = ''; }
+        else if (user.kecamatan_id) {
             supabaseClient.from('master_kecamatan').select('nama').eq('id', user.kecamatan_id).single()
-                .then(({ data }) => {
-                    const jenis = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
-                    scopeEl.textContent = `📍 ${data?.nama || 'Kecamatan'} • ${jenis[user.role] || ''}`;
-                })
+                .then(({ data }) => { const jenis = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' }; scopeEl.textContent = `📍 ${data?.nama || 'Kecamatan'} • ${jenis[user.role] || ''}`; })
                 .catch(() => {});
         } else if (user.lembaga_id) {
             supabaseClient.from('lembaga').select('nama').eq('id', user.lembaga_id).single()
@@ -1119,20 +651,13 @@
         if (!user) return;
         const setT = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
         setT('welcomeName', user.name);
-
         const roleNames = { 'super_admin': 'Super Admin SI-MUSTAFA', 'admin_kab': 'Admin Kemenag Kabupaten Tegal', 'batko': 'Admin BATKO', 'fkdt': 'Admin FKDT', 'ponpes': 'Admin PONPES', 'operator': 'Operator Lembaga' };
         let roleText = roleNames[user.role] || user.role;
-
         if (['batko', 'fkdt', 'ponpes'].includes(user.role) && user.kecamatan_id) {
             supabaseClient.from('master_kecamatan').select('nama').eq('id', user.kecamatan_id).single()
-                .then(({ data }) => {
-                    const jenis = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' };
-                    setT('welcomeRole', `Admin ${jenis[user.role] || ''} ${data?.nama || 'Kecamatan'}`);
-                })
+                .then(({ data }) => { const jenis = { 'batko': 'LPQ', 'fkdt': 'MDT', 'ponpes': 'PONPES' }; setT('welcomeRole', `Admin ${jenis[user.role] || ''} ${data?.nama || 'Kecamatan'}`); })
                 .catch(() => setT('welcomeRole', roleText));
-        } else {
-            setT('welcomeRole', roleText);
-        }
+        } else { setT('welcomeRole', roleText); }
     }
 
     // ============================================================
@@ -1147,9 +672,7 @@
             CacheManager.clear();
             showToast('Logout berhasil!', 'success');
             setTimeout(() => { window.location.href = 'index.html'; }, 1000);
-        } catch (e) {
-            showToast('Gagal logout: ' + e.message, 'error');
-        }
+        } catch (e) { showToast('Gagal logout: ' + e.message, 'error'); }
     }
 
     // ============================================================
@@ -1157,10 +680,7 @@
     // ============================================================
     function debounce(fn, delay) {
         let timer;
-        return function(...args) {
-            clearTimeout(timer);
-            timer = setTimeout(() => fn.apply(this, args), delay);
-        };
+        return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), delay); };
     }
 
     // ============================================================
@@ -1169,28 +689,21 @@
     function openFilterModal() {
         document.getElementById('filterJenis').value = currentFilters.jenis || 'all';
         document.getElementById('filterStatus').value = currentFilters.status || 'all';
-
         loadKecamatanFilterOptions().then(() => {
             const kecSelect = document.getElementById('filterKecamatan');
             if (currentFilters.kecamatan) {
                 kecSelect.value = currentFilters.kecamatan;
-                loadDesaFilter(currentFilters.kecamatan).then(() => {
-                    document.getElementById('filterDesa').value = currentFilters.desa || '';
-                });
+                loadDesaFilter(currentFilters.kecamatan).then(() => { document.getElementById('filterDesa').value = currentFilters.desa || ''; });
             }
         });
-
         document.getElementById('filterModal').classList.add('active');
     }
 
-    function closeFilterModal() {
-        document.getElementById('filterModal').classList.remove('active');
-    }
+    function closeFilterModal() { document.getElementById('filterModal').classList.remove('active'); }
 
     async function loadKecamatanFilterOptions() {
         const cached = CacheManager.get('kecamatan_filter');
         if (cached) { populateSelect('filterKecamatan', cached, 'Semua Kecamatan'); return; }
-
         const { data, error } = await supabaseClient.from('master_kecamatan').select('id, nama').order('nama');
         if (error) throw error;
         CacheManager.set('kecamatan_filter', data);
@@ -1202,9 +715,7 @@
         if (!select) return;
         const currentValue = select.value;
         select.innerHTML = placeholder ? `<option value="">${placeholder}</option>` : '';
-        data.forEach(item => {
-            select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
-        });
+        data.forEach(item => { select.innerHTML += `<option value="${item.id}">${item.nama}</option>`; });
         if (currentValue && data.some(d => d.id === currentValue)) select.value = currentValue;
     }
 
@@ -1212,10 +723,8 @@
         const cacheKey = `desa_filter_${kecamatanId || 'all'}`;
         const cached = CacheManager.get(cacheKey);
         if (cached) { populateSelect('filterDesa', cached, 'Semua Desa'); return; }
-
         let query = supabaseClient.from('master_kelurahan').select('id, nama').order('nama');
         if (kecamatanId) query = query.eq('kecamatan_id', kecamatanId);
-
         const { data, error } = await query;
         if (error) throw error;
         CacheManager.set(cacheKey, data);
@@ -1227,7 +736,6 @@
         currentFilters.kecamatan = document.getElementById('filterKecamatan').value;
         currentFilters.desa = document.getElementById('filterDesa').value;
         currentFilters.status = document.getElementById('filterStatus').value;
-
         currentPage = 1;
         closeFilterModal();
         updateFilterBadge();
@@ -1264,34 +772,18 @@
     function updateFilterBadge() {
         const badge = document.getElementById('filterActiveBadge');
         const btnFilter = document.getElementById('btnFilter');
-
-        const hasFilter =
-            currentFilters.jenis !== 'all' ||
-            currentFilters.kecamatan !== '' ||
-            currentFilters.desa !== '' ||
-            currentFilters.status !== 'all' ||
-            currentFilters.search !== '';
-
-        if (hasFilter) {
-            badge.style.display = 'inline';
-            btnFilter.classList.add('btn-filter-active');
-        } else {
-            badge.style.display = 'none';
-            btnFilter.classList.remove('btn-filter-active');
-        }
+        const hasFilter = currentFilters.jenis !== 'all' || currentFilters.kecamatan !== '' || currentFilters.desa !== '' || currentFilters.status !== 'all' || currentFilters.search !== '';
+        if (hasFilter) { badge.style.display = 'inline'; btnFilter.classList.add('btn-filter-active'); }
+        else { badge.style.display = 'none'; btnFilter.classList.remove('btn-filter-active'); }
     }
 
     function updateSearchInfo() {
         const searchCount = document.getElementById('searchCount');
         const btnClear = document.getElementById('btnClearSearch');
-
         if (currentFilters.search) {
             btnClear.style.display = 'inline-flex';
             searchCount.textContent = totalData > 0 ? `${totalData} hasil` : 'Mencari...';
-        } else {
-            btnClear.style.display = 'none';
-            searchCount.textContent = '';
-        }
+        } else { btnClear.style.display = 'none'; searchCount.textContent = ''; }
     }
 
     function clearSearch() {
@@ -1310,7 +802,6 @@
     async function loadKecamatanOptions() {
         const cached = CacheManager.get('kecamatan_options');
         if (cached) { populateSelect('editKecamatan', cached, '-- Pilih Kecamatan --'); return; }
-
         const { data, error } = await supabaseClient.from('master_kecamatan').select('id, nama').order('nama');
         if (error) throw error;
         CacheManager.set('kecamatan_options', data);
@@ -1320,51 +811,32 @@
     async function loadDesaOptions(kecamatanId, targetId = 'editDesa') {
         const select = document.getElementById(targetId);
         if (!select) return;
-
-        if (!kecamatanId) {
-            select.innerHTML = '<option value="">-- Pilih Desa --</option>';
-            return;
-        }
-
+        if (!kecamatanId) { select.innerHTML = '<option value="">-- Pilih Desa --</option>'; return; }
         const cacheKey = `desa_options_${kecamatanId}`;
         const cached = CacheManager.get(cacheKey);
-
         let data;
-        if (cached) {
-            data = cached;
-        } else {
-            const { data: fetched, error } = await supabaseClient
-                .from('master_kelurahan')
-                .select('id, nama')
-                .eq('kecamatan_id', kecamatanId)
-                .order('nama');
+        if (cached) { data = cached; }
+        else {
+            const { data: fetched, error } = await supabaseClient.from('master_kelurahan').select('id, nama').eq('kecamatan_id', kecamatanId).order('nama');
             if (error) throw error;
             data = fetched;
             CacheManager.set(cacheKey, data);
         }
-
         const currentValue = select.value;
         select.innerHTML = '<option value="">-- Pilih Desa --</option>';
-        data.forEach(item => {
-            select.innerHTML += `<option value="${item.id}">${item.nama}</option>`;
-        });
-
+        data.forEach(item => { select.innerHTML += `<option value="${item.id}">${item.nama}</option>`; });
         if (currentValue && data.some(d => d.id === currentValue)) select.value = currentValue;
     }
 
     async function loadJenjangOptions() {
         const cached = CacheManager.get('jenjang_options');
         if (cached) { populateSelect('editJenjangId', cached, '-- Pilih Jenjang --'); return; }
-
         try {
             const { data, error } = await supabaseClient.from('master_jenjang').select('id, nama').order('nama');
             if (error) throw error;
             CacheManager.set('jenjang_options', data);
             populateSelect('editJenjangId', data, '-- Pilih Jenjang --');
-        } catch (e) {
-            console.warn('Tabel master_jenjang tidak ada atau error:', e.message);
-            // Biarkan kosong, tidak fatal
-        }
+        } catch (e) { console.warn('Tabel master_jenjang tidak ada atau error:', e.message); }
     }
 
     // ============================================================
@@ -1386,31 +858,18 @@
     }
 
     // ============================================================
-    // ===== LOAD LEMBAGA (PAKAI RPC search_lembaga) =====
+    // ===== LOAD LEMBAGA =====
     // ============================================================
     async function loadLembaga() {
         try {
             const user = getUser();
             const filter = getRoleFilter();
-
             if (filter.restrict) {
-                document.getElementById('lembagaTableBody').innerHTML =
-                    `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">
-                        <i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                        Anda tidak memiliki akses ke data ini
-                    </td></tr>`;
+                document.getElementById('lembagaTableBody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;"><i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px;"></i>Anda tidak memiliki akses ke data ini</td></tr>`;
                 return;
             }
-
-            // Loading state
-            document.getElementById('lembagaTableBody').innerHTML =
-                `<tr><td colspan="7" style="text-align:center;padding:20px;">
-                    <div class="spinner" style="margin:0 auto;"></div>
-                </td></tr>`;
-
+            document.getElementById('lembagaTableBody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto;"></div></td></tr>`;
             const offset = (currentPage - 1) * pageSize;
-
-            // ✅ 1 RPC = data + count sekaligus
             const { data, error } = await supabaseClient.rpc('search_lembaga', {
                 p_search: currentFilters.search || null,
                 p_jenis: currentFilters.jenis || 'all',
@@ -1421,30 +880,18 @@
                 p_limit: pageSize,
                 p_offset: offset
             });
-
             if (error) throw error;
-
             const rows = Array.isArray(data) ? data : [];
             totalData = rows.length > 0 ? Number(rows[0].total_count || 0) : 0;
-
-            // Map ke format render
             const mapped = rows.map(row => ({
-                id: row.id,
-                nama: row.nama,
-                jenis_lembaga: row.jenis_lembaga,
-                nslp: row.nslp,
-                desa: row.desa,
-                kecamatan: row.kecamatan,
-                status_aktif: row.status_aktif,
+                id: row.id, nama: row.nama, jenis_lembaga: row.jenis_lembaga,
+                nslp: row.nslp, desa: row.desa, kecamatan: row.kecamatan, status_aktif: row.status_aktif,
                 master_kecamatan: row.kecamatan_nama ? { nama: row.kecamatan_nama } : null,
                 master_kelurahan: row.desa_nama ? { nama: row.desa_nama } : null
             }));
-
             renderTable(mapped);
             updatePagination();
             updateSearchInfo();
-
-            // Role badge
             const oldBadge = document.querySelector('.role-badge-filter');
             if (oldBadge) oldBadge.remove();
             if (filter.jenis_lembaga || filter.kecamatan_id) {
@@ -1458,27 +905,15 @@
                 const filterSection = document.querySelector('.filter-section');
                 if (filterSection) filterSection.prepend(badge);
             }
-
-            // Button visibility
             const userRole = user?.role || '';
             const isOperator = userRole === 'operator';
             const btnTambah = document.getElementById('btnTambah');
             const btnImport = document.getElementById('btnImport');
-            if (isOperator) {
-                btnTambah.style.display = 'none';
-                btnImport.style.display = 'none';
-            } else {
-                btnTambah.style.display = 'inline-flex';
-                btnImport.style.display = 'inline-flex';
-            }
-
+            if (isOperator) { btnTambah.style.display = 'none'; btnImport.style.display = 'none'; }
+            else { btnTambah.style.display = 'inline-flex'; btnImport.style.display = 'inline-flex'; }
         } catch (e) {
             console.error('Error loading lembaga:', e);
-            document.getElementById('lembagaTableBody').innerHTML =
-                `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;">
-                    <i class="fas fa-exclamation-circle" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                    Gagal memuat data: ${e.message}
-                </td></tr>`;
+            document.getElementById('lembagaTableBody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f44336;"><i class="fas fa-exclamation-circle" style="font-size:24px;display:block;margin-bottom:8px;"></i>Gagal memuat data: ${e.message}</td></tr>`;
         }
     }
 
@@ -1488,21 +923,13 @@
     function renderTable(data) {
         const tbody = document.getElementById('lembagaTableBody');
         document.getElementById('totalData').textContent = `${totalData} data`;
-
         if (!data || data.length === 0) {
-            const searchMsg = currentFilters.search ?
-                `Tidak ada hasil untuk "<strong>${escapeHtml(currentFilters.search)}</strong>"` :
-                'Belum ada data';
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">
-                <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                ${searchMsg}
-            </td></tr>`;
+            const searchMsg = currentFilters.search ? `Tidak ada hasil untuk "<strong>${escapeHtml(currentFilters.search)}</strong>"` : 'Belum ada data';
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;"><i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>${searchMsg}</td></tr>`;
             return;
         }
-
         const start = (currentPage - 1) * pageSize;
         const searchTerm = currentFilters.search || '';
-
         tbody.innerHTML = data.map((item, i) => {
             const jenisClass = (item.jenis_lembaga || 'LPQ').toLowerCase();
             return `<tr onclick="viewLembaga('${item.id}')" style="cursor:pointer;">
@@ -1521,26 +948,21 @@
     }
 
     // ============================================================
-    // ===== STATS (1 RPC) =====
+    // ===== STATS (RPC sudah pakai count — tidak perlu diubah) =====
     // ============================================================
     async function updateStats() {
         try {
             const user = getUser();
             const filter = getRoleFilter();
-
             if (filter.restrict) return;
-
             const cacheKey = `stats_${user.id}_${JSON.stringify(filter)}`;
             let statsData = CacheManager.get(cacheKey);
-
             if (!statsData) {
                 const { data, error } = await supabaseClient.rpc('get_lembaga_stats', {
                     p_kecamatan_id: filter.kecamatan_id || null,
                     p_jenis_lembaga: filter.jenis_lembaga || null
                 });
-
                 if (error) throw error;
-
                 const row = Array.isArray(data) ? data[0] : data;
                 statsData = {
                     total: Number(row?.total || 0),
@@ -1548,15 +970,12 @@
                     mdt: Number(row?.mdt || 0),
                     ponpes: Number(row?.ponpes || 0)
                 };
-
                 CacheManager.set(cacheKey, statsData);
             }
-
             document.getElementById('totalLembagaStat').textContent = statsData.total;
             document.getElementById('totalLPQ').textContent = statsData.lpq;
             document.getElementById('totalMDT').textContent = statsData.mdt;
             document.getElementById('totalPONPES').textContent = statsData.ponpes;
-
         } catch (e) { console.error('Stats error:', e); }
     }
 
@@ -1589,7 +1008,6 @@
     function closeModal() {
         document.getElementById('lembagaModal').classList.remove('active');
         document.body.style.overflow = '';
-
         document.getElementById('editId').value = '';
         document.getElementById('editNama').value = '';
         document.getElementById('editJenis').value = 'LPQ';
@@ -1605,7 +1023,6 @@
         document.getElementById('editNoHp').value = '';
         document.getElementById('editEmail').value = '';
         document.getElementById('editStatus').value = 'true';
-
         document.getElementById('btnEditMode').style.display = 'none';
         document.getElementById('btnSave').style.display = 'none';
         enableInputs(true);
@@ -1630,18 +1047,13 @@
 
     function openAddModal() {
         const user = getUser();
-        if (user?.role === 'operator') {
-            showToast('Anda tidak memiliki akses untuk menambah data', 'error');
-            return;
-        }
-
+        if (user?.role === 'operator') { showToast('Anda tidak memiliki akses untuk menambah data', 'error'); return; }
         isNewRecord = true;
         modalMode = 'add';
         document.getElementById('modalTitle').textContent = 'Tambah Lembaga Baru';
         document.getElementById('btnEditMode').style.display = 'none';
         document.getElementById('btnSave').style.display = 'inline-flex';
         document.getElementById('btnSave').innerHTML = '<i class="fas fa-plus"></i> Tambah';
-
         document.getElementById('editId').value = '';
         document.getElementById('editNama').value = '';
         document.getElementById('editJenis').value = 'LPQ';
@@ -1657,8 +1069,6 @@
         document.getElementById('editNoHp').value = '';
         document.getElementById('editEmail').value = '';
         document.getElementById('editStatus').value = 'true';
-
-        // Auto-set kecamatan untuk role batko/fkdt/ponpes
         const filter = getRoleFilter();
         if (filter.kecamatan_id) {
             document.getElementById('editKecamatan').value = filter.kecamatan_id;
@@ -1667,13 +1077,8 @@
         } else {
             document.getElementById('editKecamatan').disabled = false;
         }
-
         enableInputs(false);
-        // Kecamatan mungkin disabled, tapi yang lain enabled
-        if (!filter.kecamatan_id) {
-            document.getElementById('editKecamatan').disabled = false;
-        }
-
+        if (!filter.kecamatan_id) { document.getElementById('editKecamatan').disabled = false; }
         openModal();
     }
 
@@ -1695,14 +1100,11 @@
         setV('editNoHp', data.no_hp);
         setV('editEmail', data.email);
         setV('editStatus', data.status_aktif ? 'true' : 'false');
-
         await loadKecamatanOptions();
         if (data.kecamatan_id) {
             document.getElementById('editKecamatan').value = data.kecamatan_id;
             await loadDesaOptions(data.kecamatan_id, 'editDesa');
-            if (data.desa_id) {
-                document.getElementById('editDesa').value = data.desa_id;
-            }
+            if (data.desa_id) { document.getElementById('editDesa').value = data.desa_id; }
         }
     }
 
@@ -1715,41 +1117,25 @@
         document.getElementById('modalTitle').textContent = 'Detail Lembaga';
         document.getElementById('btnEditMode').style.display = 'inline-flex';
         document.getElementById('btnSave').style.display = 'none';
-
         try {
-            // ✅ Pakai RPC get_lembaga_detail
             const { data, error } = await supabaseClient.rpc('get_lembaga_detail', { p_id: id });
             if (error) throw error;
-
             const row = Array.isArray(data) ? data[0] : data;
             if (!row) { showToast('Data tidak ditemukan', 'error'); return; }
-
             await fillLembagaForm(row);
-
             enableInputs(true);
-
-            // ✅ FIX: Role batko/fkdt/ponpes tidak bisa ubah kecamatan
             const filter = getRoleFilter();
-            if (filter.kecamatan_id) {
-                document.getElementById('editKecamatan').disabled = true;
-            }
-
+            if (filter.kecamatan_id) { document.getElementById('editKecamatan').disabled = true; }
             openModal();
-        } catch (e) {
-            console.error(e);
-            showToast('Gagal memuat detail: ' + e.message, 'error');
-        }
+        } catch (e) { console.error(e); showToast('Gagal memuat detail: ' + e.message, 'error'); }
     }
 
     async function editLembaga(id) {
         await viewLembaga(id);
         setTimeout(() => {
             enableEditMode();
-            // Kecamatan tetap disabled untuk role terbatas
             const filter = getRoleFilter();
-            if (filter.kecamatan_id) {
-                document.getElementById('editKecamatan').disabled = true;
-            }
+            if (filter.kecamatan_id) { document.getElementById('editKecamatan').disabled = true; }
         }, 300);
     }
 
@@ -1760,16 +1146,12 @@
         const id = document.getElementById('editId').value;
         const isEdit = !!id;
         const nama = document.getElementById('editNama').value.trim();
-
         if (!nama) { showToast('Nama lembaga wajib diisi', 'error'); return; }
-
         const saveBtn = document.getElementById('btnSave');
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-
         const kecId = document.getElementById('editKecamatan').value || null;
         const desaId = document.getElementById('editDesa').value || null;
-
         const data = {
             nama: nama,
             jenis_lembaga: document.getElementById('editJenis').value,
@@ -1787,60 +1169,30 @@
             status_aktif: document.getElementById('editStatus').value === 'true',
             updated_at: new Date().toISOString()
         };
-
-        // Sync nama kecamatan & desa (untuk backward compat & search_text)
-        if (kecId) {
-            const kecSelect = document.getElementById('editKecamatan');
-            const selectedOpt = kecSelect.options[kecSelect.selectedIndex];
-            if (selectedOpt) data.kecamatan = selectedOpt.text;
-        }
-        if (desaId) {
-            const desaSelect = document.getElementById('editDesa');
-            const selectedOpt = desaSelect.options[desaSelect.selectedIndex];
-            if (selectedOpt) data.desa = selectedOpt.text;
-        }
-
+        if (kecId) { const kecSelect = document.getElementById('editKecamatan'); const selectedOpt = kecSelect.options[kecSelect.selectedIndex]; if (selectedOpt) data.kecamatan = selectedOpt.text; }
+        if (desaId) { const desaSelect = document.getElementById('editDesa'); const selectedOpt = desaSelect.options[desaSelect.selectedIndex]; if (selectedOpt) data.desa = selectedOpt.text; }
         try {
             let error;
-            if (isEdit) {
-                const { error: e } = await supabaseClient.from('lembaga').update(data).eq('id', id);
-                error = e;
-            } else {
-                data.created_at = new Date().toISOString();
-                const { error: e } = await supabaseClient.from('lembaga').insert([data]);
-                error = e;
-            }
-
+            if (isEdit) { const { error: e } = await supabaseClient.from('lembaga').update(data).eq('id', id); error = e; }
+            else { data.created_at = new Date().toISOString(); const { error: e } = await supabaseClient.from('lembaga').insert([data]); error = e; }
             if (error) throw error;
-
             CacheManager.clear();
             showToast(`Lembaga berhasil ${isEdit ? 'diperbarui' : 'ditambahkan'}!`, 'success');
             closeModal();
             loadLembaga();
             updateStats();
-        } catch (e) {
-            console.error(e);
-            showToast(`Gagal ${isEdit ? 'menyimpan' : 'menambah'}: ` + e.message, 'error');
-        } finally {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = isEdit ? '<i class="fas fa-save"></i> Simpan' : '<i class="fas fa-plus"></i> Tambah';
-        }
+        } catch (e) { console.error(e); showToast(`Gagal ${isEdit ? 'menyimpan' : 'menambah'}: ` + e.message, 'error'); }
+        finally { saveBtn.disabled = false; saveBtn.innerHTML = isEdit ? '<i class="fas fa-save"></i> Simpan' : '<i class="fas fa-plus"></i> Tambah'; }
     }
 
     // ============================================================
     // ===== DELETE LEMBAGA =====
     // ============================================================
     async function deleteLembaga(id) {
-        // Konfirmasi ganda: ketik nama lembaga
         const user = getUser();
-        if (user?.role === 'operator') {
-            showToast('Anda tidak memiliki akses untuk menghapus', 'error');
-            return;
-        }
-
+        if (user?.role === 'operator') { showToast('Anda tidak memiliki akses untuk menghapus', 'error'); return; }
         if (!confirm('⚠️ Yakin ingin menghapus lembaga ini?\n\nSemua data pendidik terkait juga akan terpengaruh!')) return;
         if (!confirm('Konfirmasi terakhir: Yakin hapus?')) return;
-
         try {
             const { error } = await supabaseClient.from('lembaga').delete().eq('id', id);
             if (error) throw error;
@@ -1848,125 +1200,63 @@
             showToast('Lembaga berhasil dihapus', 'success');
             loadLembaga();
             updateStats();
-        } catch (e) {
-            showToast('Gagal hapus: ' + e.message, 'error');
-        }
+        } catch (e) { showToast('Gagal hapus: ' + e.message, 'error'); }
     }
 
     // ============================================================
-    // ===== EXPORT (pakai kolom spesifik) =====
+    // ===== EXPORT =====
     // ============================================================
     async function exportData() {
         if (isExporting) { showToast('Export sedang diproses...', 'warning'); return; }
-
         const exportBtn = document.getElementById('btnExport');
         isExporting = true;
         exportBtn.disabled = true;
         exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengambil data...';
-
         const spinnerOverlay = document.getElementById('spinnerOverlay');
         const spinnerText = document.getElementById('spinnerText');
         spinnerText.textContent = 'Mengambil semua data lembaga...';
         spinnerOverlay.classList.add('active');
-
         try {
             const user = getUser();
             const filter = getRoleFilter();
-
             let allData = [];
             let page = 0;
             const batchSize = 1000;
             let hasMore = true;
-
-            // ✅ Kolom spesifik, bukan *
-            const selectCols = `
-                id, nama, jenis_lembaga, nslp, tahun_berdiri, pimpinan,
-                alamat, desa, kecamatan, kabupaten, provinsi, no_hp, email,
-                status_aktif, kecamatan_id, desa_id,
-                master_kecamatan!lembaga_kecamatan_id_fkey(nama),
-                master_kelurahan!lembaga_desa_id_fkey(nama)
-            `;
-
+            const selectCols = `id, nama, jenis_lembaga, nslp, tahun_berdiri, pimpinan, alamat, desa, kecamatan, kabupaten, provinsi, no_hp, email, status_aktif, kecamatan_id, desa_id, master_kecamatan!lembaga_kecamatan_id_fkey(nama), master_kelurahan!lembaga_desa_id_fkey(nama)`;
             while (hasMore) {
                 const from = page * batchSize;
                 const to = from + batchSize - 1;
-
                 let query = supabaseClient.from('lembaga').select(selectCols);
-
                 if (filter.kecamatan_id) query = query.eq('kecamatan_id', filter.kecamatan_id);
                 if (filter.jenis_lembaga) query = query.eq('jenis_lembaga', filter.jenis_lembaga);
-
-                if (currentFilters.search) {
-                    const st = currentFilters.search.trim().toLowerCase();
-                    query = query.ilike('search_text', `%${st}%`);
-                }
-                if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') {
-                    query = query.eq('jenis_lembaga', currentFilters.jenis);
-                }
-                if (currentFilters.status !== 'all') {
-                    query = query.eq('status_aktif', currentFilters.status === 'true');
-                }
-                if (!filter.kecamatan_id && currentFilters.kecamatan) {
-                    query = query.eq('kecamatan_id', currentFilters.kecamatan);
-                }
-                if (currentFilters.desa) {
-                    query = query.eq('desa_id', currentFilters.desa);
-                }
-
-                const { data, error } = await query
-                    .order('nama', { ascending: true })
-                    .range(from, to);
-
+                if (currentFilters.search) { const st = currentFilters.search.trim().toLowerCase(); query = query.ilike('search_text', `%${st}%`); }
+                if (!filter.jenis_lembaga && currentFilters.jenis !== 'all') { query = query.eq('jenis_lembaga', currentFilters.jenis); }
+                if (currentFilters.status !== 'all') { query = query.eq('status_aktif', currentFilters.status === 'true'); }
+                if (!filter.kecamatan_id && currentFilters.kecamatan) { query = query.eq('kecamatan_id', currentFilters.kecamatan); }
+                if (currentFilters.desa) { query = query.eq('desa_id', currentFilters.desa); }
+                const { data, error } = await query.order('nama', { ascending: true }).range(from, to);
                 if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    hasMore = false;
-                } else {
+                if (!data || data.length === 0) { hasMore = false; }
+                else {
                     allData = allData.concat(data);
                     if (data.length < batchSize) hasMore = false;
-                    else {
-                        page++;
-                        spinnerText.textContent = `Mengambil data... ${allData.length} terkumpul`;
-                    }
+                    else { page++; spinnerText.textContent = `Mengambil data... ${allData.length} terkumpul`; }
                 }
             }
-
-            if (allData.length === 0) {
-                showToast('Tidak ada data untuk diexport', 'warning');
-                spinnerOverlay.classList.remove('active');
-                return;
-            }
-
+            if (allData.length === 0) { showToast('Tidak ada data untuk diexport', 'warning'); spinnerOverlay.classList.remove('active'); return; }
             spinnerText.textContent = `Memproses ${allData.length} data untuk export...`;
-
-            const headers = [
-                'NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP',
-                'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
-                'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI',
-                'NO. HP', 'EMAIL', 'STATUS'
-            ];
-
+            const headers = ['NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP', 'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT', 'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI', 'NO. HP', 'EMAIL', 'STATUS'];
             const rows = allData.map(item => [
-                item.nama || '',
-                item.jenis_lembaga || '',
-                item.nslp || '',
-                item.tahun_berdiri || '',
-                item.pimpinan || '',
-                item.alamat || '',
-                item.master_kecamatan?.nama || item.kecamatan || '',
-                item.master_kelurahan?.nama || item.desa || '',
-                item.kabupaten || 'Tegal',
-                item.provinsi || 'Jawa Tengah',
-                item.no_hp || '',
-                item.email || '',
+                item.nama || '', item.jenis_lembaga || '', item.nslp || '', item.tahun_berdiri || '', item.pimpinan || '', item.alamat || '',
+                item.master_kecamatan?.nama || item.kecamatan || '', item.master_kelurahan?.nama || item.desa || '',
+                item.kabupaten || 'Tegal', item.provinsi || 'Jawa Tengah', item.no_hp || '', item.email || '',
                 item.status_aktif ? 'Aktif' : 'Tidak Aktif'
             ]);
-
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
             ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
             XLSX.utils.book_append_sheet(wb, ws, 'Lembaga');
-
             const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
             const blob = new Blob([wbout], { type: 'application/octet-stream' });
             const link = document.createElement('a');
@@ -1975,37 +1265,18 @@
             link.download = `data_lembaga_${date}_${allData.length}.xlsx`;
             link.click();
             URL.revokeObjectURL(link.href);
-
             spinnerOverlay.classList.remove('active');
             showToast(`✅ Export berhasil! ${allData.length} data`, 'success');
-        } catch (e) {
-            console.error('Export error:', e);
-            spinnerOverlay.classList.remove('active');
-            showToast('❌ Gagal export: ' + e.message, 'error');
-        } finally {
-            isExporting = false;
-            exportBtn.disabled = false;
-            exportBtn.innerHTML = '<i class="fas fa-file-excel"></i> Export';
-        }
+        } catch (e) { console.error('Export error:', e); spinnerOverlay.classList.remove('active'); showToast('❌ Gagal export: ' + e.message, 'error'); }
+        finally { isExporting = false; exportBtn.disabled = false; exportBtn.innerHTML = '<i class="fas fa-file-excel"></i> Export'; }
     }
 
     // ============================================================
     // ===== TEMPLATE & IMPORT =====
     // ============================================================
     function downloadTemplate() {
-        const headers = [
-            'NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP',
-            'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT',
-            'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI',
-            'NO. HP', 'EMAIL', 'STATUS'
-        ];
-        const exampleRow = [
-            'MDTU Lafutuhiyah', 'MDT', '1234567890',
-            '1998', 'H. Ahmad', 'Jl. Karangdawa No. 1',
-            'Margasari', 'Karangdawa', 'Tegal', 'Jawa Tengah',
-            '08123456789', 'lafutuhiyah@example.com', 'Aktif'
-        ];
-
+        const headers = ['NAMA LEMBAGA', 'JENIS LEMBAGA', 'NSLP/NSPP', 'TAHUN BERDIRI', 'PIMPINAN', 'ALAMAT', 'KECAMATAN', 'DESA/KELURAHAN', 'KABUPATEN', 'PROVINSI', 'NO. HP', 'EMAIL', 'STATUS'];
+        const exampleRow = ['MDTU Lafutuhiyah', 'MDT', '1234567890', '1998', 'H. Ahmad', 'Jl. Karangdawa No. 1', 'Margasari', 'Karangdawa', 'Tegal', 'Jawa Tengah', '08123456789', 'lafutuhiyah@example.com', 'Aktif'];
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
         ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 20) }));
@@ -2016,10 +1287,7 @@
 
     function openImportModal() {
         const user = getUser();
-        if (user?.role === 'operator') {
-            showToast('Anda tidak memiliki akses untuk import data', 'error');
-            return;
-        }
+        if (user?.role === 'operator') { showToast('Anda tidak memiliki akses untuk import data', 'error'); return; }
         document.getElementById('importModal').classList.add('active');
         document.getElementById('fileInputLembaga').value = '';
         const btn = document.getElementById('btnImportSubmit');
@@ -2035,14 +1303,11 @@
     async function importLembaga() {
         const file = document.getElementById('fileInputLembaga').files[0];
         if (!file) { showToast('Pilih file Excel terlebih dahulu!', 'error'); return; }
-
         const btn = document.getElementById('btnImportSubmit');
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
         showToast('Memproses import...', 'info');
         closeImportModal();
-
         const reader = new FileReader();
         reader.onload = async function(e) {
             try {
@@ -2050,102 +1315,59 @@
                 const workbook = XLSX.read(data, { type: 'array' });
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-                if (json.length === 0) {
-                    showToast('File kosong!', 'error');
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-upload"></i> Upload';
-                    return;
-                }
-
-                // ✅ Fetch master data SEKALI di awal (bukan per baris)
+                if (json.length === 0) { showToast('File kosong!', 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-upload"></i> Upload'; return; }
                 const { data: kecAll } = await supabaseClient.from('master_kecamatan').select('id, nama');
                 const kecMap = {};
                 (kecAll || []).forEach(k => { kecMap[k.nama.toLowerCase().trim()] = k.id; });
-
                 const { data: desaAll } = await supabaseClient.from('master_kelurahan').select('id, nama, kecamatan_id');
                 const desaMap = {};
-                (desaAll || []).forEach(d => { 
-                    desaMap[`${d.kecamatan_id}_${d.nama.toLowerCase().trim()}`] = d.id;
-                });
-
+                (desaAll || []).forEach(d => { desaMap[`${d.kecamatan_id}_${d.nama.toLowerCase().trim()}`] = d.id; });
                 let success = 0, failed = 0;
                 const errors = [];
                 const batchInserts = [];
-
                 for (let i = 0; i < json.length; i++) {
                     const row = json[i];
                     try {
                         const nama = row['NAMA LEMBAGA'] || row['Nama Lembaga'] || '';
                         if (!nama) { errors.push(`Baris ${i + 2}: Nama lembaga kosong`); failed++; continue; }
-
                         const jenis = row['JENIS LEMBAGA'] || row['Jenis Lembaga'] || '';
                         const mappedJenis = mapJenjang(jenis) || 'LPQ';
-
                         const kecamatanNama = (row['KECAMATAN'] || row['Kecamatan'] || '').trim();
                         let kecamatanId = kecMap[kecamatanNama.toLowerCase()] || null;
-
                         const desaNama = (row['DESA/KELURAHAN'] || row['Desa'] || '').trim();
                         let desaId = null;
-                        if (desaNama && kecamatanId) {
-                            desaId = desaMap[`${kecamatanId}_${desaNama.toLowerCase()}`] || null;
-                        }
-
+                        if (desaNama && kecamatanId) { desaId = desaMap[`${kecamatanId}_${desaNama.toLowerCase()}`] || null; }
                         const status = row['STATUS'] || row['Status'] || 'Aktif';
-
                         batchInserts.push({
-                            nama: nama,
-                            jenis_lembaga: mappedJenis,
+                            nama: nama, jenis_lembaga: mappedJenis,
                             nslp: row['NSLP/NSPP'] || row['NSLP'] || '',
                             tahun_berdiri: parseInt(row['TAHUN BERDIRI']) || null,
-                            pimpinan: row['PIMPINAN'] || '',
-                            alamat: row['ALAMAT'] || '',
-                            kecamatan_id: kecamatanId,
-                            desa_id: desaId,
-                            kecamatan: kecamatanNama,
-                            desa: desaNama,
-                            kabupaten: row['KABUPATEN'] || 'Tegal',
-                            provinsi: row['PROVINSI'] || 'Jawa Tengah',
-                            no_hp: row['NO. HP'] || '',
-                            email: row['EMAIL'] || '',
+                            pimpinan: row['PIMPINAN'] || '', alamat: row['ALAMAT'] || '',
+                            kecamatan_id: kecamatanId, desa_id: desaId,
+                            kecamatan: kecamatanNama, desa: desaNama,
+                            kabupaten: row['KABUPATEN'] || 'Tegal', provinsi: row['PROVINSI'] || 'Jawa Tengah',
+                            no_hp: row['NO. HP'] || '', email: row['EMAIL'] || '',
                             status_aktif: status.toLowerCase() === 'aktif',
-                            created_at: new Date().toISOString(),
-                            updated_at: new Date().toISOString()
+                            created_at: new Date().toISOString(), updated_at: new Date().toISOString()
                         });
                         success++;
-                    } catch (err) {
-                        failed++;
-                        errors.push(`Baris ${i + 2}: ${err.message}`);
-                    }
+                    } catch (err) { failed++; errors.push(`Baris ${i + 2}: ${err.message}`); }
                 }
-
-                // ✅ Insert per batch 100 (jauh lebih cepat dari 1-by-1)
                 const BATCH_SIZE = 100;
                 let insertedCount = 0;
                 for (let i = 0; i < batchInserts.length; i += BATCH_SIZE) {
                     const batch = batchInserts.slice(i, i + BATCH_SIZE);
                     const { error } = await supabaseClient.from('lembaga').insert(batch);
-                    if (error) {
-                        errors.push(`Batch ${i / BATCH_SIZE + 1}: ${error.message}`);
-                        failed += batch.length;
-                        success -= batch.length;
-                    } else {
-                        insertedCount += batch.length;
-                    }
+                    if (error) { errors.push(`Batch ${i / BATCH_SIZE + 1}: ${error.message}`); failed += batch.length; success -= batch.length; }
+                    else { insertedCount += batch.length; }
                 }
-
                 if (errors.length > 0) console.warn('⚠️ Import errors:', errors);
-
                 CacheManager.clear();
                 showToast(`Import selesai: ${insertedCount} berhasil, ${failed} gagal${errors.length > 0 ? '. Cek console.' : ''}`, insertedCount > 0 ? 'success' : 'error');
                 loadLembaga();
                 updateStats();
-            } catch (error) {
-                showToast('Gagal membaca file: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-upload"></i> Upload';
-            }
+            } catch (error) { showToast('Gagal membaca file: ' + error.message, 'error'); }
+            finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-upload"></i> Upload'; }
         };
         reader.readAsArrayBuffer(file);
     }
@@ -2190,61 +1412,33 @@
     // ============================================================
     document.addEventListener('DOMContentLoaded', async function() {
         pageSize = window.innerWidth < 768 ? 20 : 50;
-
         if (!await checkAuth()) return;
-
         updateDate();
-
-        // Setup event listeners
         const editKecamatan = document.getElementById('editKecamatan');
-        if (editKecamatan) {
-            editKecamatan.addEventListener('change', function() {
-                loadDesaOptions(this.value, 'editDesa');
-            });
-        }
-
+        if (editKecamatan) { editKecamatan.addEventListener('change', function() { loadDesaOptions(this.value, 'editDesa'); }); }
         const filterKecamatan = document.getElementById('filterKecamatan');
-        if (filterKecamatan) {
-            filterKecamatan.addEventListener('change', function() {
-                loadDesaFilter(this.value);
-            });
-        }
-
+        if (filterKecamatan) { filterKecamatan.addEventListener('change', function() { loadDesaFilter(this.value); }); }
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             const debouncedSearch = debounce(applyFilter, 400);
             searchInput.addEventListener('input', debouncedSearch);
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') applyFilter();
-            });
+            searchInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') applyFilter(); });
         }
-
-        // Load master data
         await loadKecamatanOptions();
         await loadJenjangOptions();
         await loadKecamatanFilterOptions();
-
-        // Load data
         await loadLembaga();
         await updateStats();
         updateFilterBadge();
-
-        // Nav count
         try {
-            const { count } = await supabaseClient
-                .from('pendidik')
-                .select('*', { count: 'exact', head: true })
-                .eq('status_aktif', true);
+            const { count } = await supabaseClient.from('pendidik').select('*', { count: 'exact', head: true }).eq('status_aktif', true);
             document.getElementById('navPendidikCount').textContent = count || 0;
         } catch (e) { console.error('Nav count error:', e); }
-
         setInterval(updateDate, 60000);
         startAutoRefresh();
     });
 
-    window.addEventListener('beforeunload', () => {
-        if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-    });
+    window.addEventListener('beforeunload', () => { if (autoRefreshTimer) clearInterval(autoRefreshTimer); });
 
     // ============================================================
     // ===== EXPOSE =====

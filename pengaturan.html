@@ -111,96 +111,18 @@
         .user-list-item .user-status.active { background: var(--success); }
         .user-list-item .user-status.inactive { background: #ccc; }
         .user-list-item .action-buttons { display: flex; gap: 4px; align-items: center; }
-
-        /* ===== SEARCH BAR ===== */
-        .search-bar {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .search-bar .search-input-wrapper {
-            flex: 1;
-            position: relative;
-            min-width: 200px;
-        }
-        .search-bar .search-input-wrapper i {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-        .search-bar .search-input-wrapper input {
-            width: 100%;
-            padding: 10px 12px 10px 38px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            background: #fafafa;
-            transition: all 0.3s ease;
-        }
-        .search-bar .search-input-wrapper input:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0,100,0,0.08);
-            background: white;
-        }
-        .search-bar .search-input-wrapper input::placeholder {
-            color: #bbb;
-        }
-        .search-bar .search-filter {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .search-bar .search-filter select {
-            padding: 10px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            background: #fafafa;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 120px;
-        }
-        .search-bar .search-filter select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0,100,0,0.08);
-        }
-        .search-bar .search-clear-btn {
-            padding: 10px 14px;
-            border: none;
-            background: #f0f2f5;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .search-bar .search-clear-btn:hover {
-            background: #e0e0e0;
-            color: var(--danger);
-        }
-        .search-bar .search-result-count {
-            font-size: 0.75rem;
-            color: #888;
-            padding: 4px 12px;
-            background: #f0f2f5;
-            border-radius: 20px;
-            white-space: nowrap;
-        }
-        .search-bar .search-result-count strong {
-            color: var(--primary);
-        }
-
+        .search-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+        .search-bar .search-input-wrapper { flex: 1; position: relative; min-width: 200px; }
+        .search-bar .search-input-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 0.9rem; }
+        .search-bar .search-input-wrapper input { width: 100%; padding: 10px 12px 10px 38px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 0.85rem; background: #fafafa; transition: all 0.3s ease; }
+        .search-bar .search-input-wrapper input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,100,0,0.08); background: white; }
+        .search-bar .search-filter { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .search-bar .search-filter select { padding: 10px 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 0.8rem; background: #fafafa; cursor: pointer; transition: all 0.3s ease; min-width: 120px; }
+        .search-bar .search-filter select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,100,0,0.08); }
+        .search-bar .search-clear-btn { padding: 10px 14px; border: none; background: #f0f2f5; border-radius: 10px; font-size: 0.8rem; color: #666; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 6px; }
+        .search-bar .search-clear-btn:hover { background: #e0e0e0; color: var(--danger); }
+        .search-bar .search-result-count { font-size: 0.75rem; color: #888; padding: 4px 12px; background: #f0f2f5; border-radius: 20px; white-space: nowrap; }
+        .search-bar .search-result-count strong { color: var(--primary); }
         .btn { padding: 6px 14px; border: none; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
@@ -220,7 +142,6 @@
         .btn-icon.success:hover { background: #e8f5e9; color: var(--success); }
         .btn-icon.warning:hover { background: #fff3e0; color: var(--warning); }
         .btn-icon.info:hover { background: #e3f2fd; color: var(--info); }
-
         .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f5f6f8; }
         .setting-item:last-child { border-bottom: none; }
         .setting-item .item-label { font-size: 0.85rem; color: #333; }
@@ -246,118 +167,55 @@
         .info-box i { margin-right: 6px; }
         .progress-bar { width: 100%; height: 6px; background: #f0f2f5; border-radius: 3px; margin-top: 8px; overflow: hidden; }
         .progress-bar .fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s ease; width: 0%; }
-
-        /* Modal Edit */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease;
-        }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; animation: fadeIn 0.3s ease; }
         .modal-overlay.active { display: flex; }
-        .modal-box {
-            background: white;
-            border-radius: 16px;
-            padding: 24px 32px;
-            max-width: 500px;
-            width: 95%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s ease;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .modal-box .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f0f2f5;
-        }
-        .modal-box .modal-header h3 {
-            font-size: 1rem;
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .modal-box .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: #999;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 6px;
-            transition: 0.2s;
-        }
+        .modal-box { background: white; border-radius: 16px; padding: 24px 32px; max-width: 500px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-box .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f0f2f5; }
+        .modal-box .modal-header h3 { font-size: 1rem; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; }
+        .modal-box .modal-close { background: none; border: none; font-size: 1.2rem; color: #999; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; }
         .modal-box .modal-close:hover { background: #f0f2f5; color: var(--danger); }
         .modal-box .form-group { margin-bottom: 12px; }
         .modal-box .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 4px; }
-        .modal-box .form-group input, .modal-box .form-group select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            transition: 0.2s;
-        }
-        .modal-box .form-group input:focus, .modal-box .form-group select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0,100,0,0.08);
-        }
-        .modal-box .form-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 16px;
-            padding-top: 12px;
-            border-top: 2px solid #f0f2f5;
-        }
-        .modal-box .password-hint {
-            font-size: 0.7rem;
-            color: #888;
-            margin-top: 4px;
-        }
-        .modal-box .password-hint i {
-            color: var(--warning);
-            margin-right: 4px;
-        }
+        .modal-box .form-group input, .modal-box .form-group select { width: 100%; padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.85rem; transition: 0.2s; }
+        .modal-box .form-group input:focus, .modal-box .form-group select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,100,0,0.08); }
+        .modal-box .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; padding-top: 12px; border-top: 2px solid #f0f2f5; }
+        .modal-box .password-hint { font-size: 0.7rem; color: #888; margin-top: 4px; }
+        .modal-box .password-hint i { color: var(--warning); margin-right: 4px; }
+        .modal-box .reset-password-info { background: #fff3e0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.85rem; color: #e65100; border-left: 3px solid var(--warning); }
+        .modal-box .reset-password-info i { margin-right: 8px; }
 
-        /* Modal Reset Password */
-        .modal-box .reset-password-info {
-            background: #fff3e0;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            font-size: 0.85rem;
-            color: #e65100;
-            border-left: 3px solid var(--warning);
-        }
-        .modal-box .reset-password-info i {
-            margin-right: 8px;
-        }
+        /* ===== STATS CARDS (untuk tab Status Akun) ===== */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .stat-box { background: white; border-radius: 12px; padding: 16px 18px; box-shadow: var(--card-shadow); border-left: 4px solid var(--primary); }
+        .stat-box.orange { border-left-color: var(--warning); }
+        .stat-box.red { border-left-color: var(--danger); }
+        .stat-box.green { border-left-color: var(--success); }
+        .stat-box .label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .stat-box .value { font-size: 1.6rem; font-weight: 700; color: var(--primary-dark); line-height: 1.2; margin-top: 4px; }
+        .stat-box.orange .value { color: var(--warning); }
+        .stat-box.red .value { color: var(--danger); }
+        .stat-box.green .value { color: var(--success); }
 
-        .badge-badko {
-            background: #e3f2fd !important;
-            color: #0d47a1 !important;
-            padding: 2px 12px !important;
-            border-radius: 12px !important;
-            font-size: 0.65rem !important;
-            font-weight: 600 !important;
-        }
+        /* ===== TABLE akun lembaga ===== */
+        .akun-table-wrapper { overflow-x: auto; }
+        .akun-table-wrapper table { width: 100%; font-size: 0.8rem; border-collapse: collapse; }
+        .akun-table-wrapper th { padding: 10px 12px; text-align: left; background: #f8faf8; font-weight: 700; font-size: 0.68rem; text-transform: uppercase; color: #666; letter-spacing: 0.5px; border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; }
+        .akun-table-wrapper td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+        .akun-table-wrapper tbody tr:hover { background: #f8faf8; }
+        .badge-status { padding: 3px 12px; border-radius: 12px; font-size: 0.68rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .badge-status.punya { background: #e8f5e9; color: #2e7d32; }
+        .badge-status.belum { background: #ffebee; color: #c62828; }
+        .badge-jenis { padding: 2px 10px; border-radius: 12px; font-size: 0.65rem; font-weight: 600; display: inline-block; }
+        .badge-jenis.lpq { background: #e8f5e9; color: #2e7d32; }
+        .badge-jenis.mdt { background: #e3f2fd; color: #0d47a1; }
+        .badge-jenis.ponpes { background: #f3e5f5; color: #4a148c; }
+
+        /* ===== ACTION BAR ===== */
+        .action-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+
+        /* ===== PAGINATION ===== */
+        .pagination-bar { display: flex; justify-content: center; align-items: center; gap: 16px; padding-top: 12px; border-top: 1px solid #f0f2f5; margin-top: 12px; font-size: 0.8rem; color: #666; }
 
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); }
@@ -378,6 +236,7 @@
             .modal-box { padding: 20px; }
             .search-bar { flex-direction: column; align-items: stretch; }
             .search-bar .search-filter { flex-wrap: wrap; }
+            .stat-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 480px) {
             .header { padding: 0 12px; height: 56px; }
@@ -390,6 +249,7 @@
             .welcome-section { padding: 14px 16px; }
             .user-list-item .action-buttons { margin-left: auto; }
             .search-bar .search-filter select { min-width: 80px; }
+            .stat-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -439,11 +299,13 @@
 
         <div class="tabs">
             <button class="tab-btn active" data-tab="users" onclick="switchTab('users')"><i class="fas fa-users"></i> Pengguna</button>
+            <button class="tab-btn" data-tab="akun-lembaga" id="tabAkunLembagaBtn" onclick="switchTab('akun-lembaga')" style="display:none;"><i class="fas fa-user-check"></i> Status Akun Lembaga</button>
             <button class="tab-btn" data-tab="system" onclick="switchTab('system')"><i class="fas fa-sliders-h"></i> Sistem</button>
             <button class="tab-btn" data-tab="backup" onclick="switchTab('backup')"><i class="fas fa-database"></i> Backup</button>
             <button class="tab-btn" data-tab="about" onclick="switchTab('about')"><i class="fas fa-info-circle"></i> Tentang</button>
         </div>
 
+        <!-- ===== TAB: PENGGUNA (existing) ===== -->
         <div id="tab-users" class="tab-content active">
             <div class="setting-section" id="addUserSection">
                 <div class="section-header"><div><div class="section-title" id="addUserTitle"><i class="fas fa-user-plus"></i>Tambah Pengguna</div><div class="section-desc" id="addUserDesc">Pilih wilayah → lembaga → auto-fill data</div></div></div>
@@ -467,7 +329,6 @@
                     <button class="btn btn-outline btn-sm" onclick="loadUsers()"><i class="fas fa-sync"></i> Refresh</button>
                 </div>
                 
-                <!-- ===== SEARCH BAR ===== -->
                 <div class="search-bar">
                     <div class="search-input-wrapper">
                         <i class="fas fa-search"></i>
@@ -502,6 +363,108 @@
             </div>
         </div>
 
+        <!-- ===== TAB: STATUS AKUN LEMBAGA (BARU) ===== -->
+        <div id="tab-akun-lembaga" class="tab-content">
+            <div class="setting-section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title"><i class="fas fa-user-check"></i>Status Akun Lembaga</div>
+                        <div class="section-desc">Monitor lembaga yang belum memiliki akun operator</div>
+                    </div>
+                </div>
+
+                <!-- Ringkasan -->
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="label">Total Lembaga Aktif</div>
+                        <div class="value" id="alTotalLembaga">0</div>
+                    </div>
+                    <div class="stat-box green">
+                        <div class="label">Sudah Punya Akun</div>
+                        <div class="value" id="alSudahPunya">0</div>
+                    </div>
+                    <div class="stat-box red">
+                        <div class="label">Belum Punya Akun</div>
+                        <div class="value" id="alBelumPunya">0</div>
+                    </div>
+                    <div class="stat-box orange">
+                        <div class="label">Progress</div>
+                        <div class="value" id="alProgress">0%</div>
+                        <div class="progress-bar"><div class="fill" id="alProgressBar" style="width:0%"></div></div>
+                    </div>
+                </div>
+
+                <!-- Filter -->
+                <div class="search-bar" style="margin-top:16px;">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="alSearchInput" placeholder="Cari nama lembaga, NSLP, atau nama operator..." autocomplete="off">
+                    </div>
+                    <div class="search-filter">
+                        <select id="alFilterKecamatan">
+                            <option value="">Semua Kecamatan</option>
+                        </select>
+                        <select id="alFilterJenis">
+                            <option value="">Semua Jenis</option>
+                            <option value="LPQ">LPQ</option>
+                            <option value="MDT">MDT</option>
+                            <option value="PONPES">PONPES</option>
+                        </select>
+                        <select id="alFilterStatus">
+                            <option value="">Semua Status</option>
+                            <option value="belum">❌ Belum Punya Akun</option>
+                            <option value="punya">✅ Sudah Punya Akun</option>
+                        </select>
+                        <select id="alFilterDesa">
+                            <option value="">Semua Desa</option>
+                        </select>
+                        <button class="search-clear-btn" onclick="resetAkunLembagaFilter()" title="Reset filter">
+                            <i class="fas fa-times"></i> Reset
+                        </button>
+                    </div>
+                    <span class="search-result-count" id="alResultCount">Menampilkan <strong>0</strong> lembaga</span>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="action-bar">
+                    <button class="btn btn-primary" onclick="exportAkunLembagaExcel()"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    <button class="btn btn-success" onclick="copyAkunLembagaData()"><i class="fas fa-copy"></i> Copy Semua Data</button>
+                    <button class="btn btn-outline" onclick="refreshAkunLembaga()"><i class="fas fa-sync"></i> Refresh</button>
+                </div>
+
+                <!-- Tabel -->
+                <div class="akun-table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:40px;">No</th>
+                                <th>Nama Lembaga</th>
+                                <th>Jenis</th>
+                                <th>NSLP</th>
+                                <th>Kecamatan</th>
+                                <th>Desa</th>
+                                <th>Status Akun</th>
+                                <th>Nama Operator</th>
+                                <th>Email Operator</th>
+                                <th style="width:80px;text-align:center;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alTableBody">
+                            <tr><td colspan="10" style="text-align:center;padding:30px;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-bar">
+                    <button class="btn btn-outline btn-sm" onclick="changeAkunLembagaPage(-1)" id="alPrevPage"><i class="fas fa-chevron-left"></i></button>
+                    <span id="alPageInfo">Halaman 1</span>
+                    <button class="btn btn-outline btn-sm" onclick="changeAkunLembagaPage(1)" id="alNextPage"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: SISTEM (existing) ===== -->
         <div id="tab-system" class="tab-content">
             <div class="setting-section">
                 <div class="section-header"><div><div class="section-title"><i class="fas fa-sliders-h"></i>Konfigurasi Sistem</div></div></div>
@@ -516,6 +479,7 @@
             </div>
         </div>
 
+        <!-- ===== TAB: BACKUP (existing) ===== -->
         <div id="tab-backup" class="tab-content">
             <div class="setting-section">
                 <div class="section-header"><div><div class="section-title"><i class="fas fa-database"></i>Backup & Restore</div></div></div>
@@ -544,6 +508,7 @@
             </div>
         </div>
 
+        <!-- ===== TAB: TENTANG (existing) ===== -->
         <div id="tab-about" class="tab-content">
             <div class="setting-section">
                 <div class="section-header"><div><div class="section-title"><i class="fas fa-info-circle"></i>Tentang SI-MUSTAFA</div></div></div>
@@ -642,37 +607,26 @@
 
     <script>
         // ============================================================
-        // ===== FUNGSI UTAMA =====
+        // ===== ROLE DISPLAY =====
         // ============================================================
-        
         function formatRoleDisplay(role) {
             const roleDisplayMap = {
-                'super_admin': '🛡️ Super Admin',
-                'admin_kab': '🏛️ Admin Kabupaten',
-                'batko': '📘 BADKO LPQ',
-                'fkdt': '📗 FKDT',
-                'ponpes': '📕 PONPES',
-                'operator': '📋 Operator'
+                'super_admin': '🛡️ Super Admin', 'admin_kab': '🏛️ Admin Kabupaten',
+                'batko': '📘 BADKO LPQ', 'fkdt': '📗 FKDT', 'ponpes': '📕 PONPES', 'operator': '📋 Operator'
             };
             return roleDisplayMap[role] || role.charAt(0).toUpperCase() + role.slice(1);
         }
-
         function getSafeRoleDisplay(role) {
             if (!role) return 'Unknown';
-            if (role === 'batko') return '📘 BADKO LPQ';
             const displayMap = {
-                'super_admin': '🛡️ Super Admin',
-                'admin_kab': '🏛️ Admin Kabupaten',
-                'badko_lpq': '📘 BADKO LPQ',
-                'fkdt': '📗 FKDT',
-                'ponpes': '📕 PONPES',
-                'operator': '📋 Operator'
+                'super_admin': '🛡️ Super Admin', 'admin_kab': '🏛️ Admin Kabupaten',
+                'batko': '📘 BADKO LPQ', 'fkdt': '📗 FKDT', 'ponpes': '📕 PONPES', 'operator': '📋 Operator'
             };
             return displayMap[role] || role.charAt(0).toUpperCase() + role.slice(1);
         }
 
         // ============================================================
-        // ===== CACHE MANAGER =====
+        // ===== CACHE =====
         // ============================================================
         const dataCache = {
             _store: {},
@@ -687,7 +641,7 @@
         };
 
         // ============================================================
-        // ===== GLOBAL STATE =====
+        // ===== STATE =====
         // ============================================================
         let allLembaga = [];
         let isProcessing = false;
@@ -695,6 +649,16 @@
         let allUsersData = [];
         let resetPasswordTarget = null;
         let filterDebounceTimer = null;
+
+        // State khusus tab Status Akun Lembaga
+        let alState = {
+            page: 1,
+            pageSize: 20,
+            totalData: 0,
+            filter: { search: '', kecamatan_id: '', jenis_lembaga: '', status_akun: '', desa_id: '' },
+            searchTimeout: null,
+            lastLoadedData: []
+        };
 
         // ============================================================
         // ===== SIDEBAR & TOAST =====
@@ -709,7 +673,6 @@
                 document.getElementById('sidebarOverlay').classList.remove('active');
             }
         });
-
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             if (!toast) { console.log(message); return; }
@@ -720,10 +683,6 @@
             clearTimeout(toast._timeout);
             toast._timeout = setTimeout(() => toast.classList.remove('show'), 4000);
         }
-
-        // ============================================================
-        // ===== DATE =====
-        // ============================================================
         function updateDate() {
             const el = document.getElementById('currentDate');
             if (!el) return;
@@ -742,21 +701,20 @@
                 if (!session) { window.location.href = 'index.html'; return false; }
                 const { data: userData, error } = await supabaseClient.from('users')
                     .select('id, name, email, role, kecamatan_id, lembaga_id, active').eq('id', session.user.id).single();
-                if (error || !userData?.active) { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; return false; }
+                if (error || !userData?.active) {
+                    await supabaseClient.auth.signOut();
+                    window.location.href = 'index.html';
+                    return false;
+                }
                 window.currentUser = { 
-                    id: userData.id, 
-                    name: userData.name || session.user.email, 
-                    email: session.user.email, 
-                    role: userData.role || 'operator', 
-                    kecamatan_id: userData.kecamatan_id, 
-                    lembaga_id: userData.lembaga_id 
+                    id: userData.id, name: userData.name || session.user.email, email: session.user.email, 
+                    role: userData.role || 'operator', kecamatan_id: userData.kecamatan_id, lembaga_id: userData.lembaga_id 
                 };
                 updateHeaderUI(window.currentUser);
                 updateWelcomeUI(window.currentUser);
                 return true;
             } catch (e) { window.location.href = 'index.html'; return false; }
         }
-
         function getUser() { return window.currentUser || null; }
 
         function updateHeaderUI(user) {
@@ -769,21 +727,15 @@
             document.getElementById('userNameSmall').textContent = user.name;
             document.getElementById('headerRoleBadge').textContent = displayRole;
         }
-
         function updateWelcomeUI(user) {
             if (!user) return;
             document.getElementById('welcomeName').textContent = user.name;
             const roleDescMap = {
-                'super_admin': 'Super Admin SI-MUSTAFA',
-                'admin_kab': 'Admin Kemenag Kabupaten Tegal',
-                'batko': 'Admin BADKO LPQ',
-                'fkdt': 'Admin FKDT',
-                'ponpes': 'Admin PONPES',
-                'operator': 'Operator Lembaga'
+                'super_admin': 'Super Admin SI-MUSTAFA', 'admin_kab': 'Admin Kemenag Kabupaten Tegal',
+                'batko': 'Admin BADKO LPQ', 'fkdt': 'Admin FKDT', 'ponpes': 'Admin PONPES', 'operator': 'Operator Lembaga'
             };
             document.getElementById('welcomeRole').textContent = roleDescMap[user.role] || user.role;
         }
-
         async function handleLogout() {
             if (!confirm('Yakin ingin keluar?')) return;
             await supabaseClient.auth.signOut();
@@ -798,10 +750,15 @@
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${tab}`));
+            
+            // Load data saat tab Status Akun Lembaga dibuka
+            if (tab === 'akun-lembaga') {
+                initAkunLembagaTab();
+            }
         }
 
         // ============================================================
-        // ===== BUILD FORM =====
+        // ===== BUILD FORM (existing) =====
         // ============================================================
         function buildForm() {
             const container = document.getElementById('formContainer');
@@ -840,7 +797,6 @@
             dataCache.set('kecamatan_options', data || []);
             populateSelect('inputKecamatan', data || [], '-- Kecamatan --');
         }
-
         function populateSelect(id, data, placeholder) {
             const sel = document.getElementById(id);
             if (!sel) return;
@@ -849,7 +805,6 @@
             data.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.nama}</option>`);
             if (cv && data.some(d => d.id === cv)) sel.value = cv;
         }
-
         async function loadLembagaByKecamatan() {
             const kid = document.getElementById('inputKecamatan')?.value || '';
             const jenis = document.getElementById('inputJenisLembaga')?.value || '';
@@ -864,7 +819,6 @@
             sel.innerHTML = '<option value="">-- Lembaga --</option>';
             allLembaga.forEach(l => sel.innerHTML += `<option value="${l.id}" data-nslp="${l.nslp||''}" data-jenis="${l.jenis_lembaga}">${lb[l.jenis_lembaga]||''} ${l.nama} (${l.jenis_lembaga||'LPQ'})</option>`);
         }
-
         async function loadDesaOptionsKecamatan() {
             const user = getUser();
             if (!user?.kecamatan_id) return;
@@ -874,7 +828,6 @@
             dataCache.set(`desa_${user.kecamatan_id}`, data || []);
             populateSelect('inputDesa', data || [], '-- Desa --');
         }
-
         async function loadLembagaByDesa() {
             const user = getUser();
             if (!user) return;
@@ -891,7 +844,6 @@
             sel.innerHTML = '<option value="">-- Lembaga --</option>';
             allLembaga.forEach(l => sel.innerHTML += `<option value="${l.id}" data-nslp="${l.nslp||''}" data-jenis="${l.jenis_lembaga}">${lb[l.jenis_lembaga]||''} ${l.nama}</option>`);
         }
-
         function autoFillFromLembaga() {
             const lid = document.getElementById('inputLembaga')?.value || '';
             if (!lid) { document.getElementById('inputName').value = ''; document.getElementById('inputEmail').value = ''; document.getElementById('inputPassword').value = ''; return; }
@@ -910,7 +862,6 @@
                     }
                 }).catch(() => {});
         }
-
         function resetForm() {
             ['inputName', 'inputEmail', 'inputPassword'].forEach(id => document.getElementById(id).value = '');
             ['inputKecamatan', 'inputDesa', 'inputLembaga', 'inputJenisLembaga', 'inputRole'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -919,10 +870,9 @@
         }
 
         // ============================================================
-        // ===== VALIDASI =====
+        // ===== ADD USER (existing) =====
         // ============================================================
         function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
-
         function getFormValues() {
             const user = getUser();
             if (!user) return null;
@@ -936,10 +886,6 @@
                 desaId: document.getElementById('inputDesa')?.value || null
             };
         }
-
-        // ============================================================
-        // ===== ADD USER =====
-        // ============================================================
         async function addUser() {
             const user = getUser();
             if (!user) { showToast('Silakan login', 'error'); return; }
@@ -954,10 +900,8 @@
                 if (v.role === 'operator' && !v.lembagaId) { showToast('Operator harus pilih lembaga!', 'error'); return; }
             }
             if (['batko', 'fkdt', 'ponpes'].includes(user.role) && !v.lembagaId) { showToast('Pilih lembaga!', 'error'); return; }
-
             const { data: exist } = await supabaseClient.from('users').select('email').eq('email', v.email).maybeSingle();
             if (exist) { showToast('Email sudah terdaftar!', 'error'); return; }
-
             isProcessing = true;
             const btn = document.getElementById('btnAddUser');
             btn.disabled = true;
@@ -972,6 +916,10 @@
                 resetForm();
                 showToast(`Pengguna ${v.name} berhasil ditambahkan!`, 'success');
                 loadUsers();
+                // Refresh tab akun lembaga kalau sedang terbuka
+                if (document.getElementById('tab-akun-lembaga')?.classList.contains('active')) {
+                    refreshAkunLembaga();
+                }
             } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
             finally { isProcessing = false;
                 btn.disabled = false;
@@ -979,12 +927,9 @@
         }
 
         // ============================================================
-        // ===== EDIT USER =====
+        // ===== EDIT USER (existing) =====
         // ============================================================
         function openEditModal(userId) {
-            const user = getUser();
-            if (!user) return;
-            
             let userData = null;
             const users = document.querySelectorAll('.user-list-item');
             for (const el of users) {
@@ -994,7 +939,6 @@
                     const emailEl = el.querySelector('.email');
                     const roleEl = el.querySelector('.user-role');
                     const statusEl = el.querySelector('.user-status');
-                    
                     userData = {
                         id: userId,
                         name: nameEl ? nameEl.textContent.replace(' (Nonaktif)', '') : '',
@@ -1005,108 +949,63 @@
                     break;
                 }
             }
-            
             if (!userData) {
                 supabaseClient.from('users').select('*').eq('id', userId).single()
                     .then(({ data, error }) => {
-                        if (error || !data) {
-                            showToast('Gagal memuat data pengguna', 'error');
-                            return;
-                        }
+                        if (error || !data) { showToast('Gagal memuat data pengguna', 'error'); return; }
                         fillEditModal(data);
                     });
                 return;
             }
-            
             fillEditModal(userData);
         }
-
         function fillEditModal(userData) {
             editingUserId = userData.id;
             document.getElementById('editName').value = userData.name || '';
             document.getElementById('editEmail').value = userData.email || '';
-            
             const roleSelect = document.getElementById('editRole');
-            const roleMap = {
-                'super_admin': 'super_admin',
-                'admin_kab': 'admin_kab',
-                'batko': 'batko',
-                'fkdt': 'fkdt',
-                'ponpes': 'ponpes',
-                'operator': 'operator'
-            };
+            const roleMap = { 'super_admin': 'super_admin', 'admin_kab': 'admin_kab', 'batko': 'batko', 'fkdt': 'fkdt', 'ponpes': 'ponpes', 'operator': 'operator' };
             const roleKey = roleMap[userData.role] || 'operator';
             roleSelect.value = roleKey;
-            
             document.getElementById('editStatus').value = userData.active !== false ? 'true' : 'false';
             document.getElementById('editModal').classList.add('active');
         }
-
         function closeEditModal() {
             document.getElementById('editModal').classList.remove('active');
             editingUserId = null;
         }
-
         async function saveEditUser() {
-            if (!editingUserId) {
-                showToast('Tidak ada pengguna yang diedit', 'error');
-                return;
-            }
-            
+            if (!editingUserId) { showToast('Tidak ada pengguna yang diedit', 'error'); return; }
             const name = document.getElementById('editName').value.trim();
             const email = document.getElementById('editEmail').value.trim();
             const role = document.getElementById('editRole').value;
             const status = document.getElementById('editStatus').value === 'true';
-            
             if (!name) { showToast('Nama wajib diisi!', 'error'); return; }
             if (!email) { showToast('Email wajib diisi!', 'error'); return; }
             if (!isValidEmail(email)) { showToast('Format email tidak valid!', 'error'); return; }
-            
-            const { data: exist } = await supabaseClient.from('users')
-                .select('email')
-                .eq('email', email)
-                .neq('id', editingUserId)
-                .maybeSingle();
+            const { data: exist } = await supabaseClient.from('users').select('email').eq('email', email).neq('id', editingUserId).maybeSingle();
             if (exist) { showToast('Email sudah digunakan oleh pengguna lain!', 'error'); return; }
-            
             isProcessing = true;
             const btn = document.getElementById('btnSaveEdit');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-            
             try {
-                const updateData = {
-                    name: name,
-                    email: email,
-                    role: role,
-                    active: status,
-                    updated_at: new Date().toISOString()
-                };
-                
-                const { error: ue } = await supabaseClient.from('users')
-                    .update(updateData)
-                    .eq('id', editingUserId);
+                const updateData = { name: name, email: email, role: role, active: status, updated_at: new Date().toISOString() };
+                const { error: ue } = await supabaseClient.from('users').update(updateData).eq('id', editingUserId);
                 if (ue) throw ue;
-                
                 showToast('Pengguna berhasil diperbarui!', 'success');
                 closeEditModal();
                 loadUsers();
-            } catch (e) {
-                showToast('Gagal: ' + e.message, 'error');
-            } finally {
-                isProcessing = false;
+            } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
+            finally { isProcessing = false;
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> Simpan';
-            }
+                btn.innerHTML = '<i class="fas fa-save"></i> Simpan'; }
         }
 
         // ============================================================
-        // ===== RESET PASSWORD =====
+        // ===== RESET PASSWORD (existing) =====
         // ============================================================
         function openResetPasswordModal(userId) {
-            const user = getUser();
-            if (!user) return;
-            
             let userData = null;
             const users = document.querySelectorAll('.user-list-item');
             for (const el of users) {
@@ -1122,14 +1021,10 @@
                     break;
                 }
             }
-            
             if (!userData) {
                 supabaseClient.from('users').select('id, name, email').eq('id', userId).single()
                     .then(({ data, error }) => {
-                        if (error || !data) {
-                            showToast('Gagal memuat data pengguna', 'error');
-                            return;
-                        }
+                        if (error || !data) { showToast('Gagal memuat data pengguna', 'error'); return; }
                         resetPasswordTarget = data;
                         document.getElementById('resetUserDisplay').textContent = `${data.name} (${data.email})`;
                         document.getElementById('resetNewPassword').value = '';
@@ -1138,63 +1033,39 @@
                     });
                 return;
             }
-            
             resetPasswordTarget = userData;
             document.getElementById('resetUserDisplay').textContent = `${userData.name} (${userData.email})`;
             document.getElementById('resetNewPassword').value = '';
             document.getElementById('resetConfirmPassword').value = '';
             document.getElementById('resetPasswordModal').classList.add('active');
         }
-
         function closeResetPasswordModal() {
             document.getElementById('resetPasswordModal').classList.remove('active');
             resetPasswordTarget = null;
             document.getElementById('resetNewPassword').value = '';
             document.getElementById('resetConfirmPassword').value = '';
         }
-
         async function confirmResetPassword() {
-            if (!resetPasswordTarget) {
-                showToast('Tidak ada target reset password', 'error');
-                return;
-            }
-
+            if (!resetPasswordTarget) { showToast('Tidak ada target reset password', 'error'); return; }
             const newPassword = document.getElementById('resetNewPassword').value.trim();
             const confirmPassword = document.getElementById('resetConfirmPassword').value.trim();
-
-            if (!newPassword) {
-                showToast('Password baru tidak boleh kosong!', 'error');
-                return;
-            }
-            if (newPassword.length < 6) {
-                showToast('Password minimal 6 karakter!', 'error');
-                return;
-            }
-            if (newPassword !== confirmPassword) {
-                showToast('Password dan konfirmasi tidak sama!', 'error');
-                return;
-            }
-
-            if (!confirm(`Yakin akan mereset password untuk ${resetPasswordTarget.name}?`)) {
-                return;
-            }
-
+            if (!newPassword) { showToast('Password baru tidak boleh kosong!', 'error'); return; }
+            if (newPassword.length < 6) { showToast('Password minimal 6 karakter!', 'error'); return; }
+            if (newPassword !== confirmPassword) { showToast('Password dan konfirmasi tidak sama!', 'error'); return; }
+            if (!confirm(`Yakin akan mereset password untuk ${resetPasswordTarget.name}?`)) return;
             isProcessing = true;
             const btn = document.getElementById('btnResetPassword');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
             try {
                 const { data, error } = await supabaseClient.rpc('reset_user_password', {
                     target_user_id: resetPasswordTarget.id,
                     new_password: newPassword
                 });
-
                 if (error) {
                     console.warn('RPC gagal, mencoba metode alternatif...', error);
                     throw new Error('Fungsi RPC tidak ditemukan. Silakan buat fungsi reset_user_password di Supabase SQL Editor.');
                 }
-
                 showToast(`Password untuk ${resetPasswordTarget.name} berhasil direset!`, 'success');
                 closeResetPasswordModal();
             } catch (e) {
@@ -1208,7 +1079,7 @@
         }
 
         // ============================================================
-        // ===== DELETE USER =====
+        // ===== DELETE & REACTIVATE USER (existing) =====
         // ============================================================
         async function deleteUser(userId) {
             if (!confirm('Nonaktifkan pengguna ini?\nMereka tidak akan bisa login lagi.')) return;
@@ -1222,9 +1093,18 @@
                 loadUsers();
             } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
         }
+        async function reactivateUser(userId) {
+            if (!confirm('Aktifkan kembali pengguna ini?')) return;
+            try {
+                const { error } = await supabaseClient.from('users').update({ active: true, updated_at: new Date().toISOString() }).eq('id', userId);
+                if (error) throw error;
+                showToast('Pengguna diaktifkan kembali!', 'success');
+                loadUsers();
+            } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
+        }
 
         // ============================================================
-        // ===== LOAD & RENDER USERS (DIPERBAIKI) =====
+        // ===== LOAD & RENDER USERS (existing) =====
         // ============================================================
         async function loadUsers() {
             const user = getUser();
@@ -1240,20 +1120,15 @@
                 }
                 const { data } = await q;
                 allUsersData = data || [];
-
-                // === Enrich data dengan nama lembaga & kecamatan ===
                 const kids = [...new Set(allUsersData.map(u => u.kecamatan_id).filter(Boolean))];
                 const lids = [...new Set(allUsersData.map(u => u.lembaga_id).filter(Boolean))];
-
                 const [kecRes, lemRes] = await Promise.all([
                     kids.length ? supabaseClient.from('master_kecamatan').select('id, nama').in('id', kids) : Promise.resolve({ data: [] }),
                     lids.length ? supabaseClient.from('lembaga').select('id, nama, nslp, jenis_lembaga').in('id', lids) : Promise.resolve({ data: [] })
                 ]);
-
                 const km = {}, lm = {};
                 (kecRes.data || []).forEach(k => km[k.id] = k.nama);
                 (lemRes.data || []).forEach(l => lm[l.id] = l);
-
                 allUsersData = allUsersData.map(u => ({
                     ...u,
                     _kecamatanNama: km[u.kecamatan_id] || '',
@@ -1261,13 +1136,11 @@
                     _lembagaNslp: lm[u.lembaga_id]?.nslp || '',
                     _lembagaJenis: lm[u.lembaga_id]?.jenis_lembaga || ''
                 }));
-
                 renderUserList(allUsersData);
             } catch (e) {
                 document.getElementById('userList').innerHTML = `<div style="text-align:center;padding:30px;color:#f44336;">Gagal: ${e.message}</div>`;
             }
         }
-
         function renderUserList(users) {
             const container = document.getElementById('userList');
             if (!users?.length) {
@@ -1275,16 +1148,7 @@
                 document.getElementById('searchResultCount').innerHTML = 'Menampilkan <strong>0</strong> pengguna';
                 return;
             }
-
-            const rl = {
-                'super_admin': '🛡️ Super Admin',
-                'admin_kab': '🏛️ Admin Kab',
-                'batko': '📘 BADKO LPQ',
-                'fkdt': '📗 FKDT',
-                'ponpes': '📕 PONPES',
-                'operator': '📋 Operator'
-            };
-
+            const rl = { 'super_admin': '🛡️ Super Admin', 'admin_kab': '🏛️ Admin Kab', 'batko': '📘 BADKO LPQ', 'fkdt': '📗 FKDT', 'ponpes': '📕 PONPES', 'operator': '📋 Operator' };
             container.innerHTML = users.map(u => {
                 const act = u.active !== false;
                 const displayRole = rl[u.role] || u.role;
@@ -1302,106 +1166,52 @@
                     <span class="user-status ${act?'active':'inactive'}"></span>
                     <div class="action-buttons">
                         ${act ? `
-                            <button class="btn-icon warning" onclick="openEditModal('${u.id}')" title="Edit" data-user-id="${u.id}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-icon info" onclick="openResetPasswordModal('${u.id}')" title="Reset Password" data-user-id="${u.id}">
-                                <i class="fas fa-key"></i>
-                            </button>
-                            <button class="btn-icon danger" onclick="deleteUser('${u.id}')" title="Nonaktifkan" data-user-id="${u.id}">
-                                <i class="fas fa-ban"></i>
-                            </button>
+                            <button class="btn-icon warning" onclick="openEditModal('${u.id}')" title="Edit" data-user-id="${u.id}"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon info" onclick="openResetPasswordModal('${u.id}')" title="Reset Password" data-user-id="${u.id}"><i class="fas fa-key"></i></button>
+                            <button class="btn-icon danger" onclick="deleteUser('${u.id}')" title="Nonaktifkan" data-user-id="${u.id}"><i class="fas fa-ban"></i></button>
                         ` : `
-                            <button class="btn-icon success" onclick="reactivateUser('${u.id}')" title="Aktifkan kembali" data-user-id="${u.id}">
-                                <i class="fas fa-check-circle"></i>
-                            </button>
+                            <button class="btn-icon success" onclick="reactivateUser('${u.id}')" title="Aktifkan kembali" data-user-id="${u.id}"><i class="fas fa-check-circle"></i></button>
                         `}
                     </div>
                 </div>`;
             }).join('');
-
             document.getElementById('searchResultCount').innerHTML = `Menampilkan <strong>${users.length}</strong> pengguna`;
         }
-
-        // ============================================================
-        // ===== FILTER USERS (DIPERBAIKI) =====
-        // ============================================================
         function filterUsers() {
             clearTimeout(filterDebounceTimer);
             filterDebounceTimer = setTimeout(_doFilterUsers, 250);
         }
-
         function _doFilterUsers() {
             const searchQuery = (document.getElementById('searchUserInput').value || '').toLowerCase().trim();
             const roleFilter = document.getElementById('searchRoleFilter').value;
             const statusFilter = document.getElementById('searchStatusFilter').value;
-
-            // Map role → teks display untuk pencarian
             const roleSearchMap = {
-                'super_admin': 'super admin superadmin',
-                'admin_kab': 'admin kabupaten admin kab adminkab',
-                'batko': 'badko badko lpq batko',
-                'fkdt': 'fkdt fkdt mdt',
-                'ponpes': 'ponpes ponpes',
-                'operator': 'operator op'
+                'super_admin': 'super admin superadmin', 'admin_kab': 'admin kabupaten admin kab adminkab',
+                'batko': 'badko badko lpq batko', 'fkdt': 'fkdt fkdt mdt', 'ponpes': 'ponpes ponpes', 'operator': 'operator op'
             };
-
             let filtered = allUsersData.slice();
-
-            // === Filter teks pencarian ===
             if (searchQuery) {
                 const terms = searchQuery.split(/\s+/).filter(Boolean);
                 filtered = filtered.filter(u => {
                     const haystack = [
-                        u.name || '',
-                        u.email || '',
-                        u.role || '',
-                        roleSearchMap[u.role] || '',
-                        u._lembagaNama || '',
-                        u._lembagaNslp || '',
-                        u._lembagaJenis || '',
-                        u._kecamatanNama || '',
+                        u.name || '', u.email || '', u.role || '', roleSearchMap[u.role] || '',
+                        u._lembagaNama || '', u._lembagaNslp || '', u._lembagaJenis || '', u._kecamatanNama || '',
                         u.active === false ? 'nonaktif inactive' : 'aktif active'
                     ].join(' ').toLowerCase();
-
                     return terms.every(t => haystack.includes(t));
                 });
             }
-
-            // === Filter role ===
-            if (roleFilter) {
-                filtered = filtered.filter(u => u.role === roleFilter);
-            }
-
-            // === Filter status ===
-            if (statusFilter === 'active') {
-                filtered = filtered.filter(u => u.active !== false);
-            } else if (statusFilter === 'inactive') {
-                filtered = filtered.filter(u => u.active === false);
-            }
-
+            if (roleFilter) filtered = filtered.filter(u => u.role === roleFilter);
+            if (statusFilter === 'active') filtered = filtered.filter(u => u.active !== false);
+            else if (statusFilter === 'inactive') filtered = filtered.filter(u => u.active === false);
             renderUserList(filtered);
         }
-
         function clearSearch() {
             document.getElementById('searchUserInput').value = '';
             document.getElementById('searchRoleFilter').value = '';
             document.getElementById('searchStatusFilter').value = '';
             _doFilterUsers();
             showToast('Pencarian direset', 'info');
-        }
-
-        // ============================================================
-        // ===== REACTIVATE USER =====
-        // ============================================================
-        async function reactivateUser(userId) {
-            if (!confirm('Aktifkan kembali pengguna ini?')) return;
-            try {
-                const { error } = await supabaseClient.from('users').update({ active: true, updated_at: new Date().toISOString() }).eq('id', userId);
-                if (error) throw error;
-                showToast('Pengguna diaktifkan kembali!', 'success');
-                loadUsers();
-            } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
         }
 
         function applyUIRestrictions() {
@@ -1414,10 +1224,357 @@
                 document.getElementById('addUserDesc').textContent = `Pilih desa → lembaga ${user.role === 'batko' ? 'LPQ' : user.role === 'fkdt' ? 'MDT' : 'PONPES'} → auto-fill`;
                 document.getElementById('userListDesc').textContent = `Kelola akun Operator ${rn[user.role]} di Kecamatan Anda`;
             }
+            // Tampilkan tab Status Akun Lembaga untuk semua kecuali operator
+            const tabAkun = document.getElementById('tabAkunLembagaBtn');
+            if (tabAkun) {
+                const allowed = ['super_admin', 'admin_kab', 'batko', 'fkdt', 'ponpes'].includes(user.role);
+                tabAkun.style.display = allowed ? 'inline-flex' : 'none';
+            }
         }
 
         // ============================================================
-        // ===== SYSTEM =====
+        // ===== TAB: STATUS AKUN LEMBAGA =====
+        // ============================================================
+        let alInitialized = false;
+
+        async function initAkunLembagaTab() {
+            if (!alInitialized) {
+                await alPopulateKecamatanDropdown();
+                alBindEvents();
+                alInitialized = true;
+            }
+            await loadAkunLembagaSummary();
+            await loadAkunLembagaList();
+        }
+
+        function alBindEvents() {
+            // Search
+            document.getElementById('alSearchInput').addEventListener('input', function() {
+                clearTimeout(alState.searchTimeout);
+                alState.searchTimeout = setTimeout(() => {
+                    alState.filter.search = this.value.trim();
+                    alState.page = 1;
+                    loadAkunLembagaList();
+                }, 400);
+            });
+
+            // Kecamatan
+            document.getElementById('alFilterKecamatan').addEventListener('change', async function() {
+                alState.filter.kecamatan_id = this.value;
+                alState.filter.desa_id = '';
+                // Reload desa dropdown
+                const desaSelect = document.getElementById('alFilterDesa');
+                desaSelect.innerHTML = '<option value="">Semua Desa</option>';
+                if (this.value) {
+                    const { data } = await supabaseClient.from('master_kelurahan').select('id, nama').eq('kecamatan_id', this.value).order('nama');
+                    (data || []).forEach(d => {
+                        desaSelect.innerHTML += `<option value="${d.id}">${d.nama}</option>`;
+                    });
+                }
+                alState.page = 1;
+                loadAkunLembagaSummary();
+                loadAkunLembagaList();
+            });
+
+            // Jenis
+            document.getElementById('alFilterJenis').addEventListener('change', function() {
+                alState.filter.jenis_lembaga = this.value;
+                alState.page = 1;
+                loadAkunLembagaSummary();
+                loadAkunLembagaList();
+            });
+
+            // Status akun
+            document.getElementById('alFilterStatus').addEventListener('change', function() {
+                alState.filter.status_akun = this.value;
+                alState.page = 1;
+                loadAkunLembagaList();
+            });
+
+            // Desa
+            document.getElementById('alFilterDesa').addEventListener('change', function() {
+                alState.filter.desa_id = this.value;
+                alState.page = 1;
+                loadAkunLembagaList();
+            });
+        }
+
+        async function alPopulateKecamatanDropdown() {
+            const user = getUser();
+            const select = document.getElementById('alFilterKecamatan');
+            if (!select) return;
+
+            // Kalau user kecamatan (batko/fkdt/ponpes), kunci ke kecamatannya
+            if (user && ['batko', 'fkdt', 'ponpes'].includes(user.role) && user.kecamatan_id) {
+                const { data } = await supabaseClient.from('master_kecamatan').select('id, nama').eq('id', user.kecamatan_id).single();
+                if (data) {
+                    select.innerHTML = `<option value="${data.id}">${data.nama}</option>`;
+                    select.value = data.id;
+                    select.disabled = true;
+                    alState.filter.kecamatan_id = data.id;
+                    // Isi desa
+                    const desaSelect = document.getElementById('alFilterDesa');
+                    const { data: desaData } = await supabaseClient.from('master_kelurahan').select('id, nama').eq('kecamatan_id', data.id).order('nama');
+                    desaSelect.innerHTML = '<option value="">Semua Desa</option>';
+                    (desaData || []).forEach(d => desaSelect.innerHTML += `<option value="${d.id}">${d.nama}</option>`);
+                }
+                return;
+            }
+
+            // Super admin / admin kab: tampilkan semua kecamatan
+            const cached = dataCache.get('kecamatan_options', 3600000);
+            if (cached) {
+                select.innerHTML = '<option value="">Semua Kecamatan</option>';
+                cached.forEach(k => select.innerHTML += `<option value="${k.id}">${k.nama}</option>`);
+                return;
+            }
+            const { data } = await supabaseClient.from('master_kecamatan').select('id, nama').order('nama');
+            dataCache.set('kecamatan_options', data || []);
+            select.innerHTML = '<option value="">Semua Kecamatan</option>';
+            (data || []).forEach(k => select.innerHTML += `<option value="${k.id}">${k.nama}</option>`);
+        }
+
+        async function loadAkunLembagaSummary() {
+            try {
+                const user = getUser();
+                const p_kecamatan_id = alState.filter.kecamatan_id || null;
+                const p_jenis_lembaga = alState.filter.jenis_lembaga || null;
+
+                const { data, error } = await supabaseClient.rpc('get_lembaga_akun_summary', {
+                    p_kecamatan_id: p_kecamatan_id,
+                    p_jenis_lembaga: p_jenis_lembaga
+                });
+                if (error) throw error;
+                const row = Array.isArray(data) ? data[0] : data;
+                const total = Number(row?.total || 0);
+                const sudah = Number(row?.sudah_punya || 0);
+                const belum = Number(row?.belum_punya || 0);
+                const progress = total > 0 ? Math.round((sudah / total) * 100) : 0;
+
+                document.getElementById('alTotalLembaga').textContent = total.toLocaleString('id-ID');
+                document.getElementById('alSudahPunya').textContent = sudah.toLocaleString('id-ID');
+                document.getElementById('alBelumPunya').textContent = belum.toLocaleString('id-ID');
+                document.getElementById('alProgress').textContent = progress + '%';
+                document.getElementById('alProgressBar').style.width = progress + '%';
+            } catch (e) {
+                console.error('Summary error:', e);
+            }
+        }
+
+        async function loadAkunLembagaList() {
+            const tbody = document.getElementById('alTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;"><div class="spinner" style="margin:0 auto;"></div></td></tr>';
+
+            try {
+                const offset = (alState.page - 1) * alState.pageSize;
+                const { data, error } = await supabaseClient.rpc('get_lembaga_akun_status', {
+                    p_kecamatan_id: alState.filter.kecamatan_id || null,
+                    p_jenis_lembaga: alState.filter.jenis_lembaga || null,
+                    p_status_akun: alState.filter.status_akun || 'all',
+                    p_desa_id: alState.filter.desa_id || null,
+                    p_search: alState.filter.search || null,
+                    p_limit: alState.pageSize,
+                    p_offset: offset
+                });
+                if (error) throw error;
+
+                const rows = Array.isArray(data) ? data : [];
+                alState.totalData = rows.length > 0 ? Number(rows[0].total_count || 0) : 0;
+                alState.lastLoadedData = rows;
+
+                if (!rows.length) {
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;"><i class="fas fa-inbox" style="font-size:1.8rem;display:block;margin-bottom:8px;opacity:.5;"></i>Tidak ada lembaga yang cocok dengan filter</td></tr>';
+                } else {
+                    const start = (alState.page - 1) * alState.pageSize;
+                    tbody.innerHTML = rows.map((r, i) => {
+                        const jenisClass = (r.jenis_lembaga || '').toLowerCase();
+                        const statusClass = r.status_akun === 'punya' ? 'punya' : 'belum';
+                        const statusText = r.status_akun === 'punya' ? '✅ Sudah Punya' : '❌ Belum Punya';
+                        return `<tr>
+                            <td>${start + i + 1}</td>
+                            <td><strong>${escapeHtmlAkun(r.nama_lembaga)}</strong></td>
+                            <td><span class="badge-jenis ${jenisClass}">${escapeHtmlAkun(r.jenis_lembaga)}</span></td>
+                            <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${escapeHtmlAkun(r.nslp) || '-'}</code></td>
+                            <td>${escapeHtmlAkun(r.kecamatan) || '-'}</td>
+                            <td>${escapeHtmlAkun(r.desa) || '-'}</td>
+                            <td><span class="badge-status ${statusClass}">${statusText}</span></td>
+                            <td>${escapeHtmlAkun(r.operator_nama) || '<span style="color:#ccc;">-</span>'}</td>
+                            <td style="font-size:0.75rem;color:#666;">${escapeHtmlAkun(r.operator_email) || '<span style="color:#ccc;">-</span>'}</td>
+                            <td style="text-align:center;">
+                                <button class="btn-icon info" onclick="copySingleNslp('${escapeHtmlAkun(r.nslp)}', '${escapeHtmlAkun(r.nama_lembaga)}')" title="Copy NSLP"><i class="fas fa-copy"></i></button>
+                            </td>
+                        </tr>`;
+                    }).join('');
+                }
+
+                // Update count
+                document.getElementById('alResultCount').innerHTML = `Menampilkan <strong>${rows.length}</strong> dari <strong>${alState.totalData}</strong> lembaga`;
+
+                // Update pagination
+                const totalPages = Math.ceil(alState.totalData / alState.pageSize) || 1;
+                document.getElementById('alPageInfo').textContent = `Halaman ${alState.page} dari ${totalPages}`;
+                document.getElementById('alPrevPage').disabled = alState.page <= 1;
+                document.getElementById('alNextPage').disabled = alState.page >= totalPages;
+
+            } catch (e) {
+                console.error('Load akun lembaga error:', e);
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:30px;color:#f44336;">Gagal memuat data: ${e.message}</td></tr>`;
+            }
+        }
+
+        function escapeHtmlAkun(s) {
+            if (s === null || s === undefined) return '';
+            return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+        }
+
+        function resetAkunLembagaFilter() {
+            document.getElementById('alSearchInput').value = '';
+            document.getElementById('alFilterJenis').value = '';
+            document.getElementById('alFilterStatus').value = '';
+            document.getElementById('alFilterDesa').value = '';
+
+            const user = getUser();
+            const kecSelect = document.getElementById('alFilterKecamatan');
+            if (user && ['batko', 'fkdt', 'ponpes'].includes(user.role) && user.kecamatan_id) {
+                // tetap di kecamatan sendiri
+            } else {
+                kecSelect.value = '';
+            }
+            alState.filter = { search: '', kecamatan_id: kecSelect.value || '', jenis_lembaga: '', status_akun: '', desa_id: '' };
+            alState.page = 1;
+            loadAkunLembagaSummary();
+            loadAkunLembagaList();
+            showToast('Filter direset', 'info');
+        }
+
+        function changeAkunLembagaPage(delta) {
+            const totalPages = Math.ceil(alState.totalData / alState.pageSize) || 1;
+            const newPage = alState.page + delta;
+            if (newPage < 1 || newPage > totalPages) return;
+            alState.page = newPage;
+            loadAkunLembagaList();
+        }
+
+        async function refreshAkunLembaga() {
+            await loadAkunLembagaSummary();
+            await loadAkunLembagaList();
+            showToast('Data diperbarui', 'success');
+        }
+
+        function copySingleNslp(nslp, namaLembaga) {
+            const text = `${nslp} - ${namaLembaga}`;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`NSLP disalin: ${text}`, 'success');
+            }).catch(() => {
+                showToast('Gagal copy, silakan copy manual', 'error');
+            });
+        }
+
+        async function copyAkunLembagaData() {
+            const data = alState.lastLoadedData;
+            if (!data || !data.length) {
+                showToast('Tidak ada data untuk di-copy', 'warning');
+                return;
+            }
+            // Format TSV (bisa di-paste ke Excel/WhatsApp/Spreadsheet)
+            const headers = ['No', 'Nama Lembaga', 'Jenis', 'NSLP', 'Kecamatan', 'Desa', 'Status Akun', 'Nama Operator', 'Email Operator'];
+            const rows = data.map((r, i) => [
+                i + 1,
+                r.nama_lembaga || '-',
+                r.jenis_lembaga || '-',
+                r.nslp || '-',
+                r.kecamatan || '-',
+                r.desa || '-',
+                r.status_akun === 'punya' ? 'Sudah Punya' : 'Belum Punya',
+                r.operator_nama || '-',
+                r.operator_email || '-'
+            ]);
+            const tsv = [headers.join('\t'), ...rows.map(r => r.join('\t'))].join('\n');
+            try {
+                await navigator.clipboard.writeText(tsv);
+                showToast(`✅ ${data.length} baris disalin ke clipboard! Paste ke Excel/WA.`, 'success');
+            } catch (e) {
+                // Fallback untuk browser lama
+                const ta = document.createElement('textarea');
+                ta.value = tsv;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast(`✅ ${data.length} baris disalin ke clipboard!`, 'success');
+            }
+        }
+
+        async function exportAkunLembagaExcel() {
+            // Ambil SEMUA data sesuai filter (bukan hanya halaman aktif)
+            showToast('Mengambil semua data...', 'info');
+            try {
+                const { data, error } = await supabaseClient.rpc('get_lembaga_akun_status', {
+                    p_kecamatan_id: alState.filter.kecamatan_id || null,
+                    p_jenis_lembaga: alState.filter.jenis_lembaga || null,
+                    p_status_akun: alState.filter.status_akun || 'all',
+                    p_desa_id: alState.filter.desa_id || null,
+                    p_search: alState.filter.search || null,
+                    p_limit: 10000,   // ambil banyak sekaligus
+                    p_offset: 0
+                });
+                if (error) throw error;
+                const rows = Array.isArray(data) ? data : [];
+                if (!rows.length) { showToast('Tidak ada data untuk diexport', 'warning'); return; }
+
+                // Load SheetJS via CDN (lazy)
+                if (!window.XLSX) {
+                    await new Promise((resolve, reject) => {
+                        const s = document.createElement('script');
+                        s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+                        s.onload = resolve;
+                        s.onerror = reject;
+                        document.head.appendChild(s);
+                    });
+                }
+
+                const headers = ['No', 'Nama Lembaga', 'Jenis Lembaga', 'NSLP', 'Kecamatan', 'Desa', 'Status Akun', 'Nama Operator', 'Email Operator'];
+                const excelRows = rows.map((r, i) => [
+                    i + 1,
+                    r.nama_lembaga || '',
+                    r.jenis_lembaga || '',
+                    r.nslp || '',
+                    r.kecamatan || '',
+                    r.desa || '',
+                    r.status_akun === 'punya' ? 'Sudah Punya' : 'Belum Punya',
+                    r.operator_nama || '',
+                    r.operator_email || ''
+                ]);
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...excelRows]);
+                ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length + 2, 18) }));
+
+                // Format judul kolom
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const addr = XLSX.utils.encode_col(C) + '1';
+                    if (ws[addr]) {
+                        ws[addr].s = {
+                            font: { bold: true, color: { rgb: 'FFFFFF' } },
+                            fill: { fgColor: { rgb: '0B5C30' } }
+                        };
+                    }
+                }
+
+                XLSX.utils.book_append_sheet(wb, ws, 'Status Akun Lembaga');
+                const dateStr = new Date().toISOString().split('T')[0];
+                XLSX.writeFile(wb, `status_akun_lembaga_${dateStr}_${rows.length}.xlsx`);
+                showToast(`✅ Export berhasil! ${rows.length} lembaga`, 'success');
+            } catch (e) {
+                console.error('Export error:', e);
+                showToast('Gagal export: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // ===== SYSTEM (existing) =====
         // ============================================================
         function toggleSwitch(id) { document.getElementById(`toggle${id.charAt(0).toUpperCase()+id.slice(1)}`)?.classList.toggle('active'); }
         function saveSystemSettings() {
@@ -1433,7 +1590,7 @@
         }
 
         // ============================================================
-        // ===== BACKUP =====
+        // ===== BACKUP (existing) =====
         // ============================================================
         async function backupDatabase() {
             if (isProcessing) return;
@@ -1461,7 +1618,6 @@
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-download"></i> Download'; if (prog) prog.style.display = 'none'; }
         }
-
         async function restoreDatabase(input) {
             const file = input.files[0];
             if (!file) return;
@@ -1479,7 +1635,6 @@
                 loadUsers();
             } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
         }
-
         async function loadTotalDataStats() {
             try {
                 const tables = ['master_kecamatan', 'master_kelurahan', 'master_jenjang', 'lembaga', 'pendidik', 'bantuan', 'mutasi'];
@@ -1508,7 +1663,7 @@
         });
 
         // ============================================================
-        // ===== EXPOSE FUNCTIONS =====
+        // ===== EXPOSE =====
         // ============================================================
         window.switchTab = switchTab;
         window.loadUsers = loadUsers;
@@ -1538,6 +1693,16 @@
         window.clearSearch = clearSearch;
         window.formatRoleDisplay = formatRoleDisplay;
         window.getSafeRoleDisplay = getSafeRoleDisplay;
+        // Tab Status Akun Lembaga
+        window.initAkunLembagaTab = initAkunLembagaTab;
+        window.loadAkunLembagaSummary = loadAkunLembagaSummary;
+        window.loadAkunLembagaList = loadAkunLembagaList;
+        window.resetAkunLembagaFilter = resetAkunLembagaFilter;
+        window.changeAkunLembagaPage = changeAkunLembagaPage;
+        window.refreshAkunLembaga = refreshAkunLembaga;
+        window.copyAkunLembagaData = copyAkunLembagaData;
+        window.copySingleNslp = copySingleNslp;
+        window.exportAkunLembagaExcel = exportAkunLembagaExcel;
     </script>
 </body>
 </html>
