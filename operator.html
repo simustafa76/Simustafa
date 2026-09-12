@@ -293,7 +293,7 @@ const App = {
 
 const CLOUDINARY_CLOUD_NAME = 'ddrbmte6';
 const CLOUDINARY_UPLOAD_PRESET = 'simustafa_preset';
-const MAX_FILE_SIZE = 300;
+const MAX_FILE_SIZE = 200;
 
 /* ---------- CORE UTILS ---------- */
 const $ = id => document.getElementById(id);
@@ -676,7 +676,9 @@ const DashboardModal = {
           <div class="form-group"><label>Jenis</label><select id="editJenisLembaga" disabled><option value="LPQ">LPQ</option><option value="MDT">MDT</option><option value="PONPES">PONPES</option></select></div>
         </div>
         <div class="section-title"><i class="fas fa-file-alt"></i> Dokumen KYC</div>
-        <div class="form-group full-width"><label>KTP</label><input type="file" id="editDokumenKtp" accept=".pdf,.jpg,.jpeg,.png"><div class="upload-preview" id="dokumenKtpPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenKtpName"></span><button type="button" class="btn btn-outline btn-sm" data-rmdoc="ktp" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
+        <div class="form-group full-width">
+  <label>KTP <small style="color:#f44336;font-weight:400;">(maks 200KB)</small></label>
+  <input type="file" id="editDokumenKtp" accept=".pdf,.jpg,.jpeg,.png"><div class="upload-preview" id="dokumenKtpPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenKtpName"></span><button type="button" class="btn btn-outline btn-sm" data-rmdoc="ktp" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
         <div class="form-group full-width"><label>Rek Bupati</label><input type="file" id="editDokumenBupati" accept=".pdf,.jpg,.jpeg,.png"><div class="upload-preview" id="dokumenBupatiPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenBupatiName"></span><button type="button" class="btn btn-outline btn-sm" data-rmdoc="bupati" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
         <div class="form-group full-width"><label>Rek Gubernur</label><input type="file" id="editDokumenGubernur" accept=".pdf,.jpg,.jpeg,.png"><div class="upload-preview" id="dokumenGubernurPreview"><i class="fas fa-file-pdf" style="color:#d32f2f;"></i><span class="file-name" id="dokumenGubernurName"></span><button type="button" class="btn btn-outline btn-sm" data-rmdoc="gubernur" style="padding:2px 8px;font-size:.65rem;"><i class="fas fa-times"></i></button></div></div>
         <div class="section-title"><i class="fas fa-info-circle"></i> Status & Verifikasi</div>
@@ -802,23 +804,41 @@ const DashboardModal = {
     $('editLamaMengabdi').value=l;
   },
   async _upload(input,type){
-    const file=input.files[0]; if(!file) return;
-    if(file.size>10*1024*1024){showToast('File terlalu besar! Maks 10MB','error');input.value='';return;}
-    showToast('Memproses file...','info');
-    try{
-      let up=file;
-      if(file.type.startsWith('image/')) up=await this._compress(file,MAX_FILE_SIZE);
-      const fd=new FormData();
-      fd.append('file',up);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);
-      const r=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`,{method:'POST',body:fd});
-      const d=await r.json();
-      if(d.error) throw new Error(d.error.message);
-      this._state.dokUrls[type]=d.secure_url;
-      $('dokumen'+type.charAt(0).toUpperCase()+type.slice(1)+'Preview').classList.add('visible');
-      $('dokumen'+type.charAt(0).toUpperCase()+type.slice(1)+'Name').textContent=file.name;
-      showToast('Berhasil upload!','success');
-    }catch(e){showToast('Gagal: '+e.message,'error');input.value='';}
-  },
+  const file=input.files[0]; 
+  if(!file) return;
+
+  // 🔴 VALIDASI KETAT: tolak kalau > 200KB
+  const maxBytes = MAX_FILE_SIZE * 1024;
+  if(file.size > maxBytes){
+    const sizeKB = (file.size / 1024).toFixed(0);
+    showToast(`❌ File terlalu besar! ${sizeKB}KB (maks ${MAX_FILE_SIZE}KB). Kompres dulu sebelum upload.`, 'error');
+    input.value = '';
+    return;
+  }
+
+  // ✅ File sudah ≤ 200KB, langsung upload
+  showToast('Mengupload...','info');
+  try{
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    
+    const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
+      method: 'POST',
+      body: fd
+    });
+    const d = await r.json();
+    if(d.error) throw new Error(d.error.message);
+    
+    this._state.dokUrls[type] = d.secure_url;
+    $('dokumen'+type.charAt(0).toUpperCase()+type.slice(1)+'Preview').classList.add('visible');
+    $('dokumen'+type.charAt(0).toUpperCase()+type.slice(1)+'Name').textContent = file.name;
+    showToast('✅ Berhasil upload!','success');
+  }catch(e){
+    showToast('Gagal: '+e.message,'error');
+    input.value='';
+  }
+},
   _compress(file,targetKB=300){
     return new Promise(res=>{
       if(file.size<=targetKB*1024){res(file);return;}
