@@ -1848,8 +1848,12 @@ const BantuanModal = {
 };
 
 /* ====================================================================
-   VIEW 4: MUTASI
+   VIEW 4: MUTASI (FIXED)
    ==================================================================== */
+
+// ✅ Konstanta global: jenis mutasi yang TIDAK butuh lembaga tujuan
+const MUTASI_TANPA_TUJUAN = ['pensiun', 'meninggal', 'berhenti'];
+
 const MutasiView = {
   state:{cp:1,ps:10,td:0,searchTimeout:null,allPendidik:[],allLembaga:[],selectedPendidik:null,did:null},
   template(){
@@ -1943,18 +1947,22 @@ const MutasiView = {
     const sv=$('searchInput')?.value||'';
     const start=(s.cp-1)*s.ps;
     t.innerHTML=data.map((i,n)=>{
-      const st=sm[i.status]||sm.diajukan;
+      const stt=sm[i.status]||sm.diajukan;
       const j=jm[i.jenis_mutasi]||i.jenis_mutasi;
       const c=jc[i.jenis_mutasi]||'badge-jenis-antar_lembaga';
       const canCancel=i.status==='diajukan';
+      // ✅ Kolom Tujuan: tampil "—" kalau tanpa tujuan
+      const tujuanHTML = i.ke_lembaga?.nama 
+        ? highlightText(i.ke_lembaga.nama, sv)
+        : `<span style="color:#999;font-style:italic;">—</span>`;
       return `<tr>
         <td>${start+n+1}</td>
         <td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:.7rem;">${highlightText(i.nomor_mutasi||'-',sv)}</code></td>
         <td><strong>${highlightText(i.pendidik?.nama_lengkap||'-',sv)}</strong><br><small>${highlightText(i.pendidik?.nik||'',sv)}</small></td>
-        <td>${highlightText(i.ke_lembaga?.nama||'-',sv)}</td>
+        <td>${tujuanHTML}</td>
         <td><span class="badge ${c}">${j}</span></td>
         <td>${formatTanggal(i.tanggal_mutasi)}</td>
-        <td><span class="badge ${st.c}">${st.l}</span></td>
+        <td><span class="badge ${stt.c}">${stt.l}</span></td>
         <td><div class="action-buttons">
           <button class="btn btn-outline btn-xs" data-act="view" data-id="${i.id}"><i class="fas fa-eye"></i></button>
           ${canCancel?`<button class="btn btn-danger btn-xs" data-act="cancel" data-id="${i.id}"><i class="fas fa-times"></i></button>`:''}
@@ -1999,6 +2007,20 @@ const MutasiView = {
     if(!data){showToast('Tidak ditemukan','error');return;}
     const sm={diajukan:'Diajukan',disetujui:'Disetujui',berlaku:'Berlaku',ditolak:'Ditolak'};
     const jm={antar_lembaga:'Antar Lembaga',antar_kecamatan:'Antar Kecamatan',pensiun:'Pensiun',berhenti:'Berhenti',meninggal:'Meninggal'};
+    // ✅ Deteksi apakah jenis ini butuh tujuan
+    const butuhTujuan = !MUTASI_TANPA_TUJUAN.includes(data.jenis_mutasi);
+    // ✅ HTML untuk card Tujuan
+    const tujuanCardHTML = butuhTujuan 
+      ? `<div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #0d47a1;">
+           <div style="font-size:.7rem;">Tujuan</div>
+           <div>${data.ke_lembaga?.nama||'-'}</div>
+           <div style="font-size:.7rem;color:#888;">${data.ke_lembaga?.jenis_lembaga||''}</div>
+         </div>`
+      : `<div style="background:#fff3e0;padding:10px 14px;border-radius:8px;border-left:3px solid #e65100;">
+           <div style="font-size:.7rem;">Tujuan</div>
+           <div style="font-style:italic;color:#999;">— Tidak ada lembaga tujuan —</div>
+           <div style="font-size:.7rem;color:#888;">Jenis: ${jm[data.jenis_mutasi]||data.jenis_mutasi}</div>
+         </div>`;
     $('modalContainer').innerHTML=`<div class="modal-overlay active" id="detailModal2"><div class="modal-container" style="max-width:650px;">
       <div class="modal-header"><h2><i class="fas fa-exchange-alt"></i> Detail Mutasi</h2><button class="close-btn" data-close><i class="fas fa-times"></i></button></div>
       <div class="modal-body">
@@ -2017,11 +2039,7 @@ const MutasiView = {
             <div>${data.dari_lembaga?.nama||'-'}</div>
             <div style="font-size:.7rem;color:#888;">${data.dari_lembaga?.jenis_lembaga||''}</div>
           </div>
-          <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #0d47a1;">
-            <div style="font-size:.7rem;">Tujuan</div>
-            <div>${data.ke_lembaga?.nama||'-'}</div>
-            <div style="font-size:.7rem;color:#888;">${data.ke_lembaga?.jenis_lembaga||''}</div>
-          </div>
+          ${tujuanCardHTML}
           <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:.7rem;">Jenis</div><div>${jm[data.jenis_mutasi]||data.jenis_mutasi}</div></div>
           <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:.7rem;">Tanggal</div><div>${formatTanggal(data.tanggal_mutasi)}</div></div>
           <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:.7rem;">Alasan</div><div>${data.alasan_mutasi||'-'}</div></div>
@@ -2051,7 +2069,7 @@ const MutasiView = {
   }
 };
 
-/* ---------- Mutasi Modal ---------- */
+/* ---------- Mutasi Modal (FIXED) ---------- */
 const MutasiModal = {
   _state:{selectedPendidik:null,asalId:''},
   _close(){const m=$('mutasiModal2');if(m)m.remove();},
@@ -2078,16 +2096,28 @@ const MutasiModal = {
           <input type="text" id="mLembagaAsal" readonly placeholder="Pilih pendidik dulu" style="background:#f5f5f5;cursor:not-allowed;">
           <input type="hidden" id="mAsalId">
         </div>
-        <div class="form-group"><label>Tujuan <span style="color:red;">*</span></label>
+        <!-- ✅ Field Tujuan: dibungkus #tujuanGroup untuk dynamic show/hide -->
+        <div class="form-group" id="tujuanGroup">
+          <label>Tujuan <span style="color:red;" id="tujuanRequiredMark">*</span></label>
           <div class="searchable-select-wrapper" id="tsWrap">
             <input type="text" id="tujuanSearchInput" placeholder="Cari lembaga tujuan..." autocomplete="off">
             <div class="dropdown-list" id="tujuanDropdown"></div>
             <input type="hidden" id="mTujuanId">
           </div>
-          <div style="font-size:.7rem;color:#888;margin-top:4px;"><i class="fas fa-info-circle"></i> Dapat memilih lintas jenis lembaga (LPQ ↔ MDT ↔ PONPES)</div>
+          <div style="font-size:.7rem;color:#888;margin-top:4px;" id="tujuanHint">
+            <i class="fas fa-info-circle"></i> Dapat memilih lintas jenis lembaga (LPQ ↔ MDT ↔ PONPES)
+          </div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Jenis <span style="color:red;">*</span></label><select id="mJenis"><option value="antar_lembaga">Antar Lembaga</option><option value="antar_kecamatan">Antar Kecamatan</option><option value="pensiun">Pensiun</option><option value="berhenti">Berhenti</option><option value="meninggal">Meninggal</option></select></div>
+          <div class="form-group"><label>Jenis <span style="color:red;">*</span></label>
+            <select id="mJenis">
+              <option value="antar_lembaga">Antar Lembaga</option>
+              <option value="antar_kecamatan">Antar Kecamatan</option>
+              <option value="pensiun">Pensiun</option>
+              <option value="berhenti">Berhenti</option>
+              <option value="meninggal">Meninggal</option>
+            </select>
+          </div>
           <div class="form-group"><label>Tanggal <span style="color:red;">*</span></label><input type="date" id="mTanggal" value="${new Date().toISOString().split('T')[0]}"></div>
         </div>
         <div class="form-group"><label>Alasan <span style="color:red;">*</span></label>
@@ -2120,12 +2150,42 @@ const MutasiModal = {
     $('tujuanSearchInput').addEventListener('input',e=>this._renderTujuan(e.target.value));
     $('tujuanSearchInput').addEventListener('focus',e=>this._renderTujuan(e.target.value));
     $('mAlasan').addEventListener('change',()=>this._toggleAlasan());
+    $('mJenis').addEventListener('change',()=>this._toggleTujuan()); // ✅ listener baru
     $('mSave').addEventListener('click',()=>this._save(view));
     document.addEventListener('click',this._docClick=this._docClick.bind(this));
+    this._toggleTujuan(); // ✅ initial state
   },
   _docClick(e){
     if(!e.target.closest('#psWrap')) $('pendidikDropdown')?.classList.remove('open');
     if(!e.target.closest('#tsWrap')) $('tujuanDropdown')?.classList.remove('open');
+  },
+  // ✅ Toggle field Tujuan sesuai jenis mutasi
+  _toggleTujuan(){
+    const jenis = $('mJenis').value;
+    const butuh = !MUTASI_TANPA_TUJUAN.includes(jenis);
+    const group = $('tujuanGroup');
+    const input = $('tujuanSearchInput');
+    const hidden = $('mTujuanId');
+    const mark = $('tujuanRequiredMark');
+    const hint = $('tujuanHint');
+    if(!group) return;
+    if(!butuh){
+      group.style.opacity = '0.5';
+      input.disabled = true;
+      input.value = '';
+      input.placeholder = 'Tidak diperlukan untuk jenis ini';
+      hidden.value = '';
+      if(mark) mark.style.display = 'none';
+      hint.innerHTML = '<i class="fas fa-info-circle" style="color:#FF9800;"></i> Tidak perlu lembaga tujuan untuk jenis ini';
+      hint.style.color = '#e65100';
+    } else {
+      group.style.opacity = '1';
+      input.disabled = false;
+      input.placeholder = 'Cari lembaga tujuan...';
+      if(mark) mark.style.display = 'inline';
+      hint.innerHTML = '<i class="fas fa-info-circle"></i> Dapat memilih lintas jenis lembaga (LPQ ↔ MDT ↔ PONPES)';
+      hint.style.color = '#888';
+    }
   },
   _renderPendidik(filter=''){
     const dd=$('pendidikDropdown');if(!dd) return;
@@ -2183,79 +2243,89 @@ const MutasiModal = {
     if(v==='lainnya') g.classList.add('visible');
     else{g.classList.remove('visible');$('mAlasanLain').value='';}
   },
-async _generateNomorMutasi(){
-  const n=new Date();
-  const y=n.getFullYear();
-  const m=String(n.getMonth()+1).padStart(2,'0');
-  const prefix=`MUT/${y}/${m}/`;
-  const {data}=await supabaseClient
-    .from('mutasi')
-    .select('nomor_mutasi')
-    .like('nomor_mutasi',`${prefix}%`)
-    .order('nomor_mutasi',{ascending:false})
-    .limit(1);
-  let seq=1;
-  if(data&&data.length){
-    const last=data[0].nomor_mutasi||'';
-    const match=last.match(/\/(\d+)\s*$/);
-    if(match) seq=parseInt(match[1],10)+1;
-  }
-  return `${prefix}${String(seq).padStart(3,'0')}`;
-},
-
-async _save(view){
-  const pid=$('mPid').value, did=$('mAsalId').value, kid=$('mTujuanId').value;
-  const jenis=$('mJenis').value, tgl=$('mTanggal').value, alasanSel=$('mAlasan').value;
-  const alasanLain=$('mAlasanLain').value.trim(), ket=$('mKet').value.trim();
-  if(!pid||!did||!kid||!tgl||!alasanSel){showToast('Semua field wajib diisi!','error');return;}
-  if(did===kid){showToast('Asal dan tujuan tidak boleh sama!','error');return;}
-  if(alasanSel==='lainnya'&&!alasanLain){showToast('Isi alasan lainnya!','error');return;}
-  const alasan=alasanSel==='lainnya'?alasanLain:alasanSel;
-  const btn=$('mSave');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Mengirim...';
-
-  const baseData={
-    pendidik_id:pid,dari_lembaga_id:did,ke_lembaga_id:kid,
-    jenis_mutasi:jenis,tanggal_mutasi:tgl,alasan_mutasi:alasan,keterangan:ket,
-    status:'diajukan',diajukan_oleh:App.user.id,
-    updated_at:new Date().toISOString()
-  };
-
-  let lastErr=null;
-  // Retry maks 5x untuk handle race condition (2 user simpan bersamaan)
-  for(let attempt=0;attempt<5;attempt++){
-    try{
-      const nomor=await this._generateNomorMutasi();
-      const {error}=await supabaseClient.from('mutasi').insert([{
-        ...baseData, nomor_mutasi:nomor,
-        created_at:new Date().toISOString()
-      }]);
-      if(error){
-        // Jika duplicate key → coba nomor berikutnya
-        if(/duplicate|unique|23505/i.test(error.message||'')){
-          lastErr=error;
-          await new Promise(r=>setTimeout(r,150)); // jeda kecil sebelum retry
-          continue;
-        }
-        throw error;
-      }
-      // Sukses
-      App.cache.clear();
-      showToast('Pengajuan berhasil dikirim!','success');
-      this._close();
-      view.load();
-      btn.disabled=false;
-      btn.innerHTML='<i class="fas fa-paper-plane"></i> Ajukan';
-      return;
-    }catch(e){
-      lastErr=e;
+  async _generateNomorMutasi(){
+    const n=new Date();
+    const y=n.getFullYear();
+    const m=String(n.getMonth()+1).padStart(2,'0');
+    const prefix=`MUT/${y}/${m}/`;
+    const {data}=await supabaseClient
+      .from('mutasi')
+      .select('nomor_mutasi')
+      .like('nomor_mutasi',`${prefix}%`)
+      .order('nomor_mutasi',{ascending:false})
+      .limit(1);
+    let seq=1;
+    if(data&&data.length){
+      const last=data[0].nomor_mutasi||'';
+      const match=last.match(/\/(\d+)\s*$/);
+      if(match) seq=parseInt(match[1],10)+1;
     }
+    return `${prefix}${String(seq).padStart(3,'0')}`;
+  },
+  async _save(view){
+    const pid=$('mPid').value, did=$('mAsalId').value, kid=$('mTujuanId').value;
+    const jenis=$('mJenis').value, tgl=$('mTanggal').value, alasanSel=$('mAlasan').value;
+    const alasanLain=$('mAlasanLain').value.trim(), ket=$('mKet').value.trim();
+    // ✅ Deteksi apakah jenis ini butuh tujuan
+    const butuhTujuan = !MUTASI_TANPA_TUJUAN.includes(jenis);
+    // ✅ Validasi: tujuan hanya wajib kalau butuhTujuan
+    if(!pid||!did||!tgl||!alasanSel){
+      showToast('Field wajib belum lengkap!','error');return;
+    }
+    if(butuhTujuan && !kid){
+      showToast('Lembaga tujuan wajib dipilih!','error');return;
+    }
+    if(butuhTujuan && did===kid){
+      showToast('Asal dan tujuan tidak boleh sama!','error');return;
+    }
+    if(alasanSel==='lainnya'&&!alasanLain){
+      showToast('Isi alasan lainnya!','error');return;
+    }
+    const alasan=alasanSel==='lainnya'?alasanLain:alasanSel;
+    const btn=$('mSave');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+    const baseData={
+      pendidik_id:pid,
+      dari_lembaga_id:did,
+      ke_lembaga_id: butuhTujuan ? kid : null, // ✅ null kalau tanpa tujuan
+      jenis_mutasi:jenis,
+      tanggal_mutasi:tgl,
+      alasan_mutasi:alasan,
+      keterangan:ket,
+      status:'diajukan',
+      diajukan_oleh:App.user.id,
+      updated_at:new Date().toISOString()
+    };
+    let lastErr=null;
+    for(let attempt=0;attempt<5;attempt++){
+      try{
+        const nomor=await this._generateNomorMutasi();
+        const {error}=await supabaseClient.from('mutasi').insert([{
+          ...baseData, nomor_mutasi:nomor,
+          created_at:new Date().toISOString()
+        }]);
+        if(error){
+          if(/duplicate|unique|23505/i.test(error.message||'')){
+            lastErr=error;
+            await new Promise(r=>setTimeout(r,150));
+            continue;
+          }
+          throw error;
+        }
+        App.cache.clear();
+        showToast('Pengajuan berhasil dikirim!','success');
+        this._close();
+        view.load();
+        btn.disabled=false;
+        btn.innerHTML='<i class="fas fa-paper-plane"></i> Ajukan';
+        return;
+      }catch(e){
+        lastErr=e;
+      }
+    }
+    showToast('Gagal: '+(lastErr?.message||'Tidak dapat generate nomor unik'),'error');
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-paper-plane"></i> Ajukan';
   }
-
-  // Kalau semua percobaan gagal
-  showToast('Gagal: '+(lastErr?.message||'Tidak dapat generate nomor unik'),'error');
-  btn.disabled=false;
-  btn.innerHTML='<i class="fas fa-paper-plane"></i> Ajukan';
-}
 };
 
 /* ====================================================================
