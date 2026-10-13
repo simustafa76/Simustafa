@@ -256,6 +256,7 @@
 
     <div class="modal-overlay" id="filterModal"><div class="modal-container" style="max-width:500px;"><div class="modal-header"><h2><i class="fas fa-sliders-h"></i> Filter</h2><button class="close-btn" onclick="closeFilterModal()"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="form-group"><label>Status</label><select id="filterStatus" onchange="applyFilterFromModal()"><option value="all">Semua</option><option value="diajukan">Diajukan</option><option value="disetujui">Disetujui</option><option value="berlaku">Berlaku</option><option value="ditolak">Ditolak</option></select></div><div class="form-group"><label>Jenis Mutasi</label><select id="filterJenis" onchange="applyFilterFromModal()"><option value="all">Semua</option><option value="antar_lembaga">Antar Lembaga</option><option value="antar_kecamatan">Antar Kecamatan</option><option value="pensiun">Pensiun</option><option value="berhenti">Berhenti</option><option value="meninggal">Meninggal</option></select></div><div class="form-group"><label>Tanggal</label><input type="date" id="filterTanggal" onchange="applyFilterFromModal()"></div><div style="display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:2px solid #f0f2f5;"><button class="btn btn-outline" onclick="resetFilterModal()" style="flex:1;"><i class="fas fa-undo"></i> Reset</button><button class="btn btn-primary" onclick="applyFilterFromModal()" style="flex:1;"><i class="fas fa-check"></i> Terapkan</button></div></div></div></div>
 
+    <!-- ========== MODAL TAMBAH/EDIT ========== -->
     <div class="modal-overlay" id="mutasiModal"><div class="modal-container"><div class="modal-header"><h2 id="modalTitle">Tambah Mutasi</h2><button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button></div><div class="modal-body">
         <input type="hidden" id="editId">
         
@@ -281,19 +282,23 @@
             <input type="hidden" id="editLembagaAsalId">
         </div>
 
-        <div class="form-group">
-            <label>Tujuan <span style="color:red;">*</span></label>
+        <!-- ✅ Field Tujuan: dibungkus #tujuanFormGroup untuk toggle -->
+        <div class="form-group" id="tujuanFormGroup">
+            <label>Tujuan <span style="color:red;" id="tujuanRequiredMark">*</span></label>
             <div class="searchable-select-wrapper" id="tujuanSelectWrapper">
                 <input type="text" id="tujuanSearchInput" placeholder="Cari lembaga tujuan..." autocomplete="off">
                 <div class="dropdown-list" id="tujuanDropdown"><div class="dropdown-loading">Memuat data...</div></div>
                 <input type="hidden" id="editLembagaTujuanId">
+            </div>
+            <div id="tujuanHint" style="font-size:0.7rem;color:#888;margin-top:4px;">
+                <i class="fas fa-info-circle"></i> Lintas jenis lembaga (LPQ ↔ MDT ↔ PONPES)
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group">
                 <label>Jenis Mutasi <span style="color:red;">*</span></label>
-                <select id="editJenisMutasi">
+                <select id="editJenisMutasi" onchange="toggleTujuan()">
                     <option value="antar_lembaga">Antar Lembaga</option>
                     <option value="antar_kecamatan">Antar Kecamatan</option>
                     <option value="pensiun">Pensiun</option>
@@ -354,6 +359,13 @@
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
     <script>
+        // ============================================================
+        // ===== KONSTANTA GLOBAL =====
+        // ============================================================
+        // ✅ Jenis mutasi yang TIDAK butuh lembaga tujuan
+        const MUTASI_TANPA_TUJUAN = ['pensiun', 'meninggal', 'berhenti'];
+        function butuhTujuan(jenis) { return !MUTASI_TANPA_TUJUAN.includes(jenis); }
+
         // ============================================================
         // ===== CACHE MANAGER =====
         // ============================================================
@@ -440,6 +452,47 @@
         }
 
         // ============================================================
+        // ===== TOGGLE FUNCTIONS =====
+        // ============================================================
+        function toggleAlasanLainnya() {
+            const s = document.getElementById('editAlasan'), g = document.getElementById('alasanLainnyaGroup');
+            if (s.value === 'lainnya') { g.classList.add('visible'); document.getElementById('editAlasanLainnya').required = true }
+            else { g.classList.remove('visible'); document.getElementById('editAlasanLainnya').required = false; document.getElementById('editAlasanLainnya').value = '' }
+        }
+
+        // ✅ Toggle field Tujuan sesuai jenis mutasi
+        function toggleTujuan() {
+            const jenisEl = document.getElementById('editJenisMutasi');
+            if (!jenisEl) return;
+            const jenis = jenisEl.value;
+            const butuh = butuhTujuan(jenis);
+            const group = document.getElementById('tujuanFormGroup');
+            const input = document.getElementById('tujuanSearchInput');
+            const hidden = document.getElementById('editLembagaTujuanId');
+            const mark = document.getElementById('tujuanRequiredMark');
+            const hint = document.getElementById('tujuanHint');
+            if (!group) return;
+            if (!butuh) {
+                group.style.opacity = '0.5';
+                input.disabled = true;
+                input.value = '';
+                input.placeholder = 'Tidak diperlukan untuk jenis ini';
+                hidden.value = '';
+                if (mark) mark.style.display = 'none';
+                hint.innerHTML = '<i class="fas fa-info-circle" style="color:#FF9800;"></i> Tidak perlu lembaga tujuan untuk jenis ini';
+                hint.style.color = '#e65100';
+                document.getElementById('tujuanDropdown').classList.remove('open');
+            } else {
+                group.style.opacity = '1';
+                input.disabled = false;
+                input.placeholder = 'Cari lembaga tujuan...';
+                if (mark) mark.style.display = 'inline';
+                hint.innerHTML = '<i class="fas fa-info-circle"></i> Lintas jenis lembaga (LPQ ↔ MDT ↔ PONPES)';
+                hint.style.color = '#888';
+            }
+        }
+
+        // ============================================================
         // ===== SEARCHABLE SELECT =====
         // ============================================================
         async function loadPendidikDropdown(page = 1, search = '') {
@@ -484,6 +537,15 @@
         function changePendidikPage(delta) { const newPage = pendidikPage + delta; const totalPages = Math.ceil(pendidikTotal / pendidikPageSize); if (newPage < 1 || newPage > totalPages) return; loadPendidikDropdown(newPage, pendidikSearch); }
 
         async function loadTujuanDropdown(page = 1, search = '') {
+            const jenisEl = document.getElementById('editJenisMutasi');
+            const jenis = jenisEl?.value;
+            // ✅ Skip load kalau jenis tidak butuh tujuan
+            if (jenis && !butuhTujuan(jenis)) {
+                const dropdown = document.getElementById('tujuanDropdown');
+                dropdown.innerHTML = '<div class="no-result">Tidak diperlukan untuk jenis ini</div>';
+                dropdown.classList.remove('open');
+                return;
+            }
             const dropdown = document.getElementById('tujuanDropdown');
             const asalId = document.getElementById('editLembagaAsalId').value;
             dropdown.innerHTML = `<div class="dropdown-loading"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>`;
@@ -546,7 +608,10 @@
                     document.getElementById('tujuanSearchInput').value = '';
                     tujuanPage = 1;
                     tujuanSearch = '';
-                    loadTujuanDropdown(1, '');
+                    // ✅ Hanya load dropdown tujuan kalau memang butuh
+                    if (butuhTujuan(document.getElementById('editJenisMutasi').value)) {
+                        loadTujuanDropdown(1, '');
+                    }
                 }
             });
         }
@@ -590,12 +655,6 @@
                 allLembaga = data || [];
                 dataCache.set('lembaga_active', allLembaga);
             } catch (e) { console.error(e) }
-        }
-
-        function toggleAlasanLainnya() {
-            const s = document.getElementById('editAlasan'), g = document.getElementById('alasanLainnyaGroup');
-            if (s.value === 'lainnya') { g.classList.add('visible'); document.getElementById('editAlasanLainnya').required = true }
-            else { g.classList.remove('visible'); document.getElementById('editAlasanLainnya').required = false; document.getElementById('editAlasanLainnya').value = '' }
         }
 
         // ============================================================
@@ -666,7 +725,6 @@
                 renderTable(filtered);
                 updatePagination();
                 updateSearchInfo(filtered.length);
-                // ✅ loadStats() TIDAK dipanggil di sini — dipanggil terpisah
                 document.getElementById('btnTambah').style.display = u?.role === 'operator' ? 'none' : 'inline-flex';
             } catch (e) {
                 console.error(e);
@@ -698,7 +756,11 @@
                 } else if (canApprove && i.status === 'disetujui') {
                     statusButtons = `<button class="btn btn-success btn-sm" onclick="event.stopPropagation();updateStatus('${i.id}','berlaku')" title="Berlakukan"><i class="fas fa-check-double"></i></button>`;
                 }
-                return `<tr onclick="viewDetail('${i.id}')" style="cursor:pointer;"><td>${start+n+1}</td><td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${highlightText(i.nomor_mutasi||'-', searchTerm)}</code></td><td><strong>${highlightText(i.pendidik?.nama_lengkap||'-', searchTerm)}</strong><br><small>${highlightText(i.pendidik?.nik||'', searchTerm)}</small></td><td>${highlightText(i.dari_lembaga?.nama||'-', searchTerm)}</td><td>${highlightText(i.ke_lembaga?.nama||'-', searchTerm)}</td><td><span class="badge ${c}">${j}</span></td><td>${formatTanggal(i.tanggal_mutasi)}</td><td><span class="badge ${s.class}">${s.label}</span></td><td style="min-width:120px;"><div style="display:flex;gap:4px;flex-wrap:wrap;">${statusButtons}<button class="btn btn-edit btn-sm" onclick="event.stopPropagation();editMutasi('${i.id}')" title="Edit" ${canEdit ? '' : 'disabled'}><i class="fas fa-edit"></i></button>${['super_admin','admin_kab'].includes(currentUser?.role)?`<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteMutasi('${i.id}')" title="Hapus"><i class="fas fa-trash"></i></button>`:''}</div></td></tr>`;
+                // ✅ Kolom Tujuan: tampil "—" kalau null
+                const tujuanHTML = i.ke_lembaga?.nama 
+                    ? highlightText(i.ke_lembaga.nama, searchTerm)
+                    : '<span style="color:#999;font-style:italic;">—</span>';
+                return `<tr onclick="viewDetail('${i.id}')" style="cursor:pointer;"><td>${start+n+1}</td><td><code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${highlightText(i.nomor_mutasi||'-', searchTerm)}</code></td><td><strong>${highlightText(i.pendidik?.nama_lengkap||'-', searchTerm)}</strong><br><small>${highlightText(i.pendidik?.nik||'', searchTerm)}</small></td><td>${highlightText(i.dari_lembaga?.nama||'-', searchTerm)}</td><td>${tujuanHTML}</td><td><span class="badge ${c}">${j}</span></td><td>${formatTanggal(i.tanggal_mutasi)}</td><td><span class="badge ${s.class}">${s.label}</span></td><td style="min-width:120px;"><div style="display:flex;gap:4px;flex-wrap:wrap;">${statusButtons}<button class="btn btn-edit btn-sm" onclick="event.stopPropagation();editMutasi('${i.id}')" title="Edit" ${canEdit ? '' : 'disabled'}><i class="fas fa-edit"></i></button>${['super_admin','admin_kab'].includes(currentUser?.role)?`<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteMutasi('${i.id}')" title="Hapus"><i class="fas fa-trash"></i></button>`:''}</div></td></tr>`;
             }).join('');
         }
 
@@ -708,7 +770,6 @@
         async function loadStats() {
             try {
                 const f = getRoleFilter();
-                // ✅ RPC hemat: hitung 5 status di server, bukan full scan
                 const { data, error } = await supabaseClient.rpc('get_mutasi_stats', {
                     p_kecamatan_id: f.kecamatan_id || null,
                     p_jenis_lembaga: f.jenis_lembaga || null
@@ -764,7 +825,9 @@
             isSaving = false;
             pendidikPage = 1; pendidikSearch = '';
             tujuanPage = 1; tujuanSearch = '';
-            loadPendidikOptions().then(() => { loadPendidikDropdown(1, ''); loadTujuanDropdown(1, ''); });
+            loadPendidikOptions().then(() => { loadPendidikDropdown(1, ''); });
+            // ✅ Set initial state field tujuan
+            toggleTujuan();
             document.getElementById('mutasiModal').classList.add('active');
         }
 
@@ -791,8 +854,11 @@
             const alasanLain = document.getElementById('editAlasanLainnya').value.trim();
             const ket = document.getElementById('editKeterangan').value.trim();
             const status = document.getElementById('editStatus').value;
-            if (!pid || !did || !kid || !tgl || !alasanSel) { showToast('Semua field wajib diisi!', 'error'); return }
-            if (did === kid) { showToast('Asal dan tujuan tidak boleh sama!', 'error'); return }
+            // ✅ Validasi conditional berdasarkan jenis
+            const butuh = butuhTujuan(jenis);
+            if (!pid || !did || !tgl || !alasanSel) { showToast('Field wajib belum lengkap!', 'error'); return }
+            if (butuh && !kid) { showToast('Lembaga tujuan wajib dipilih!', 'error'); return }
+            if (butuh && did === kid) { showToast('Asal dan tujuan tidak boleh sama!', 'error'); return }
             if (alasanSel === 'lainnya' && !alasanLain) { showToast('Isi alasan lainnya!', 'error'); return }
             const alasan = alasanSel === 'lainnya' ? alasanLain : alasanSel;
             const u = getUser();
@@ -801,7 +867,17 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             const now = new Date().toISOString();
-            const d = { pendidik_id: pid, dari_lembaga_id: did, ke_lembaga_id: kid, jenis_mutasi: jenis, tanggal_mutasi: tgl, alasan_mutasi: alasan, keterangan: ket || null, status: status, updated_at: now };
+            const d = {
+                pendidik_id: pid,
+                dari_lembaga_id: did,
+                ke_lembaga_id: butuh ? kid : null, // ✅ null kalau tanpa tujuan
+                jenis_mutasi: jenis,
+                tanggal_mutasi: tgl,
+                alasan_mutasi: alasan,
+                keterangan: ket || null,
+                status: status,
+                updated_at: now
+            };
             try {
                 let err;
                 if (id) {
@@ -834,8 +910,9 @@
                 // Jika status berlaku → update data pendidik
                 if (status === 'berlaku') {
                     const upData = { updated_at: now };
-                    if (['pensiun', 'berhenti', 'meninggal'].includes(jenis)) { upData.status_aktif = false; }
-                    else {
+                    if (MUTASI_TANPA_TUJUAN.includes(jenis)) {
+                        upData.status_aktif = false;
+                    } else {
                         upData.lembaga_id = kid;
                         const { data: lembagaTujuan } = await supabaseClient.from('lembaga').select('kecamatan_id').eq('id', kid).single();
                         if (lembagaTujuan?.kecamatan_id) upData.kecamatan_lembaga_id = lembagaTujuan.kecamatan_id;
@@ -876,21 +953,25 @@
                 if (error) throw error;
                 if (newStatus === 'berlaku') {
                     const upData = { updated_at: now };
-                    if (['pensiun', 'berhenti', 'meninggal'].includes(mutasi.jenis_mutasi)) {
+                    if (MUTASI_TANPA_TUJUAN.includes(mutasi.jenis_mutasi)) {
                         upData.status_aktif = false;
                         showToast(`Pendidik ${mutasi.pendidik?.nama_lengkap || ''} dinonaktifkan (${mutasi.jenis_mutasi})`, 'info');
-                    } else {
+                    } else if (mutasi.ke_lembaga_id) {
+                        // ✅ Guard: pastikan ke_lembaga_id ada sebelum update
                         upData.lembaga_id = mutasi.ke_lembaga_id;
                         const { data: lembagaTujuan } = await supabaseClient.from('lembaga').select('kecamatan_id').eq('id', mutasi.ke_lembaga_id).single();
                         if (lembagaTujuan?.kecamatan_id) upData.kecamatan_lembaga_id = lembagaTujuan.kecamatan_id;
                         showToast(`Pendidik ${mutasi.pendidik?.nama_lengkap || ''} dipindahkan ke lembaga tujuan`, 'success');
+                    } else {
+                        showToast('⚠️ Jenis mutasi butuh lembaga tujuan, tapi data kosong. Hubungi admin.', 'error');
+                        return;
                     }
                     const { error: updatePendidikError } = await supabaseClient.from('pendidik').update(upData).eq('id', mutasi.pendidik_id);
                     if (updatePendidikError) {
                         console.error('Error updating pendidik:', updatePendidikError);
                         showToast('Status berhasil diubah, tapi gagal update data pendidik: ' + updatePendidikError.message, 'warning');
-                    } else {
-                        showToast(`Status berhasil diubah menjadi ${statusLabels[newStatus] || newStatus}! Data pendidik sudah terupdate.`, 'success');
+                    } else if (MUTASI_TANPA_TUJUAN.includes(mutasi.jenis_mutasi)) {
+                        showToast(`Status berhasil diubah menjadi Berlaku! Pendidik sudah dinonaktifkan.`, 'success');
                     }
                 } else {
                     showToast(`Status berhasil diubah menjadi ${statusLabels[newStatus] || newStatus}!`, 'success');
@@ -916,7 +997,7 @@
                 document.getElementById('editId').value = data.id;
                 document.getElementById('editPendidikId').value = data.pendidik_id;
                 document.getElementById('editLembagaAsalId').value = data.dari_lembaga_id;
-                document.getElementById('editLembagaTujuanId').value = data.ke_lembaga_id;
+                document.getElementById('editLembagaTujuanId').value = data.ke_lembaga_id || '';
                 document.getElementById('editJenisMutasi').value = data.jenis_mutasi;
                 document.getElementById('editTanggal').value = data.tanggal_mutasi;
                 document.getElementById('editStatus').value = data.status;
@@ -936,18 +1017,28 @@
                     document.getElementById('selectedInfo').style.display = 'block';
                     document.getElementById('selectedNama').textContent = pendidik.nama_lengkap;
                     document.getElementById('selectedNik').textContent = 'NIK: ' + pendidik.nik;
+                    document.getElementById('pendidikSearchInput').value = pendidik.nama_lengkap + ' (' + pendidik.nik + ')';
                     if (pendidik.lembaga) {
                         document.getElementById('editLembagaAsal').value = pendidik.lembaga.nama + ' (' + pendidik.lembaga.jenis_lembaga + ')';
                         document.getElementById('selectedLembagaAsal').textContent = 'Lembaga: ' + pendidik.lembaga.nama;
                     }
                 }
-                const { data: tujuan } = await supabaseClient.from('lembaga').select('id,nama,jenis_lembaga').eq('id', data.ke_lembaga_id).single();
-                if (tujuan) { document.getElementById('tujuanSearchInput').value = tujuan.nama; }
+                // ✅ Handle null tujuan (pensiun/meninggal/berhenti)
+                const butuh = butuhTujuan(data.jenis_mutasi);
+                if (butuh && data.ke_lembaga_id) {
+                    const { data: tujuan } = await supabaseClient.from('lembaga').select('id,nama,jenis_lembaga').eq('id', data.ke_lembaga_id).maybeSingle();
+                    if (tujuan) { document.getElementById('tujuanSearchInput').value = tujuan.nama; }
+                } else {
+                    document.getElementById('editLembagaTujuanId').value = '';
+                    document.getElementById('tujuanSearchInput').value = '';
+                }
                 pendidikPage = 1; pendidikSearch = '';
                 tujuanPage = 1; tujuanSearch = '';
                 await loadPendidikOptions();
                 loadPendidikDropdown(1, '');
-                loadTujuanDropdown(1, '');
+                // ✅ Toggle dulu sebelum load dropdown tujuan
+                toggleTujuan();
+                if (butuh) loadTujuanDropdown(1, '');
                 document.getElementById('btnSaveMutasi').disabled = false;
                 document.getElementById('btnSaveMutasi').innerHTML = '<i class="fas fa-save"></i> Update';
                 isSaving = false;
@@ -973,12 +1064,16 @@
                 if (!data) { showToast('Data tidak ditemukan', 'error'); return }
                 const sm = { diajukan: 'Diajukan', disetujui: 'Disetujui', berlaku: 'Berlaku', ditolak: 'Ditolak' },
                     jm = { antar_lembaga: 'Antar Lembaga', antar_kecamatan: 'Antar Kecamatan', pensiun: 'Pensiun', berhenti: 'Berhenti', meninggal: 'Meninggal' };
+                // ✅ Card Tujuan conditional
+                const tujuanCardHTML = data.ke_lembaga?.nama
+                    ? `<div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #0d47a1;"><div style="font-size:0.7rem;color:#888;">Tujuan</div><div style="font-weight:600;">${data.ke_lembaga.nama}</div><div style="font-size:0.7rem;color:#888;">${data.ke_lembaga.jenis_lembaga||''}</div></div>`
+                    : `<div style="background:#fff3e0;padding:10px 14px;border-radius:8px;border-left:3px solid #e65100;"><div style="font-size:0.7rem;color:#888;">Tujuan</div><div style="font-style:italic;color:#999;">— Tidak ada lembaga tujuan —</div><div style="font-size:0.7rem;color:#888;">Jenis: ${jm[data.jenis_mutasi]||data.jenis_mutasi}</div></div>`;
                 document.getElementById('detailBody').innerHTML = `
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                         <div style="grid-column:1/-1;background:#e8f5e9;padding:12px 16px;border-radius:8px;border-left:4px solid #2e7d32;"><div style="font-size:0.7rem;color:#888;">Nomor Mutasi</div><div style="font-weight:700;font-size:1.1rem;">${data.nomor_mutasi||'-'}</div></div>
                         <div style="grid-column:1/-1;background:#f8faf8;padding:12px 16px;border-radius:8px;"><div style="font-size:0.7rem;color:#888;">Pendidik</div><div style="font-weight:600;">${data.pendidik?.nama_lengkap||'-'}</div><div style="font-size:0.8rem;color:#888;">NIK: ${data.pendidik?.nik||'-'}</div></div>
                         <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #e65100;"><div style="font-size:0.7rem;color:#888;">Asal</div><div style="font-weight:600;">${data.dari_lembaga?.nama||'-'}</div><div style="font-size:0.7rem;color:#888;">${data.dari_lembaga?.jenis_lembaga||''}</div></div>
-                        <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;border-left:3px solid #0d47a1;"><div style="font-size:0.7rem;color:#888;">Tujuan</div><div style="font-weight:600;">${data.ke_lembaga?.nama||'-'}</div><div style="font-size:0.7rem;color:#888;">${data.ke_lembaga?.jenis_lembaga||''}</div></div>
+                        ${tujuanCardHTML}
                         <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:0.7rem;">Jenis</div><div>${jm[data.jenis_mutasi]||data.jenis_mutasi}</div></div>
                         <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:0.7rem;">Tanggal</div><div>${formatTanggal(data.tanggal_mutasi)}</div></div>
                         <div style="background:#f8faf8;padding:10px 14px;border-radius:8px;"><div style="font-size:0.7rem;">Alasan</div><div>${data.alasan_mutasi||'-'}</div></div>
@@ -1051,6 +1146,9 @@
                 tujuanSearchTimeout = setTimeout(() => { tujuanPage = 1; loadTujuanDropdown(1, val); }, 300);
             });
             document.getElementById('tujuanSearchInput').addEventListener('focus', function() {
+                // ✅ Skip kalau jenis tidak butuh tujuan
+                const jenis = document.getElementById('editJenisMutasi').value;
+                if (!butuhTujuan(jenis)) return;
                 if (!this.value) { loadTujuanDropdown(1, ''); }
                 const dropdown = document.getElementById('tujuanDropdown');
                 if (dropdown.innerHTML.includes('Memuat')) { loadTujuanDropdown(tujuanPage, this.value); }
@@ -1090,6 +1188,8 @@
         window.resetFilterModal = resetFilterModal;
         window.updateFilterBadge = updateFilterBadge;
         window.toggleAlasanLainnya = toggleAlasanLainnya;
+        window.toggleTujuan = toggleTujuan;
+        window.butuhTujuan = butuhTujuan;
         window.clearSearch = clearSearch;
         window.updateSearchInfo = updateSearchInfo;
         window.highlightText = highlightText;
